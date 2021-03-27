@@ -1,7 +1,7 @@
 {
   "name": "server",
   "version": "1.0.0",
-  "description": "Groep 2",
+  "description": "CTF",
   "main": "dist/server.js",
   "scripts": {
     "server_with_auto_reload_files": "nodemon dist/server.js",
@@ -14,7 +14,7 @@
     "type": "git",
     "url": "git+https://github.com/INF-Vakken-PSOPV-20-21/inf-psopv-20-21-team-groep-2.git"
   },
-  "author": "",
+  "author": "Singh",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/INF-Vakken-PSOPV-20-21/inf-psopv-20-21-team-groep-2/issues"
