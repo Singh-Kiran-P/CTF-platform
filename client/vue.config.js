@@ -8,11 +8,11 @@ module.exports = {
           changeOrigin: true,
           logLevel: "debug",
           pathRewrite: {
-            "^/api": "/"
-          }
+            "^/api": "/",
+          },
         },
       },
-      port: process.env.SERVER_PORT
+      port: process.env.SERVER_PORT,
     },
   },
 };
