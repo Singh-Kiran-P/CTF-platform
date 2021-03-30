@@ -16,12 +16,6 @@ cd client
 # Install all dependencies for Vue
 npm install
 
-# Create .env file:
-NODE_ENV=development
-SERVER_PORT=80
-API_SERVER=3000
-
-
 # Start Vue framework
 npm run serve
 ```
@@ -32,10 +26,6 @@ cd server
 
 # Install all dependencies for the REST API
 npm install
-
-# Create .env file:
-NODE_ENV=development
-SERVER_PORT=3000
 
 # Start backend server
 npm run server_dev
