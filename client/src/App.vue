@@ -9,7 +9,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import PageBar from './PageBar.vue';
+import PageBar from './components/PageBar.vue';
 
 export default Vue.extend({
     name: 'App',
