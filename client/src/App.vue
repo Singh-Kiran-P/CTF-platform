@@ -1,35 +1,59 @@
 <template>
-  <div id="app">
-    <NavBar></NavBar>
-    <b-container fluid>
-      <router-view />
-    </b-container>
-  </div>
+    <div id="app">
+        <PageBar/>
+        <div id="page">
+            <router-view/>
+        </div>
+    </div>
 </template>
 
-<script>
-import NavBar from '@/components/NavBar.vue';
+<script lang="ts">
+import Vue from 'vue';
+import PageBar from './PageBar.vue';
 
-export default {
-  metaInfo: {
-    title: 'App',
-    titleTemplate: '%s | Frontend',
-    meta: []
-  },
-  components: {
-    NavBar,
-  },
-
-};
+export default Vue.extend({
+    name: 'App',
+    components: {
+        PageBar
+    }
+});
 </script>
 
 <style lang="scss">
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  color: #2c3e50;
+@import 'assets/css/custom.css';
+
+html, body, #app {
+    width: 100%;
+    height: 100%;
+    font-family: Avenir, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
-@import 'assets/css/custom.css';
+#app {
+    display: flex;
+    flex-direction: column;
+}
+
+#pageBar, #page {
+    width: 100%;
+}
+
+#page {
+    height: 100%;
+    display: flex;
+    flex-shrink: 1;
+    overflow: auto;
+}
+
+#page > iframe, #page > div {
+    width: 100%;
+    max-width: 100%;
+    min-height: 100%;
+    overflow: auto;
+}
+
+#page > iframe {
+    border: none;
+}
 </style>

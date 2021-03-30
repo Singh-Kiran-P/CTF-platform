@@ -3,10 +3,10 @@
 ## Node.js (REST API) + Vue.js(Frontend) + PostgreSQL
 
 - API
-  - Node.js, Express, Socket.io
+    - Node.js, Express, Socket.io
 
 - Frontend - Vue.js
-  - Vue.js, Vuex, Vue Router, BootstrapVue
+    - Vue.js, Vue Router, BootstrapVue
 
 ## Setup for development
 Client side

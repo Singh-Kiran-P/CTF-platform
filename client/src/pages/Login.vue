@@ -1,0 +1,23 @@
+<template>
+    <div class="login">
+        <span>This is the login page</span>
+    </div>
+</template>
+
+<script lang="ts">
+import Vue from 'vue';
+
+export default Vue.extend({
+    name: 'Login'
+});
+</script>
+
+<style scoped>
+.login {
+    border-left: 50px solid red;
+}
+
+span {
+    text-decoration: underline;
+}
+</style>
