@@ -12,6 +12,11 @@ const pages: { [page: string]: Route } = {
         name: 'Login',
         src: 'Login.vue'
     },
+    register: {
+        path: '/register',
+        name: 'Register',
+        src: 'Register.vue'
+    },
     leaderboard: {
         path: '/leaderboard',
         name: 'Leaderboard',
@@ -44,7 +49,8 @@ const uploadedPages: Array<Route> = [
 // define which pages are available to which user type (excluding uploaded pages)
 const routes: { [page: string]: Array<Route> } = {
     visitor: [
-        pages.login
+        pages.login,
+        pages.register
     ],
     participant: [
         pages.leaderboard,
@@ -58,7 +64,7 @@ const routes: { [page: string]: Array<Route> } = {
 };
 
 // TODO: choose available routes based on user type (visitor, participant or organizer)
-const availableRoutes: Array<Route> = routes.organizer;
+const availableRoutes: Array<Route> = routes.visitor;
 
 // PageNotFound shown when no page matches the url
 availableRoutes.push({
