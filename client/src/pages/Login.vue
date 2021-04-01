@@ -13,10 +13,8 @@ export default Vue.extend({
 </script>
 
 <style scoped>
-* {
-    margin: 1rem;
-}
 .login {
+    padding: 1rem;
     border-left: 50px solid red;
 }
 
