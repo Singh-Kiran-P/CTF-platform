@@ -1,18 +1,21 @@
 <template>
     <div class="login">
-        <span>This is the login page</span>
+        <span>login form</span>
     </div>
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
+import Vue from "vue";
 
 export default Vue.extend({
-    name: 'Login'
+    name: "Login"
 });
 </script>
 
 <style scoped>
+* {
+    margin: 1rem;
+}
 .login {
     border-left: 50px solid red;
 }
