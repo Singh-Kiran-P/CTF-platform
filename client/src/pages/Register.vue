@@ -56,7 +56,7 @@ export default Vue.extend({
             { text: "BAC1", value: 1 },
             { text: "BAC2", value: 2 },
             { text: "BAC3", value: 3 },
-            { text: "MASTER", value: 4 }               
+            { text: "MASTER", value: 4 }
         ]
     }),
     methods: {
