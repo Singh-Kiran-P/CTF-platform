@@ -1,0 +1,17 @@
+{
+  "name": "docker_scripts",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "make": "node make-challege-image.js",
+    "start": "node make-start-challenge-container.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dockerode": "^3.2.1",
+    "dockerode-build": "^1.1.6",
+    "path": "^0.12.7",
+    "pump": "^3.0.0"
+  }
+}
