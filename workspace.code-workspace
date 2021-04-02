@@ -1,0 +1,16 @@
+{
+	"folders": [
+		{
+			"path": "client"
+		},
+		{
+			"path": "server"
+		}
+	],
+	"settings": {
+		"vetur.format.options.tabSize": 4,
+		"search.exclude": {
+			"**/package-lock.json": true
+		}
+	}
+}
