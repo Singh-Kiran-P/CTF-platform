@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class User {
@@ -20,11 +20,11 @@ export class User {
     @Column()
     team: number;
 
-    constructor(name: string, password: string, category: number, team: number, salt: string) {
+    constructor(name: string, password: string, category: number, team: number) {
         this.name = name;
         this.password = password;
+        this.salt = 'randomly generated salt';
         this.category = category;
         this.team = team;
-        this.salt = salt;
     }
 }

@@ -1,26 +1,58 @@
 import 'reflect-metadata';
-import { createConnection } from 'typeorm';
-import { User } from './entities/User';
+import EventEmitter = require('events');
+import { Connection, createConnection } from 'typeorm';
 import dotenv from 'dotenv';
-
 dotenv.config();
 
-createConnection({
-    type: 'postgres',
-    host: 'localhost',
-    port: 5432,
-    database: 'ctf_platform',
-    username: 'root',
-    password: 'admin',
-    synchronize: true,
-    logging: true,
-    entities: [
-        __dirname + '/entities/*.js'
-    ]
-}).then(async connection => {
-    let user = new User('name', 'password', 0, 0, 'ds');
+interface DatabaseEvents { // defines all events the database can emit
+    'connected': (connection: Connection) => void;
+    'error': (error: any) => void;
+}
 
-    await connection.manager
-        .save(user);
+/**
+ * Database class to connect to the database and provide help functions to access it
+ */
+class Database extends EventEmitter {
+    connection: Connection = null;
 
-}).catch(error => console.log(error));
+    constructor() {
+        super();
+        this.connect();
+    }
+
+    connect(): void {
+        createConnection({
+            type: 'postgres',
+            host: process.env.DB_HOST,
+            port: parseInt(process.env.DB_PORT),
+            database: process.env.DB_NAME,
+            username: process.env.DB_USER,
+            password: process.env.DB_PASSWORD,
+            synchronize: true,
+            logging: true,
+            entities: [
+                __dirname + '/entities/*.js'
+            ]
+        }).then(async connection => {
+            this.connection = connection;
+            this.emit('connected', this.connection);
+        }).catch(error => this.emit('error', error));
+    }
+
+    connected(): boolean {
+        return this.connection !== null;
+    }
+}
+
+declare interface Database { // applies DatabaseEvents to Database to enable event checking
+    on<U extends keyof DatabaseEvents>(
+        event: U, listener: DatabaseEvents[U]
+    ): this;
+
+    emit<U extends keyof DatabaseEvents>(
+        event: U, ...args: Parameters<DatabaseEvents[U]>
+    ): boolean;
+}
+
+const instance: Database = new Database();
+export default instance;
