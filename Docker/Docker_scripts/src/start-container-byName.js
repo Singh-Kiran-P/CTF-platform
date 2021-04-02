@@ -1,7 +1,7 @@
 var Docker = require('dockerode');
 var docker = new Docker({ socketPath: '/var/run/docker.sock' });
 
-var container = docker.getContainer('team2-challedfsnge2');
+var container = docker.getContainer('challenge-name/ uuid');
 
 // query API for container info
 container.inspect(function (err, data) {

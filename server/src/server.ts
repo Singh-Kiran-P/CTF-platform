@@ -13,7 +13,7 @@ const app = express();
 // define a route handler for the default home page
 app.get("/", (req, res) => {
     // render the index template
-    res.send("yo lo");
+    res.send("yo lsso");
 });
 
 app.get("/getId", (req, res) => {
