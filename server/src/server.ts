@@ -24,6 +24,6 @@ app.listen(port, () => {
 
 
 // example database usage
-Database.on('connected', connection => {
+Database.on('connect', connection => {
     console.log('Database connected');
 });

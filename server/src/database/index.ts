@@ -5,7 +5,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 interface DatabaseEvents { // defines all events the database can emit
-    'connected': (connection: Connection) => void;
+    'connect': (connection: Connection) => void;
     'error': (error: any) => void;
 }
 
@@ -35,7 +35,7 @@ class Database extends EventEmitter {
             ]
         }).then(async connection => {
             this.connection = connection;
-            this.emit('connected', this.connection);
+            this.emit('connect', this.connection);
         }).catch(error => this.emit('error', error));
     }
 
