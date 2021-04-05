@@ -22,7 +22,6 @@ app.listen(port, () => {
     console.log(`server started at http://localhost:${port}`);
 });
 
-
 // example database usage
 Database.on('connect', connection => {
     console.log('Database connected');

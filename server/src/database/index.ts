@@ -31,7 +31,7 @@ class Database extends EventEmitter {
             synchronize: true,
             logging: true,
             entities: [
-                __dirname + '/entities/*.js'
+                __dirname + '/entities/*/*.js'
             ]
         }).then(async connection => {
             this.connection = connection;

@@ -8,17 +8,17 @@ export class User {
     @Column()
     name: string;
 
-    @Column('text')
+    @Column()
     password: string;
 
-    @Column('text')
+    @Column()
     salt: string;
 
     @Column()
-    category: number;
+    category: number; // fk
 
     @Column()
-    team: number;
+    team: number; // fk
 
     constructor(name: string, password: string, category: number, team: number) {
         this.name = name;
@@ -26,5 +26,6 @@ export class User {
         this.salt = 'randomly generated salt';
         this.category = category;
         this.team = team;
+        // TODO
     }
 }
