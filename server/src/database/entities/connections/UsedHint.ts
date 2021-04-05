@@ -1,15 +1,17 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import { Hint } from '../challenges/Hint';
+import { Solve } from './Solve';
 
 @Entity()
 export class UsedHint {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column()
-    hint: number; // fk
+    @ManyToOne(_ => Hint, hint => hint.usedHints, { nullable: false })
+    hint: Hint;
 
-    @Column()
-    solve: number; // fk
+    @ManyToOne(_ => Solve, solve => solve.usedHints, { nullable: false })
+    solve: Solve;
 
     constructor() {
         // TODO

@@ -1,12 +1,13 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import { Challenge } from './Challenge';
 
 @Entity()
 export class Attachment {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column()
-    challenge: number; // fk
+    @ManyToOne(_ => Challenge, challenge => challenge.attachments, { nullable: false })
+    challenge: Challenge;
 
     @Column()
     filename: string;

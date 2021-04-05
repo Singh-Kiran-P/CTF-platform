@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { Challenge } from './Challenge';
 
 @Entity()
 export class Tag {
@@ -10,6 +11,9 @@ export class Tag {
 
     @Column()
     description: string;
+
+    @OneToMany(_ => Challenge, challenge => challenge.tag)
+    challenges: Challenge[];
 
     constructor() {
         // TODO

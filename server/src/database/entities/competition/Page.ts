@@ -12,7 +12,7 @@ export class Page {
     htmlfile: string
 
     @Column()
-    authentication: number; // enum? remove this?
+    authentication: number; // TODO: enum? remove this?
 
     @Column()
     visibility: boolean;

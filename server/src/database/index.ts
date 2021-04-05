@@ -4,6 +4,10 @@ import { Connection, createConnection } from 'typeorm';
 import dotenv from 'dotenv';
 dotenv.config();
 
+/*
+TODO: test entities and create entity CRUD operations
+*/
+
 interface DatabaseEvents { // defines all events the database can emit
     'connect': (connection: Connection) => void;
     'error': (error: any) => void;

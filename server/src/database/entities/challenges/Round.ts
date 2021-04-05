@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { Challenge } from './Challenge';
 
 @Entity()
 export class Round {
@@ -13,6 +14,9 @@ export class Round {
 
     @Column()
     end: number;
+
+    @OneToMany(_ => Challenge, challenge => challenge.round)
+    challenges: Challenge[];
 
     constructor() {
         // TODO

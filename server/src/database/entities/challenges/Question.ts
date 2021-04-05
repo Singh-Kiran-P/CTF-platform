@@ -1,12 +1,13 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import { Challenge } from './Challenge';
 
 @Entity()
 export class Question {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column()
-    quiz: number; // fk
+    @ManyToOne(_ => Challenge, challenge => challenge.questions, { nullable: false })
+    quiz: Challenge;
 
     @Column()
     question: string;

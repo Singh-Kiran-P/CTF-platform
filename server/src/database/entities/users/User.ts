@@ -1,4 +1,8 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany } from 'typeorm';
+import { Attempt } from '../connections/Attempt';
+import { Solve } from '../connections/Solve';
+import { Category } from './Category';
+import { Team } from './Team';
 
 @Entity()
 export class User {
@@ -14,18 +18,19 @@ export class User {
     @Column()
     salt: string;
 
-    @Column()
-    category: number; // fk
+    @ManyToOne(_ => Category, category => category.users, { nullable: false })
+    category: Category;
 
-    @Column()
-    team: number; // fk
+    @ManyToOne(_ => Team, team => team.members, { nullable: true })
+    team: Team;
 
-    constructor(name: string, password: string, category: number, team: number) {
-        this.name = name;
-        this.password = password;
-        this.salt = 'randomly generated salt';
-        this.category = category;
-        this.team = team;
+    @OneToMany(_ => Solve, solve => solve.user)
+    solves: Solve[];
+
+    @OneToMany(_ => Attempt, attempt => attempt.user)
+    attempts: Attempt[];
+
+    constructor() {
         // TODO
     }
 }
