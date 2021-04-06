@@ -2,7 +2,7 @@
     "name": "server",
     "version": "1.0.0",
     "description": "CTF",
-    "main": "dist/server/index.js",
+    "main": "dist",
     "scripts": {
         "server_with_auto_reload_files": "nodemon dist/server.js",
         "server_watch_TS": "tsc --watch",

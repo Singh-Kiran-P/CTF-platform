@@ -30,7 +30,16 @@ export class Participant {
     @OneToMany(_ => Attempt, attempt => attempt.participant)
     attempts: Attempt[];
 
-    constructor() {
-        // TODO
+    constructor(name: string, password: string, category: Category) {
+        this.name = name;
+        this.setPassword(password);
+        this.category = category;
+        this.team = null;
+    }
+
+    setPassword(password: string) {
+        this.salt = 'TODO: generate random salt';
+        this.password = password;
+        // TODO: generate random salt and hash password with it
     }
 }

@@ -24,7 +24,8 @@ export class Team {
     @OneToMany(_ => Environment, environment => environment.team)
     environments: Environment[];
 
-    constructor() {
-        // TODO
+    constructor(name: string, owner: Participant) {
+        this.name = name;
+        // TODO: set owner and update owners team in database
     }
 }

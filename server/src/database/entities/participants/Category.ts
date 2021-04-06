@@ -15,7 +15,8 @@ export class Category {
     @OneToMany(_ => Participant, participant => participant.category)
     participants: Participant[];
 
-    constructor() {
-        // TODO
+    constructor(name: string, priority: number) {
+        this.name = name;
+        this.priority = priority;
     }
 }
