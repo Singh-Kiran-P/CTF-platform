@@ -1,7 +1,8 @@
 import 'reflect-metadata';
+import dotenv from 'dotenv';
 import EventEmitter = require('events');
 import { Connection, createConnection } from 'typeorm';
-import dotenv from 'dotenv';
+import loadTestData from './testData';
 dotenv.config();
 
 /*
@@ -17,6 +18,7 @@ interface DatabaseEvents { // defines all events the database can emit
  * Database class to connect to the database and provide help functions to access it
  */
 class Database extends EventEmitter {
+    loadTestData: boolean = true; // empties and loads test data into the database before connecting if true
     connection: Connection = null;
 
     constructor() {
@@ -39,6 +41,7 @@ class Database extends EventEmitter {
             ]
         }).then(async connection => {
             this.connection = connection;
+            if (this.loadTestData) await loadTestData();
             this.emit('connect', this.connection);
         }).catch(error => this.emit('error', error));
     }
