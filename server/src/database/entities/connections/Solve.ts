@@ -1,8 +1,8 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany } from 'typeorm';
+import { Participant } from '../participants/Participant';
 import { Challenge } from '../challenges/Challenge';
+import { Team } from '../participants/Team';
 import { UsedHint } from './UsedHint';
-import { Team } from '../users/Team';
-import { User } from '../users/User';
 
 @Entity()
 export class Solve {
@@ -12,8 +12,8 @@ export class Solve {
     @ManyToOne(_ => Team, team => team.solves, { nullable: false })
     team: Team;
 
-    @ManyToOne(_ => User, user => user.solves, { nullable: true })
-    user: User;
+    @ManyToOne(_ => Participant, participant => participant.solves, { nullable: true })
+    participant: Participant;
 
     @ManyToOne(_ => Challenge, challenge => challenge.solves, { nullable: false })
     challenge: Challenge;

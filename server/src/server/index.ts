@@ -1,6 +1,5 @@
 import dotenv from 'dotenv';
 import express from 'express';
-import { Category } from '../database/entities/users/Category';
 import Database from '../database';
 dotenv.config();
 
@@ -24,13 +23,13 @@ app.listen(port, () => {
 });
 
 // example database usage
-Database.on('connect', connection => {
+Database.on('connect', conn => {
     console.log('Database connected');
 
-    connection.query('SELECT * FROM category').then((categories: Category[]) => {
-        console.log('available categories: ');
+    conn.query('SELECT * FROM category').then((categories) => {
+        console.log('available categories:');
         console.log(JSON.stringify(categories));
-    }).catch(error => console.log(error));
+    });
 });
 
 export default app;

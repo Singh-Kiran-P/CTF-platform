@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
-import { Team } from '../users/Team';
-import { User } from '../users/User';
+import { Participant } from '../participants/Participant';
+import { Team } from '../participants/Team';
 
 export enum AttemptTypes {
     LOGIN = 'login',
@@ -12,8 +12,8 @@ export class Attempt {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @ManyToOne(_ => User, user => user.attempts, { nullable: false })
-    user: User;
+    @ManyToOne(_ => Participant, participant => participant.attempts, { nullable: false })
+    participant: Participant;
 
     @ManyToOne(_ => Team, team => team.attempts, { nullable: true })
     team: Team;

@@ -1,5 +1,5 @@
-import Database from '../database';
-import { Category } from './entities/users/Category';
+import DB from '../database';
+import { Category } from './entities/participants/Category';
 
 /**
  * loads test entries into the database
@@ -11,16 +11,15 @@ async function loadTestData() {
     let category = new Category();
     category.name = 'test 1';
     category.priority = 1;
-    await Database.connection.manager.save(category);
+    await DB.conn.manager.save(category);
 }
 
 /**
  * truncates all tables in the database
  */
 async function emptyDatabase() {
-    for (const entity of Database.connection.entityMetadatas) { // for every table
-        if (entity.tableName == 'user') continue;
-        await Database.connection.query(`DELETE FROM ${entity.tableName};`); // truncate the table
+    for (const entity of DB.conn.entityMetadatas) { // for every table
+        await DB.conn.query(`DELETE FROM ${entity.tableName};`); // truncate the table
     }
 }
 

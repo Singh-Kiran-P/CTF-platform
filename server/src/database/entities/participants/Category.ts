@@ -1,5 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
-import { User } from './User';
+import { Participant } from './Participant';
 
 @Entity()
 export class Category {
@@ -12,8 +12,8 @@ export class Category {
     @Column()
     priority: number;
 
-    @OneToMany(_ => User, user => user.category)
-    users: User[];
+    @OneToMany(_ => Participant, participant => participant.category)
+    participants: Participant[];
 
     constructor() {
         // TODO

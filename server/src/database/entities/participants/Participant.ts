@@ -5,7 +5,7 @@ import { Category } from './Category';
 import { Team } from './Team';
 
 @Entity()
-export class User {
+export class Participant {
     @PrimaryGeneratedColumn()
     id: number;
 
@@ -18,16 +18,16 @@ export class User {
     @Column()
     salt: string;
 
-    @ManyToOne(_ => Category, category => category.users, { nullable: false })
+    @ManyToOne(_ => Category, category => category.participants, { nullable: false })
     category: Category;
 
-    @ManyToOne(_ => Team, team => team.members, { nullable: true })
+    @ManyToOne(_ => Team, team => team.participants, { nullable: true })
     team: Team;
 
-    @OneToMany(_ => Solve, solve => solve.user)
+    @OneToMany(_ => Solve, solve => solve.participant)
     solves: Solve[];
 
-    @OneToMany(_ => Attempt, attempt => attempt.user)
+    @OneToMany(_ => Attempt, attempt => attempt.participant)
     attempts: Attempt[];
 
     constructor() {

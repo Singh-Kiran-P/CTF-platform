@@ -10,7 +10,7 @@ TODO: test entities and create entity CRUD operations
 */
 
 interface DatabaseEvents { // defines all events the database can emit
-    'connect': (connection: Connection) => void;
+    'connect': (conn: Connection) => void;
     'error': (error: any) => void;
 }
 
@@ -19,7 +19,7 @@ interface DatabaseEvents { // defines all events the database can emit
  */
 class Database extends EventEmitter {
     loadTestData: boolean = true; // empties and loads test data into the database before connecting if true
-    connection: Connection = null;
+    conn: Connection = null;
 
     constructor() {
         super();
@@ -39,15 +39,15 @@ class Database extends EventEmitter {
             entities: [
                 __dirname + '/entities/*/*.js'
             ]
-        }).then(async connection => {
-            this.connection = connection;
+        }).then(async conn => {
+            this.conn = conn;
             if (this.loadTestData) await loadTestData();
-            this.emit('connect', this.connection);
+            this.emit('connect', this.conn);
         }).catch(error => this.emit('error', error));
     }
 
     connected(): boolean {
-        return this.connection !== null;
+        return this.conn !== null;
     }
 }
 
