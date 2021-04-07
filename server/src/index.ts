@@ -1,21 +1,42 @@
-import App from './server';
-import DB from './database';
-import { Team } from './database/entities/participants/Team';
+const cors = require("cors");
+const express = require("express");
+const bp = require("body-parser");
+const { success, error } = require("consola");
+import DB from "./database";
 
-// example server usage
-App.get('/', (req, res) => {
-    res.send('yo lo 2');
-});
+// Bring in the app constants
+const { PORT } = require("./config");
 
-App.get('/getId', (req, res) => {
-    res.json({ username: 'Flavio :)' });
-});
+// Init the application
+const app = express();
 
-// example database usage
-DB.on('connect', conn => {
-    console.log('Database connected');
-    conn.getRepository(Team).find({ relations: ['participants'] }).then(entries => {
-        console.log('Availale teams:');
-        console.log(JSON.stringify(entries));
+// Middleware
+app.use(cors());
+app.user(bp.json());
+
+// User Router Middleware
+app.use('/api/users', require("./routes/users"))
+
+const startApp = async () => {
+  try {
+    // Connect to database (make connnection to datae base, to use it through the hole app)
+    await DB.on("connect", (conn) => {
+      console.log("Database connected");
     });
-});
+
+    // Start express app
+    app.listen(PORT, () =>
+      success({ message: `Server started on PORT ${PORT}`, badge: true })
+    );
+  } catch (err) {
+    error({
+      message: `Unable to connect with database \n ${err}`,
+      badge: true,
+    });
+    startApp();
+  }
+};
+
+startApp();
+
+

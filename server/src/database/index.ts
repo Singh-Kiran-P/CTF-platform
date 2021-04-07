@@ -39,7 +39,7 @@ class Database extends EventEmitter {
             ]
         }).then(async conn => {
             this.conn = conn;
-            if (this.loadTestData) await loadTestData();
+         /*    if (this.loadTestData) await loadTestData(); */
             this.emit('connect', this.conn);
         }).catch(error => this.emit('error', error));
     }
