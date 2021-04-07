@@ -1,5 +1,6 @@
 import App from './server';
 import DB from './database';
+import { Team } from './database/entities/participants/Team';
 
 // example server usage
 App.get('/', (req, res) => {
@@ -13,15 +14,8 @@ App.get('/getId', (req, res) => {
 // example database usage
 DB.on('connect', conn => {
     console.log('Database connected');
-
-    const log = (entity: string) => { // very simple log to inspect entries of an entity
-        conn.query(`SELECT * FROM ${entity}`).then(entries => {
-            console.log(`available ${entity}s:`);
-            console.log(JSON.stringify(entries));
-        });
-    }
-
-    log('category');
-    log('participant');
-    log('team');
+    conn.getRepository(Team).find({ relations: ['participants'] }).then(entries => {
+        console.log('Availale teams:');
+        console.log(JSON.stringify(entries));
+    });
 });

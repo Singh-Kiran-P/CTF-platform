@@ -20,6 +20,7 @@ async function loadTestData() {
         new Category('MAST 1', 4),
         new Category('MAST 2', 5)
     ]);
+
     let participants: Participant[] = await save([
         new Participant('John', 'password', categories[0]),
         new Participant('Edward', 'password', categories[1]),
@@ -27,13 +28,17 @@ async function loadTestData() {
         new Participant('John 2', 'password', categories[3]),
         new Participant('BOB!', 'password', categories[4])
     ]);
+    
     let teams: Team[] = await save([
-        new Team('Team 1', participants[0]),
-        new Team('Team 2', participants[2]),
-        new Team('Team 3', participants[4])
+        new Team('Team 1'),
+        new Team('Team 2'),
+        new Team('Team 3')
     ]);
-    participants[1].team = teams[0]; // TODO: update in database
-    participants[3].team = teams[1]; // TODO: update in database
+
+    for (let i = 0; i < participants.length; ++i) { // give every participant a team
+        participants[i].team = teams[Math.round(i * (teams.length - 1) / (participants.length - 1))];
+        await DB.conn.manager.update(Participant, participants[i].id, participants[i]);
+    }
 }
 
 /**
