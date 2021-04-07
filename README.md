@@ -25,7 +25,9 @@ Server side
 cd server
 
 # Install all dependencies for the REST API
-npm install
+npm i
+# Only once time
+npm i -g nodemon ts-node 
 
 # Start backend server
 npm run server_dev
@@ -41,7 +43,7 @@ cd server
 npm run server_watch_TS
 
 # Run backend server
-npm run server_dev
+npm run start:watch
 
 # Run Client framework (VUE)
 npm run client
