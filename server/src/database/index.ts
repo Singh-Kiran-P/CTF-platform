@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import dotenv from 'dotenv';
 import EventEmitter = require('events');
-import { Connection, createConnection, Db, EntityTarget, FindManyOptions, ObjectType, Repository } from 'typeorm';
+import { Connection, createConnection, EntityTarget, ObjectType, Repository } from 'typeorm';
 import loadTestData from './testData';
 dotenv.config();
 
