@@ -37,7 +37,7 @@ export class Account {
         this.team = null;
     }
 
-    organizer(): boolean {
+    admin(): boolean {
         return !this.category;
     }
 
