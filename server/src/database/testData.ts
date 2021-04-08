@@ -1,7 +1,7 @@
 import DB from '../database';
-import { Team } from './entities/participants/Team';
-import { Category } from './entities/participants/Category';
-import { Participant } from './entities/participants/Participant';
+import { Team } from './entities/accounts/Team';
+import { Category } from './entities/accounts/Category';
+import { Account } from './entities/accounts/Account';
 
 /**
  * loads test entries into the database
@@ -21,12 +21,12 @@ async function loadTestData() {
         new Category('MAST 2', 5)
     ]);
 
-    let participants: Participant[] = await save([
-        new Participant('John', 'password', categories[0]),
-        new Participant('Edward', 'password', categories[1]),
-        new Participant('Thomas', 'password', categories[2]),
-        new Participant('John 2', 'password', categories[3]),
-        new Participant('BOB!', 'password', categories[4])
+    let accounts: Account[] = await save([
+        new Account('John', 'password', categories[0]),
+        new Account('Edward', 'password', categories[1]),
+        new Account('Thomas', 'password', categories[2]),
+        new Account('John 2', 'password', categories[3]),
+        new Account('BOB!', 'password', categories[4])
     ]);
     
     let teams: Team[] = await save([
@@ -35,9 +35,9 @@ async function loadTestData() {
         new Team('Team 3')
     ]);
 
-    for (let i = 0; i < participants.length; ++i) { // give every participant a team
-        participants[i].team = teams[Math.round(i * (teams.length - 1) / (participants.length - 1))];
-        await DB.repo(Participant).update(participants[i].id, participants[i]);
+    for (let i = 0; i < accounts.length; ++i) { // give every account a team
+        accounts[i].team = teams[Math.round(i * (teams.length - 1) / (accounts.length - 1))];
+        await DB.repo(Account).update(accounts[i].id, accounts[i]);
     }
 }
 

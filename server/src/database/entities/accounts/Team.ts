@@ -2,7 +2,7 @@ import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 import { Environment } from '../connections/Environment';
 import { Attempt } from '../connections/Attempt';
 import { Solve } from '../connections/Solve';
-import { Participant } from './Participant';
+import { Account } from './Account';
 
 @Entity()
 export class Team {
@@ -12,13 +12,13 @@ export class Team {
     @Column()
     name: string;
 
-    @OneToMany(_ => Participant, participant => participant.team)
-    participants: Participant[];
+    @OneToMany(_ => Account, account => account.team)
+    accounts: Account[];
 
-    @OneToMany(_ => Solve, solve => solve.participant)
+    @OneToMany(_ => Solve, solve => solve.account)
     solves: Solve[];
 
-    @OneToMany(_ => Attempt, attempt => attempt.participant)
+    @OneToMany(_ => Attempt, attempt => attempt.account)
     attempts: Attempt[];
 
     @OneToMany(_ => Environment, environment => environment.team)

@@ -7,7 +7,7 @@ import { Round } from './Round';
 import { Hint } from './Hint';
 import { Tag } from './Tag';
 
-export enum ChallengeTypes {
+export enum ChallengeType {
     QUIZ = 'quiz',
     BASIC = 'basic',
     INTERACTIVE = 'interactive'
@@ -54,8 +54,8 @@ export class Challenge {
     @Column()
     points: number;
 
-    @Column({ type: 'enum', enum: ChallengeTypes })
-    type: ChallengeTypes;
+    @Column({ type: 'enum', enum: ChallengeType })
+    type: ChallengeType;
 
     @Column()
     flag: string;

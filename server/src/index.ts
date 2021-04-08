@@ -1,6 +1,6 @@
 import App from './server';
 import DB from './database';
-import { Team } from './database/entities/participants/Team';
+import { Team } from './database/entities/accounts/Team';
 
 // example server usage
 App.get('/', (req, res) => {
@@ -14,7 +14,7 @@ App.get('/getId', (req, res) => {
 // example database usage
 DB.once('connect', () => {
     console.log('Database connected');
-    DB.repo(Team).find({ relations: ['participants', 'participants.category'] }).then(entries => {
+    DB.repo(Team).find({ relations: ['accounts', 'accounts.category'] }).then(entries => {
         console.log('Availale teams:');
         console.log(JSON.stringify(entries));
     });

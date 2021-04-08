@@ -1,8 +1,8 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
-import { Participant } from '../participants/Participant';
-import { Team } from '../participants/Team';
+import { Account } from '../accounts/Account';
+import { Team } from '../accounts/Team';
 
-export enum AttemptTypes {
+export enum AttemptType {
     LOGIN = 'login',
     SOLVE = 'solve'
 }
@@ -12,14 +12,14 @@ export class Attempt {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @ManyToOne(_ => Participant, participant => participant.attempts, { nullable: false })
-    participant: Participant;
+    @ManyToOne(_ => Account, account => account.attempts, { nullable: false })
+    account: Account;
 
     @ManyToOne(_ => Team, team => team.attempts, { nullable: true })
     team: Team;
 
-    @Column({ type: 'enum', enum: AttemptTypes })
-    type: AttemptTypes;
+    @Column({ type: 'enum', enum: AttemptType })
+    type: AttemptType;
 
     @Column()
     timestamp: number;

@@ -1,7 +1,7 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany } from 'typeorm';
-import { Participant } from '../participants/Participant';
+import { Account } from '../accounts/Account';
 import { Challenge } from '../challenges/Challenge';
-import { Team } from '../participants/Team';
+import { Team } from '../accounts/Team';
 import { UsedHint } from './UsedHint';
 
 @Entity()
@@ -12,8 +12,8 @@ export class Solve {
     @ManyToOne(_ => Team, team => team.solves, { nullable: false })
     team: Team;
 
-    @ManyToOne(_ => Participant, participant => participant.solves, { nullable: true })
-    participant: Participant;
+    @ManyToOne(_ => Account, account => account.solves, { nullable: true })
+    account: Account;
 
     @ManyToOne(_ => Challenge, challenge => challenge.solves, { nullable: false })
     challenge: Challenge;

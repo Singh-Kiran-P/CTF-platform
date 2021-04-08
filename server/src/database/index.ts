@@ -5,7 +5,7 @@ import { Connection, createConnection, EntityTarget, ObjectType, Repository } fr
 import loadTestData from './testData';
 dotenv.config();
 
-// TODO: test entities and create entity CRUD operations
+// TODO: create entity CRUD operations (custom entity repositories)
 
 interface DatabaseEvents { // defines all events the database can emit
     'connect': () => void;
@@ -40,13 +40,14 @@ class Database extends EventEmitter {
             ]
         }).then(async conn => {
             this.conn = conn;
+            await this.conn.query(`SET search_path TO ${process.env.DB_SCHEMA};`);
             if (this.loadTestData) await loadTestData();
             this.emit('connect');
         }).catch(error => this.emit('error', error));
     }
 
     connected(): boolean {
-        return this.conn !== null;
+        return this.conn != null;
     }
 
     /**

@@ -5,7 +5,7 @@ import { Category } from './Category';
 import { Team } from './Team';
 
 @Entity()
-export class Participant {
+export class Account {
     @PrimaryGeneratedColumn()
     id: number;
 
@@ -18,23 +18,27 @@ export class Participant {
     @Column()
     salt: string;
 
-    @ManyToOne(_ => Category, category => category.participants, { nullable: false })
+    @ManyToOne(_ => Category, category => category.accounts, { nullable: true })
     category: Category;
 
-    @ManyToOne(_ => Team, team => team.participants, { nullable: true })
+    @ManyToOne(_ => Team, team => team.accounts, { nullable: true })
     team: Team;
 
-    @OneToMany(_ => Solve, solve => solve.participant)
+    @OneToMany(_ => Solve, solve => solve.account)
     solves: Solve[];
 
-    @OneToMany(_ => Attempt, attempt => attempt.participant)
+    @OneToMany(_ => Attempt, attempt => attempt.account)
     attempts: Attempt[];
 
-    constructor(name: string, password: string, category: Category) {
+    constructor(name: string, password: string, category?: Category) {
         this.name = name;
         this.setPassword(password);
         this.category = category;
         this.team = null;
+    }
+
+    organizer(): boolean {
+        return !this.category;
     }
 
     setPassword(password: string) {
