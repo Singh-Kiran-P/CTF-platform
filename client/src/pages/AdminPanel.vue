@@ -12,9 +12,8 @@ export default Vue.extend({
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 span {
     text-align: center;
-    color: var(--accentcolor) !important;
 }
 </style>

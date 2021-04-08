@@ -1,6 +1,5 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
-
 Vue.use(VueRouter);
 
 type Route = { path: string, name: string, src: string, meta?: {} };
@@ -38,7 +37,7 @@ const pages: { [page: string]: Route } = {
 // html pages uploaded by the organizer, these are available to all users
 // TODO: retrieve these pages from the database instead (make sure theres a page with path '/')
 // TODO: make pages not available to all users?
-const uploadedPages: Array<Route> = [
+const uploadedPages: Route[] = [
     {
         path: '/',
         name: 'Test',
@@ -47,7 +46,7 @@ const uploadedPages: Array<Route> = [
 ];
 
 // define which pages are available to which user type (excluding uploaded pages)
-const routes: { [page: string]: Array<Route> } = {
+const routes: { [page: string]: Route[] } = {
     visitor: [
         pages.login,
         pages.register
@@ -64,7 +63,7 @@ const routes: { [page: string]: Array<Route> } = {
 };
 
 // TODO: choose available routes based on user type (visitor, participant or organizer)
-const availableRoutes: Array<Route> = routes.visitor;
+const availableRoutes: Route[] = routes.organizer;
 
 // PageNotFound shown when no page matches the url
 availableRoutes.push({
