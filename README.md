@@ -26,8 +26,8 @@ cd server
 
 # Install all dependencies for the REST API
 npm i
-# Only once time
-npm i -g nodemon ts-node 
+# TODO: why is this needed?
+npm i -g nodemon ts-node
 
 # Start backend server
 npm run server_dev

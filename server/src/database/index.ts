@@ -1,14 +1,14 @@
 import 'reflect-metadata';
 import dotenv from 'dotenv';
 import EventEmitter = require('events');
-import { Connection, createConnection } from 'typeorm';
+import { Connection, createConnection, Db, EntityTarget, FindManyOptions, Repository } from 'typeorm';
 import loadTestData from './testData';
 dotenv.config();
 
 // TODO: test entities and create entity CRUD operations
 
 interface DatabaseEvents { // defines all events the database can emit
-    'connect': (conn: Connection) => void;
+    'connect': () => void;
     'error': (error: any) => void;
 }
 
@@ -30,6 +30,7 @@ class Database extends EventEmitter {
             host: process.env.DB_HOST,
             port: parseInt(process.env.DB_PORT),
             database: process.env.DB_NAME,
+            schema: process.env.DB_SCHEMA,
             username: process.env.DB_USER,
             password: process.env.DB_PASSWORD,
             synchronize: true,
@@ -40,17 +41,28 @@ class Database extends EventEmitter {
         }).then(async conn => {
             this.conn = conn;
             if (this.loadTestData) await loadTestData();
-            this.emit('connect', this.conn);
+            this.emit('connect');
         }).catch(error => this.emit('error', error));
     }
 
     connected(): boolean {
         return this.conn !== null;
     }
+
+    /**
+     * returns the repository for the given entity, assumes the database is connected
+     */
+    repo<E>(entity: EntityTarget<E>): Repository<E> {
+        return this.conn.getRepository(entity);
+    }
 }
 
 declare interface Database { // applies DatabaseEvents to Database to enable event checking
     on<U extends keyof DatabaseEvents>(
+        event: U, listener: DatabaseEvents[U]
+    ): this;
+
+    once<U extends keyof DatabaseEvents>(
         event: U, listener: DatabaseEvents[U]
     ): this;
 

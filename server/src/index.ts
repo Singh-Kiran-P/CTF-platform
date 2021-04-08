@@ -12,9 +12,9 @@ App.get('/getId', (req, res) => {
 });
 
 // example database usage
-DB.on('connect', conn => {
+DB.once('connect', () => {
     console.log('Database connected');
-    conn.getRepository(Team).find({ relations: ['participants'] }).then(entries => {
+    DB.repo(Team).find({ relations: ['participants'] }).then(entries => {
         console.log('Availale teams:');
         console.log(JSON.stringify(entries));
     });
