@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import dotenv from 'dotenv';
 import EventEmitter = require('events');
-import { Connection, createConnection, Db, EntityTarget, FindManyOptions, Repository } from 'typeorm';
+import { Connection, createConnection, Db, EntityTarget, FindManyOptions, ObjectType, Repository } from 'typeorm';
 import loadTestData from './testData';
 dotenv.config();
 
@@ -54,6 +54,13 @@ class Database extends EventEmitter {
      */
     repo<E>(entity: EntityTarget<E>): Repository<E> {
         return this.conn.getRepository(entity);
+    }
+
+    /**
+     * returns an instance of the given custom repository, assumes the database is connected
+     */
+    crepo<E>(entity: ObjectType<E>): E {
+        return this.conn.getCustomRepository(entity);
     }
 }
 

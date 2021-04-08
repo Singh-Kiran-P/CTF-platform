@@ -37,7 +37,7 @@ async function loadTestData() {
 
     for (let i = 0; i < participants.length; ++i) { // give every participant a team
         participants[i].team = teams[Math.round(i * (teams.length - 1) / (participants.length - 1))];
-        await DB.conn.manager.update(Participant, participants[i].id, participants[i]);
+        await DB.repo(Participant).update(participants[i].id, participants[i]);
     }
 }
 

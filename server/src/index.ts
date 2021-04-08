@@ -14,7 +14,7 @@ App.get('/getId', (req, res) => {
 // example database usage
 DB.once('connect', () => {
     console.log('Database connected');
-    DB.repo(Team).find({ relations: ['participants'] }).then(entries => {
+    DB.repo(Team).find({ relations: ['participants', 'participants.category'] }).then(entries => {
         console.log('Availale teams:');
         console.log(JSON.stringify(entries));
     });
