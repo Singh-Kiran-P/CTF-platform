@@ -73,7 +73,7 @@ export default Vue.extend({
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .register {
     padding: 1rem;
 }

@@ -12,7 +12,7 @@ export default Vue.extend({
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .pageNotFound {
     display: flex;
     align-items: center;

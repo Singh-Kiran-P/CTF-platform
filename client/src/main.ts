@@ -7,8 +7,6 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faTrash, faPlus, faCheckSquare, faSquare } from '@fortawesome/free-solid-svg-icons';
 import '@sweetalert2/theme-dark/dark.css';
-import 'bootstrap/dist/css/bootstrap.css';
-import 'bootstrap-vue/dist/bootstrap-vue.css';
 
 import App from './App.vue';
 import router from './router';

@@ -36,7 +36,13 @@ export default Vue.extend({
         });
     },
     data: () => ({
-        pages: { left: [] as Array<{ path: string, name: string }>, right: [] as Array<{ path: string, name: string }> }
+        pages: { left: [] as { path: string, name: string }[], right: [] as { path: string, name: string }[] }
     })
 });
 </script>
+
+<style scoped lang="scss">    
+a.router-link-exact-active, a:hover, a:focus-visible {
+    color: var(--primary) !important;
+}
+</style>
