@@ -3,6 +3,7 @@ import { Attempt } from '../connections/Attempt';
 import { Solve } from '../connections/Solve';
 import { Category } from './Category';
 import { Team } from './Team';
+import  Roles  from './Roles';
 
 @Entity()
 export class Account {
@@ -18,6 +19,9 @@ export class Account {
     @Column()
     salt: string;
 
+    @Column()
+    role: Roles;
+
     @ManyToOne(_ => Category, category => category.accounts, { nullable: true })
     category: Category;
 
@@ -30,10 +34,11 @@ export class Account {
     @OneToMany(_ => Attempt, attempt => attempt.account)
     attempts: Attempt[];
 
-    constructor(name: string, password: string, category?: Category) {
+    constructor(name: string, password: string, role: Roles, category?: Category) {
         this.name = name;
         this.setPassword(password);
         this.category = category;
+        this.role = role;
         this.team = null;
     }
 

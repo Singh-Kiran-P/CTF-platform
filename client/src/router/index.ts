@@ -56,7 +56,7 @@ const routes: { [page: string]: Array<Route> } = {
         pages.leaderboard,
         pages.teams
     ],
-    organizer: [
+    admin: [
         pages.leaderboard,
         pages.teams,
         pages.adminPanel

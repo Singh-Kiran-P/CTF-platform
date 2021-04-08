@@ -2,7 +2,7 @@ import DB from '../database';
 import { Team } from './entities/accounts/Team';
 import { Category } from './entities/accounts/Category';
 import { Account } from './entities/accounts/Account';
-
+import Roles from './entities/accounts/Roles';
 /**
  * loads test entries into the database
  * this function is called each time the database connection is made, after emptying the database
@@ -22,11 +22,11 @@ async function loadTestData() {
     ]);
 
     let accounts: Account[] = await save([
-        new Account('John', 'password', categories[0]),
-        new Account('Edward', 'password', categories[1]),
-        new Account('Thomas', 'password', categories[2]),
-        new Account('John 2', 'password', categories[3]),
-        new Account('BOB!', 'password', categories[4])
+        new Account('John', 'password', Roles.participant, categories[0]),
+        new Account('Edward', 'password', Roles.participant, categories[1]),
+        new Account('Thomas', 'password', Roles.participant, categories[2]),
+        new Account('John 2', 'password', Roles.participant, categories[3]),
+        new Account('BOB!', 'password', Roles.participant, categories[4])
     ]);
     
     let teams: Team[] = await save([
