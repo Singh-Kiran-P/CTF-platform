@@ -51,3 +51,13 @@ npm run client
 # Run Client & REST API
 npm run dev
 ```
+
+## Docker
+```
+# Run all dockers
+docker-compose up
+# Delete all images / containers
+docker stop $(docker ps -a -q)
+docker rm $(docker ps -a -q)
+docker rmi -f $(docker images -a -q)
+```

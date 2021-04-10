@@ -6,8 +6,7 @@
     "scripts": {
         "server_with_auto_reload_files": "nodemon dist/server.js",
         "server_watch_TS": "tsc --watch",
-        "build" : "tsc -b",
-        "server_dev": " npm run build && npm run server_with_auto_reload_files",
+        "server_dev": "concurrently --kill-others  \"npm run server_watch_TS \" \"npm run server_with_auto_reload_files\"",
         "client": "npm run serve --prefix ../client",
         "dev": "concurrently --kill-others  \"npm run client\" \"npm run server_dev\""
     },

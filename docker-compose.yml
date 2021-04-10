@@ -1,0 +1,58 @@
+# docker-compose.yml
+version: "3.7"
+
+services:
+  postgres:
+    container_name: postgres
+    restart: always
+    image: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ctf-platform
+    ports:
+      - '5432:5432'
+    volumes:
+      - ctf-db:/var/lib/postgresql/data
+    networks:
+      - mynet
+
+  vue-ui:
+    container_name: vue-ui
+    build:
+      context: ./client
+    ports:
+      - "80:80"
+    volumes:
+      - ./client:/ctf/client
+    networks:
+      - mynet
+
+  nodejs-server:
+    container_name: nodejs-server
+    build:
+      context: ./server
+    environment:
+      DB_SCHEMA: ctf-platform
+      DB_USER: postgres
+      DB_PASSWORD: singh
+      DB_HOST: postgres
+    depends_on:
+      - postgres
+    links:
+      - postgres
+    ports:
+      - '4000:4000'
+    volumes:
+      - ./server:/ctf/server
+    networks:
+      - mynet
+
+volumes:
+    ctf-db:
+
+networks:
+  mynet:
+    driver: bridge
+    ipam:
+      driver: default

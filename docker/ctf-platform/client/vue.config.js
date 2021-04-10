@@ -4,7 +4,7 @@ module.exports = {
         devServer: {
             proxy: {
                 "^/api": {
-                    target: `http://${process.env.API_HOST}:${process.env.API_SERVER}`,
+                    target: `http://localhost:${process.env.API_SERVER}`,
                     changeOrigin: true,
                     logLevel: "debug",
                     pathRewrite: {
