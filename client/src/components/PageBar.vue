@@ -1,16 +1,16 @@
 <template>
-    <div id="pageBar">
-        <b-navbar toggleable="md" type="dark" variant="dark">
-            <b-navbar-toggle target="nav-collapse"/>
+    <div id=pageBar>
+        <b-navbar toggleable=md type=dark variant=dark>
+            <b-navbar-toggle target=nav-collapse />
             
-            <b-collapse id="nav-collapse" is-nav>
+            <b-collapse id=nav-collapse is-nav>
                 <b-navbar-nav>
                     <b-nav-item v-for="page in pages.left" :key="page.path" :to="page.path">
                         {{page.name}}
                     </b-nav-item>
                 </b-navbar-nav>
 
-                <b-navbar-nav class="ml-auto">
+                <b-navbar-nav class=ml-auto>
                     <b-nav-item v-for="page in pages.right" :key="page.path" :to="page.path">
                         {{page.name}}
                     </b-nav-item>
