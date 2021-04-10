@@ -1,8 +1,8 @@
 <template>
     <div id="pageBar">
         <b-navbar toggleable="md" type="dark" variant="dark">
-            <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
-
+            <b-navbar-toggle target="nav-collapse"/>
+            
             <b-collapse id="nav-collapse" is-nav>
                 <b-navbar-nav>
                     <b-nav-item v-for="page in pages.left" :key="page.path" :to="page.path">
