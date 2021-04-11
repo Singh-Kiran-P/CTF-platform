@@ -1,6 +1,6 @@
 <template>
     <div class=register>
-        <b-form @submit="checkForm">
+        <b-form @submit="onSubmit($event)">
             <b-form-group id=input-group-username label=Username label-for=username>
                 <b-form-input
                     id=username
@@ -9,7 +9,9 @@
                     v-model="form.username"
                     placeholder="Enter username"
                     required
+                    :state="state(usernameFeedback)"
                 ></b-form-input> 
+                <b-form-invalid-feedback>{{usernameFeedback}}</b-form-invalid-feedback>
             </b-form-group>
 
             <b-form-group id=input-group-password label=Password label-for=password>
@@ -18,14 +20,10 @@
                     name=password
                     type=password
                     v-model="form.password"
-                    :state="passLenCheck"
                     required
+                    :state="state(passwordFeedback)"
                 ></b-form-input>
-
-                <!-- This will only be shown if the preceding input has an invalid state -->
-                <b-form-invalid-feedback id=input-live-feedback>
-                    Enter at least 6 characters
-                </b-form-invalid-feedback>
+                <b-form-invalid-feedback>{{passwordFeedback}}</b-form-invalid-feedback>
             </b-form-group>
 
             <b-form-group id=input-group-category label=Category label-for=category>
@@ -36,9 +34,10 @@
                     v-model="form.category"
                     :options="categories"
                     required
+                    :state="state(categoryFeedback)"
                 ></b-form-select>
+                <b-form-invalid-feedback>{{categoryFeedback}}</b-form-invalid-feedback>
             </b-form-group>
-
             <b-button type=submit variant=primary>Submit</b-button>
         </b-form>
     </div>
@@ -51,7 +50,6 @@ export default Vue.extend({
     name: "Register",
     data: () => ({
         form: {
-            errors: [] as any,
             username: "",
             password: "",
             category: null
@@ -63,14 +61,15 @@ export default Vue.extend({
             { text: "MASTER", value: 4 }
         ]
     }),
+    
+    computed: {
+        usernameFeedback(): string { return this.feedback(this.form.username, 'username', true, 4, 32, []); },
+        passwordFeedback(): string { return this.feedback(this.form.password, 'password', true, 6, 32, []); },
+        categoryFeedback(): string { return this.form.category ? '' : 'Please select a category' }
+    },
     methods: {
-        onSubmit(event: Event) {
-            event.preventDefault();
-            alert(JSON.stringify(this.form));
-        },
-        checkForm(e: Event){
+        /*checkForm(e: Event){
             this.form.errors = [];
-
             if(!this.form.username) {
                 this.form.errors.push("Username is required");
             } else if (this.form.username.length < 4) {
@@ -80,20 +79,25 @@ export default Vue.extend({
             } else if(this.form.password.length < 6){
                 this.form.errors.push("Password lengths should be at least 6");
             }
-
             if (!this.form.errors.length) {
                 return true;
             }
-
             e.preventDefault();
-        }
-    },
-    computed: {
-        passLenCheck(): boolean {
-            return this.form.password.length > 6 ? true : false;
+        }*/
+        onSubmit(e: Event): void {
+            e.preventDefault();
+            // TODO: store in database and perform server side validation
         },
-        usernameLenCheck(): boolean {
-            return this.form.username.length > 3 ? true : false;
+        feedback(input: string, name: string, required: boolean, min: number, max: number, others: string[]): string {
+            let l = input.length;
+            if (required && l == 0) return `${name} is required`;
+            if (others.includes(input)) return `${name} already exists`;
+            if (l && l < min) return `${name} must be at least ${min} characters`;
+            else if (l > max) return `${name} must be at most ${max} characters`;
+            return '';
+        },
+        state(feedback: string): boolean {
+            return feedback.length == 0;
         }
     }
 });

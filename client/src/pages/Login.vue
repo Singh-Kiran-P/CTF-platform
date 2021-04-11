@@ -1,6 +1,6 @@
 <template>
     <div class=login>
-        <b-form @submit="checkForm">
+        <b-form @submit="onSubmit($event)">
             <b-form-group id=input-group-username label=Username label-for=username>
                 <b-form-input
                     id=username
@@ -9,7 +9,9 @@
                     v-model="form.username"
                     placeholder="Enter username"
                     required
+                    :state="state(usernameFeedback)"
                 ></b-form-input> 
+                <b-form-invalid-feedback>{{usernameFeedback}}</b-form-invalid-feedback>
             </b-form-group>
 
             <b-form-group id=input-group-password label=Password label-for=password>
@@ -19,9 +21,10 @@
                     type=password
                     v-model="form.password"
                     required
-                ></b-form-input>
+                    :state="state(passwordFeedback)"
+                ></b-form-input> 
+                <b-form-invalid-feedback>{{passwordFeedback}}</b-form-invalid-feedback>
             </b-form-group>
-
             <b-button type=submit variant=primary>Submit</b-button>
         </b-form>
     </div>
@@ -31,16 +34,19 @@
 import Vue from "vue";
 
 export default Vue.extend({
-    name: "Register",
+    name: "Login",
     data: () => ({
         form: {
-            errors: [] as any,
             username: "",
             password: ""
         }
     }),
+    computed: {
+        usernameFeedback(): string { return this.feedback(this.form.username, 'username', true, 4, 32, []); },
+        passwordFeedback(): string { return this.feedback(this.form.password, 'password', true, 6, 32, []); },
+    },
     methods: {
-        checkForm(e: Event){
+        /*checkForm(e: Event){
             this.form.errors = [];
 
             if(!this.form.username) {
@@ -56,9 +62,22 @@ export default Vue.extend({
             }
 
             e.preventDefault();
+        },*/
+        onSubmit(e: Event): void {
+            e.preventDefault();
+            // TODO: store in database and perform server side validation
+        },
+        feedback(input: string, name: string, required: boolean, min: number, max: number, others: string[]): string {
+            let l = input.length;
+            if (required && l == 0) return `${name} is required`;
+            if (others.includes(input)) return `${name} already exists`;
+            if (l && l < min) return `${name} must be at least ${min} characters`;
+            else if (l > max) return `${name} must be at most ${max} characters`;
+            return '';
+        },
+        state(feedback: string): boolean {
+            return feedback.length == 0;
         }
-    },
-    computed: {
     }
 });
 </script>

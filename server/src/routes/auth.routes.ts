@@ -34,4 +34,9 @@ authRouter.get('/logout', (req, res, next) => {
     res.redirect('/login');
 })
 
+authRouter.get('/test', (req, res) => {
+    res.send('hello tester');
+    //return res.json({message: "Welcome to template route!"});
+})
+
 export default authRouter;
