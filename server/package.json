@@ -4,9 +4,11 @@
     "description": "CTF",
     "main": "dist",
     "scripts": {
-        "server_with_auto_reload_files": "nodemon dist/server.js",
+        "build": "tsc -b",
         "server_watch_TS": "tsc --watch",
-        "server_dev": "concurrently --kill-others  \"npm run server_watch_TS \" \"npm run server_with_auto_reload_files\"",
+        "server_with_auto_reload_files": "nodemon dist/server.js",
+        "dev_backend" : "concurrently --kill-others  \"npm run server_watch_TS \" \"npm run server_with_auto_reload_files\"",
+        "server_dev": " npm run build && npm run dev_backend",
         "client": "npm run serve --prefix ../client",
         "dev": "concurrently --kill-others  \"npm run client\" \"npm run server_dev\""
     },
@@ -41,6 +43,7 @@
         "ejs": "^3.1.6",
         "express": "^4.17.1",
         "livereload": "^0.9.3",
+        "morgan": "^1.10.0",
         "pg": "^8.5.1",
         "reflect-metadata": "^0.1.13",
         "socket.io": "^4.0.1",
