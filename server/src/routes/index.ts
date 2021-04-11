@@ -1,8 +1,13 @@
-import {Router} from 'express';
+import express = require("express");
 import authRouter from './auth.routes';
 
-const routes = Router();
+const router = express.Router();
 
-routes.use('/auth', authRouter);
+router.get("/", (req, res) => {
+  return res.json({'message' : "Welcome to Backend!"});
+});
 
-export default routes;
+router.use('/auth', authRouter);
+
+module.exports = router;
+

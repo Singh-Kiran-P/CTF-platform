@@ -1,17 +1,26 @@
-import App from './server';
-import DB from './database';
-import { Team } from './database/entities/accounts/Team';
+import dotenv from "dotenv";
+import express from "express";
+import DB from "./database";
+import { Team } from "./database/entities/accounts/Team";
+dotenv.config();
 
-// example server usage
-App.get('/', (req, res) => {
-    res.send('yo lo 2');
-});
+const app = express();
+app.use(express.urlencoded());
+app.use(express.json());
 
-App.get('/getId', (req, res) => {
-    res.json({ username: 'Flavio :)' });
-});
+// routes
+const routes = require("./routes");
+app.use(routes);
 
-// example database usage
+// template routes
+const temproutes = require("./routes/template");
+// route with prefix
+app.use("/template", temproutes);
+
+app.listen(process.env.SERVER_PORT);
+console.log(`Server started at http://localhost:${process.env.SERVER_PORT}`);
+
+/* // example database usage
 DB.once('connect', () => {
     console.log('Database connected');
     DB.repo(Team).find({ relations: ['accounts', 'accounts.category'] }).then(entries => {
@@ -19,3 +28,5 @@ DB.once('connect', () => {
         console.log(JSON.stringify(entries));
     });
 });
+
+ */
