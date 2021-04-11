@@ -2,11 +2,9 @@ import dotenv from 'dotenv';
 import express from 'express';
 import session from 'express-session';
 import passport from 'passport';
-import crypto from 'crypto';
 import { Session } from '../database/entities/sessions/Session';
 import { TypeormStore } from 'typeorm-store';
 import DB from '../database';
-import routes from '../routes';
 dotenv.config();
 
 // TODO: add more functionality to server? custom Server class?
@@ -35,7 +33,6 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 //ROUTES
-app.use(routes);
 
 //SERVER
 app.listen(process.env.SERVER_PORT);
