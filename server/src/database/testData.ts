@@ -22,11 +22,11 @@ async function loadTestData() {
     ]);
 
     let accounts: Account[] = await save([
-        new Account('John', 'password', Roles.participant, categories[0]),
-        new Account('Edward', 'password', Roles.participant, categories[1]),
-        new Account('Thomas', 'password', Roles.participant, categories[2]),
-        new Account('John 2', 'password', Roles.participant, categories[3]),
-        new Account('BOB!', 'password', Roles.participant, categories[4])
+        new Account('John', 'password', 'salt', Roles.participant, categories[0]),
+        new Account('Edward', 'password', 'salt', Roles.participant, categories[1]),
+        new Account('Thomas', 'password', 'salt', Roles.participant, categories[2]),
+        new Account('John 2', 'password', 'salt', Roles.participant, categories[3]),
+        new Account('BOB!', 'password', 'salt', Roles.participant, categories[4])
     ]);
     
     let teams: Team[] = await save([

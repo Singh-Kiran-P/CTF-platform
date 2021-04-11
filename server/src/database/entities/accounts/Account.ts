@@ -10,7 +10,7 @@ export class Account {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column()
+    @Column({unique: true})
     name: string;
 
     @Column()
@@ -34,21 +34,23 @@ export class Account {
     @OneToMany(_ => Attempt, attempt => attempt.account)
     attempts: Attempt[];
 
-    constructor(name: string, password: string, role: Roles, category?: Category) {
+    constructor(name: string, password: string, salt: string, role: Roles, category?: Category) {
         this.name = name;
-        this.setPassword(password);
-        this.category = category;
+        this.password = password;
+        this.salt = salt;
         this.role = role;
+        this.category = category;
         this.team = null;
     }
 
     admin(): boolean {
         return !this.category;
     }
+    
 
-    setPassword(password: string) {
+    /*setPassword(password: string) {
         this.salt = 'TODO: generate random salt';
         this.password = password;
         // TODO: generate random salt and hash password with it
-    }
+    }*/
 }
