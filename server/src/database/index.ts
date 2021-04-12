@@ -54,14 +54,18 @@ class Database extends EventEmitter {
      * returns the repository for the given entity, assumes the database is connected
      */
     repo<E>(entity: EntityTarget<E>): Repository<E> {
-        return this.conn.getRepository(entity);
+        if (this.conn) {
+            return this.conn.getRepository(entity);
+        }
     }
 
     /**
      * returns an instance of the given custom repository, assumes the database is connected
      */
     crepo<E>(entity: ObjectType<E>): E {
-        return this.conn.getCustomRepository(entity);
+        if (this.conn) {
+            return this.conn.getCustomRepository(entity);
+        }
     }
 }
 

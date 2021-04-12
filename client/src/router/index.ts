@@ -63,7 +63,7 @@ const routes: { [page: string]: Route[] } = {
 };
 
 // TODO: choose available routes based on user type (visitor, participant or organizer)
-const availableRoutes: Route[] = routes.organizer;
+const availableRoutes: Route[] = routes.visitor;
 
 // PageNotFound shown when no page matches the url
 availableRoutes.push({
