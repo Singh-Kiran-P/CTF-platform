@@ -67,8 +67,8 @@
                 </div>
             </b-form-group>
 
-            <b-button type=button variant=danger :disabled="!changed" @click="onCancel()">Cancel</b-button>
-            <b-button type=submit variant=primary :disabled="!validForm() || !changed">Save</b-button>
+            <b-button type=button variant=danger @click="onCancel()">Cancel</b-button>
+            <b-button type=submit variant=primary :disabled="!validForm()">Save</b-button>
         </b-form>
     </div>
 </template>
@@ -78,7 +78,7 @@ import Vue from 'vue';
 import axios from 'axios';
 
 export default Vue.extend({
-    name: 'AdminPanel',
+    name: 'AdminPanel', // TODO: add sponsors, pages, ...
     created() {
         this.loadFormData();
     },
@@ -89,13 +89,8 @@ export default Vue.extend({
             categories: [] as string[],
             newTag: { name: '', description: '' },
             tags: [] as { name: string, description: string }[]
-        },
-        changed: false,
-        loaded: false
+        }
     }),
-    watch: {
-        formDataWatch() { this.loaded ? this.loaded = false : this.changed = true; }
-    },
     computed: {
         name(): string { return this.form.name.trim(); },
         nameFeedback(): string { return this.feedback(this.name, 'Competition name', true, 3, 32, []); },
@@ -103,8 +98,7 @@ export default Vue.extend({
         newCategory(): string { return this.form.newCategory.trim() },
         newCategoryFeedback(): string { return this.feedback(this.newCategory, 'Category', false, 3, 32, this.form.categories); },
         newTag() { return { name: this.form.newTag.name.trim(), description: this.form.newTag.description }; },
-        newTagFeedback(): string { return this.feedback(this.newTag.name, 'Tag name', false, 3, 32, this.form.tags.map(x => x.name)); },
-        formDataWatch(): any[] { return [this.form.name, this.form.categories, this.form.tags] }
+        newTagFeedback(): string { return this.feedback(this.newTag.name, 'Tag name', false, 3, 32, this.form.tags.map(x => x.name)); }
     },
     methods: {
         loadFormData(): void {
@@ -115,8 +109,6 @@ export default Vue.extend({
                 this.form.name = data.name;
                 this.form.categories = data.categories;
                 this.form.tags = data.tags;
-                this.changed = false;
-                this.loaded = true;
             });
         },
         onCancel(): void {
@@ -128,7 +120,7 @@ export default Vue.extend({
                 name: this.name,
                 categories: this.form.categories.map((category, i) => ({ name: category, priority: i })),
                 tags: this.form.tags
-            }).then(() => { this.changed = false; });
+            }).then(() => { /* TODO: show saved message */ });
         },
 
         feedback(input: string, name: string, required: boolean, min: number, max: number, others: string[]): string {
