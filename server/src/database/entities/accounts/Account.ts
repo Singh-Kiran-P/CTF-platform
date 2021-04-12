@@ -43,8 +43,8 @@ export class Account {
         this.team = null;
     }
 
-    admin(): boolean {
-        return !this.category;
+    isAdmin(): boolean {
+        return this.role === Roles.admin;
     }
     
 

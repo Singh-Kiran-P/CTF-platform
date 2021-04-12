@@ -7,6 +7,7 @@ const LocalStrategy = passportLocal.Strategy;
 import DB from '../database';
 import { Account } from '../database/entities/accounts/Account';
 import { validPassword } from './passportUtils';
+import Errors from './Errors';
 
 const AccountRepo = DB.repo(Account);
 
@@ -21,12 +22,12 @@ const strategy = new LocalStrategy(htmlFieldNames,
         AccountRepo.findOne({name: username})
             .then((account: Account) => {
                 //No account with this username found
-                if (!account) {return done(null, false)}
+                if (!account) {return done(Errors.USER_NOT_FOUND, false)}
 
                 if(validPassword(password, account.password, account.salt)) {
                     return done(null, account);
                 } else {
-                    return done(null, false);
+                    return done(Errors.WRONG_PASSWORD, false);
                 }
             })
             .catch((err) => {

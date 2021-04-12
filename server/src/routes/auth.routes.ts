@@ -1,19 +1,23 @@
 import Router from 'express';
-const authRouter = Router();
+const router = Router();
 import passport from 'passport';
 import { Repository } from 'typeorm';
 import { generatePassword } from '../auth/passportUtils';
 import DB from '../database';
 import { Account } from '../database/entities/accounts/Account';
 import Roles from '../database/entities/accounts/Roles';
+import Errors from '../auth/Errors';
 
 const accountRepo = DB.repo(Account);
 
 //POST ROUTES
 
-authRouter.post('/login', passport.authenticate('local'), (req, res, next) => {});
+router.post('/login', passport.authenticate('local'), (req, res, next) => {});
 
-authRouter.post('/register', (req, res, next) => {
+router.post('/register', (req, res, next) => {
+    if(accountRepo.findOne({name: req.body.username})) {
+        return res.status(400).json({errors: Errors.USER_ALREADY_EXISTS})
+    }
     const hashedPasswordData = generatePassword(req.body.password);
 
     const salt : string = hashedPasswordData.salt;
@@ -26,17 +30,17 @@ authRouter.post('/register', (req, res, next) => {
             console.log(account);
         });
     
-    res.redirect('/login');
+    //res.redirect('/login');
 });
 
-authRouter.get('/logout', (req, res, next) => {
+router.get('/logout', (req, res, next) => {
     req.logOut();
     res.redirect('/login');
 })
 
-authRouter.get('/test', (req, res) => {
+router.get('/test', (req, res) => {
     res.send('hello tester');
     //return res.json({message: "Welcome to template route!"});
 })
 
-export default authRouter;
+export default { path: '/auth', router };

@@ -19,7 +19,7 @@ const repository = DB.repo(Session);
 app.use(session({
     secret: process.env.SECRET,
     resave: false,
-    saveUninitialized: true,
+    //saveUninitialized: true,
     store: new TypeormStore({ repository }),
     cookie: {
         maxAge: 1000 * 60 * 60 * 24 //1day
