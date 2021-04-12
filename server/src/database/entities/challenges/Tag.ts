@@ -15,7 +15,8 @@ export class Tag {
     @OneToMany(_ => Challenge, challenge => challenge.tag)
     challenges: Challenge[];
 
-    constructor() {
-        // TODO
+    constructor(name: string, description: string) {
+        this.name = name;
+        this.description = description;
     }
 }

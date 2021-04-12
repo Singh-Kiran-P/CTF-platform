@@ -1,7 +1,5 @@
-import DB from '../database';
-import { Team } from './entities/accounts/Team';
-import { Category } from './entities/accounts/Category';
-import { Account } from './entities/accounts/Account';
+import DB, { Team, Competition, Category, Tag, Account } from '../database';
+
 import Roles from './entities/accounts/Roles';
 /**
  * loads test entries into the database
@@ -13,12 +11,22 @@ async function loadTestData() {
         return entries;
     }
 
+    let competition: Competition = await save([
+        new Competition('CTFompetition')
+    ])[0];
+
     let categories: Category[] = await save([
         new Category('BACH 1', 1),
         new Category('BACH 2', 2),
         new Category('BACH 3', 3),
         new Category('MAST 1', 4),
         new Category('MAST 2', 5)
+    ]);
+
+    let tags: Tag[] = await save([
+        new Tag('Crypto', 'Yeah so this is like cryptography and stuff'),
+        new Tag('Networking', 'WEB'),
+        new Tag('idk anymore man', 'What is Lorem Ipsum? Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.')
     ]);
 
     let accounts: Account[] = await save([

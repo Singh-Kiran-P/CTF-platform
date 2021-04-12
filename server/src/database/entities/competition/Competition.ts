@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryColumn } from 'typeorm';
+import { Entity, Column, PrimaryColumn, Repository, EntityRepository } from 'typeorm';
 
 @Entity()
 export class Competition {
@@ -11,7 +11,21 @@ export class Competition {
     @Column()
     flagFormat: string;
 
-    constructor() {
-        // TODO
+    constructor(name: string) {
+        this.name = name;
+        this.paused = false;
+        this.flagFormat = '';
+        // TODO: flagFormat
+    }
+}
+
+@EntityRepository(Competition)
+export class CompetitionRepo extends Repository<Competition> {
+    instance() {
+        return this.findOne();
+    }
+
+    setName(name: string) {
+        return this.createQueryBuilder().update().set({ name: name }).execute();
     }
 }

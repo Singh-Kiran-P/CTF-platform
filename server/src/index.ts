@@ -6,12 +6,13 @@ import { Session } from './database/entities/sessions/Session';
 import { TypeormStore } from 'typeorm-store';
 import DB from "./database";
 import { Team } from "./database/entities/accounts/Team";
+import routes from './routes';
 dotenv.config();
 
 //create express
 const app = express();
-app.use(express.urlencoded());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // SESSION SETUP
 //Moet session opgeslagen in db? wordt oorspronkelijk door middleware op server zelf opgeslagen maar dit is niet echt schaalbaar.
@@ -34,22 +35,12 @@ app.use(passport.session());
 // routes
 const routes = require("./routes");
 app.use(routes);
-
-// template routes
-const temproutes = require("./routes/template");
-// route with prefix
-app.use("/template", temproutes);
+// listener called before every single route, calls any following routes once the database is connected
+// this ensures that the database is already connected in every single route listener
+app.all(/./, (_, __, next) => {
+    if (DB.connected()) next();
+    else DB.on('connect', () => next());
+});
+routes.forEach(route => app.use(route.path, route.router));
 
 app.listen(process.env.SERVER_PORT);
-console.log(`Server started at http://localhost:${process.env.SERVER_PORT}`);
-
-/* // example database usage
-DB.once('connect', () => {
-    console.log('Database connected');
-    DB.repo(Team).find({ relations: ['accounts', 'accounts.category'] }).then(entries => {
-        console.log('Availale teams:');
-        console.log(JSON.stringify(entries));
-    });
-});
-
- */

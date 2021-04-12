@@ -75,9 +75,10 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import axios from 'axios';
 
 export default Vue.extend({
-    name: 'AdminPanel',
+    name: 'AdminPanel', // TODO: add sponsors, pages, ...
     created() {
         this.loadFormData();
     },
@@ -91,7 +92,8 @@ export default Vue.extend({
         }
     }),
     computed: {
-        nameFeedback(): string { return this.feedback(this.form.name, 'Competition name', true, 3, 32, []); },
+        name(): string { return this.form.name.trim(); },
+        nameFeedback(): string { return this.feedback(this.name, 'Competition name', true, 3, 32, []); },
         categoryFeedback(): string { return this.form.categories.length ? '' : 'At least one category is required' },
         newCategory(): string { return this.form.newCategory.trim() },
         newCategoryFeedback(): string { return this.feedback(this.newCategory, 'Category', false, 3, 32, this.form.categories); },
@@ -102,18 +104,23 @@ export default Vue.extend({
         loadFormData(): void {
             this.form.newCategory = '';
             this.form.newTag = { name: '', description: '' };
-
-            // TODO: load from database
-            this.form.name = '';
-            this.form.categories = [];
-            this.form.tags = []
+            axios.get('/api/competition/data').then(response => {
+                let data = response.data;
+                this.form.name = data.name;
+                this.form.categories = data.categories;
+                this.form.tags = data.tags;
+            });
         },
         onCancel(): void {
             this.loadFormData();
         },
         onSubmit(e: Event): void {
             e.preventDefault();
-            // TODO: store in database
+            axios.put('/api/competition/save', {
+                name: this.name,
+                categories: this.form.categories.map((category, i) => ({ name: category, priority: i })),
+                tags: this.form.tags
+            }).then(() => { /* TODO: show saved message */ });
         },
 
         feedback(input: string, name: string, required: boolean, min: number, max: number, others: string[]): string {
@@ -138,7 +145,7 @@ export default Vue.extend({
             let i = this.form.categories.indexOf(category);
             if (i >= this.form.categories.length - 1) return;
             let temp = this.form.categories[i];
-            Vue.set(this.form.categories, i, this.form.categories[i + 1])
+            Vue.set(this.form.categories, i, this.form.categories[i + 1]);
             Vue.set(this.form.categories, i + 1, temp);
         },
         removeCategory(category: string): void {

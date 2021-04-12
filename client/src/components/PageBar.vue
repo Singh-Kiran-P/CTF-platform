@@ -1,16 +1,16 @@
 <template>
-    <div id="pageBar">
-        <b-navbar toggleable="md" type="dark" variant="dark">
-            <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
-
-            <b-collapse id="nav-collapse" is-nav>
+    <div id=pageBar>
+        <b-navbar toggleable=md type=dark variant=dark>
+            <b-navbar-toggle target=nav-collapse />
+            
+            <b-collapse id=nav-collapse is-nav>
                 <b-navbar-nav>
                     <b-nav-item v-for="page in pages.left" :key="page.path" :to="page.path">
                         {{page.name}}
                     </b-nav-item>
                 </b-navbar-nav>
 
-                <b-navbar-nav class="ml-auto">
+                <b-navbar-nav class=ml-auto>
                     <b-nav-item v-for="page in pages.right" :key="page.path" :to="page.path">
                         {{page.name}}
                     </b-nav-item>
@@ -36,7 +36,13 @@ export default Vue.extend({
         });
     },
     data: () => ({
-        pages: { left: [] as Array<{ path: string, name: string }>, right: [] as Array<{ path: string, name: string }> }
+        pages: { left: [] as { path: string, name: string }[], right: [] as { path: string, name: string }[] }
     })
 });
 </script>
+
+<style scoped lang="scss">    
+a.router-link-exact-active, a:hover, a:focus-visible {
+    color: var(--primary) !important;
+}
+</style>

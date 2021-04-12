@@ -44,21 +44,21 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import Vue from 'vue';
 
 export default Vue.extend({
-    name: "Register",
+    name: 'Register',
     data: () => ({
         form: {
-            username: "",
-            password: "",
+            username: '',
+            password: '',
             category: null
         },
         categories: [ // TODO: have to be loaded from the database instead of hardcoded
-            { text: "BAC1", value: 1 },
-            { text: "BAC2", value: 2 },
-            { text: "BAC3", value: 3 },
-            { text: "MASTER", value: 4 }
+            { text: 'BAC1', value: 1 },
+            { text: 'BAC2', value: 2 },
+            { text: 'BAC3', value: 3 },
+            { text: 'MASTER', value: 4 }
         ]
     }),
     
@@ -103,7 +103,7 @@ export default Vue.extend({
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .register {
     padding: 1rem;
 }

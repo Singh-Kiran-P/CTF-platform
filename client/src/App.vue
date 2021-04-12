@@ -20,17 +20,11 @@ export default Vue.extend({
 </script>
 
 <style lang="scss">
-@import 'assets/css/custom.css';
-
-html, body, #app {
-    width: 100%;
-    height: 100%;
-    font-family: Avenir, Helvetica, Arial, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-}
+@import 'assets/css/custom.scss';
 
 #app {
+    width: 100%;
+    height: 100%;
     display: flex;
     flex-direction: column;
 }
