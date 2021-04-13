@@ -7,7 +7,7 @@
         "build": "tsc -b",
         "server_watch_TS": "tsc --watch",
         "server_with_auto_reload_files": "nodemon dist/server.js",
-        "dev_backend" : "concurrently --kill-others  \"npm run server_watch_TS \" \"npm run server_with_auto_reload_files\"",
+        "dev_backend": "concurrently --kill-others  \"npm run server_watch_TS \" \"npm run server_with_auto_reload_files\"",
         "server_dev": " npm run build && npm run dev_backend",
         "client": "npm run serve --prefix ../client",
         "dev": "concurrently --kill-others  \"npm run client\" \"npm run server_dev\""
@@ -39,12 +39,16 @@
     "dependencies": {
         "bunyan": "^1.8.15",
         "concurrently": "^6.0.0",
+        "dockerode": "^3.2.1",
+        "dockerode-build": "^1.1.6",
         "dotenv": "^8.2.0",
         "ejs": "^3.1.6",
         "express": "^4.17.1",
         "livereload": "^0.9.3",
         "morgan": "^1.10.0",
+        "path": "^0.12.7",
         "pg": "^8.5.1",
+        "pump": "^3.0.0",
         "reflect-metadata": "^0.1.13",
         "socket.io": "^4.0.1",
         "typeorm": "^0.2.32"

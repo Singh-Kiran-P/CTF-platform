@@ -1,4 +1,4 @@
-import express = require("express");
+import express from 'express';
 const router = express.Router();
 
 /**
@@ -8,4 +8,4 @@ router.get("/conatiners", (req, res) => {
   return res.json();
 });
 
-module.exports = router;
+export default { path: '/docker', router };
