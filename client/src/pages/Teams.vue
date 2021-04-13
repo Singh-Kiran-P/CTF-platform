@@ -13,7 +13,7 @@ export default Vue.extend({
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 span {
     font-weight: bold;
     display: block;

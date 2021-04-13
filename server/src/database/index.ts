@@ -92,3 +92,20 @@ declare interface Database {
 
 const instance: Database = new Database();
 export default instance;
+
+export { Account } from './entities/accounts/Account';
+export { Category } from './entities/accounts/Category';
+export { Team } from './entities/accounts/Team';
+export { Attachment } from './entities/challenges/Attachment';
+export { Challenge } from './entities/challenges/Challenge';
+export { Hint } from './entities/challenges/Hint';
+export { Question } from './entities/challenges/Question';
+export { Round } from './entities/challenges/Round';
+export { Tag } from './entities/challenges/Tag';
+export { Competition, CompetitionRepo } from './entities/competition/Competition';
+export { Page } from './entities/competition/Page';
+export { Sponsor } from './entities/competition/Sponsor';
+export { Attempt } from './entities/connections/Attempt';
+export { Environment } from './entities/connections/Environment';
+export { Solve } from './entities/connections/Solve';
+export { UsedHint } from './entities/connections/UsedHint';

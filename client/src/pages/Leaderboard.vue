@@ -12,7 +12,7 @@ export default Vue.extend({
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 span {
     font-size: 2rem;
 }

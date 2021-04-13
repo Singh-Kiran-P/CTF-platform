@@ -8,7 +8,7 @@
                     v-model="form.username"
                     placeholder="Enter username"
                     required
-                ></b-form-input>
+                />
             </b-form-group>
 
             <b-form-group id="input-group-password" label="Password" label-for="password">
@@ -18,7 +18,7 @@
                     v-model="form.password"
                     :state="passLenCheck"
                     required
-                ></b-form-input>
+                />
 
                 <!-- This will only be shown if the preceding input has an invalid state -->
                 <b-form-invalid-feedback id="input-live-feedback">
@@ -33,7 +33,7 @@
                     v-model="form.category"
                     :options="categories"
                     required
-                ></b-form-select>
+                />
             </b-form-group>
 
             <b-button type="submit" variant="primary">Submit</b-button>
@@ -42,21 +42,21 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import Vue from 'vue';
 
 export default Vue.extend({
-    name: "Register",
+    name: 'Register',
     data: () => ({
         form: {
-            username: "",
-            password: "",
+            username: '',
+            password: '',
             category: null
         },
         categories: [ // TODO: have to be loaded from the database instead of hardcoded
-            { text: "BAC1", value: 1 },
-            { text: "BAC2", value: 2 },
-            { text: "BAC3", value: 3 },
-            { text: "MASTER", value: 4 }
+            { text: 'BAC1', value: 1 },
+            { text: 'BAC2', value: 2 },
+            { text: 'BAC3', value: 3 },
+            { text: 'MASTER', value: 4 }
         ]
     }),
     methods: {
@@ -73,7 +73,7 @@ export default Vue.extend({
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .register {
     padding: 1rem;
 }

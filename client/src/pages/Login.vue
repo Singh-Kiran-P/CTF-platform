@@ -12,7 +12,7 @@ export default Vue.extend({
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .login {
     padding: 1rem;
     border-left: 50px solid red;
