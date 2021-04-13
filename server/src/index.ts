@@ -21,10 +21,9 @@ app.use(session({
     saveUninitialized: false,
     store: new TypeormStore({
       cleanupLimit: 2,
-      limitSubquery: false, // If using MariaDB.
       ttl: 86400
     }).connect(sessionRepo),
-    secret: "keyboard cat"
+    secret: process.env.SECRET
   }
 ));
 
