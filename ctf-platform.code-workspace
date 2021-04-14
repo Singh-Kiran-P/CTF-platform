@@ -7,7 +7,7 @@
 			"path": "server"
         },
         {
-			"path": "Docker"
+			"path": "docker"
 		}
 	],
 	"settings": {

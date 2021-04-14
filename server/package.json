@@ -5,6 +5,7 @@
     "main": "dist",
     "scripts": {
         "build": "tsc -b",
+        "docker-test" : "npm run build && npm run server_with_auto_reload_files",
         "server_watch_TS": "tsc --watch",
         "server_with_auto_reload_files": "nodemon dist/server.js",
         "dev_backend": "concurrently --kill-others  \"npm run server_watch_TS \" \"npm run server_with_auto_reload_files\"",

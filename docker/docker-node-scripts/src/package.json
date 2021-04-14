@@ -4,7 +4,8 @@
   "description": "",
   "scripts": {
     "make": "node make-challege-image.js",
-    "start": "node make-start-challenge-container.js"
+    "start": "node make-start-challenge-container.js",
+    "info": "node getinfo.js"
   },
   "author": "",
   "license": "ISC",
