@@ -17,27 +17,22 @@ services:
     networks:
       - mynet
 
-  # vue-ui:
-  #   container_name: vue-ui
-  #   build:
-  #     context: ./client
-  #   ports:
-  #     - "80:80"
-  #   volumes:
-  #     - ./client:/ctf/client
-  #   working_dir: /ctf/client
-  #   networks:
-  #     - mynet
+  vue-ui:
+    container_name: vue-ui
+    build:
+      context: ./client
+    ports:
+      - "80:80"
+    volumes:
+      - ./client:/ctf/client
+    working_dir: /ctf/client
+    networks:
+      - mynet
 
   nodejs-server:
     container_name: nodejs-server
     build:
       context: ./server
-    environment:
-      DB_SCHEMA: ctf-platform
-      DB_USER: postgres1
-      DB_PASSWORD: postgres
-      DB_HOST: postgres
     depends_on:
       - postgres
     links:

@@ -37,7 +37,6 @@ class Database extends EventEmitter {
       host: process.env.DB_HOST,
       port: parseInt(process.env.DB_PORT),
       database: process.env.DB_NAME,
-      schema: process.env.DB_SCHEMA,
       username: process.env.DB_USER,
       password: process.env.DB_PASSWORD,
       synchronize: true,
@@ -46,7 +45,6 @@ class Database extends EventEmitter {
     })
       .then(async (conn) => {
         this.conn = conn;
-        await this.conn.query(`SET search_path TO ${process.env.DB_SCHEMA};`);
         if (this.loadTestData) await loadTestData();
         this.emit("connect");
       })
