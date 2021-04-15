@@ -41,7 +41,8 @@ services:
       - '4000:4000'
     volumes:
       - ./server:/ctf/server
-      - /var/run/docker.sock:/var/run/docker.sock
+      # For accessing docker works ONLY in Linux
+      # - /var/run/docker.sock:/var/run/docker.sock
     working_dir: /ctf/server
     networks:
       - mynet
