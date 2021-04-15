@@ -6,7 +6,7 @@
                     id=username
                     name=username
                     type=text
-                    v-model="form.username"
+                    v-model="form.username.value"
                     placeholder="Enter username"
                     required
                     :state="state(usernameFeedback)"
@@ -19,7 +19,7 @@
                     id=password
                     name=password
                     type=password
-                    v-model="form.password"
+                    v-model="form.password.value"
                     required
                     :state="state(passwordFeedback)"
                 ></b-form-input>
@@ -45,21 +45,26 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import axios from 'axios';
 
 export default Vue.extend({
     name: 'Register',
+    created() {
+        this.loadFormCategories();
+    },
     data: () => ({
         form: {
-            username: '',
-            password: '',
+            username: {
+                value: '',
+                serverError: ''
+            },
+            password: {
+                value: '', 
+                serverError: ''
+            },
             category: null
         },
-        categories: [ // TODO: have to be loaded from the database instead of hardcoded
-            { text: 'BAC1', value: 1 },
-            { text: 'BAC2', value: 2 },
-            { text: 'BAC3', value: 3 },
-            { text: 'MASTER', value: 4 }
-        ]
+        categories: [] as string[],
     }),
     
     computed: {
@@ -86,19 +91,38 @@ export default Vue.extend({
         }*/
         onSubmit(e: Event): void {
             e.preventDefault();
+            axios.post('/api/auth/register', {username: this.form.username.value, password: this.form.password.value, category: this.form.category}).then(response => {
+                if(response.data.error) {
+                    if(response.data.error === "USER_ALREADY_EXISTS") {
+                        this.form.username.serverError = "An account with this username already exists";
+                    } else {
+                        console.log(response.data.error);
+                        //notify unknown server error?
+                    }
+                } else {
+                    console.log("succes!");
+                }
+            });
             // TODO: store in database and perform server side validation
         },
-        feedback(input: string, name: string, required: boolean, min: number, max: number, others: string[]): string {
-            let l = input.length;
+        feedback(input: any, name: string, required: boolean, min: number, max: number, others: string[]): string {
+            let l = input.value.length;
+            if(input.serverError) return input.serverError;
             if (required && l == 0) return `${name} is required`;
-            if (others.includes(input)) return `${name} already exists`;
+            if (others.includes(input.value)) return `${name} already exists`;
             if (l && l < min) return `${name} must be at least ${min} characters`;
             else if (l > max) return `${name} must be at most ${max} characters`;
             return '';
         },
         state(feedback: string): boolean {
             return feedback.length == 0;
-        }
+        },
+        loadFormCategories(): void {
+            axios.get('/api/auth/loadCategories').then(response => {
+                let data = response.data;
+                this.categories = data.categories;
+            });
+        },
     }
 });
 </script>

@@ -3,34 +3,38 @@ const router = Router();
 import passport from 'passport';
 import { Repository } from 'typeorm';
 import { generatePassword } from '../auth/passportUtils';
-import DB from '../database';
-import { Account } from '../database/entities/accounts/Account';
+import DB, { Account, Category } from '../database';
 import Roles from '../database/entities/accounts/Roles';
 import Errors from '../auth/Errors';
-
-const accountRepo = DB.repo(Account);
+import { RESERVED_EVENTS } from 'socket.io/dist/socket';
 
 //POST ROUTES
 
-router.post('/login', passport.authenticate('local'), (req, res, next) => {});
+router.post('/login', passport.authenticate('local'));
 
 router.post('/register', (req, res, next) => {
-    if(accountRepo.findOne({name: req.body.username})) {
-        return res.status(400).json({errors: Errors.USER_ALREADY_EXISTS})
-    }
-    const hashedPasswordData = generatePassword(req.body.password);
+    const accountRepo = DB.repo(Account);
+    console.log(req.body.username);
+    console.log(req.body.password);
+    console.log(req.body.category);
+    accountRepo.findOne({name: req.body.username}).then((acc : Account) => {
+        if(acc) {
+            return res.json({error: Errors.USER_ALREADY_EXISTS});
+        }
+        const hashedPasswordData = generatePassword(req.body.password);
 
-    const salt : string = hashedPasswordData.salt;
-    const hashedPass : string = hashedPasswordData.hash;
+        const salt : string = hashedPasswordData.salt;
+        const hashedPass : string = hashedPasswordData.hash;
 
-    const newAccount = new Account(req.body.username, hashedPass, salt, Roles.participant, req.body.category);
+        DB.repo(Category).findOne({name: req.body.category}).then((category: Category) => {
+            const newAccount = new Account(req.body.username, hashedPass, salt, Roles.participant, category);
 
-    accountRepo.save(newAccount)
-        .then((account: Account) => {
-            console.log(account);
-        });
-    
-    //res.redirect('/login');
+            accountRepo.save(newAccount)
+                .then((account: Account) => {
+                    console.log(account);
+                });
+        })
+    });
 });
 
 router.get('/logout', (req, res, next) => {
@@ -38,9 +42,36 @@ router.get('/logout', (req, res, next) => {
     res.redirect('/login');
 })
 
-router.get('/test', (req, res) => {
-    res.send('hello tester');
-    //return res.json({message: "Welcome to template route!"});
+//test
+router.get('/account/:name', (req, res) => {
+    const accountRepo = DB.repo(Account);
+
+    accountRepo.findOne({name: req.params.name})
+    .then((acc:Account)=> {
+        if(acc) {
+            return res.json({error: 'exists'});
+        }
+        return res.json({error: true, type: "USERNAME" })
+    });
+    /*
+    if(accountRepo.findOne({name: req.body.username})) {
+        res.send(acc)
+    }*/
+});
+
+router.get('/test/:password', (req, res) => {
+    console.log(req.params.password);
+    const hashedPasswordData = generatePassword(req.params.password);
+    res.send(hashedPasswordData);
 })
+
+router.get('/loadCategories', (_, res) => {
+    DB.repo(Category).find({ order: { priority: 'ASC' } })
+    .then((data: Category[] )=> {
+        res.json({
+            categories: data.map(category => category.name),
+        });
+    });
+});
 
 export default { path: '/auth', router };

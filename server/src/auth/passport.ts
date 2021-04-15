@@ -9,8 +9,6 @@ import { Account } from '../database/entities/accounts/Account';
 import { validPassword } from './passportUtils';
 import Errors from './Errors';
 
-const AccountRepo = DB.repo(Account);
-
 //if fieldnames in frontend are different from 'username' and 'password' these have to be set
 const htmlFieldNames = {
     usernameField: 'username',
@@ -19,7 +17,7 @@ const htmlFieldNames = {
 
 const strategy = new LocalStrategy(htmlFieldNames, 
     (username: string, password: string,  done ) => {
-        AccountRepo.findOne({name: username})
+        DB.repo(Account).findOne({name: username})
             .then((account: Account) => {
                 //No account with this username found
                 if (!account) {return done(Errors.USER_NOT_FOUND, false)}
@@ -44,7 +42,7 @@ passport.serializeUser((account: Account, done) => {
 });
 
 passport.deserializeUser((accountId: number, done) => {
-    AccountRepo.findOne(accountId)
+    DB.repo(Account).findOne(accountId)
         .then((account: Account) => {
             done(null, account);
         })

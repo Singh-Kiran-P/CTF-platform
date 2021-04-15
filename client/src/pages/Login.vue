@@ -32,6 +32,7 @@
 
 <script lang="ts">
 import Vue from "vue";
+import axios from "axios"
 
 export default Vue.extend({
     name: "Login",
@@ -65,6 +66,10 @@ export default Vue.extend({
         },*/
         onSubmit(e: Event): void {
             e.preventDefault();
+            axios.get('/api/auth/test').then(response => {
+                let data = response.data;
+                console.log(data);
+            });
             // TODO: store in database and perform server side validation
         },
         feedback(input: string, name: string, required: boolean, min: number, max: number, others: string[]): string {

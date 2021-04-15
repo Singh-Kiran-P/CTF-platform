@@ -1,7 +1,7 @@
 const enum Errors {
-    USER_NOT_FOUND = "This user was not found",
-    USER_ALREADY_EXISTS = "This user already exists",
-    WRONG_PASSWORD = "Wrong password"
+    USER_NOT_FOUND = "USER_NOT_FOUND",
+    USER_ALREADY_EXISTS = "USER_ALREADY_EXISTS",
+    WRONG_PASSWORD = "WRONG_PASSWORD"
 }
 
 export default Errors;
