@@ -40,7 +40,7 @@ class Database extends EventEmitter {
       username: process.env.DB_USER,
       password: process.env.DB_PASSWORD,
       synchronize: true,
-      logging: true,
+      logging: false,
       entities: [__dirname + "/entities/*/*.js"],
     })
       .then(async (conn) => {
