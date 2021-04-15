@@ -1,6 +1,6 @@
 <template>
     <div class="leaderboard">
-        <span>This is the leaderboard</span>
+        <span>This is the leaderboar d</span>
     </div>
 </template>
 

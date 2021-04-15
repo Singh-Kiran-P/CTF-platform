@@ -12,7 +12,11 @@ module.exports = {
                     }
                 },
             },
-            port: process.env.SERVER_PORT
+            port: process.env.SERVER_PORT,
+            // https://github.com/vuejs-templates/webpack/issues/378
+            watchOptions: {
+                poll: true,
+            },
         }
     }
 };
