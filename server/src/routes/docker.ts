@@ -2,10 +2,9 @@ import express from 'express';
 import Docker = require('dockerode');
 var docker = new Docker({ socketPath: '/var/run/docker.sock' });
 
-const router = express.Router();
+let DockerController = require('../controllers/docker')
 
-// Require controller modules.
-var dockerControllers = require('../controllers/docker');
+const router = express.Router();
 
 router.get("/containers", (req, res) => {
 
@@ -13,6 +12,14 @@ router.get("/containers", (req, res) => {
     res.json(containers);
   });
 
+});
+
+router.post("/unzip", DockerController.createChallengeImage);
+
+router.get("/images", (req, res) => {
+  docker.listImages((err, images) => {
+    res.json(images);
+  });
 });
 
 router.get("/containers", (req, res) => {

@@ -1,11 +1,18 @@
-import { Entity, PrimaryColumn, ManyToOne } from 'typeorm';
+import { Entity, PrimaryColumn, ManyToOne, Column } from 'typeorm';
 import { Challenge } from '../challenges/Challenge';
 import { Team } from '../accounts/Team';
 
 @Entity()
 export class Environment {
     @PrimaryColumn()
-    environment: number;
+    id: number;
+
+    @Column()
+    containerId: number;
+
+    @Column()
+    removed: boolean;
+
 
     @ManyToOne(_ => Team, team => team.environments, { nullable: false })
     team: Team;
