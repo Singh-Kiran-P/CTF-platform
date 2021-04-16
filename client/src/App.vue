@@ -1,26 +1,26 @@
 <template>
     <div id="app">
-        <PageBar/>
+        <PageBar />
         <div id="page">
-            <router-view/>
+            <router-view />
         </div>
     </div>
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
-import PageBar from './components/PageBar.vue';
+import Vue from "vue";
+import PageBar from "./components/PageBar.vue";
 
 export default Vue.extend({
-    name: 'App',
+    name: "App",
     components: {
-        PageBar
-    }
+        PageBar,
+    },
 });
 </script>
 
 <style lang="scss">
-@import 'assets/css/custom.scss';
+@import "assets/css/custom.scss";
 
 #app {
     width: 100%;
@@ -29,7 +29,8 @@ export default Vue.extend({
     flex-direction: column;
 }
 
-#pageBar, #page {
+#pageBar,
+#page {
     width: 100%;
 }
 
@@ -40,7 +41,8 @@ export default Vue.extend({
     overflow: auto;
 }
 
-#page > iframe, #page > div {
+#page > iframe,
+#page > div {
     width: 100%;
     max-width: 100%;
     min-height: 100%;

@@ -1,45 +1,37 @@
+import { Request, Response, NextFunction } from 'express';
 import Docker = require('dockerode');
-import AdmZip = require("adm-zip");
-import path = require('path');
-var appDir = path.dirname(require.main.filename);
+import pump from 'pump';
+var build = require('dockerode-build')
 var docker = new Docker({ socketPath: '/var/run/docker.sock' });
 
 function getAllRunningContainers() {
-  let data = [];
-  docker.listContainers(function (err, containers) {
-    containers.forEach(function (containerInfo) {
-      data.push([containerInfo]);
+    let data:any = [];
+    docker.listContainers(function (err, containers) {
+        containers.forEach(function (containerInfo) {
+            data.push([containerInfo]);
+        });
     });
-  });
-  Promise.all
-  return data;
+    return data;
 }
-
-async function unzip(name) {
-
-  let challengeFilePath = appDir + "/uploads/Challenges/compressed/" + name + ".zip";
-  console.log(challengeFilePath);
-
-  var zip = new AdmZip(challengeFilePath);
-  let newPath = appDir + "/uploads/Challenges/uncompressed/" + name + "/";
-  zip.extractAllTo(newPath, true);
-
-  return newPath;
-}
-
 
 /**
  * unzip and make docker image from Dockerfile
  * @param challengeFile Zip file
  */
-async function createChallengeImage(req, res, next) {
-  let files = unzip("test")
-
-  res.send(files)
+async function createChallengeImage(req: Request, res: Response, next: NextFunction) {
+    pump(
+        build(`${__dirname}/../../public/uploads/Challenges/uncompressed/test-challenge/Dockerfile`, { t: req.query.name }),
+        process.stdout,
+        function (err) {
+            if (err) {
+                console.log('something went wrong:', err.message)
+                process.exit(1)
+            }
+        }
+    )
 }
 
-module.exports = {
-  getAllRunningContainers,
-  createChallengeImage,
-  unzip
+export default {
+    getAllRunningContainers,
+    createChallengeImage,
 }

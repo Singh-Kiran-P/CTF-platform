@@ -1,25 +1,25 @@
 <template>
-    <div class="pageNotFound">
-        <span>404 page not found</span>
-    </div>
+  <div class="pageNotFound">
+    <span>404 page not found</span>
+  </div>
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
+import Vue from "vue";
 
 export default Vue.extend({
-    name: 'PageNotFound'
+  name: "PageNotFound",
 });
 </script>
 
 <style scoped lang="scss">
 .pageNotFound {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 span {
-    font-size: 2rem;
+  font-size: 2rem;
 }
 </style>

@@ -5,18 +5,18 @@ var container = docker.getContainer('challenge-name/ uuid');
 
 // query API for container info
 container.inspect(function (err, data) {
-  console.log(data);
+    console.log(data);
 });
 
 container.start(function (err, data) {
-  console.log(data);
+    console.log(data);
 });
 
 container.stop(function (err, data) {
-  console.log(data);
+    console.log(data);
 });
 
 
 container.remove(function (err, data) {
-  console.log(data);
+    console.log(data);
 });

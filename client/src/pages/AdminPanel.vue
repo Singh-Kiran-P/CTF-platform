@@ -1,110 +1,183 @@
 <template>
-    <div class=admin-panel>
+    <div class="admin-panel">
         <b-form @submit="onSubmit($event)">
-            <b-form-group variant=dark type=dark>
-                <label for=competition-name>Competition name</label>
+            <b-form-group variant="dark" type="dark">
+                <label for="competition-name">Competition name</label>
                 <b-form-input
-                    type=text
-                    id=competition-name
+                    type="text"
+                    id="competition-name"
                     v-model="form.name"
                     placeholder="Enter competition name"
                     :state="state(nameFeedback)"
                 />
-                <b-form-invalid-feedback>{{nameFeedback}}</b-form-invalid-feedback>
+                <b-form-invalid-feedback>{{
+                    nameFeedback
+                }}</b-form-invalid-feedback>
             </b-form-group>
 
-            <b-form-group :state="state(categoryFeedback)" :invalid-feedback="categoryFeedback">
+            <b-form-group
+                :state="state(categoryFeedback)"
+                :invalid-feedback="categoryFeedback"
+            >
                 <label>Participant categories</label>
-                <span>The lowest category takes priority when deciding the category of a team.</span>
-                <div class=list-item v-for="category in form.categories" :key="category">
-                    <span class=item-name>{{category}}</span>
+                <span
+                    >The lowest category takes priority when deciding the
+                    category of a team.</span
+                >
+                <div
+                    class="list-item"
+                    v-for="category in form.categories"
+                    :key="category"
+                >
+                    <span class="item-name">{{ category }}</span>
                     <div class="icon btn" @click="categoryDown(category)">
-                        <font-awesome-icon icon=chevron-down />
+                        <font-awesome-icon icon="chevron-down" />
                     </div>
-                    <div class="icon btn danger" @click="removeCategory(category)">
-                        <font-awesome-icon icon=times />
+                    <div
+                        class="icon btn danger"
+                        @click="removeCategory(category)"
+                    >
+                        <font-awesome-icon icon="times" />
                     </div>
                 </div>
-                <div class=add-list-item>
+                <div class="add-list-item">
                     <b-form-input
-                        type=text
+                        type="text"
                         v-model="form.newCategory"
                         placeholder="Enter new category"
                         :state="state(newCategoryFeedback)"
                     />
-                    <b-button type=button variant=primary :disabled="!valid(newCategory, newCategoryFeedback)" @click="addCategory()">
-                        <font-awesome-icon icon=plus />
+                    <b-button
+                        type="button"
+                        variant="primary"
+                        :disabled="!valid(newCategory, newCategoryFeedback)"
+                        @click="addCategory()"
+                    >
+                        <font-awesome-icon icon="plus" />
                     </b-button>
-                    <b-form-invalid-feedback>{{newCategoryFeedback}}</b-form-invalid-feedback>
+                    <b-form-invalid-feedback>{{
+                        newCategoryFeedback
+                    }}</b-form-invalid-feedback>
                 </div>
             </b-form-group>
 
             <b-form-group>
                 <label>Challenge tags</label>
-                <div class=list-item v-for="tag in form.tags" :key="tag.name">
-                    <span class=item-name>{{tag.name}}</span>
+                <div class="list-item" v-for="tag in form.tags" :key="tag.name">
+                    <span class="item-name">{{ tag.name }}</span>
                     <div class="icon btn danger" @click="removeTag(tag.name)">
-                        <font-awesome-icon icon=times />
+                        <font-awesome-icon icon="times" />
                     </div>
-                    <span class=item-description>{{tag.description}}</span>
+                    <span class="item-description">{{ tag.description }}</span>
                 </div>
-                <div class=add-list-item>
+                <div class="add-list-item">
                     <b-form-input
-                        type=text
+                        type="text"
                         v-model="form.newTag.name"
                         placeholder="Enter new tag name"
                         :state="state(newTagFeedback)"
                     />
-                    <b-button type=button variant=primary :disabled="!valid(newTag.name, newTagFeedback)" @click="addTag()">
-                        <font-awesome-icon icon=plus />
+                    <b-button
+                        type="button"
+                        variant="primary"
+                        :disabled="!valid(newTag.name, newTagFeedback)"
+                        @click="addTag()"
+                    >
+                        <font-awesome-icon icon="plus" />
                     </b-button>
                     <b-form-textarea
                         v-model="form.newTag.description"
                         placeholder="Enter new tag description"
                         :state="state(newTagFeedback)"
                     />
-                    <b-form-invalid-feedback>{{newTagFeedback}}</b-form-invalid-feedback>
+                    <b-form-invalid-feedback>{{
+                        newTagFeedback
+                    }}</b-form-invalid-feedback>
                 </div>
             </b-form-group>
 
-            <b-button type=button variant=danger @click="onCancel()">Cancel</b-button>
-            <b-button type=submit variant=primary :disabled="!validForm()">Save</b-button>
+            <b-button type="button" variant="danger" @click="onCancel()"
+                >Cancel</b-button
+            >
+            <b-button type="submit" variant="primary" :disabled="!validForm()"
+                >Save</b-button
+            >
         </b-form>
     </div>
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
-import axios from 'axios';
+import Vue from "vue";
+import axios from "axios";
 
 export default Vue.extend({
-    name: 'AdminPanel', // TODO: add sponsors, pages, ...
+    name: "AdminPanel", // TODO: add sponsors, pages, ...
     created() {
         this.loadFormData();
     },
     data: () => ({
         form: {
-            name: '',
-            newCategory: '',
+            name: "",
+            newCategory: "",
             categories: [] as string[],
-            newTag: { name: '', description: '' },
-            tags: [] as { name: string, description: string }[]
-        }
+            newTag: { name: "", description: "" },
+            tags: [] as { name: string; description: string }[],
+        },
     }),
     computed: {
-        name(): string { return this.form.name.trim(); },
-        nameFeedback(): string { return this.feedback(this.name, 'Competition name', true, 3, 32, []); },
-        categoryFeedback(): string { return this.form.categories.length ? '' : 'At least one category is required' },
-        newCategory(): string { return this.form.newCategory.trim() },
-        newCategoryFeedback(): string { return this.feedback(this.newCategory, 'Category', false, 3, 32, this.form.categories); },
-        newTag() { return { name: this.form.newTag.name.trim(), description: this.form.newTag.description }; },
-        newTagFeedback(): string { return this.feedback(this.newTag.name, 'Tag name', false, 3, 32, this.form.tags.map(x => x.name)); }
+        name(): string {
+            return this.form.name.trim();
+        },
+        nameFeedback(): string {
+            return this.feedback(
+                this.name,
+                "Competition name",
+                true,
+                3,
+                32,
+                []
+            );
+        },
+        categoryFeedback(): string {
+            return this.form.categories.length
+                ? ""
+                : "At least one category is required";
+        },
+        newCategory(): string {
+            return this.form.newCategory.trim();
+        },
+        newCategoryFeedback(): string {
+            return this.feedback(
+                this.newCategory,
+                "Category",
+                false,
+                3,
+                32,
+                this.form.categories
+            );
+        },
+        newTag() {
+            return {
+                name: this.form.newTag.name.trim(),
+                description: this.form.newTag.description,
+            };
+        },
+        newTagFeedback(): string {
+            return this.feedback(
+                this.newTag.name,
+                "Tag name",
+                false,
+                3,
+                32,
+                this.form.tags.map((x) => x.name)
+            );
+        },
     },
     methods: {
         loadFormData(): void {
-            this.form.newCategory = '';
-            this.form.newTag = { name: '', description: '' };
-            axios.get('/api/competition/data').then(response => {
+            this.form.newCategory = "";
+            this.form.newTag = { name: "", description: "" };
+            axios.get("/api/competition/data").then((response) => {
                 let data = response.data;
                 this.form.name = data.name;
                 this.form.categories = data.categories;
@@ -116,20 +189,36 @@ export default Vue.extend({
         },
         onSubmit(e: Event): void {
             e.preventDefault();
-            axios.put('/api/competition/save', {
-                name: this.name,
-                categories: this.form.categories.map((category, i) => ({ name: category, priority: i })),
-                tags: this.form.tags
-            }).then(() => { /* TODO: show saved message */ });
+            axios
+                .put("/api/competition/save", {
+                    name: this.name,
+                    categories: this.form.categories.map((category, i) => ({
+                        name: category,
+                        priority: i,
+                    })),
+                    tags: this.form.tags,
+                })
+                .then(() => {
+                    /* TODO: show saved message */
+                });
         },
 
-        feedback(input: string, name: string, required: boolean, min: number, max: number, others: string[]): string {
+        feedback(
+            input: string,
+            name: string,
+            required: boolean,
+            min: number,
+            max: number,
+            others: string[]
+        ): string {
             let l = input.length;
             if (required && l == 0) return `${name} is required`;
             if (others.includes(input)) return `${name} already exists`;
-            if (l && l < min) return `${name} must be at least ${min} characters`;
-            else if (l > max) return `${name} must be at most ${max} characters`;
-            return '';
+            if (l && l < min)
+                return `${name} must be at least ${min} characters`;
+            else if (l > max)
+                return `${name} must be at most ${max} characters`;
+            return "";
         },
         state(feedback: string): boolean {
             return feedback.length == 0;
@@ -138,7 +227,10 @@ export default Vue.extend({
             return input.length > 0 && this.state(feedback);
         },
         validForm(): boolean {
-            return this.state(this.nameFeedback) && this.state(this.categoryFeedback);
+            return (
+                this.state(this.nameFeedback) &&
+                this.state(this.categoryFeedback)
+            );
         },
 
         categoryDown(category: string): void {
@@ -149,23 +241,25 @@ export default Vue.extend({
             Vue.set(this.form.categories, i + 1, temp);
         },
         removeCategory(category: string): void {
-            this.form.categories = this.form.categories.filter(x => x != category);
+            this.form.categories = this.form.categories.filter(
+                (x) => x != category
+            );
         },
         addCategory(): void {
             if (!this.valid(this.newCategory, this.newCategoryFeedback)) return;
             this.form.categories.push(this.newCategory);
-            this.form.newCategory = '';
+            this.form.newCategory = "";
         },
 
         removeTag(name: string): void {
-            this.form.tags = this.form.tags.filter(x => x.name != name);
+            this.form.tags = this.form.tags.filter((x) => x.name != name);
         },
         addTag(): void {
             if (!this.valid(this.newTag.name, this.newTagFeedback)) return;
             this.form.tags.push(this.newTag);
-            this.form.newTag = { name: '', description: '' };
-        }
-    }
+            this.form.newTag = { name: "", description: "" };
+        },
+    },
 });
 </script>
 
@@ -188,7 +282,9 @@ form label {
     margin-bottom: 0;
 }
 
-form label ~ input, form label ~ .list-item, form label ~ .add-list-item {
+form label ~ input,
+form label ~ .list-item,
+form label ~ .add-list-item {
     margin-top: var(--margin);
 }
 

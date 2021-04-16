@@ -28,7 +28,7 @@ async function loadTestData() {
         new Account('John 2', 'password', categories[3]),
         new Account('BOB!', 'password', categories[4])
     ]);
-    
+
     let teams: Team[] = await save([
         new Team('Team 1'),
         new Team('Team 2'),
