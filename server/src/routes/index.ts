@@ -1,4 +1,4 @@
-import auth from './auth.routes';
+import auth from './auth';
 import template from './template';
 import express = require("express"); //comment
 const router = express.Router(); //comment

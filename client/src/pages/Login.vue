@@ -6,7 +6,7 @@
                     id=username
                     name=username
                     type=text
-                    v-model="form.username"
+                    v-model="form.username.value"
                     placeholder="Enter username"
                     required
                     :state="state(usernameFeedback)"
@@ -19,12 +19,13 @@
                     id=password
                     name=password
                     type=password
-                    v-model="form.password"
+                    v-model="form.password.value"
                     required
                     :state="state(passwordFeedback)"
                 ></b-form-input> 
                 <b-form-invalid-feedback>{{passwordFeedback}}</b-form-invalid-feedback>
             </b-form-group>
+            <router-link :to="{ name: 'Register'}">No account? Click here to register</router-link>
             <b-button type=submit variant=primary>Submit</b-button>
         </b-form>
     </div>
@@ -38,8 +39,14 @@ export default Vue.extend({
     name: "Login",
     data: () => ({
         form: {
-            username: "",
-            password: ""
+            username: {
+                value: '',
+                serverError: ''
+            },
+            password: {
+                value: '', 
+                serverError: ''
+            }
         }
     }),
     computed: {
@@ -47,35 +54,30 @@ export default Vue.extend({
         passwordFeedback(): string { return this.feedback(this.form.password, 'password', true, 6, 32, []); },
     },
     methods: {
-        /*checkForm(e: Event){
-            this.form.errors = [];
-
-            if(!this.form.username) {
-                this.form.errors.push("Username is required");
-            } else if (this.form.username.length < 4) {
-                this.form.errors.push("Username length should be at least 4");
-            } else if(this.form.password.length < 6){
-                this.form.errors.push("Password lengths should be at least 6");
-            }
-
-            if (!this.form.errors.length) {
-                return true;
-            }
-
-            e.preventDefault();
-        },*/
         onSubmit(e: Event): void {
             e.preventDefault();
-            axios.get('/api/auth/test').then(response => {
-                let data = response.data;
-                console.log(data);
+            axios.post('/api/auth/login', {username: this.form.username.value, password: this.form.password.value}).then(response => {
+                if(response.data.error) {
+                    if(response.data.error === "USER_NOT_FOUND") {
+                        this.form.username.serverError = "No account with this username was found";
+                    } else if (response.data.error === "WRONG_PASSWORD") {
+                        this.form.password.serverError = "Wrong password";
+                    } else {
+                        console.log(response.data.error);
+                        //notify unknown server error?
+                    }
+                } else { //succesfully logged in
+                    console.log("succesful login!");
+                    this.$router.push({name: 'Register'})
+                }
             });
             // TODO: store in database and perform server side validation
         },
-        feedback(input: string, name: string, required: boolean, min: number, max: number, others: string[]): string {
-            let l = input.length;
+        feedback(input: any, name: string, required: boolean, min: number, max: number, others: string[]): string {
+            let l = input.value.length;
+            if(input.serverError) return input.serverError;
             if (required && l == 0) return `${name} is required`;
-            if (others.includes(input)) return `${name} already exists`;
+            if (others.includes(input.value)) return `${name} already exists`;
             if (l && l < min) return `${name} must be at least ${min} characters`;
             else if (l > max) return `${name} must be at most ${max} characters`;
             return '';
@@ -96,9 +98,15 @@ export default Vue.extend({
     margin: auto;
 }*/
 form {
-    padding: 1rem;
-    text-align: center;
+    padding-top: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
     width: 50%;
     margin: auto;
+}
+.router-link-active {
+    padding-bottom: 1rem;
 }
 </style>

@@ -1,22 +1,38 @@
 import Router from 'express';
 const router = Router();
 import passport from 'passport';
-import { Repository } from 'typeorm';
 import { generatePassword } from '../auth/passportUtils';
 import DB, { Account, Category } from '../database';
-import Roles from '../database/entities/accounts/Roles';
+import Roles from '../auth/Roles';
 import Errors from '../auth/Errors';
+import { isAuth, isAdmin } from '../auth/authMiddleware';
 import { RESERVED_EVENTS } from 'socket.io/dist/socket';
 
 //POST ROUTES
-
-router.post('/login', passport.authenticate('local'));
+router.post('/login', (req, res, next) => {
+    console.log('login route entered');
+    passport.authenticate('local', (err, user, info) => {
+        console.log('callback');
+        //server error, not a passport/authentication error, send error to frontend
+        if (err) {
+            return res.json({error: 'Server/Database error, contact support'});
+        }
+        //login failed, invalid username or password, send error to frontend
+        if (!user) {
+            return res.json({error: info.message}); //status 401 needed?
+        }
+        //login succeeded
+        //save user in express-session
+        req.login(user, err => {
+            if (err) 
+                next(err);
+        });
+    })(req,res,next);
+});
 
 router.post('/register', (req, res, next) => {
     const accountRepo = DB.repo(Account);
-    console.log(req.body.username);
-    console.log(req.body.password);
-    console.log(req.body.category);
+ 
     accountRepo.findOne({name: req.body.username}).then((acc : Account) => {
         if(acc) {
             return res.json({error: Errors.USER_ALREADY_EXISTS});
@@ -38,8 +54,9 @@ router.post('/register', (req, res, next) => {
 });
 
 router.get('/logout', (req, res, next) => {
-    req.logOut();
-    res.redirect('/login');
+    req.logOut(); // removes the req.user property and clears the login session
+    console.log('logged out');
+    //res.redirect('/login');
 })
 
 //test
@@ -59,10 +76,8 @@ router.get('/account/:name', (req, res) => {
     }*/
 });
 
-router.get('/test/:password', (req, res) => {
-    console.log(req.params.password);
-    const hashedPasswordData = generatePassword(req.params.password);
-    res.send(hashedPasswordData);
+router.get('/test', isAuth, isAdmin, (req, res) => {
+    console.log('passed all auth tests');
 })
 
 router.get('/loadCategories', (_, res) => {

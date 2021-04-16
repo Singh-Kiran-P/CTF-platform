@@ -16,5 +16,4 @@ function validPassword(password: string, hash: string, salt: string) : boolean {
     return hash === verify;
 }
 
-export {validPassword as validPassword};
-export {generatePassword as generatePassword};
+export {validPassword, generatePassword};

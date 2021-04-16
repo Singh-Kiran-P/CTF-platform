@@ -20,16 +20,20 @@ const strategy = new LocalStrategy(htmlFieldNames,
         DB.repo(Account).findOne({name: username})
             .then((account: Account) => {
                 //No account with this username found
-                if (!account) {return done(Errors.USER_NOT_FOUND, false)}
-
+                if (!account) {
+                    console.log('not found');
+                    return done(null, false, {message: Errors.USER_NOT_FOUND})
+                }
                 if(validPassword(password, account.password, account.salt)) {
+                    console.log('found');
                     return done(null, account);
                 } else {
-                    return done(Errors.WRONG_PASSWORD, false);
+                    console.log('found')
+                    return done(null, false, {message: Errors.WRONG_PASSWORD});
                 }
             })
             .catch((err) => {
-                done(err);
+                done(err); //server or database error, no auth error.
             });
     }
 );

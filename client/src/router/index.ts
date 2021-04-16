@@ -16,6 +16,12 @@ const pages: { [page: string]: Route } = {
         name: 'Register',
         src: 'Register.vue'
     },
+    logout: {
+        path: '/logout',
+        name: 'Logout',
+        src: 'Logout.vue',
+        meta: { right: true }
+    },
     leaderboard: {
         path: '/leaderboard',
         name: 'Leaderboard',
@@ -53,7 +59,8 @@ const routes: { [page: string]: Route[] } = {
     ],
     participant: [
         pages.leaderboard,
-        pages.teams
+        pages.teams,
+        pages.logout
     ],
     admin: [
         pages.leaderboard,

@@ -38,6 +38,7 @@
                 ></b-form-select>
                 <b-form-invalid-feedback>{{categoryFeedback}}</b-form-invalid-feedback>
             </b-form-group>
+            <router-link :to="{ name: 'Login'}">Already have an account? Click here to log in</router-link>
             <b-button type=submit variant=primary>Submit</b-button>
         </b-form>
     </div>

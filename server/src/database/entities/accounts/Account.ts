@@ -3,7 +3,7 @@ import { Attempt } from '../connections/Attempt';
 import { Solve } from '../connections/Solve';
 import { Category } from './Category';
 import { Team } from './Team';
-import  Roles  from './Roles';
+import  Roles  from '../../../auth/Roles';
 
 @Entity()
 export class Account {
