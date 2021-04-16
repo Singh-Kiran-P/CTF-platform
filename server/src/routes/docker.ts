@@ -14,11 +14,34 @@ router.get("/containers", (req, res) => {
 
 });
 
-router.get("/create", (req, res, next) => {
+router.post("/create", (req, res, next) => {
+    let jsonObj = req.body;
     DockerController
-        .createChallengeImage(req, res, next)
+        .createChallengeImage(jsonObj)
         .then(() => {
             res.send('oke');
+        })
+        .catch((err) =>{
+            res.send("noke");
+        })
+});
+
+/* TODO: catch error createChallengeContainer  */
+
+router.post("/createChallengeContainer", (req, res, next) => {
+    let jsonObj = req.body;
+    DockerController
+        .createChallengeContainer(jsonObj)
+        .then((data) => {
+            res.json(data);
+        })
+        .catch((err) =>{
+            console.log(err);
+
+            res.json(err);
+        })
+        .catch(() =>{
+            res.json();
         })
 });
 

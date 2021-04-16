@@ -4,6 +4,7 @@
     "description": "",
     "scripts": {
         "make": "node make-challege-image.js",
+        "create": "node create-container+start.js",
         "start": "node make-start-challenge-container.js",
         "info": "node getinfo.js"
     },
