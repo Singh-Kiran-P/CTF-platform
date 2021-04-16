@@ -17,6 +17,18 @@ services:
     networks:
       - mynet
 
+  portainer-dockerManager:
+    container_name: portainer-dockerManager
+    image: portainer/portainer-ce
+    command: -H unix:///var/run/docker.sock
+    restart: always
+    ports:
+      - 9000:9000
+      - 8000:8000
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+
   vue-ui:
     container_name: vue-ui
     build:
@@ -48,6 +60,7 @@ services:
 
 volumes:
     ctf-db:
+    portainer_data:
 
 networks:
   mynet:
