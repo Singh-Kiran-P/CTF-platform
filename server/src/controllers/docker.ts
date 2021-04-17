@@ -22,15 +22,16 @@ function getAllRunningContainers() {
  * @param challengeFile Zip file *
  * @pre files have to be in de dir
  */
-function createChallengeImage(jsonObj: any) {
-    pump(
-        build(`${__dirname}/../../public/uploads/Challenges/uncompressed/test-challenge/Dockerfile`, { t: jsonObj.name }),
-        process.stdout,
-        (err) => {
-            return Promise.reject(err);
-        }
-    )
-    return Promise.resolve();
+async function createChallengeImage(jsonObj: any) {
+    return new Promise((resolve, reject) => {
+        pump(
+            build(`${__dirname}/../../public/uploads/Challenges/uncompressed/test-challenge/Dockerfile`, { t: jsonObj.name }),
+            process.stdout,
+            (err) => {
+                reject(err);
+            }
+        )
+    });
 }
 
 function randomIntFromInterval(min, max) { // min and max included
@@ -39,25 +40,20 @@ function randomIntFromInterval(min, max) { // min and max included
 /* TODO: error terug geven line 39-42 */
 async function createChallengeContainer(jsonObj: any) {
     let randomPort = randomIntFromInterval(500, 10000)
-
-    docker.createContainer({ Image: jsonObj.image, name: jsonObj.containerName, HostConfig: { PortBindings: { '8080/tcp': [{ HostPort: randomPort.toString() }] } } }, function (err, container) {
-        if (err) {
-            console.log(err);
-            return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
+        docker.createContainer({ Image: jsonObj.image, name: jsonObj.containerName, HostConfig: { PortBindings: { '8080/tcp': [{ HostPort: randomPort.toString() }] } } }, (err, container) => {
+            if (err) {
                 reject(err);
-            })
-
-        }
-        container.start(function (err, data) {
-            console.log(err);
-
-            return new Promise((resolve, reject) => {
-                resolve(err);
-            })
+            } else {
+                container.start((err, data) => {
+                    if (err)
+                        reject(err);
+                    else
+                        resolve();
+                });
+            }
         });
     });
-
-
 }
 
 export default {

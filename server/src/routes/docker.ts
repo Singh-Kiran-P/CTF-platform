@@ -14,37 +14,6 @@ router.get("/containers", (req, res) => {
 
 });
 
-router.post("/create", (req, res, next) => {
-    let jsonObj = req.body;
-    DockerController
-        .createChallengeImage(jsonObj)
-        .then(() => {
-            res.send('oke');
-        })
-        .catch((err) =>{
-            res.send("noke");
-        })
-});
-
-/* TODO: catch error createChallengeContainer  */
-
-router.post("/createChallengeContainer", (req, res, next) => {
-    let jsonObj = req.body;
-    DockerController
-        .createChallengeContainer(jsonObj)
-        .then((data) => {
-            res.json(data);
-        })
-        .catch((err) =>{
-            console.log(err);
-
-            res.json(err);
-        })
-        .catch(() =>{
-            res.json();
-        })
-});
-
 router.get("/images", (req, res) => {
     docker.listImages((err, images) => {
         res.json(images);
@@ -62,9 +31,52 @@ router.get("/containers", (req, res) => {
     });
 });
 
+router.post("/createChallengeImage", (req, res, next) => {
+    let jsonObj = req.body;
+    DockerController
+        .createChallengeImage(jsonObj)
+        .then(() => {
+            res.json({"msg" : "Challenge image started"});
+        })
+        .catch((err) =>{
+            res.send(err);
+        })
+});
+
+/* TODO: catch error createChallengeContainer  */
+
+router.post("/createChallengeContainer", (req, res, next) => {
+    let jsonObj = req.body;
+    DockerController
+        .createChallengeContainer(jsonObj)
+        .then(() => {
+            res.json({"msg" : "Challenge container started"});
+        })
+        .catch((err) =>{
+            res.json(err);
+        });
+});
+
+/**
+ * id can be de container id OR name of the container
+ */
+router.post("/startContainer", (req, res) => {
+    let id = req.body.id;
+    let container = docker.getContainer(id);
+    container.start((err, data) => {
+        if (err == null)
+            res.json({ statusCode: 200, msg: "Container started successfully" })
+        else
+            res.json(err);
+    });
+});
+
+/**
+ * id can be de container id OR name of the container
+ */
 router.post("/stopContainer", (req, res) => {
-    let Id = req.body.Id;
-    let container = docker.getContainer(Id);
+    let id = req.body.id;
+    let container = docker.getContainer(id);
     container.stop((err, data) => {
         if (err == null)
             res.json({ statusCode: 200, msg: "Container stopt successfully" })
@@ -73,15 +85,25 @@ router.post("/stopContainer", (req, res) => {
     });
 });
 
-router.post("/startContainer", (req, res) => {
-    let Id = req.body.Id;
-    let container = docker.getContainer(Id);
-    container.start((err, data) => {
+// TODO: Make resetContainer route
+/**
+ *
+ * Stop container
+ * Removbe container
+ * Make new container with de base challenge image *
+ */
+router.post("/resetContainer", (req, res) => {
+
+
+    let id = req.body.id;
+    let container = docker.getContainer(id);
+    container.stop((err, data) => {
         if (err == null)
-            res.json({ statusCode: 200, msg: "Container started successfully" })
+            res.json({ statusCode: 200, msg: "Container reset successfully" })
         else
             res.json(err);
     });
 });
+
 
 export default { path: '/docker', router };
