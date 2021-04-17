@@ -1,7 +1,7 @@
 <template>
-    <div id="app">
+    <div id=app>
         <PageBar/>
-        <div id="page">
+        <div id=page>
             <router-view/>
         </div>
     </div>
@@ -9,7 +9,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import PageBar from './components/PageBar.vue';
+import PageBar from '@/components/PageBar.vue';
 
 export default Vue.extend({
     name: 'App',
@@ -20,7 +20,7 @@ export default Vue.extend({
 </script>
 
 <style lang="scss">
-@import 'assets/css/custom.scss';
+@import '@/assets/css/custom.scss';
 
 #app {
     width: 100%;

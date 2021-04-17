@@ -18,7 +18,9 @@ Vue.use(VueSweetalert2, {});
 Vue.use(VueMeta, { refreshOnceOnNavigation: true });
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 
-new Vue({
-    router,
-    render: h => h(App)
-}).$mount('#app');
+router.onReady = router => {
+    new Vue({
+        router,
+        render: h => h(App)
+    }).$mount('#app');
+}

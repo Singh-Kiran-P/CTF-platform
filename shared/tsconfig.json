@@ -1,37 +1,23 @@
 {
     "compilerOptions": {
         "strict": true,
-        "target": "esnext",
-        "module": "esnext",
+        "target": "es6",
+        "module": "commonjs",
         "esModuleInterop": true,
         "moduleResolution": "node",
-        "jsx": "preserve",
         "sourceMap": true,
         "baseUrl": ".",
-        "types": [
-            "webpack-env"
-        ],
         "paths": {
             "*": [
                 "node_modules/*"
             ],
             "@/*": [
                 "src/*"
-            ],
-            "@shared/*": [
-                "../shared/src/*"
             ]
-        },
-        "lib": [
-            "dom",
-            "dom.iterable",
-            "scripthost",
-            "esnext"
-        ]
+        }
     },
     "include": [
-        "src/**/*.ts",
-        "src/**/*.vue"
+        "src/**/*.ts"
     ],
     "exclude": [
         "node_modules"

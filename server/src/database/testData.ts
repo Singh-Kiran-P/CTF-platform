@@ -1,4 +1,4 @@
-import DB, { Team, Competition, Category, Tag, Account } from '../database';
+import DB, { Team, Competition, Category, Tag, Account, Page } from '../database';
 
 /**
  * loads test entries into the database
@@ -10,9 +10,15 @@ async function loadTestData() {
         return entries;
     }
 
-    let competition: Competition = await save([
+    let competition: Competition = (await save([
         new Competition('CTFompetition')
-    ])[0];
+    ]))[0];
+
+    let pages: Page[] = await save([
+        new Page('About', '/', '/temp/about/index.html'),
+        new Page('Test 1', '/test1', '/temp/test1/test.html'),
+        new Page('Test 2', '/test2', '/temp/test2/test.html')
+    ]);
 
     let categories: Category[] = await save([
         new Category('BACH 1', 1),

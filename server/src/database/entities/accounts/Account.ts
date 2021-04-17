@@ -30,7 +30,7 @@ export class Account {
     @OneToMany(_ => Attempt, attempt => attempt.account)
     attempts: Attempt[];
 
-    constructor(name: string, password: string, category?: Category) {
+    constructor(name: string, password: string, category: Category) {
         this.name = name;
         this.setPassword(password);
         this.category = category;
