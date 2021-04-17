@@ -12,7 +12,7 @@ import axios from 'axios';
 export default Vue.extend({
     name: 'Teams',
     created() {
-        
+        axios.get('/api/auth/getAuthRole').then((response) => console.log(response.data.role));
     }
 });
 </script>

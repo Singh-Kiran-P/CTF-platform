@@ -15,7 +15,7 @@ export default Vue.extend({
             axios
             .get("/api/auth/logout")
             .then(() => {
-                this.$router.push({name: 'Login'}); //or reload, needs to be configured using Landers code
+                this.$router.push({name: 'Login'}); //load visitor routes, needs to be configured using Landers code
             });
         }
     }

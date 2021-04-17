@@ -55,7 +55,8 @@ const uploadedPages: Route[] = [
 const routes: { [page: string]: Route[] } = {
     visitor: [
         pages.login,
-        pages.register
+        pages.register,
+        pages.teams
     ],
     participant: [
         pages.leaderboard,

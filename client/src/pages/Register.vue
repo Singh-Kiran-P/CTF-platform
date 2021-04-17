@@ -22,6 +22,7 @@
                     v-model="form.password.value"
                     required
                     :state="state(passwordFeedback)"
+                    v-on:input="onChangeUsername"
                 ></b-form-input>
                 <b-form-invalid-feedback>{{passwordFeedback}}</b-form-invalid-feedback>
             </b-form-group>
@@ -102,6 +103,7 @@ export default Vue.extend({
                     }
                 } else {
                     console.log("succes!");
+                    this.$router.push({name: 'Login'})
                 }
             });
             // TODO: store in database and perform server side validation
@@ -124,6 +126,9 @@ export default Vue.extend({
                 this.categories = data.categories;
             });
         },
+        onChangeUsername(e: Event) {
+            this.form.username.serverError = ''; //reset server error on input change
+        }
     }
 });
 </script>
@@ -132,14 +137,16 @@ export default Vue.extend({
 .register {
     padding: 1rem;
 }
-/*.form-group {
-    width: 50%;
-    margin: auto;
-}*/
 form {
-    padding: 1rem;
-    text-align: center;
+    padding-top: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
     width: 50%;
     margin: auto;
+}
+a {
+    padding-bottom: 1rem;
 }
 </style>

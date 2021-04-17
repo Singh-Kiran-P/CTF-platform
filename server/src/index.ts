@@ -14,19 +14,13 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // SESSION SETUP
-//Moet session opgeslagen in db? wordt oorspronkelijk door middleware op server zelf opgeslagen maar dit is niet echt schaalbaar.
-const sessionRepo = DB.repo(Session);
 app.use(session({
     resave: false,
     saveUninitialized: false,
-    /*store: new TypeormStore({
-      cleanupLimit: 2,
-      ttl: 86400
-    }).connect(sessionRepo),*/
-    secret: process.env.SECRET,
-    cookie: {
+    secret: process.env.SECRET
+    /*cookie: {
       maxAge: 30 * 24 * 60 * 60 * 1000
-    }
+    }*/
   }
 ));
 

@@ -10,6 +10,7 @@
                     placeholder="Enter username"
                     required
                     :state="state(usernameFeedback)"
+                    v-on:input="onChangeUsername"
                 ></b-form-input> 
                 <b-form-invalid-feedback>{{usernameFeedback}}</b-form-invalid-feedback>
             </b-form-group>
@@ -22,6 +23,7 @@
                     v-model="form.password.value"
                     required
                     :state="state(passwordFeedback)"
+                    v-on:input="onChangePassword"
                 ></b-form-input> 
                 <b-form-invalid-feedback>{{passwordFeedback}}</b-form-invalid-feedback>
             </b-form-group>
@@ -58,6 +60,7 @@ export default Vue.extend({
             e.preventDefault();
             axios.post('/api/auth/login', {username: this.form.username.value, password: this.form.password.value}).then(response => {
                 if(response.data.error) {
+                    console.log('error');
                     if(response.data.error === "USER_NOT_FOUND") {
                         this.form.username.serverError = "No account with this username was found";
                     } else if (response.data.error === "WRONG_PASSWORD") {
@@ -68,10 +71,10 @@ export default Vue.extend({
                     }
                 } else { //succesfully logged in
                     console.log("succesful login!");
-                    this.$router.push({name: 'Register'})
+                    //TODO: Load correct routes
+                    //axios.get('/api/auth/getUser').then(()=>console.log('session revieved')).catch(()=>alert('Internal error'));
                 }
-            });
-            // TODO: store in database and perform server side validation
+            }).catch(()=> alert('Internal error'));
         },
         feedback(input: any, name: string, required: boolean, min: number, max: number, others: string[]): string {
             let l = input.value.length;
@@ -84,6 +87,12 @@ export default Vue.extend({
         },
         state(feedback: string): boolean {
             return feedback.length == 0;
+        },
+        onChangeUsername(e: Event) {
+            this.form.username.serverError = ''; //reset server error on input change
+        },
+        onChangePassword(e: Event) {
+            this.form.password.serverError = ''; //reset server error on input change
         }
     }
 });
@@ -106,7 +115,7 @@ form {
     width: 50%;
     margin: auto;
 }
-.router-link-active {
+a {
     padding-bottom: 1rem;
 }
 </style>

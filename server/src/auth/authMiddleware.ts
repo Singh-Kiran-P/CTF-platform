@@ -1,6 +1,8 @@
 import { Account } from '../database/entities/accounts/Account';
+import Roles from './Roles';
+import express from 'express';
 
-function isAuth(req, res, next) {
+function isAuth(req: express.Request, res: express.Response, next: express.NextFunction) {
     if(req.isAuthenticated()) {
         console.log('authenticated');
         next();
@@ -10,10 +12,11 @@ function isAuth(req, res, next) {
     }
 }
 
-function isAdmin(req, res, next) {
-    if(req.isAuthenticated() && req.user.isAdmin()) { //user object is set by passportjs
+function isAdmin(req, res: express.Response, next: express.NextFunction) {
+    if(req.isAuthenticated() && req.user.role == Roles.admin) { //user object is set by passportjs
         console.log('you are admin');
         next();
+        req.lol
     } else {
         console.log('you are not admin');
         res.status(401).json({message: 'You are not an admin, you can\'t view this page'});
