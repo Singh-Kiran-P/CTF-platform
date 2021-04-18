@@ -17,15 +17,18 @@ const htmlFieldNames = {
 
 const strategy = new LocalStrategy(htmlFieldNames, 
     (username: string, password: string,  done ) => {
-        DB.repo(Account).findOne({name: username})
+        DB.repo(Account).findOne({
+            where: {name: username},
+            relations: ['category']})
             .then((account: Account) => {
                 //No account with this username found
                 if (!account) {
                     console.log('not found');
                     return done(null, false, {message: Errors.USER_NOT_FOUND})
                 }
+                console.log(account);
                 if(validPassword(password, account.password, account.salt)) {
-                    console.log('found');
+                    console.log('found and correct password');
                     return done(null, account);
                 } else {
                     console.log('found')

@@ -47,6 +47,11 @@ router.post('/register', (req, res, next) => {
             accountRepo.save(newAccount)
                 .then((account: Account) => {
                     console.log(account);
+                    //save user in express-session
+                    req.login(account, err => {
+                        if (err) 
+                            next(err);
+                    });
                     return res.sendStatus(200);
                 });
         })
