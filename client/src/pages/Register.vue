@@ -40,7 +40,7 @@
                 <b-form-invalid-feedback>{{categoryFeedback}}</b-form-invalid-feedback>
             </b-form-group>
             <router-link :to="{ name: 'Login'}">Already have an account? Click here to log in</router-link>
-            <b-button type=submit variant=primary>Submit</b-button>
+            <b-button type=submit variant=primary>Register</b-button>
         </b-form>
     </div>
 </template>
@@ -75,22 +75,6 @@ export default Vue.extend({
         categoryFeedback(): string { return this.form.category ? '' : 'Please select a category' }
     },
     methods: {
-        /*checkForm(e: Event){
-            this.form.errors = [];
-            if(!this.form.username) {
-                this.form.errors.push("Username is required");
-            } else if (this.form.username.length < 4) {
-                this.form.errors.push("Username length should be at least 4");
-            } else if(!this.form.category) {
-                this.form.errors.push("Please select a category");
-            } else if(this.form.password.length < 6){
-                this.form.errors.push("Password lengths should be at least 6");
-            }
-            if (!this.form.errors.length) {
-                return true;
-            }
-            e.preventDefault();
-        }*/
         onSubmit(e: Event): void {
             e.preventDefault();
             axios.post('/api/auth/register', {username: this.form.username.value, password: this.form.password.value, category: this.form.category}).then(response => {
@@ -105,8 +89,7 @@ export default Vue.extend({
                     console.log("succes!");
                     this.$router.push({name: 'Login'})
                 }
-            });
-            // TODO: store in database and perform server side validation
+            }).catch(err => alert(err));
         },
         feedback(input: any, name: string, required: boolean, min: number, max: number, others: string[]): string {
             let l = input.value.length;

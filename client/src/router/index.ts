@@ -22,6 +22,11 @@ const pages: { [page: string]: Route } = {
         src: 'Logout.vue',
         meta: { right: true }
     },
+    team: {
+        path: '/team',
+        name: 'Team',
+        src: 'Team.vue',
+    },
     leaderboard: {
         path: '/leaderboard',
         name: 'Leaderboard',
@@ -56,7 +61,8 @@ const routes: { [page: string]: Route[] } = {
     visitor: [
         pages.login,
         pages.register,
-        pages.teams //for testing
+        pages.teams, //for testing
+        pages.team //for testing
     ],
     participant: [
         pages.leaderboard,

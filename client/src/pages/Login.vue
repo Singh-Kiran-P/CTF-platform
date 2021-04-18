@@ -72,7 +72,6 @@ export default Vue.extend({
                 } else { //succesfully logged in
                     console.log("succesful login!");
                     //TODO: Load correct routes
-                    //axios.get('/api/auth/getUser').then(()=>console.log('session revieved')).catch(()=>alert('Internal error'));
                 }
             }).catch(()=> alert('Internal error'));
         },
