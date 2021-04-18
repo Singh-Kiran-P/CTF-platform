@@ -7,7 +7,7 @@
         "build": "tsc -b",
         "server_watch_TS": "tsc --watch",
         "server_with_auto_reload_files": "nodemon dist/server.js",
-        "dev_backend" : "concurrently --kill-others  \"npm run server_watch_TS \" \"npm run server_with_auto_reload_files\"",
+        "dev_backend": "concurrently --kill-others  \"npm run server_watch_TS \" \"npm run server_with_auto_reload_files\"",
         "server_dev": " npm run build && npm run dev_backend",
         "client": "npm run serve --prefix ../client",
         "dev": "concurrently --kill-others  \"npm run client\" \"npm run server_dev\""
@@ -25,8 +25,11 @@
     "devDependencies": {
         "@types/dotenv": "^8.2.0",
         "@types/express": "^4.17.11",
+        "@types/express-session": "^1.17.3",
         "@types/fs-extra": "^9.0.9",
         "@types/node": "^14.14.37",
+        "@types/passport": "^1.0.6",
+        "@types/passport-local": "^1.0.33",
         "@types/shelljs": "^0.8.8",
         "fs-extra": "^9.1.0",
         "nodemon": "^2.0.7",
@@ -39,14 +42,20 @@
     "dependencies": {
         "bunyan": "^1.8.15",
         "concurrently": "^6.0.0",
+        "connect-typeorm": "^1.1.4",
+        "crypto": "^1.0.1",
         "dotenv": "^8.2.0",
         "ejs": "^3.1.6",
         "express": "^4.17.1",
+        "express-session": "^1.17.1",
         "livereload": "^0.9.3",
         "morgan": "^1.10.0",
+        "passport": "^0.4.1",
+        "passport-local": "^1.0.0",
         "pg": "^8.5.1",
         "reflect-metadata": "^0.1.13",
         "socket.io": "^4.0.1",
-        "typeorm": "^0.2.32"
+        "typeorm": "^0.2.32",
+        "typeorm-store": "^1.2.0"
     }
 }

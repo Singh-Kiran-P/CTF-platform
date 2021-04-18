@@ -6,10 +6,10 @@ import { Account } from './Account';
 
 @Entity()
 export class Team {
-    @PrimaryGeneratedColumn()
-    id: number;
+    @PrimaryGeneratedColumn("uuid")
+    id: string;
 
-    @Column()
+    @Column({unique: true})
     name: string;
 
     @OneToMany(_ => Account, account => account.team)

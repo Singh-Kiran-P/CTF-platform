@@ -1,73 +1,133 @@
 <template>
-    <div class="register">
-        <b-form @submit="onSubmit">
-            <b-form-group id="input-group-username" label="Username" label-for="username">
+    <div class=register>
+        <b-form @submit="onSubmit($event)">
+            <b-form-group id=input-group-username label=Username label-for=username>
                 <b-form-input
-                    id="username"
-                    type="text"
-                    v-model="form.username"
+                    id=username
+                    name=username
+                    type=text
+                    v-model="form.username.value"
                     placeholder="Enter username"
                     required
-                />
+                    :state="state(usernameFeedback)"
+                ></b-form-input> 
+                <b-form-invalid-feedback>{{usernameFeedback}}</b-form-invalid-feedback>
             </b-form-group>
 
-            <b-form-group id="input-group-password" label="Password" label-for="password">
+            <b-form-group id=input-group-password label=Password label-for=password>
                 <b-form-input
-                    id="password"
-                    type="password"
-                    v-model="form.password"
-                    :state="passLenCheck"
+                    id=password
+                    name=password
+                    type=password
+                    v-model="form.password.value"
                     required
-                />
-
-                <!-- This will only be shown if the preceding input has an invalid state -->
-                <b-form-invalid-feedback id="input-live-feedback">
-                    Enter at least 6 characters
-                </b-form-invalid-feedback>
+                    :state="state(passwordFeedback)"
+                    v-on:input="onChangeUsername"
+                ></b-form-input>
+                <b-form-invalid-feedback>{{passwordFeedback}}</b-form-invalid-feedback>
             </b-form-group>
 
-            <b-form-group id="input-group-category" label="Category" label-for="category">
+            <b-form-group id=input-group-category label=Category label-for=category>
                 <b-form-select
-                    id="category"
-                    placeholder="Select category"
+                    id=category
+                    name=category
+                    placeholder=Select category
                     v-model="form.category"
                     :options="categories"
                     required
-                />
+                    :state="state(categoryFeedback)"
+                ></b-form-select>
+                <b-form-invalid-feedback>{{categoryFeedback}}</b-form-invalid-feedback>
             </b-form-group>
-
-            <b-button type="submit" variant="primary">Submit</b-button>
+            <router-link :to="{ name: 'Login'}">Already have an account? Click here to log in</router-link>
+            <b-button type=submit variant=primary>Submit</b-button>
         </b-form>
     </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
+import axios from 'axios';
 
 export default Vue.extend({
     name: 'Register',
+    created() {
+        this.loadFormCategories();
+    },
     data: () => ({
         form: {
-            username: '',
-            password: '',
+            username: {
+                value: '',
+                serverError: ''
+            },
+            password: {
+                value: '', 
+                serverError: ''
+            },
             category: null
         },
-        categories: [ // TODO: have to be loaded from the database instead of hardcoded
-            { text: 'BAC1', value: 1 },
-            { text: 'BAC2', value: 2 },
-            { text: 'BAC3', value: 3 },
-            { text: 'MASTER', value: 4 }
-        ]
+        categories: [] as string[],
     }),
-    methods: {
-        onSubmit(event: Event) {
-            event.preventDefault();
-            alert(JSON.stringify(this.form));
-        }
-    },
+    
     computed: {
-        passLenCheck(): boolean {
-            return this.form.password.length > 6 ? true : false;
+        usernameFeedback(): string { return this.feedback(this.form.username, 'username', true, 4, 32, []); },
+        passwordFeedback(): string { return this.feedback(this.form.password, 'password', true, 6, 32, []); },
+        categoryFeedback(): string { return this.form.category ? '' : 'Please select a category' }
+    },
+    methods: {
+        /*checkForm(e: Event){
+            this.form.errors = [];
+            if(!this.form.username) {
+                this.form.errors.push("Username is required");
+            } else if (this.form.username.length < 4) {
+                this.form.errors.push("Username length should be at least 4");
+            } else if(!this.form.category) {
+                this.form.errors.push("Please select a category");
+            } else if(this.form.password.length < 6){
+                this.form.errors.push("Password lengths should be at least 6");
+            }
+            if (!this.form.errors.length) {
+                return true;
+            }
+            e.preventDefault();
+        }*/
+        onSubmit(e: Event): void {
+            e.preventDefault();
+            axios.post('/api/auth/register', {username: this.form.username.value, password: this.form.password.value, category: this.form.category}).then(response => {
+                if(response.data.error) {
+                    if(response.data.error === "USER_ALREADY_EXISTS") {
+                        this.form.username.serverError = "An account with this username already exists";
+                    } else {
+                        console.log(response.data.error);
+                        //notify unknown server error?
+                    }
+                } else {
+                    console.log("succes!");
+                    this.$router.push({name: 'Login'})
+                }
+            });
+            // TODO: store in database and perform server side validation
+        },
+        feedback(input: any, name: string, required: boolean, min: number, max: number, others: string[]): string {
+            let l = input.value.length;
+            if(input.serverError) return input.serverError;
+            if (required && l == 0) return `${name} is required`;
+            if (others.includes(input.value)) return `${name} already exists`;
+            if (l && l < min) return `${name} must be at least ${min} characters`;
+            else if (l > max) return `${name} must be at most ${max} characters`;
+            return '';
+        },
+        state(feedback: string): boolean {
+            return feedback.length == 0;
+        },
+        loadFormCategories(): void {
+            axios.get('/api/auth/loadCategories').then(response => {
+                let data = response.data;
+                this.categories = data.categories;
+            });
+        },
+        onChangeUsername(e: Event) {
+            this.form.username.serverError = ''; //reset server error on input change
         }
     }
 });
@@ -76,5 +136,17 @@ export default Vue.extend({
 <style scoped lang="scss">
 .register {
     padding: 1rem;
+}
+form {
+    padding-top: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    width: 50%;
+    margin: auto;
+}
+a {
+    padding-bottom: 1rem;
 }
 </style>

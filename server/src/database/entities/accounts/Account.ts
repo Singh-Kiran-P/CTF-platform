@@ -3,13 +3,14 @@ import { Attempt } from '../connections/Attempt';
 import { Solve } from '../connections/Solve';
 import { Category } from './Category';
 import { Team } from './Team';
+import  Roles  from '../../../auth/Roles';
 
 @Entity()
 export class Account {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column()
+    @Column({unique: true})
     name: string;
 
     @Column()
@@ -17,6 +18,9 @@ export class Account {
 
     @Column()
     salt: string;
+
+    @Column()
+    role: Roles;
 
     @ManyToOne(_ => Category, category => category.accounts, { nullable: true })
     category: Category;
@@ -30,20 +34,23 @@ export class Account {
     @OneToMany(_ => Attempt, attempt => attempt.account)
     attempts: Attempt[];
 
-    constructor(name: string, password: string, category?: Category) {
+    constructor(name: string, password: string, salt: string, role: Roles, category?: Category) {
         this.name = name;
-        this.setPassword(password);
+        this.password = password;
+        this.salt = salt;
+        this.role = role;
         this.category = category;
         this.team = null;
     }
 
-    admin(): boolean {
-        return !this.category;
+    isAdmin(): boolean {
+        return this.role === Roles.admin;
     }
+    
 
-    setPassword(password: string) {
+    /*setPassword(password: string) {
         this.salt = 'TODO: generate random salt';
         this.password = password;
         // TODO: generate random salt and hash password with it
-    }
+    }*/
 }
