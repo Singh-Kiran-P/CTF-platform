@@ -56,7 +56,7 @@ const routes: { [page: string]: Route[] } = {
     visitor: [
         pages.login,
         pages.register,
-        pages.teams
+        pages.teams //for testing
     ],
     participant: [
         pages.leaderboard,

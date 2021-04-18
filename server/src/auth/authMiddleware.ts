@@ -13,7 +13,7 @@ function isAuth(req: express.Request, res: express.Response, next: express.NextF
 }
 
 function isAdmin(req, res: express.Response, next: express.NextFunction) {
-    if(req.isAuthenticated() && req.user.role == Roles.admin) { //user object is set by passportjs
+    if(req.isAuthenticated() && req.user.role == Roles.admin) { //user object is set by express session
         console.log('you are admin');
         next();
         req.lol
