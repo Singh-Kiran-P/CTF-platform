@@ -182,6 +182,7 @@ export default Vue.extend({
                 this.form.name = data.name;
                 this.form.categories = data.categories;
                 this.form.tags = data.tags;
+                console.log(data);
             });
         },
         onCancel(): void {
