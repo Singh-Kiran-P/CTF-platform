@@ -19,6 +19,7 @@
         "concurrently": "^6.0.0",
         "core-js": "^3.6.5",
         "dotenv": "^8.2.0",
+        "object-to-formdata": "^4.1.0",
         "sweetalert2": "^10.15.7",
         "vue": "^2.6.12",
         "vue-fontawesome": "^0.0.2",

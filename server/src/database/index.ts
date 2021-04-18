@@ -63,6 +63,27 @@ class Database extends EventEmitter {
     crepo<E>(entity: ObjectType<E>): E {
         return this.conn.getCustomRepository(entity);
     }
+
+    /**
+     * allows for efficiently updating the database to a new list of entities, if you want to use this function ask Lander how to use it
+     */
+    setRepo<E>(repo: Repository<E>, newEntries: E[], id: (x: E) => any[], files: (x: E) => string[] = () => []) {
+        const equal = (x: any[], y: any[]): boolean => x.length == y.length && x.every((_, i) => x[i] == y[i]);
+        return new Promise<void>((resolve, reject) => {
+            repo.find().then(old => {
+                let [save, remove]: E[][] = [newEntries.filter(entry => !old.some(x => equal(id(entry), id(x)))), []];
+                old.forEach(entry => {
+                    let match = newEntries.find(x => equal(id(entry), id(x)));
+                    match == undefined ? remove.push(entry) : save.push(Object.assign(entry, match));
+                });
+                let oldFiles = old.reduce((acc, c) => acc.concat(files(c)), ['']).filter(f => f && !newEntries.some(x => files(x).includes(f))); // TODO: remove these files
+                Promise.all([
+                    repo.save(save),
+                    repo.remove(remove)
+                ]).then(() => resolve()).catch(err => reject(err));
+            }).catch(err => reject(err));
+        });
+    }
 }
 
 declare interface Database { // applies DatabaseEvents to Database to enable event checking

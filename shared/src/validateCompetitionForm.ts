@@ -1,13 +1,16 @@
 // functions to validate the competition form
 
+import { File as UFile } from 'formidable';
+
 type Category = { name: string, priority: number };
 type Tag = { name: string, description: string };
-type Page = { name: string, path: string, source: string, html: File | null, attachments: File[] };
+type Page = { name: string, path: string, source: string, html: File | UFile | null, zip: File | UFile | null };
+type Form = { name: string, categories: Category[], tags: Tag[], pages: Page[] };
 
 const state = (...feedback: string[]): boolean => feedback.every(string => string.length == 0);
 const validInput = (feedback: string, ...inputs: string[]): boolean => state(feedback) && inputs.every(input =>input.length > 0);
 
-const validForm = (f: { name: string, categories: Category[], tags: Tag[], pages: Page[] }, checkType: boolean = true): boolean => {
+const validForm = (f: Form, checkType: boolean = true): boolean => {
     return (!checkType || is.form(f)) && state(validate.name(f.name), validate.categories(f.categories), validate.tags(f.tags), validate.pages(f.pages));
 }
 
@@ -47,13 +50,16 @@ const validate = {
         if (!r && page.path && !page.path.startsWith('/')) r = `Page path must start with '/'`;
         let invalidChars = page.path.replace(/([a-zA-Z0-9\/\-]+)/g, '');
         if (!r && invalidChars) r = `Page path cannot contain the following characters: '${invalidChars}'`;
-        if (!r) r = validateString(page.path, 'Page path', 1, -1, required, pages.map(x => x.path));
-        if (!r && page.html && !page.html.name.endsWith('.html')) r = 'Page source must be an HTML file';
+        if (!r && /\/\//.test(page.path)) r = `Page path cannot have multiple '/'s in a row`;
+        if (!r && page.path.length > 1 && page.path.endsWith('/')) r = `Page path cannot end with '/'`;
+        if (!r) r = validateString(page.path.toLowerCase(), 'Page path', 1, -1, required, pages.map(x => x.path.toLowerCase()));
+        if (!r && page.html?.name && !page.html.name.endsWith('.html')) r = 'Page source must be a .html file';
+        if (!r && page.zip?.name && !page.zip.name.endsWith('.zip')) r = 'Page attachments must be contained in a .zip file';
         return r;
     }
 }
 
-const is = {
+const is = { // check if a given variable with type any is a Form
     form: (form: any): boolean => {
         return is.object(form) && is.string(form.name) && is.array(form.categories, is.category) && is.array(form.tags, is.tag) && is.array(form.pages, is.page);
     },
@@ -64,8 +70,7 @@ const is = {
         return is.object(tag) && is.string(tag.name) && is.string(tag.description);
     },
     page: (page: any): boolean => {
-        if (!(is.object(page) && is.string(page.name) && is.string(page.path) && is.string(page.source))) return false;
-        return (page.html == null || page.html == undefined || is.object(page.html)) && (page.attachments == undefined || is.array(page.attachments, is.object));
+        return is.object(page) && is.string(page.name) && is.string(page.path) && is.string(page.source);
     },
     string: (v: any): boolean => typeof v == 'string',
     number: (v: any): boolean => typeof v == 'number',
@@ -73,4 +78,4 @@ const is = {
     array: (v: any, t: (x: any) => boolean): boolean => Array.isArray(v) && (v as any[]).every(x => t(x))
 }
 
-export { state, validInput, validForm, validateString, validate, Category, Tag, Page };
+export { state, validInput, validForm, validateString, validate, Category, Tag, Page, Form };

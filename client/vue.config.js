@@ -14,6 +14,12 @@ module.exports = {
                         "^/api": "/"
                     }
                 },
+            },
+            watchOptions: {
+                ignored: [
+                    /node_modules/,
+                    /public/
+                ]
             }
         }
     },

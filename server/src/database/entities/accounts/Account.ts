@@ -18,7 +18,7 @@ export class Account {
     @Column()
     salt: string;
 
-    @ManyToOne(_ => Category, category => category.accounts, { nullable: true })
+    @ManyToOne(_ => Category, category => category.accounts, { nullable: true, onDelete: 'SET NULL' })
     category: Category;
 
     @ManyToOne(_ => Team, team => team.accounts, { nullable: true })

@@ -16,21 +16,21 @@
             <b-form-group :state="state(categoriesFeedback)" :invalid-feedback="categoriesFeedback">
                 <Collapse label="Participant categories">
                     <span>The lowest category takes priority when deciding the category of a team.</span>
-                    <div class=list-item v-for="category in categories" :key="category.name">
+                    <div class=list-item v-for="category in form.categories" :key="category.name">
                         <span class=item-name>{{category.name}}</span>
                         <div class=item-options>
-                            <button class="icon primary" @click="categoryDown(category)">
+                            <b-button type=button class="icon primary" @click="categoryDown(category)">
                                 <font-awesome-icon icon=chevron-down />
-                            </button>
-                            <button class="icon danger" @click="removeCategory(category)">
+                            </b-button>
+                            <b-button type=button class="icon danger" @click="removeCategory(category)">
                                 <font-awesome-icon icon=times />
-                            </button>
+                            </b-button>
                         </div>
                     </div>
                     <div class=add-list-item>
                         <b-form-input
                             type=text
-                            v-model="form.category"
+                            v-model="add.category"
                             placeholder="Enter new category"
                             :state="state(newCategoryFeedback)"
                         />
@@ -44,19 +44,19 @@
 
             <b-form-group :state="state(tagsFeedback)" :invalid-feedback="tagsFeedback">
                 <Collapse label="Challenge tags">
-                    <div class=list-item v-for="tag in tags" :key="tag.name">
+                    <div class=list-item v-for="tag in form.tags" :key="tag.name">
                         <span class=item-name>{{tag.name}}</span>
                         <div class=item-options>
-                            <button class="icon danger" @click="removeTag(tag)">
+                            <b-button type=button class="icon danger" @click="removeTag(tag)">
                                 <font-awesome-icon icon=times />
-                            </button>
+                            </b-button>
                         </div>
                         <span class=item-description>{{tag.description}}</span>
                     </div>
                     <div class=add-list-item>
                         <b-form-input
                             type=text
-                            v-model="form.tag.name"
+                            v-model="add.tag.name"
                             placeholder="Enter new tag name"
                             :state="state(newTagFeedback)"
                         />
@@ -64,7 +64,7 @@
                             <font-awesome-icon icon=plus />
                         </b-button>
                         <b-form-textarea
-                            v-model="form.tag.description"
+                            v-model="add.tag.description"
                             placeholder="Enter new tag description"
                             :state="state(newTagFeedback)"
                         />
@@ -75,13 +75,16 @@
 
             <b-form-group :state="state(pagesFeedback)" :invalid-feedback="pagesFeedback">
                 <Collapse label="Available pages">
-                    <span>Pages are ordered as shown below.</span>
-                    <div class=list-item v-for="page in pages" :key="page.path">
+                    <span>Pages are ordered as shown below.</span> <!-- TODO: make this work (same way as categories) -->
+                    <div class=list-item v-for="page in form.pages" :key="page.path">
                         <span class=item-name>{{page.name}}</span>
                         <div class=item-options>
-                            <button class="icon primary" @click="pageDown(page)">
+                            <b-button type=button class="icon primary" @click="pageDown(page)">
                                 <font-awesome-icon icon=chevron-down />
-                            </button>
+                            </b-button>
+                            <b-button type=button class="icon danger" @click="removePage(page)">
+                                <font-awesome-icon icon=times />
+                            </b-button>
                         </div>
                         <span class=item-description><span class=item-category>Path</span>{{page.path}}</span>
                         <span class=item-description><span class=item-category>Source</span>{{page.source}}</span>
@@ -89,7 +92,7 @@
                     <div class=add-list-item>
                         <b-form-input
                             type=text
-                            v-model="form.page.name"
+                            v-model="add.page.name"
                             placeholder="Enter new page name"
                             :state="state(newPageFeedback)"
                         />
@@ -98,24 +101,25 @@
                         </b-button>
                         <b-form-input
                             type=text
-                            v-model="form.page.path"
+                            v-model="add.page.path"
                             placeholder="Enter new page path"
                             :state="state(newPageFeedback)"
                         />
                         <b-form-file
                             accept=".html"
-                            v-model="form.page.html"
+                            v-model="add.page.html"
                             placeholder="Upload HTML..."
                             drop-placeholder="Drop HTML..."
                             :state="state(newPageFeedback)"
                         />
                         <b-form-file
-                            multiple
-                            v-model="form.page.attachments"
+                            accept=".zip"
+                            v-model="add.page.zip"
                             placeholder="Upload attachments..."
                             drop-placeholder="Drop attachments..."
                             :state="state(newPageFeedback)"
                         />
+                        TODO: attachment explanation
                         <b-form-invalid-feedback>{{newPageFeedback}}</b-form-invalid-feedback>
                     </div>
                 </Collapse>
@@ -127,8 +131,8 @@
                 </Collapse>
             </b-form-group>
 
-            <b-button type=button variant=danger @click="onCancel()">Cancel</b-button>
-            <b-button type=submit variant=primary :disabled="!validForm()">Save</b-button>
+            <StatusButton type=button variant=danger :state="cancelState" normal=Cancel loading=Loading succes=Loaded :disabled="saveState == 'loading'" @click="onCancel()"/>
+            <StatusButton type=submit variant=primary :state="saveState" normal=Save loading=Saving succes=Saved :disabled="!validForm() || cancelState == 'loading'"/>
         </b-form>
     </div>
 </template>
@@ -137,77 +141,88 @@
 import Vue from 'vue';
 import axios from 'axios';
 import Collapse from '@/components/Collapse.vue';
-import { state, validInput, validForm, validate, Category, Tag, Page } from '@shared/validateCompetitionForm';
+import StatusButton from '@/components/StatusButton.vue';
+import { state, validInput, validForm, validate, Category, Tag, Page, Form } from '@shared/validateCompetitionForm';
+import { serialize } from '@shared/objectFormData';
 
 export default Vue.extend({
     name: 'AdminPanel',
     components: {
-        Collapse  
+        Collapse,
+        StatusButton 
     },
     created() {
         this.loadFormData();
     },
     data: () => ({
-        categories: [] as Category[],
-        tags: [] as Tag[],
-        pages: [] as Page[],
         form: {
             name: '',
+            categories: [],
+            tags: [],
+            pages: [],
+        } as Form,
+        add: {
             category: '',
             tag: { name: '', description: '' },
-            page: { name: '', path: '', html: null as File | null, attachments: [] as File[] },
-        }
+            page: { name: '', path: '', html: null as File | null, zip: null as File | null },
+        },
+        loaded: false,
+        saveState: 'normal',
+        cancelState: 'normal'
     }),
     computed: {
         name(): string { return this.form.name.trim(); },
         nameFeedback(): string { return validate.name(this.name); },
-        newCategory(): Category { return { name: this.form.category.trim(), priority: this.categories.reduce((x, y) => Math.max(x, y.priority), 0) + 1 }; },
-        newCategoryFeedback(): string { return validate.category(this.newCategory, this.categories); },
+        newCategory(): Category { return { name: this.add.category.trim(), priority: this.form.categories.reduce((x, y) => Math.max(x, y.priority), 0) + 1 }; },
+        newCategoryFeedback(): string { return validate.category(this.newCategory, this.form.categories); },
         validNewCategory(): boolean { return validInput(this.newCategoryFeedback, this.newCategory.name); },
-        newTag(): Tag { return Object.assign({}, this.form.tag, { name: this.form.tag.name.trim() }); },
-        newTagFeedback(): string { return validate.tag(this.newTag, this.tags); },
+        newTag(): Tag { return Object.assign({}, this.add.tag, { name: this.add.tag.name.trim() }); },
+        newTagFeedback(): string { return validate.tag(this.newTag, this.form.tags); },
         validNewTag(): boolean { return validInput(this.newTagFeedback, this.newTag.name); },
-        newPage(): Page { return Object.assign({}, this.form.page, { name: this.form.page.name.trim(), path: this.form.page.path.trim(), source: this.form.page.html?.name || '' }); },
-        newPageFeedback(): string { return validate.page(this.newPage, this.pages); },
+        newPage(): Page { return Object.assign({}, this.add.page, { name: this.add.page.name.trim(), path: this.add.page.path.trim(), source: this.add.page.html?.name || '' }); },
+        newPageFeedback(): string { return validate.page(this.newPage, this.form.pages); },
         validNewPage(): boolean { return validInput(this.newPageFeedback, this.newPage.name, this.newPage.path) && this.newPage.html != null; },
-        categoriesFeedback(): string { return validate.categories(this.categories); },
-        tagsFeedback(): string { return validate.tags(this.tags); },
-        pagesFeedback(): string { return validate.pages(this.pages); }
+        categoriesFeedback(): string { return validate.categories(this.form.categories); },
+        tagsFeedback(): string { return validate.tags(this.form.tags); },
+        pagesFeedback(): string { return validate.pages(this.form.pages); }
+    },
+    watch: {
+        form: { deep: true, handler() {
+            let state = 'normal';
+            if (this.loaded) {
+                state = 'succes';
+                this.loaded = false;
+            }
+            this.saveState = state;
+            this.cancelState = state;
+        }}
     },
     methods: {
-        state,
-        validForm() {
-            return validForm({ name: this.name, categories: this.categories, tags: this.tags, pages: this.pages }, false)
-        },
+        state, // make the state function available in the html
+        validForm() { return validForm(this.form, false) },
 
         loadFormData(): void {
-            this.form.category = '';
-            this.form.tag = { name: '', description: '' };
-            this.form.page = { name: '', path: '', html: null, attachments: [] };
+            this.cancelState = 'loading';
+            this.add.category = '';
+            this.add.tag = { name: '', description: '' };
+            this.add.page = { name: '', path: '', html: null, zip: null };
             axios.get('/api/competition/data').then(response => {
-                let data = response.data;
-                if (!validForm(data)) return alert('error'); // TODO: replace this
-                this.form.name = data.name;
-                this.categories = data.categories;
-                this.tags = data.tags;
-                this.pages = data.pages;
-            });
+                let data: Form = response.data;
+                if (!validForm(data)) return this.cancelState = 'error';
+                this.loaded = true;
+                this.form = data;
+            }).catch(() => this.cancelState = 'error');
         },
         onCancel(): void {
-            console.log()
             this.loadFormData();
         },
         onSubmit(e: Event): void {
             e.preventDefault();
-            axios.put('/api/competition/save', {
-                name: this.name,
-                categories: this.categories,
-                tags: this.tags,
-                pages: this.pages
-            }).then(response => {
-                if (response.data.error) // TODO: replace this
-                    alert('error');
-            });
+            this.saveState = 'loading';
+            const error = () => this.saveState = 'error';
+            axios.put('/api/competition/save', serialize(this.form)).then(response => {
+                response.data.error ? error() : this.loadFormData();
+            }).catch(() => error());
         },
 
         moveDown<T>(list: T[], predicate: (x: T) => boolean, set: (x: T, y: T) => T): void {
@@ -219,36 +234,36 @@ export default Vue.extend({
         },
 
         categoryDown(category: Category): void {
-            this.moveDown(this.categories, x => x.name == category.name, (x, y) => Object.assign({}, x, { name: y.name }));
+            this.moveDown(this.form.categories, x => x.name == category.name, (x, y) => Object.assign({}, x, { name: y.name }));
         },
         removeCategory(category: Category): void {
-            this.categories = this.categories.filter(x => x.name != category.name);
+            this.form.categories = this.form.categories.filter(x => x.name != category.name);
         },
         addCategory(): void {
             if (!this.validNewCategory) return;
-            this.categories.push(this.newCategory);
-            this.form.category = '';
+            this.form.categories.push(this.newCategory);
+            this.add.category = '';
         },
 
         removeTag(tag: Tag): void {
-            this.tags = this.tags.filter(x => x.name != tag.name);
+            this.form.tags = this.form.tags.filter(x => x.name != tag.name);
         },
         addTag(): void {
             if (!this.validNewTag) return;
-            this.tags.push(this.newTag);
-            this.form.tag = { name: '', description: '' };
+            this.form.tags.push(this.newTag);
+            this.add.tag = { name: '', description: '' };
         },
 
         pageDown(page: Page): void {
-            this.moveDown(this.pages, x => x.path == page.path, (_, y) => y);
+            this.moveDown(this.form.pages, x => x.path == page.path, (_, y) => y);
         },
         removePage(page: Page): void {
-            this.pages = this.pages.filter(x => x.path != page.path);
+            this.form.pages = this.form.pages.filter(x => x.path != page.path);
         },
         addPage(): void {
             if (!this.validNewPage) return;
-            this.pages.push(this.newPage);
-            this.form.page = { name: '', path: '', html: null, attachments: [] };
+            this.form.pages.push(this.newPage);
+            this.add.page = { name: '', path: '', html: null, zip: null };
         }
     }
 });
