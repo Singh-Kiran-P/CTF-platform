@@ -1,4 +1,4 @@
-import { Account } from '../database/entities/accounts/Account';
+import { Account } from '../../database/entities/accounts/Account';
 import Roles from './Roles';
 import express from 'express';
 

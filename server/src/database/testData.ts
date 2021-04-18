@@ -1,6 +1,6 @@
 import DB, { Team, Competition, Category, Tag, Account } from '../database';
 
-import Roles from '../auth/Roles';
+import Roles from '../middlewares/auth/Roles';
 /**
  * loads test entries into the database
  * this function is called each time the database connection is made, after emptying the database

@@ -3,7 +3,7 @@ import { Attempt } from '../connections/Attempt';
 import { Solve } from '../connections/Solve';
 import { Category } from './Category';
 import { Team } from './Team';
-import  Roles  from '../../../auth/Roles';
+import  Roles  from '../../../middlewares/auth/Roles';
 
 @Entity()
 export class Account {
@@ -46,7 +46,7 @@ export class Account {
     isAdmin(): boolean {
         return this.role === Roles.admin;
     }
-    
+
 
     /*setPassword(password: string) {
         this.salt = 'TODO: generate random salt';

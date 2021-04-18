@@ -4,8 +4,8 @@ const LocalStrategy = passportLocal.Strategy;
 //import passportJWT from 'passport-jwt';
 //const JWTStrategy = passportJWT.Strategy;
 //const ExtractJWT = passportJWT.ExtractJwt;
-import DB from '../database';
-import { Account } from '../database/entities/accounts/Account';
+import DB from '../../database';
+import { Account } from '../../database/entities/accounts/Account';
 import { validPassword } from './passportUtils';
 import Errors from './Errors';
 
@@ -15,7 +15,7 @@ const htmlFieldNames = {
     passwordField: 'password'
 }
 
-const strategy = new LocalStrategy(htmlFieldNames, 
+const strategy = new LocalStrategy(htmlFieldNames,
     (username: string, password: string,  done ) => {
         DB.repo(Account).findOne({name: username})
             .then((account: Account) => {

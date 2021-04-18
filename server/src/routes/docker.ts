@@ -3,7 +3,7 @@ import Docker from "dockerode";
 var docker = new Docker({ socketPath: "/var/run/docker.sock" });
 
 import DockerController from "../controllers/docker";
-import { isAdmin, isAuth } from "auth/authMiddleware";
+import { isAdmin, isAuth } from "../middlewares/auth/authMiddleware";
 
 const router = express.Router();
 

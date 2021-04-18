@@ -1,11 +1,11 @@
 import Router from 'express';
 const router = Router();
 import passport from 'passport';
-import { generatePassword } from '../auth/passportUtils';
+import { generatePassword } from '../middlewares/auth/passportUtils';
 import DB, { Account, Category } from '../database';
-import Roles from '../auth/Roles';
-import Errors from '../auth/Errors';
-import { isAuth, isAdmin } from '../auth/authMiddleware';
+import Roles from '../middlewares/auth/Roles';
+import Errors from '../middlewares/auth/Errors';
+import { isAuth, isAdmin } from '../middlewares/auth/authMiddleware';
 
 //POST ROUTES
 router.post('/login', (req, res, next) => {
@@ -21,7 +21,7 @@ router.post('/login', (req, res, next) => {
         //login succeeded
         //save user in express-session
         req.login(user, err => {
-            if (err) 
+            if (err)
                 next(err);
         });
         console.log(req.user);
@@ -31,7 +31,7 @@ router.post('/login', (req, res, next) => {
 
 router.post('/register', (req, res, next) => {
     const accountRepo = DB.repo(Account);
- 
+
     accountRepo.findOne({name: req.body.username}).then((acc : Account) => {
         if(acc) {
             return res.json({error: Errors.USER_ALREADY_EXISTS});
