@@ -38,7 +38,7 @@ async function loadTestData() {
         new Account('BOB!', '32ff8ac1d051d367f4da30853972b82d0730059ccf2bb11ad1a0d16543afe14b58ed7eb413ba570240175d9bdd62e566129b43993350e5ef1ffc99c8daf5b970', '3b15118335536a6cedf3cb0165a3c9da6f10aa61fd354dc49e36df65264f18e7', Roles.participant, categories[4]),
         new Account('admin', '32ff8ac1d051d367f4da30853972b82d0730059ccf2bb11ad1a0d16543afe14b58ed7eb413ba570240175d9bdd62e566129b43993350e5ef1ffc99c8daf5b970', '3b15118335536a6cedf3cb0165a3c9da6f10aa61fd354dc49e36df65264f18e7', Roles.admin, categories[4])
     ]);
-    
+
     let teams: Team[] = await save([
         new Team('Team 1', accounts[0]),
         new Team('Team 2', accounts[1]),

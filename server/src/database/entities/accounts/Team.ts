@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany, OneToOne, JoinColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany, OneToOne, JoinColumn, ReturningStatementNotSupportedError, Db } from 'typeorm';
 import { Environment } from '../connections/Environment';
 import { Attempt } from '../connections/Attempt';
 import { Solve } from '../connections/Solve';
@@ -31,9 +31,9 @@ export class Team {
 
     constructor(name: string, creator: Account) {
         this.name = name;
+        if (!creator) return;
         this.captain = creator;
-        //creator.team = this;
-        //this.accounts.push(creator);
+        //creator.team = this; //TODO UPDATE IN DB
     }
 
     memberCount(): number {

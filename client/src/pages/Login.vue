@@ -28,7 +28,7 @@
                 <b-form-invalid-feedback>{{passwordFeedback}}</b-form-invalid-feedback>
             </b-form-group>
             <router-link :to="{ name: 'Register'}">No account? Click here to register</router-link>
-            <b-button type=submit variant=primary>Submit</b-button>
+            <b-button type=submit variant=primary :disabled="!validForm()">Submit</b-button>
         </b-form>
     </div>
 </template>
@@ -86,6 +86,12 @@ export default Vue.extend({
         },
         state(feedback: string): boolean {
             return feedback.length == 0;
+        },
+        valid(input: string, feedback: string): boolean {
+            return input.length > 0 && this.state(feedback);
+        },
+        validForm(): boolean {
+            return this.state(this.usernameFeedback) && this.state(this.passwordFeedback);
         },
         onChangeUsername(e: Event) {
             this.form.username.serverError = ''; //reset server error on input change

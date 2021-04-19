@@ -40,7 +40,7 @@
                 <b-form-invalid-feedback>{{categoryFeedback}}</b-form-invalid-feedback>
             </b-form-group>
             <router-link :to="{ name: 'Login'}">Already have an account? Click here to log in</router-link>
-            <b-button type=submit variant=primary>Register</b-button>
+            <b-button type=submit variant=primary :disabled="!validForm()">Register</b-button>
         </b-form>
     </div>
 </template>
@@ -102,6 +102,12 @@ export default Vue.extend({
         },
         state(feedback: string): boolean {
             return feedback.length == 0;
+        },
+        valid(input: string, feedback: string): boolean {
+            return input.length > 0 && this.state(feedback);
+        },
+        validForm(): boolean {
+            return this.state(this.usernameFeedback) && this.state(this.passwordFeedback) && this.state(this.categoryFeedback);
         },
         loadFormCategories(): void {
             axios.get('/api/auth/loadCategories').then(response => {

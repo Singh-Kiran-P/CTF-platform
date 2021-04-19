@@ -139,6 +139,8 @@ span {
 }
 .solves, .members {    
     padding: 1rem;
+    width: min(100%, 750px);
+    margin: auto;
 }
 table {
     border: 1px solid lightgray;

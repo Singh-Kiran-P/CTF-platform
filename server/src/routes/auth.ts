@@ -21,11 +21,10 @@ router.post('/login', (req, res, next) => {
         //login succeeded
         //save user in express-session
         req.login(user, err => {
-            if (err) 
-                next(err);
+            if (err) return next(err);
+            console.log(req.user);
+            return res.sendStatus(200);
         });
-        console.log(req.user);
-        return res.sendStatus(200);
     })(req,res,next);
 });
 

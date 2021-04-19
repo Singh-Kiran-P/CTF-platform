@@ -24,7 +24,7 @@ const strategy = new LocalStrategy(htmlFieldNames,
                 //No account with this username found
                 if (!account) {
                     console.log('not found');
-                    return done(null, false, {message: Errors.USER_NOT_FOUND})
+                    return done(null, null, {message: Errors.USER_NOT_FOUND})
                 }
                 console.log(account);
                 if(validPassword(password, account.password, account.salt)) {
@@ -32,7 +32,7 @@ const strategy = new LocalStrategy(htmlFieldNames,
                     return done(null, account);
                 } else {
                     console.log('found')
-                    return done(null, false, {message: Errors.WRONG_PASSWORD});
+                    return done(null, null, {message: Errors.WRONG_PASSWORD});
                 }
             })
             .catch((err) => {

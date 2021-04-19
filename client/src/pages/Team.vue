@@ -9,15 +9,18 @@ import Vue from 'vue';
 import axios from 'axios';
 import Create from '../components/Teams/Create.vue';
 import Dashboard from '../components/Teams/Dashboard.vue';
+import Loading from '../components/Loading.vue'
 
 export default Vue.extend({
     name: 'Team',
     components: {
         Create,
-        Dashboard
+        Dashboard,
+        Loading
     },
     data: () => ({ 
-        hasTeam: false as boolean //moet hasTeam worden
+        isLoading: true,
+        hasTeam: false
     }),
     created() {
         axios.get('/api/account/hasTeam').then((response) => {
@@ -26,11 +29,14 @@ export default Vue.extend({
             } else {
                 this.hasTeam = false;
             }
+            this.isLoading = false;
         }).catch((err)=>console.log(err));
     },
     computed: {
         createOrDashboard() {
-            if(this.hasTeam) {
+            if(this.isLoading){
+                return Loading;
+            } else if(this.hasTeam) {
                 return Dashboard;
             } else {
                 return Create;
