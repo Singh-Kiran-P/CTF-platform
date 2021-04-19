@@ -19,7 +19,7 @@ const strategy = new LocalStrategy(htmlFieldNames,
     (username: string, password: string,  done ) => {
         DB.repo(Account).findOne({
             where: {name: username},
-            relations: ['category']})
+            relations: ['category', 'team']})
             .then((account: Account) => {
                 //No account with this username found
                 if (!account) {

@@ -40,9 +40,9 @@ async function loadTestData() {
     ]);
     
     let teams: Team[] = await save([
-        new Team('Team 1'),
-        new Team('Team 2'),
-        new Team('Team 3')
+        new Team('Team 1', accounts[0]),
+        new Team('Team 2', accounts[1]),
+        new Team('Team 3', accounts[3])
     ]);
 
     for (let i = 0; i < accounts.length; ++i) { // give every account a team

@@ -46,11 +46,4 @@ export class Account {
     isAdmin(): boolean {
         return this.role === Roles.admin;
     }
-    
-
-    /*setPassword(password: string) {
-        this.salt = 'TODO: generate random salt';
-        this.password = password;
-        // TODO: generate random salt and hash password with it
-    }*/
 }

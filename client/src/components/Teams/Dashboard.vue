@@ -23,7 +23,12 @@
         </div>
 
         <div class=members>
-
+            <b-table sticky-header striped :items="members" :fields="members_fields">
+                <!--<template #cell(name)="data">-->
+                    <!-- `data.value` is the value after formatted by the Formatter -->
+                    <!--<a :href="`#${data.value}`">{{ data.value }}</a>
+                </template>-->
+            </b-table>
         </div>
 
         <div class=solves>
@@ -48,9 +53,14 @@ export default Vue.extend({
         team: {
             name: 'teamname',
             placement: 0,
-            points: 0
+            points: 0,
+            uuid: 0
         },
-        member: [] as { name: string, score: number }[],
+        members_fields: [
+            {key: 'name', sortable:true},
+            {key: 'points', sortable: true}
+        ],
+        members: [] as { name: string, points: number }[],
         solves_fields: [
             { key: 'name', sortable: true},
             { key: 'category', sortable: true},
@@ -87,6 +97,11 @@ export default Vue.extend({
         } 
     },
     created() {
+        this.members.push({name: 'lander', points: 1000});
+        this.members.push({name: 'kiran', points: 1000});
+        this.members.push({name: 'senn', points: 850});
+        this.members.push({name: 'random', points: 11000});
+
         this.solves.push({name: 'challenge1', category:'find', value: 100, date: '10/2/2021'});
         this.solves.push({name: 'challenge2', category:'test', value: 100, date: '10/2/2021'});
         this.solves.push({name: 'challenge3', category:'lol', value: 100, date: '10/2/2021'});
@@ -122,7 +137,7 @@ span {
     flex-direction: row;
     justify-content: center;
 }
-.solves {
+.solves, .members {    
     padding: 1rem;
 }
 table {

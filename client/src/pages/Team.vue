@@ -17,21 +17,20 @@ export default Vue.extend({
         Dashboard
     },
     data: () => ({ 
-        loggedIn: false as boolean //moet hasTeam worden
+        hasTeam: false as boolean //moet hasTeam worden
     }),
     created() {
-        axios.get('/api/auth/getAuthRole').then((response) => {
-            if(response.data.role == "visitor") {
-                this.loggedIn = false;
+        axios.get('/api/account/hasTeam').then((response) => {
+            if(response.data == true) {
+                this.hasTeam = true;
             } else {
-                this.loggedIn = true;
+                this.hasTeam = false;
             }
         }).catch((err)=>console.log(err));
     },
     computed: {
         createOrDashboard() {
-            return Dashboard;
-            if(this.loggedIn) {
+            if(this.hasTeam) {
                 return Dashboard;
             } else {
                 return Create;

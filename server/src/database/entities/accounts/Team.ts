@@ -1,8 +1,9 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany, OneToOne, JoinColumn } from 'typeorm';
 import { Environment } from '../connections/Environment';
 import { Attempt } from '../connections/Attempt';
 import { Solve } from '../connections/Solve';
 import { Account } from './Account';
+import { serializeUser } from 'passport';
 
 @Entity()
 export class Team {
@@ -11,6 +12,10 @@ export class Team {
 
     @Column({unique: true})
     name: string;
+
+    @OneToOne(() => Account)
+    @JoinColumn()
+    captain: Account;
 
     @OneToMany(_ => Account, account => account.team)
     accounts: Account[];
@@ -24,8 +29,19 @@ export class Team {
     @OneToMany(_ => Environment, environment => environment.team)
     environments: Environment[];
 
-    constructor(name: string) {
+    constructor(name: string, creator: Account) {
         this.name = name;
-        // TODO: owner?
+        this.captain = creator;
+        //creator.team = this;
+        //this.accounts.push(creator);
+    }
+
+    memberCount(): number {
+        return this.accounts.length;
+    }
+
+    addUser(account: Account) {
+        account.team = this;
+        //this.accounts.push(account);
     }
 }

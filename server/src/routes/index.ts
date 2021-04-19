@@ -1,17 +1,16 @@
 import auth from './auth';
 import template from './template';
+import team from './team';
+import account from './account';
 import express = require("express"); //comment
 const router = express.Router(); //comment
 import competition from './competition';
-
-/*
-router.get("/", (req, res) => {
-  return res.json({'message' : "Welcome to Backend!"});
-});*/
 
 
 export default [
     template,
     competition,
-    auth
+    auth,
+    team,
+    account
 ];
