@@ -16,9 +16,9 @@ async function loadTestData() {
     ]))[0];
 
     let pages: Page[] = await save([
-        new Page('About', '/', '/temp/about/index.html'),
-        new Page('Test 1', '/test1', '/temp/test1/test.html'),
-        new Page('Test 2', '/test2', '/temp/test2/test.html')
+        new Page('About', '/', '/test/about/index.html'),
+        new Page('Test 1', '/test1', '/test/test1/test.html'),
+        new Page('Test 2', '/test2', '/test/test2/test.html')
     ]);
 
     let categories: Category[] = await save([
