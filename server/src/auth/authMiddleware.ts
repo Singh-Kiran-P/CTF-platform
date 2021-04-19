@@ -12,11 +12,10 @@ function isAuth(req: express.Request, res: express.Response, next: express.NextF
     }
 }
 
-function isAdmin(req, res: express.Response, next: express.NextFunction) {
-    if(req.isAuthenticated() && req.user.role == Roles.admin) { //user object is set by express session
+function isAdmin(req: express.Request, res: express.Response, next: express.NextFunction) {
+    if(req.isAuthenticated() && false /* TODO: does not work req.user.role == Roles.admin */) { //user object is set by express session
         console.log('you are admin');
         next();
-        req.lol
     } else {
         console.log('you are not admin');
         res.status(401).json({message: 'You are not an admin, you can\'t view this page'});
