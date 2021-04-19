@@ -1,12 +1,12 @@
 # CTF platform
 ...
-## Node.js (REST API) + Vue.js(Frontend) + PostgreSQL
-
-- API
-    - Node.js, Express, Socket.io
+## Vue.js(Frontend) + Node.js (REST API) + PostgreSQL
 
 - Frontend - Vue.js
     - Vue.js, Vue Router, BootstrapVue
+
+- API
+    - Node.js, Express, Socket.io
 
 ## Setup for development
 Client side
@@ -15,9 +15,6 @@ cd client
 
 # Install all dependencies for Vue
 npm install
-
-# Start Vue framework
-npm run serve
 ```
 
 Server side
@@ -25,29 +22,21 @@ Server side
 cd server
 
 # Install all dependencies for the REST API
-npm i
-# TODO: why is this needed?
-npm i -g nodemon ts-node
-
-# Start backend server
-npm run server_dev
+npm install
 ```
-Environment variables can be changed in .env files!
+Environment variables can be changed in .env files
 
 
 ## How to run services
 ```
 cd server
 
-# Check if typescript compile everything correctly (NodeJs server only)
-npm run server_watch_TS
-
-# Run backend server
-npm run start:watch
-
-# Run Client framework (VUE)
+# Run client
 npm run client
 
-# Run Client & REST API
+# Run server
+npm run server
+
+# Run client and server
 npm run dev
 ```

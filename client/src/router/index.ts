@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import axios from 'axios';
 import VueRouter from 'vue-router';
 Vue.use(VueRouter);
 
@@ -40,17 +41,6 @@ const pages: { [page: string]: Route } = {
     }
 };
 
-// html pages uploaded by the organizer, these are available to all users
-// TODO: retrieve these pages from the database instead (make sure theres a page with path '/')
-// TODO: make pages not available to all users?
-const uploadedPages: Route[] = [
-    {
-        path: '/',
-        name: 'Test',
-        src: 'test.html'
-    }
-];
-
 // define which pages are available to which user type (excluding uploaded pages)
 const routes: { [page: string]: Route[] } = {
     visitor: [
@@ -81,21 +71,36 @@ availableRoutes.push({
     meta: { hidden: true }
 });
 
-const router = new VueRouter({
-    routes: uploadedPages.concat(availableRoutes).map(route => ({ // always add all uploaded pages to the front of the routes list
-        path: route.path,
-        name: route.name,
-        meta: route.meta,
-        component: route.src.endsWith('vue') ? () => import(`../pages/${route.src}`) : { template: `<iframe src="pages/${route.src}"/>` }
-        // include vue pages directly into the html using a lazy loaded import, with the root directory for src in '/src/pages/'
-        // include html pages using an iframe so they dont inherit any styling, with the root directory for src in '/public/pages/'
-    }))
+// retrieve all uploaded pages
+axios.get('/api/competition/pages').then(response => {
+    let uploadedPages: Route[] = response.data.map((page: any) => ({
+        path: page.path,
+        name: page.name,
+        src: page.source
+    }));
+
+    const router = new VueRouter({ // TODO: use history mode
+        routes: uploadedPages.concat(availableRoutes).map(route => ({ // always add all uploaded pages to the front of the routes list
+            path: route.path,
+            name: route.name,
+            meta: route.meta,
+            component: route.src.endsWith('vue') ? () => import(`../pages/${route.src}`) : { template: `<iframe src="pages/${route.src}"/>` }
+            // include vue pages directly into the html using a lazy loaded import, with the root directory for src in '/src/pages/'
+            // include html pages using an iframe so they dont inherit any styling, with the root directory for src in '/public/pages/'
+        }))
+    });
+
+    // update the document title to the page name on route
+    router.beforeEach((route, _, next) => {
+        document.title = route.name?.toString() || route.path;
+        next();
+    });
+
+    RouterReady.onReady(router);
 });
 
-// update the document title to the page name on route
-router.beforeEach((route, _, next) => {
-    document.title = route.name?.toString() || route.path;
-    next();
-});
+class RouterReady {
+    static onReady: (router: VueRouter) => void;
+}
 
-export default router;
+export default RouterReady;

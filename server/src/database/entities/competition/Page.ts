@@ -3,21 +3,25 @@ import { Entity, Column, PrimaryColumn } from 'typeorm';
 @Entity()
 export class Page {
     @PrimaryColumn()
-    route: string;
+    path: string;
 
     @Column()
-    title: string;
+    name: string;
 
     @Column()
-    htmlfile: string
+    source: string
 
     @Column()
     authentication: number; // TODO: enum? remove this?
 
     @Column()
-    visibility: boolean;
+    visibility: boolean; // TODO: remove this?
 
-    constructor() {
-        // TODO
+    constructor(name: string, path: string, source: string) {
+        this.name = name;
+        this.path = path;
+        this.source = source;
+        this.authentication = 0;
+        this.visibility = true;
     }
 }

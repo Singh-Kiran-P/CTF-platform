@@ -26,8 +26,9 @@ html, body {
 
 a:hover, a:focus-visible {
     text-decoration: underline !important;
+    outline: none;
 }
 
-a:focus-visible {
-    outline: thin dotted;
+button {
+    word-wrap: break-word;
 }

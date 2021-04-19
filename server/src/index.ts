@@ -6,12 +6,12 @@ import { Session } from './database/entities/sessions/Session';
 import { TypeormStore } from 'connect-typeorm';
 import DB from "./database";
 import routes from './routes';
+import formidable from 'express-formidable';
 dotenv.config();
 
 //create express
 const app = express();
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(formidable({ multiples: true }));
 
 // SESSION SETUP
 app.use(session({

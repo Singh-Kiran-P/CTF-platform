@@ -1,7 +1,10 @@
+const path = require('path');
+
 module.exports = {
     runtimeCompiler: true, // for lazy loading route pages and loading uploaded html pages
     configureWebpack: { // for connecting to back-end node server without localhost prefix
         devServer: {
+            port: process.env.SERVER_PORT,
             proxy: {
                 "^/api": {
                     target: `http://localhost:${process.env.API_SERVER}`,
@@ -12,7 +15,15 @@ module.exports = {
                     }
                 },
             },
-            port: process.env.SERVER_PORT
+            watchOptions: {
+                ignored: [
+                    /node_modules/,
+                    /public/
+                ]
+            }
         }
+    },
+    chainWebpack: config => {
+        config.resolve.alias.set('@shared', path.resolve('../shared/src')) 
     }
 };

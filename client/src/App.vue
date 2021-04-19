@@ -1,7 +1,7 @@
 <template>
-    <div id="app">
+    <div id=app>
         <PageBar/>
-        <div id="page">
+        <div id=page>
             <router-view/>
         </div>
     </div>
@@ -9,18 +9,36 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import PageBar from './components/PageBar.vue';
+import PageBar from '@/components/PageBar.vue';
 
 export default Vue.extend({
     name: 'App',
     components: {
         PageBar
+    },
+    mounted() { this.setIframeBase(); },
+    updated() { this.setIframeBase(); },
+    methods: {
+        setIframeBase(): void { // set iframe base target to _parent, making links behave normally
+            this.loaded(document.getElementById('page')?.getElementsByTagName('iframe')[0]?.contentWindow, iframe => {
+                if (iframe.document.head.getElementsByTagName('base').length > 0) return;
+                let base = document.createElement('base');
+                base.target = '_parent';
+                iframe.document.head.append(base);
+            });
+        },
+        loaded(iframe: Window | null | undefined, func: (i: Window) => void): void {
+            if (!iframe) return;
+            if (iframe.document.readyState == 'complete') func(iframe);
+            iframe.addEventListener('load', () => func(iframe));
+        }
     }
 });
+
 </script>
 
 <style lang="scss">
-@import 'assets/css/custom.scss';
+@import '@/assets/css/custom.scss';
 
 #app {
     width: 100%;
