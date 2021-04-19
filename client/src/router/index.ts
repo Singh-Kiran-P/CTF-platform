@@ -37,6 +37,12 @@ const pages: { [page: string]: Route } = {
         name: 'Admin Panel',
         src: 'AdminPanel.vue',
         meta: { right: true }
+    },
+    dockerTesting: {
+        path: '/dockerTesting',
+        name: 'Docker Testing',
+        src: 'dockertesting.vue',
+        meta: { right: true }
     }
 };
 
@@ -61,17 +67,18 @@ const routes: { [page: string]: Route[] } = {
     participant: [
         pages.leaderboard,
         pages.teams,
-        pages.logout
+        pages.logout,
+        pages.dockerTesting
     ],
     admin: [
         pages.leaderboard,
         pages.teams,
-        pages.adminPanel
+        pages.adminPanel,
     ]
 };
 
 // TODO: choose available routes based on user type (visitor, participant or organizer)
-const availableRoutes: Route[] = routes.visitor;
+const availableRoutes: Route[] = routes.participant;
 
 // PageNotFound shown when no page matches the url
 availableRoutes.push({

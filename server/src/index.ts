@@ -4,14 +4,14 @@ import session from 'express-session';
 import passport from 'passport';
 import { Session } from './database/entities/sessions/Session';
 import { TypeormStore } from 'connect-typeorm';
+import formidableMiddleware from 'express-formidable';
 import DB from "./database";
 import routes from './routes';
 dotenv.config();
 
 //create express
 const app = express();
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(formidableMiddleware());
 
 // SESSION SETUP
 app.use(session({

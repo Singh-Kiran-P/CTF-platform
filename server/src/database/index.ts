@@ -45,7 +45,7 @@ class Database extends EventEmitter {
         })
             .then(async (conn) => {
                 this.conn = conn;
-                // if (this.loadTestData) await loadTestData();
+                if (this.loadTestData) await loadTestData();
                 console.log("connected");
                 this.emit("connect");
             })
