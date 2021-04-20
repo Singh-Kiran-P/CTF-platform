@@ -33,9 +33,8 @@
                         v-model="form.category"
                         :options="categories"
                         required
-                        :state="state(categoryFeedback)"
                     ></b-form-select>
-                    <b-form-invalid-feedback>{{categoryFeedback}}</b-form-invalid-feedback>
+                    <!--<b-form-invalid-feedback>{{categoryFeedback}}</b-form-invalid-feedback>-->
                 </b-form-group>
             </b-form-group>
             <StatusButton type=submit block variant=primary :state="registerState" normal=Register loading="Registering" succes="Registered" :disabled="!validForm()"/>
@@ -48,7 +47,7 @@
 import Vue from 'vue';
 import axios from 'axios';
 import StatusButton from '@/components/StatusButton.vue';
-import { state, validInput, validateString } from '@shared/validate';
+import { state, validInput, validateString, regexPassword, regexUsername } from '@shared/validate';
 
 export default Vue.extend({
     name: 'Register',
@@ -70,16 +69,16 @@ export default Vue.extend({
     }),
     
     computed: {
-        usernameFeedback(): string { return validateString(this.form.username, 'Username', 4, 32, false); },
-        passwordFeedback(): string { return validateString(this.form.password, 'Password', 6, 32, false); },
-        categoryFeedback(): string { return this.form.category ? '' : 'Please select a category' } 
+        usernameFeedback(): string { return this.validateUsername() },
+        passwordFeedback(): string { return this.validatePasssword() }
+        //categoryFeedback(): string { return this.form.category ? '' : 'Please select a category' } 
     },
     watch: {
         form: {deep: true, handler() { this.registerState = 'normal'; }}
     },
     methods: {
         state,
-        validForm(): boolean { return validInput(this.usernameFeedback, this.form.username) && validInput(this.passwordFeedback, this.form.password) && validInput(this.categoryFeedback, this.form.category) && state(this.registerFeedback); },
+        validForm(): boolean { return validInput(this.usernameFeedback, this.form.username) && validInput(this.passwordFeedback, this.form.password) && /*validInput(this.categoryFeedback, this.form.category) &&*/ state(this.registerFeedback); },
         onSubmit(e: Event): void {
             e.preventDefault();
             this.registerState = 'loading';
@@ -88,7 +87,7 @@ export default Vue.extend({
                 this.registerFeedback = err;
             }
             axios.post('/api/auth/register', {username: this.form.username, password: this.form.password, category: this.form.category}).then(response => {
-                if(response.data.error) return error(response.data.console.error);
+                if(response.data.error) return error(response.data.error);
                 this.registerState = 'succes';
                 location.replace('/#/'); // TODO: use history mode, remove hash
                 location.reload();
@@ -98,6 +97,22 @@ export default Vue.extend({
             axios.get('/api/competition/categories').then(response => {
                 this.categories = response.data;
             });
+        },
+        validatePasssword(): string {
+            let feedback = '';
+            feedback = validateString(this.form.password, 'Password', 6, 32, false);
+            if(feedback == '' && this.form.password.length > 0) {
+                return regexPassword(this.form.password);
+            }
+            return feedback;
+        },
+        validateUsername(): string {
+            let feedback = '';
+            feedback = validateString(this.form.username, 'Username', 4, 32, false);
+            if(feedback == '' && this.form.username.length > 0) {
+                return regexUsername(this.form.username);
+            }
+            return feedback;
         }
     }
 });

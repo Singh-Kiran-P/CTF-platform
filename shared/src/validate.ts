@@ -12,4 +12,39 @@ const validateString = (input: string, name: string, min: number, max: number, r
     return '';
 }
 
-export { state, validInput, validateString };
+const regexPassword = (input: string): string => {
+    if (!/[a-z]/.test(input)) {
+        return 'Password must contain 1 lower case character';
+    }
+    if (!/[A-Z]/.test(input)) {
+        return 'Password must contain 1 upper case character';
+    }
+    if (!/[0-9]/.test(input)) {
+        return 'Password must contain 1 number';
+    }
+    if (!/[_\-\?!@#$^&\*]/.test(input)) {
+        return 'Password must contain 1 special character: _-?!@#$^&*';
+    }
+    return '';
+}
+
+const regexUsername = (input: string): string => {
+    if (!/^[a-zA-Z0-9_.]*$/.test(input)) {
+        return 'Username can only contain alphanumerical characters or \'_.\'';
+    }
+    if (/(_\.)/.test(input)) {
+        return '\'_\' can\'t be followed by \'.\'';
+    }
+    if (/(\._)/.test(input)) {
+        return '\'.\' can\'t be followed by \'_\'';
+    }
+    if (/(\.\.)/.test(input)) {
+        return '\'.\' can\'t be followed by \'.\'';
+    }
+    if (/(__)/.test(input)) {
+        return '\'_\' can\'t be followed by \'_\'';
+    }
+    return '';
+}
+
+export { state, validInput, validateString, regexPassword, regexUsername };
