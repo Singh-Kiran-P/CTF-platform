@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <title>Register</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="global.css">
+        <link rel="stylesheet" href="login.css">
+        <noscript><link rel="stylesheet" href="nojs.css"></noscript>
+        <script defer src="center.js"></script>
+        <script defer src="form.js"></script>
+    </head>
+
+    <body>
+        <article class="center" id="registerField">
+            <form action="script/action/register.php" method="post" autocomplete="off">
+                <header>DEMO TO SHOW UPLOADED PAGES WITH ATTACHMENTS</header>
+                <span>Register as<br/>
+                    <input type="radio" name="profileType" id="visitorProfile" value="visitor" checked/>
+                    <label class="selection" for="visitorProfile">Visitor</label>
+                    <input type="radio" name="profileType" id="organizerProfile" value="organizer"/>
+                    <label class="selection floatRight" for="organizerProfile">Organizer</label>
+                </span>
+                <span>Username
+                    <span class="errorText"> - </span><span class="errorMessage"></span>
+                    <input type="text" name="username" maxlength="32" autocomplete="off">
+                </span>
+                <span>Email
+                    <span class="errorText"> - </span><span class="errorMessage"></span>
+                    <input type="text" name="email" maxlength="32" autocomplete="off"/>
+                </span>
+                <span>Password
+                    <span class="errorText"> - </span><span class="errorMessage"></span>
+                    <input type="password" name="password" autocomplete="new-password"/>
+                </span>
+                <span>Confirm Password
+                    <span class="errorText"> - </span><span class="errorMessage"></span>
+                    <input type="password" name="confirmPassword" autocomplete="new-password"/>
+                </span>
+                <button type="submit">Register</button>
+                <footer>Already have a profile? <a href="/#/random/link/naar/niks.html">Login</a></footer> <!-- TODO: history mode to avoid having to use /#/ -->
+            </form>
+        </article>
+    </body>
+</html>

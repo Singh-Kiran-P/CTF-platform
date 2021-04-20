@@ -32,10 +32,9 @@
 import Vue from "vue";
 
 export default Vue.extend({
-    name: "PageBar",
-    created() {
-        // store all available routes in pages
-        (this.$router.options.routes || []).forEach((route) => {
+    name: 'PageBar',
+    created() { // store all available routes in pages
+        this.$router.getRoutes().forEach(route => {
             if (route.meta?.hidden) return;
             const page = {
                 name: route.name?.toString() || route.path.toString(),
@@ -56,9 +55,7 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-a.router-link-exact-active,
-a:hover,
-a:focus-visible {
+a.router-link-exact-active, a:hover, a:focus-visible {
     color: var(--primary) !important;
 }
 </style>

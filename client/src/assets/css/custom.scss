@@ -9,6 +9,7 @@ $primary: rgb(63, 181, 129);
     --border-radius: 0.5rem;
     --margin: 0.5rem;
     --double-margin: calc(var(--margin) * 2);
+    --half-margin: calc(var(--margin) / 2);
 }
 
 @import '~bootstrap/scss/bootstrap';
@@ -26,8 +27,10 @@ html, body {
 
 a:hover, a:focus-visible {
     text-decoration: underline !important;
+    color: var(--primary);
+    outline: none;
 }
 
-a:focus-visible {
-    outline: thin dotted;
+button {
+    word-wrap: break-word;
 }

@@ -1,5 +1,7 @@
 import Vue from 'vue';
+import axios from 'axios';
 import VueRouter from 'vue-router';
+import Roles from '@shared/roles';
 Vue.use(VueRouter);
 
 type Route = { path: string, name: string, src: string, meta?: {} };
@@ -46,63 +48,67 @@ const pages: { [page: string]: Route } = {
     }
 };
 
-// html pages uploaded by the organizer, these are available to all users
-// TODO: retrieve these pages from the database instead (make sure theres a page with path '/')
-// TODO: make pages not available to all users?
-const uploadedPages: Route[] = [
-    {
-        path: '/',
-        name: 'Test',
-        src: 'test.html'
-    }
-];
-
 // define which pages are available to which user type (excluding uploaded pages)
 const routes: { [page: string]: Route[] } = {
-    visitor: [
+    [Roles.VISITOR]: [
         pages.login,
-        pages.register,
-        pages.teams //for testing
+        pages.register
     ],
-    participant: [
+    [Roles.PARTICIPANT]: [
         pages.leaderboard,
         pages.teams,
         pages.logout,
         pages.dockerTesting
     ],
-    admin: [
+    [Roles.ORGANIZER]: [
         pages.leaderboard,
         pages.teams,
         pages.adminPanel,
+        pages.logout
     ]
 };
 
-// TODO: choose available routes based on user type (visitor, participant or organizer)
-const availableRoutes: Route[] = routes.participant;
+// retrieve all uploaded pages
+Promise.all([
+    axios.get('/api/auth/role'),
+    axios.get('/api/competition/pages')
+]).then(([roleResponse, pagesResponse]) => {
+    let availableRoutes: Route[] = pagesResponse.data.map((page: any) => ({
+        path: page.path,
+        name: page.name,
+        src: page.source
+    })).concat(routes[roleResponse.data]);
 
-// PageNotFound shown when no page matches the url
-availableRoutes.push({
-    path: '/:catchAll(.*)*',
-    name: 'Error 404',
-    src: 'PageNotFound.vue',
-    meta: { hidden: true }
+    // PageNotFound shown when no page matches the url
+    availableRoutes.push({
+        path: '/:catchAll(.*)*',
+        name: 'Error 404',
+        src: 'PageNotFound.vue',
+        meta: { hidden: true }
+    });
+
+    const router = new VueRouter({ // TODO: use history mode
+        routes: availableRoutes.map(route => ({ // always add all uploaded pages to the front of the routes list
+            path: route.path,
+            name: route.name,
+            meta: route.meta,
+            component: route.src.endsWith('vue') ? () => import(`../pages/${route.src}`) : { template: `<iframe src="/pages${route.src}"/>` }
+            // include vue pages directly into the html using a lazy loaded import, with the root directory for src in '/src/pages/'
+            // include html pages using an iframe so they dont inherit any styling, with the root directory for src in '/public/pages/'
+        }))
+    });
+
+    // update the document title to the page name on route
+    router.beforeEach((route, _, next) => {
+        document.title = route.name?.toString() || route.path;
+        next();
+    });
+
+    RouterReady.onReady(router);
 });
 
-const router = new VueRouter({
-    routes: uploadedPages.concat(availableRoutes).map(route => ({ // always add all uploaded pages to the front of the routes list
-        path: route.path,
-        name: route.name,
-        meta: route.meta,
-        component: route.src.endsWith('vue') ? () => import(`../pages/${route.src}`) : { template: `<iframe src="pages/${route.src}"/>` }
-        // include vue pages directly into the html using a lazy loaded import, with the root directory for src in '/src/pages/'
-        // include html pages using an iframe so they dont inherit any styling, with the root directory for src in '/public/pages/'
-    }))
-});
+class RouterReady {
+    static onReady: (router: VueRouter) => void;
+}
 
-// update the document title to the page name on route
-router.beforeEach((route, _, next) => {
-    document.title = route.name?.toString() || route.path;
-    next();
-});
-
-export default router;
+export default RouterReady;

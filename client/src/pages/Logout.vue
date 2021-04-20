@@ -1,26 +1,33 @@
 <template>
+    <div class=logout>
+        <b-spinner variant=primary type=grow label="Logging out..."/>
+    </div>
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import axios from "axios"
+import Vue from 'vue';
+import axios from 'axios';
 
 export default Vue.extend({
-    name: "Logout",
+    name: 'Logout',
     created() {
-        this.logout();
-    },
-    methods: {
-        logout() {
-            axios
-            .get("/api/auth/logout")
-            .then(() => {
-                this.$router.push({name: 'Login'}); //load visitor routes, needs to be configured using Landers code
-            });
-        }
+        axios.get("/api/auth/logout").then(() => {
+            location.replace('/#/login'); // TODO: use history mode, remove hash
+            location.reload();
+        });
     }
 });
 </script>
 
 <style scoped lang="scss">
+.logout {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.spinner-grow {
+    width: 25vmin;
+    height: 25vmin;
+}
 </style>

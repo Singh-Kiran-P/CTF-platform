@@ -1,8 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
-import { Environment } from '../connections/Environment';
-import { Attempt } from '../connections/Attempt';
-import { Solve } from '../connections/Solve';
-import { Account } from './Account';
+import { Environment, Attempt, Solve, Account } from '../../../database';
 
 @Entity()
 export class Team {

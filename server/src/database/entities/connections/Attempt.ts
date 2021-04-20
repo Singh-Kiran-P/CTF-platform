@@ -1,6 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
-import { Account } from '../accounts/Account';
-import { Team } from '../accounts/Team';
+import { Account, Team } from '../../../database';
 
 export enum AttemptType {
     LOGIN = 'login',

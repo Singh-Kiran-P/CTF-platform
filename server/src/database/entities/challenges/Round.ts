@@ -1,5 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
-import { Challenge } from './Challenge';
+import { Challenge } from '../../../database';
 
 @Entity()
 export class Round {

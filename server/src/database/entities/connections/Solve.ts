@@ -1,8 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany } from 'typeorm';
-import { Account } from '../accounts/Account';
-import { Challenge } from '../challenges/Challenge';
-import { Team } from '../accounts/Team';
-import { UsedHint } from './UsedHint';
+import { Account, Challenge, Team, UsedHint } from '../../../database';
 
 @Entity()
 export class Solve {

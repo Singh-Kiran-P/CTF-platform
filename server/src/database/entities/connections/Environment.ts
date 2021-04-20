@@ -1,6 +1,5 @@
-import { Entity, PrimaryColumn, ManyToOne, Column } from 'typeorm';
-import { Challenge } from '../challenges/Challenge';
-import { Team } from '../accounts/Team';
+import { Entity, PrimaryColumn, ManyToOne } from 'typeorm';
+import { Challenge, Team } from '../../../database';
 
 @Entity()
 export class Environment {

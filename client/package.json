@@ -1,12 +1,11 @@
 {
     "name": "client",
-    "version": "0.1.0",
-    "private": true,
+    "version": "1.0.0",
     "scripts": {
-        "serve": "vue-cli-service serve",
         "build": "vue-cli-service build",
-        "server": "npm run server_dev --prefix ../server",
-        "dev": "concurrently --kill-others  \"npm run serve\" \"npm run server\""
+        "client": "vue-cli-service serve",
+        "server": "npm run server --prefix ../server",
+        "dev": "npm run dev --prefix ../server"
     },
     "dependencies": {
         "@fortawesome/fontawesome-svg-core": "^1.2.35",
@@ -20,6 +19,7 @@
         "concurrently": "^6.0.0",
         "core-js": "^3.6.5",
         "dotenv": "^8.2.0",
+        "object-to-formdata": "^4.1.0",
         "sweetalert2": "^10.15.7",
         "vue": "^2.6.12",
         "vue-fontawesome": "^0.0.2",
