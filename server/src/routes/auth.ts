@@ -1,91 +1,46 @@
-import Router from 'express';
-const router = Router();
+import express from 'express';
 import passport from 'passport';
-import { generatePassword } from '../auth/passportUtils';
+import Roles from '@shared/roles';
 import DB, { Account, Category } from '../database';
-import Roles from '../auth/Roles';
-import Errors from '../auth/Errors';
-import { isAuth, isAdmin } from '../auth/authMiddleware';
+import { getAccount, generatePassword } from '../auth/passport';
+const router = express.Router();
 
-//POST ROUTES
 router.post('/login', (req, res, next) => {
-    passport.authenticate('local', (err, user, info) => {
-        //server error, not a passport/authentication error, send error to frontend
-        if (err) {
-            return res.json({error: 'Server/Database error, contact support'});
-        }
-        //login failed, invalid username or password, send error to frontend
-        if (!user) {
-            return res.json({error: info.message}); //status 401 needed?
-        }
-        //login succeeded
-        //save user in express-session
+    req.body = req.fields;
+    passport.authenticate('local', (err, user) => {
+        if (err) return res.json({ error: err });
+        if (!user) return res.json({ error: 'Error authenticating user' });
         req.login(user, err => {
-            if (err) return next(err);
-            console.log(req.user);
-            return res.sendStatus(200);
+            if (err) return res.json({ error: err });
+            return res.json({});
         });
-    })(req,res,next);
+    })(req, res, next);
 });
 
 router.post('/register', (req, res, next) => {
+    req.body = req.fields;
+    console.log(req.body);
     const accountRepo = DB.repo(Account);
- 
     accountRepo.findOne({name: req.body.username}).then((acc : Account) => {
-        if(acc) {
-            return res.json({error: Errors.USER_ALREADY_EXISTS});
-        }
-        const hashedPasswordData = generatePassword(req.body.password);
-
-        const salt : string = hashedPasswordData.salt;
-        const hashedPass : string = hashedPasswordData.hash;
-
+        if(acc) return res.json({error: "Username already in use"});
         DB.repo(Category).findOne({name: req.body.category}).then((category: Category) => {
-            const newAccount = new Account(req.body.username, hashedPass, salt, Roles.participant, category);
-
-            accountRepo.save(newAccount)
-                .then((account: Account) => {
-                    console.log(account);
-                    //save user in express-session
-                    req.login(account, err => {
-                        if (err) 
-                            next(err);
-                    });
-                    return res.sendStatus(200);
-                });
-        })
-    }).catch((error) => {
-        console.log(error);
-    });
-    ;
+            const newAccount = new Account(req.body.username, req.body.password, category);
+            accountRepo.save(newAccount).then((account: Account) => {
+                req.login(account, err => { if (err) return res.json({ error: err });});
+                return res.json({});
+            }).catch((err) => { return res.json({error: err})});
+        }).catch((err) => { return res.json({ error: err})});
+    }).catch((err) => { return res.json({ error: err });});
 });
 
 router.get('/logout', (req, res, next) => {
-    req.logOut(); // removes the req.user property and clears the login session
-    console.log('logged out');
-    res.sendStatus(200);
+    req.logout();
+    res.json({});
 })
 
-router.get('/test', isAuth, isAdmin, (req, res) => {
-    console.log('passed all auth tests');
-    return res.sendStatus(200);
-})
-
-router.get('/getAuthRole', (req: any, res) => {
-    if(req.isUnauthenticated()) {
-        return res.json({role: Roles.visitor});
-    } else {
-        return res.json({role: req.user.role})
-    }
-});
-
-router.get('/loadCategories', (_, res) => {
-    DB.repo(Category).find({ order: { priority: 'ASC' } })
-    .then((data: Category[] )=> {
-        res.json({
-            categories: data.map(category => category.name),
-        });
-    });
+router.get('/role', (req, res) => {
+    if (req.isUnauthenticated()) res.send(Roles.VISITOR);
+    else res.send(getAccount(req).admin ? Roles.ORGANIZER : Roles.PARTICIPANT);
 });
 
 export default { path: '/auth', router };

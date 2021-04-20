@@ -1,0 +1,15 @@
+{
+    "name": "shared",
+    "version": "1.0.0",
+    "scripts": {
+        "client": "npm run client --prefix ../server",
+        "server": "npm run server --prefix ../server",
+        "dev": "npm run dev --prefix ../server"
+    },
+    "dependencies": {
+        "formidable": "^1.2.2"
+    },
+    "devDependencies": {
+        "@types/formidable": "^1.2.1"
+    }
+}

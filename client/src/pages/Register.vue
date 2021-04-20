@@ -1,46 +1,44 @@
 <template>
     <div class=register>
         <b-form @submit="onSubmit($event)">
-            <b-form-group id=input-group-username label=Username label-for=username>
-                <b-form-input
-                    id=username
-                    name=username
-                    type=text
-                    v-model="form.username.value"
-                    placeholder="Enter username"
-                    required
-                    :state="state(usernameFeedback)"
-                ></b-form-input> 
-                <b-form-invalid-feedback>{{usernameFeedback}}</b-form-invalid-feedback>
-            </b-form-group>
+            <b-form-group :state="state(registerFeedback)" :invalid-feedback="registerFeedback">
+                <b-form-group label=Username label-for=username>
+                    <b-form-input
+                        id=username
+                        type=text
+                        v-model="form.username"
+                        placeholder="Enter username"
+                        :state="state(usernameFeedback)"
+                        v-on:input="registerFeedback = ''"
+                    ></b-form-input> 
+                    <b-form-invalid-feedback>{{usernameFeedback}}</b-form-invalid-feedback>
+                </b-form-group>
 
-            <b-form-group id=input-group-password label=Password label-for=password>
-                <b-form-input
-                    id=password
-                    name=password
-                    type=password
-                    v-model="form.password.value"
-                    required
-                    :state="state(passwordFeedback)"
-                    v-on:input="onChangeUsername"
-                ></b-form-input>
-                <b-form-invalid-feedback>{{passwordFeedback}}</b-form-invalid-feedback>
-            </b-form-group>
+                <b-form-group label=Password label-for=password>
+                    <b-form-input
+                        id=password
+                        type=password
+                        v-model="form.password"
+                        placeholder="Enter password"
+                        :state="state(passwordFeedback)"
+                        v-on:input="registerFeedback = ''"
+                    ></b-form-input>
+                    <b-form-invalid-feedback>{{passwordFeedback}}</b-form-invalid-feedback>
+                </b-form-group>
 
-            <b-form-group id=input-group-category label=Category label-for=category>
-                <b-form-select
-                    id=category
-                    name=category
-                    placeholder=Select category
-                    v-model="form.category"
-                    :options="categories"
-                    required
-                    :state="state(categoryFeedback)"
-                ></b-form-select>
-                <b-form-invalid-feedback>{{categoryFeedback}}</b-form-invalid-feedback>
+                <b-form-group label=Category label-for=category>
+                    <b-form-select
+                        id=category
+                        placeholder="Select category"
+                        v-model="form.category"
+                        :options="categories"
+                        required
+                    ></b-form-select>
+                    <!--<b-form-invalid-feedback>{{categoryFeedback}}</b-form-invalid-feedback>-->
+                </b-form-group>
             </b-form-group>
+            <StatusButton type=submit block variant=primary :state="registerState" normal=Register loading="Registering" succes="Registered" :disabled="!validForm()"/>
             <router-link :to="{ name: 'Login'}">Already have an account? Click here to log in</router-link>
-            <b-button type=submit variant=primary :disabled="!validForm()">Register</b-button>
         </b-form>
     </div>
 </template>
@@ -48,75 +46,73 @@
 <script lang="ts">
 import Vue from 'vue';
 import axios from 'axios';
+import StatusButton from '@/components/StatusButton.vue';
+import { state, validInput, validateString, regexPassword, regexUsername } from '@shared/validate';
 
 export default Vue.extend({
     name: 'Register',
+    components: {
+        StatusButton
+    },
     created() {
         this.loadFormCategories();
     },
     data: () => ({
         form: {
-            username: {
-                value: '',
-                serverError: ''
-            },
-            password: {
-                value: '', 
-                serverError: ''
-            },
-            category: null
+            username: '',
+            password: '',
+            category: ''
         },
         categories: [] as string[],
+        registerState: 'normal',
+        registerFeedback: ''
     }),
     
     computed: {
-        usernameFeedback(): string { return this.feedback(this.form.username, 'username', true, 4, 32, []); },
-        passwordFeedback(): string { return this.feedback(this.form.password, 'password', true, 6, 32, []); },
-        categoryFeedback(): string { return this.form.category ? '' : 'Please select a category' }
+        usernameFeedback(): string { return this.validateUsername() },
+        passwordFeedback(): string { return this.validatePasssword() }
+        //categoryFeedback(): string { return this.form.category ? '' : 'Please select a category' } 
+    },
+    watch: {
+        form: {deep: true, handler() { this.registerState = 'normal'; }}
     },
     methods: {
+        state,
+        validForm(): boolean { return validInput(this.usernameFeedback, this.form.username) && validInput(this.passwordFeedback, this.form.password) && /*validInput(this.categoryFeedback, this.form.category) &&*/ state(this.registerFeedback); },
         onSubmit(e: Event): void {
             e.preventDefault();
-            axios.post('/api/auth/register', {username: this.form.username.value, password: this.form.password.value, category: this.form.category}).then(response => {
-                if(response.data.error) {
-                    if(response.data.error === "USER_ALREADY_EXISTS") {
-                        this.form.username.serverError = "An account with this username already exists";
-                    } else {
-                        console.log(response.data.error);
-                        //notify unknown server error?
-                    }
-                } else {
-                    console.log("succes!");
-                    this.$router.push({name: 'Login'})
-                }
-            }).catch(err => alert(err));
-        },
-        feedback(input: any, name: string, required: boolean, min: number, max: number, others: string[]): string {
-            let l = input.value.length;
-            if(input.serverError) return input.serverError;
-            if (required && l == 0) return `${name} is required`;
-            if (others.includes(input.value)) return `${name} already exists`;
-            if (l && l < min) return `${name} must be at least ${min} characters`;
-            else if (l > max) return `${name} must be at most ${max} characters`;
-            return '';
-        },
-        state(feedback: string): boolean {
-            return feedback.length == 0;
-        },
-        valid(input: string, feedback: string): boolean {
-            return input.length > 0 && this.state(feedback);
-        },
-        validForm(): boolean {
-            return this.state(this.usernameFeedback) && this.state(this.passwordFeedback) && this.state(this.categoryFeedback);
+            this.registerState = 'loading';
+            const error = (err: string = '') => {
+                this.registerState = 'error';
+                this.registerFeedback = err;
+            }
+            axios.post('/api/auth/register', {username: this.form.username, password: this.form.password, category: this.form.category}).then(response => {
+                if(response.data.error) return error(response.data.error);
+                this.registerState = 'succes';
+                location.replace('/#/'); // TODO: use history mode, remove hash
+                location.reload();
+            }).catch(() => error());
         },
         loadFormCategories(): void {
-            axios.get('/api/auth/loadCategories').then(response => {
-                let data = response.data;
-                this.categories = data.categories;
+            axios.get('/api/competition/categories').then(response => {
+                this.categories = response.data;
             });
         },
-        onChangeUsername(e: Event) {
-            this.form.username.serverError = ''; //reset server error on input change
+        validatePasssword(): string {
+            let feedback = '';
+            feedback = validateString(this.form.password, 'Password', 6, 32, false);
+            if(feedback == '' && this.form.password.length > 0) {
+                return regexPassword(this.form.password);
+            }
+            return feedback;
+        },
+        validateUsername(): string {
+            let feedback = '';
+            feedback = validateString(this.form.username, 'Username', 4, 32, false);
+            if(feedback == '' && this.form.username.length > 0) {
+                return regexUsername(this.form.username);
+            }
+            return feedback;
         }
     }
 });

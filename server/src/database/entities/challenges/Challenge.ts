@@ -1,11 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany } from 'typeorm';
-import { Environment } from '../connections/Environment';
-import { Solve } from '../connections/Solve';
-import { Attachment } from './Attachment';
-import { Question } from './Question';
-import { Round } from './Round';
-import { Hint } from './Hint';
-import { Tag } from './Tag';
+import { Environment, Solve, Attachment, Question, Round, Hint, Tag } from '../../../database';
 
 export enum ChallengeType {
     QUIZ = 'quiz',

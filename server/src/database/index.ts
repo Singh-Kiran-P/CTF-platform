@@ -1,3 +1,4 @@
+import path from 'path';
 import 'reflect-metadata';
 import dotenv from 'dotenv';
 import EventEmitter = require('events');
@@ -36,7 +37,7 @@ class Database extends EventEmitter {
             synchronize: true,
             logging: true,
             entities: [
-                __dirname + '/entities/*/*.js'
+                path.join(__dirname, '/entities/*/*.js')
             ]
         }).then(async conn => {
             this.conn = conn;
@@ -67,6 +68,27 @@ class Database extends EventEmitter {
             return this.conn.getCustomRepository(entity);
         }
     }
+
+    /**
+     * allows for efficiently updating the database to a new list of entities, if you want to use this function ask Lander how to use it
+     */
+    setRepo<E>(repo: Repository<E>, newEntries: E[], id: (x: E) => any[], files: (x: E) => string[] = () => []) {
+        const equal = (x: any[], y: any[]): boolean => x.length == y.length && x.every((_, i) => x[i] == y[i]);
+        return new Promise<void>((resolve, reject) => {
+            repo.find().then(old => {
+                let [save, remove]: E[][] = [newEntries.filter(entry => !old.some(x => equal(id(entry), id(x)))), []];
+                old.forEach(entry => {
+                    let match = newEntries.find(x => equal(id(entry), id(x)));
+                    match == undefined ? remove.push(entry) : save.push(Object.assign(entry, match));
+                });
+                let oldFiles = old.reduce((acc, c) => acc.concat(files(c)), ['']).filter(f => f && !newEntries.some(x => files(x).includes(f))); // TODO: remove these files
+                Promise.all([
+                    repo.save(save),
+                    repo.remove(remove)
+                ]).then(() => resolve()).catch(err => reject(err));
+            }).catch(err => reject(err));
+        });
+    }
 }
 
 declare interface Database { // applies DatabaseEvents to Database to enable event checking
@@ -90,7 +112,7 @@ export { Account } from './entities/accounts/Account';
 export { Category } from './entities/accounts/Category';
 export { Team } from './entities/accounts/Team';
 export { Attachment } from './entities/challenges/Attachment';
-export { Challenge } from './entities/challenges/Challenge';
+export { Challenge, ChallengeType } from './entities/challenges/Challenge';
 export { Hint } from './entities/challenges/Hint';
 export { Question } from './entities/challenges/Question';
 export { Round } from './entities/challenges/Round';
@@ -98,7 +120,7 @@ export { Tag } from './entities/challenges/Tag';
 export { Competition, CompetitionRepo } from './entities/competition/Competition';
 export { Page } from './entities/competition/Page';
 export { Sponsor } from './entities/competition/Sponsor';
-export { Attempt } from './entities/connections/Attempt';
+export { Attempt, AttemptType } from './entities/connections/Attempt';
 export { Environment } from './entities/connections/Environment';
 export { Solve } from './entities/connections/Solve';
 export { UsedHint } from './entities/connections/UsedHint';

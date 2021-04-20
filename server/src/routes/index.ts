@@ -8,7 +8,6 @@ import competition from './competition';
 
 
 export default [
-    template,
     competition,
     auth,
     team,
