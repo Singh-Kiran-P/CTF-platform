@@ -56,6 +56,7 @@ const routes: { [page: string]: Route[] } = {
     [Roles.PARTICIPANT]: [
         pages.leaderboard,
         pages.teams,
+        pages.team,
         pages.logout
     ],
     [Roles.ORGANIZER]: [

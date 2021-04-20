@@ -1,7 +1,7 @@
 import Router from 'express';
 const router = Router();
 import DB, { Team, Account, Category } from '../database';
-import { isAuth, isAdmin } from '../auth/authMiddleware';
+import { isAuth, isAdmin } from '../auth/passport';
 
 router.get('/hasTeam', isAuth, (req: any, res) => {
     DB.repo(Account).findOne({
