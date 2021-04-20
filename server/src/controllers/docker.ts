@@ -16,13 +16,8 @@ function getAllRunningContainers() {
     return data;
 }
 
-/**
- * unzip and make docker image from Dockerfile
- * uniek naam geven aan image
- * @param challengeFile Zip file *
- * @pre files have to be in de dir
- */
-async function createChallengeImage(jsonObj: any) {
+// TODO: Get challenge files dynamically
+function createChallengeImage(jsonObj: any) {
     return new Promise((resolve, reject) => {
         pump(
             build(`${__dirname}/../../public/uploads/Challenges/uncompressed/test-challenge/Dockerfile`, { t: jsonObj.name }),
@@ -37,23 +32,53 @@ async function createChallengeImage(jsonObj: any) {
 function randomIntFromInterval(min, max) { // min and max included
     return Math.floor(Math.random() * (max - min + 1) + min);
 }
-/* TODO: error terug geven line 39-42 */
-async function createChallengeContainer(jsonObj: any) {
-    let randomPort = randomIntFromInterval(500, 10000)
-    return new Promise<void>((resolve, reject) => {
-        docker.createContainer({ Image: jsonObj.image, name: jsonObj.containerName, HostConfig: { PortBindings: { '8080/tcp': [{ HostPort: randomPort.toString() }] } } }, (err, container) => {
-            if (err) {
-                reject(err);
-            } else {
-                container.start((err, data) => {
-                    if (err)
-                        reject(err);
-                    else
-                        resolve();
-                });
-            }
-        });
+
+// TODO: check if user is choosing the right challengeImage (from DB)
+function createChallengeContainer(jsonObj: any) {
+    let configData = _createPortConfig(jsonObj.ports);
+    return new Promise<Object>((resolve, reject) => {
+        docker.createContainer(
+            {
+                Image: jsonObj.challengeImage,
+                name: jsonObj.containerName,
+                HostConfig: {
+                    PortBindings: configData.portBindings
+                }
+            },
+            (err, container) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    container.start((err, data) => {
+                        if (err)
+                            reject(err);
+                        else {
+                            resolve(configData.openPorts);
+                        }
+                    });
+                }
+            });
     });
+}
+
+function _createPortConfig(ports: string[]) {
+    let openPorts: Array<Number> = [];
+    let portBindings: { [port: string]: { HostPort: string }[] } = {};
+    ports.forEach(port => {
+        portBindings[port] = [{ HostPort: _giveRandomPort(openPorts) }];
+    });
+    return { openPorts: openPorts, portBindings: portBindings };
+}
+
+// TODO: Check open ports (from DB)
+function _giveRandomPort(openPorts: Number[]): string {
+    while (true) {
+        let port: Number = randomIntFromInterval(500, 5000)
+        if(!openPorts.includes(port)){
+            openPorts.push(port)
+            return port.toString();
+        }
+    }
 }
 
 export default {
@@ -61,3 +86,5 @@ export default {
     createChallengeImage,
     createChallengeContainer
 }
+
+
