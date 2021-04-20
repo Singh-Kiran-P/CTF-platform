@@ -12,7 +12,7 @@ router.post('/login', (req, res, next) => {
         if (!user) return res.json({ error: 'Error authenticating user' });
         req.login(user, err => {
             if (err) return res.json({ error: err });
-            return res.json({});
+            return res.json({message: 'Logged in successfully!'});
         });
     })(req, res, next);
 });

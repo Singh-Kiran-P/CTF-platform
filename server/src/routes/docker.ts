@@ -6,7 +6,7 @@
 import express, { json } from "express";
 import Docker from "dockerode";
 import DockerController from "../controllers/docker";
-import { isAdmin, isAuth } from "../middlewares/auth/authMiddleware";
+import { isAdmin, isAuth } from "../auth/passport";
 
 const docker = new Docker({ socketPath: "/var/run/docker.sock" });
 const router = express.Router();
@@ -37,10 +37,10 @@ router.post("/createChallengeImage", isAuth, isAdmin, (req, res, next) => {
     let jsonObj = req.fields;
     DockerController.createChallengeImage(jsonObj)
         .then(() => {
-            res.json({ message: "Challenge image started", status: 200 });
+            res.json({ message: "Challenge image started", statusCode: 200 });
         })
         .catch((err) => {
-            res.send({ message: err.message, status: 500 });
+            res.send({ message: err.message, statusCode: 500 });
         });
 });
 
@@ -49,15 +49,18 @@ router.post("/createChallengeImage", isAuth, isAdmin, (req, res, next) => {
  * - A team can access this to create a container for a challenge
  * @param req: [challengeImage]
  */
-router.post("/createChallengeContainer",isAuth, (req, res, next) => {
-    let jsonObj = {challengeImage: req.fields.challengeImage, ports: ["8080/tcp"], containerName: 'challenge_TEAM4' };
+router.post("/createChallengeContainer", (req, res, next) => {
+    // let jsonObj = {challengeImage: req.fields.challengeImage, ports: ["8080/tcp"], containerName: 'challenge_TEAM4' };
+    // console.log(req.fields);
+
+    let jsonObj = {challengeImage: req.fields.challengeImage, ports: ["8080/tcp"], containerName: req.fields.containerName };
     DockerController.createChallengeContainer(jsonObj)
         .then((ports) => {
-            res.json({ ports: ports, message: "Challenge container created/started", statusCode: 200 });
+            res.json({ ports: ports, message: `Challenge container created/started http://localhost:${ports}`, statusCode: 200 });
         })
         .catch((err) => {
             console.log(err.json);
-            res.send({ message: err.message, status: 404 });
+            res.send({ message: err.message, statusCode: 404 });
         });
 });
 

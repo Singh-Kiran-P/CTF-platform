@@ -29,13 +29,16 @@ function createChallengeImage(jsonObj: any) {
     });
 }
 
-function randomIntFromInterval(min, max) { // min and max included
+function randomIntFromInterval(min: number, max: number) { // min and max included
     return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
 // TODO: check if user is choosing the right challengeImage (from DB)
 function createChallengeContainer(jsonObj: any) {
     let configData = _createPortConfig(jsonObj.ports);
+    // console.log(configData.portBindings);
+    // console.log(jsonObj);
+
     return new Promise<Object>((resolve, reject) => {
         docker.createContainer(
             {
@@ -74,7 +77,7 @@ function _createPortConfig(ports: string[]) {
 function _giveRandomPort(openPorts: Number[]): string {
     while (true) {
         let port: Number = randomIntFromInterval(500, 5000)
-        if(!openPorts.includes(port)){
+        if (!openPorts.includes(port)) {
             openPorts.push(port)
             return port.toString();
         }

@@ -58,12 +58,12 @@ const routes: { [page: string]: Route[] } = {
         pages.leaderboard,
         pages.teams,
         pages.logout,
-        pages.dockerTesting
     ],
     [Roles.ORGANIZER]: [
         pages.leaderboard,
         pages.teams,
         pages.adminPanel,
+        pages.dockerTesting,
         pages.logout
     ]
 };

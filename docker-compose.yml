@@ -37,6 +37,7 @@ services:
       - "80:80"
     volumes:
       - ./client:/ctf/client
+      - ./shared:/ctf/shared
     working_dir: /ctf/client
     networks:
       - mynet
@@ -53,6 +54,7 @@ services:
       - '4000:4000'
     volumes:
       - ./server:/ctf/server
+      - ./shared:/ctf/shared
       # For accessing docker works ONLY in Linux
       - /var/run/docker.sock:/var/run/docker.sock
     working_dir: /ctf/server

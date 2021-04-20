@@ -18,7 +18,7 @@
                 >
                     <b-form-input
                         id="input-1"
-                        v-model="form_createChallenge.imageName"
+                        v-model="form_createChallenge.challengeImage"
                         type="Challenge Image:"
                         placeholder="Enter Image Name"
                         required
@@ -32,7 +32,7 @@
                 >
                     <b-form-input
                         id="input-1"
-                        v-model="form_createChallenge.challengeName"
+                        v-model="form_createChallenge.containerName"
                         type="Challenge Name"
                         placeholder="Enter Challenge Name"
                         required
@@ -47,7 +47,7 @@
             </b-card>
         </div>
 
-        <div class="create">
+        <!-- <div class="create">
             <h2>Create Challenge for team!</h2>
             <b-form
                 @submit="onSubmit($event)"
@@ -62,7 +62,7 @@
                 >
                     <b-form-input
                         id="input-1"
-                        v-model="form_createChallenge.imageName"
+                        v-model="form_createChallenge.challengeImage"
                         type="Challenge Image:"
                         placeholder="Enter Image Name"
                         required
@@ -76,7 +76,7 @@
                 >
                     <b-form-input
                         id="input-1"
-                        v-model="form_createChallenge.challengeName"
+                        v-model="form_createChallenge.containerName"
                         type="Challenge Name"
                         placeholder="Enter Challenge Name"
                         required
@@ -89,7 +89,7 @@
             <b-card class="mt-3" header="Form Data Result">
                 <pre class="m-0">{{ form_createChallenge }}</pre>
             </b-card>
-        </div>
+        </div> -->
     </div>
 </template>
 
@@ -112,8 +112,9 @@ export default Vue.extend({
             Status: string;
         }[],
         form_createChallenge: {
-            imageName: "",
-            challengeName: "",
+            challengeImage: "",
+            containerName: "",
+            ports: []
         },
         show: true,
     }),
@@ -126,8 +127,8 @@ export default Vue.extend({
         onReset(e: Event) {
             e.preventDefault();
             // Reset our form values
-            this.form_createChallenge.imageName = "";
-            this.form_createChallenge.challengeName = "";
+            this.form_createChallenge.challengeImage = "";
+            this.form_createChallenge.containerName = "";
 
             // Trick to reset/clear native browser form validation state
             this.show = false;
@@ -162,16 +163,17 @@ export default Vue.extend({
                 .post(
                     "/api/docker/createChallengeContainer",
                     {
-                        image: this.form_createChallenge.imageName,
-                        containerName: this.form_createChallenge.challengeName,
+                        challengeImage: this.form_createChallenge.challengeImage,
+                        containerName: this.form_createChallenge.containerName
                     },
                     axiosConfig
                 )
                 .then((response) => {
                     let data = response.data;
                     console.log(data);
-                    if (data.statusCode === 200)
+                    if (data.statusCode === 200){
                         this.toast(data.message, "success");
+                    }
                     else if (data.statusCode === 404)
                         this.toast(data.message, "danger");
                 });

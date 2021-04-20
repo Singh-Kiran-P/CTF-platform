@@ -1,4 +1,4 @@
-import { Entity, PrimaryColumn, ManyToOne } from 'typeorm';
+import { Entity, PrimaryColumn, ManyToOne, Column } from 'typeorm';
 import { Challenge, Team } from '../../../database';
 
 @Entity()
