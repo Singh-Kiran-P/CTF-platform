@@ -1,6 +1,6 @@
 import DB, { Category, CompetitionRepo, Page, Tag } from '../database';
-import { validForm, Form } from '@shared/validateCompetitionForm';
-import { deserialize } from '@shared/objectFormData';
+import { validForm, Form } from '@shared/validation/competitionForm';
+import { deserialize } from '@shared/objectFormdata';
 import { UFile, upload } from '../files';
 import express from 'express';
 import path from 'path';

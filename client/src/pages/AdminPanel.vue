@@ -132,7 +132,7 @@
             </b-form-group>
 
             <StatusButton type=button variant=danger :state="cancelState" normal=Cancel loading=Loading succes=Loaded :disabled="saveState == 'loading'" @click="onCancel()"/>
-            <StatusButton type=submit variant=primary :state="saveState" normal=Save loading=Saving succes=Saved :disabled="!validForm() || cancelState == 'loading'"/>
+            <StatusButton type=submit variant=primary :state="saveState" normal=Save loading=Saving succes=Saved :disabled="!validForm || cancelState == 'loading'"/>
         </b-form>
     </div>
 </template>
@@ -142,8 +142,8 @@ import Vue from 'vue';
 import axios from 'axios';
 import Collapse from '@/components/Collapse.vue';
 import StatusButton from '@/components/StatusButton.vue';
-import { state, validInput, validForm, validate, Category, Tag, Page, Form } from '@shared/validateCompetitionForm';
-import { serialize } from '@shared/objectFormData';
+import { state, validInput, validForm, validate, Category, Tag, Page, Form } from '@shared/validation/competitionForm';
+import { serialize } from '@shared/objectFormdata';
 
 export default Vue.extend({
     name: 'AdminPanel',
@@ -174,20 +174,22 @@ export default Vue.extend({
         name(): string { return this.form.name.trim(); },
         nameFeedback(): string { return validate.name(this.name); },
         newCategory(): Category { return { name: this.add.category.trim(), priority: this.form.categories.reduce((x, y) => Math.max(x, y.priority), 0) + 1 }; },
-        newCategoryFeedback(): string { return validate.category(this.newCategory, this.form.categories); },
+        newCategoryFeedback(): string { return validate.category(this.newCategory, this.form.categories, false); },
         validNewCategory(): boolean { return validInput(this.newCategoryFeedback, this.newCategory.name); },
         newTag(): Tag { return Object.assign({}, this.add.tag, { name: this.add.tag.name.trim() }); },
-        newTagFeedback(): string { return validate.tag(this.newTag, this.form.tags); },
+        newTagFeedback(): string { return validate.tag(this.newTag, this.form.tags, false); },
         validNewTag(): boolean { return validInput(this.newTagFeedback, this.newTag.name); },
         newPage(): Page { return Object.assign({}, this.add.page, { name: this.add.page.name.trim(), path: this.add.page.path.trim(), source: this.add.page.html?.name || '' }); },
-        newPageFeedback(): string { return validate.page(this.newPage, this.form.pages); },
+        newPageFeedback(): string { return validate.page(this.newPage, this.form.pages, false); },
         validNewPage(): boolean { return validInput(this.newPageFeedback, this.newPage.name, this.newPage.path) && this.newPage.html != null; },
         categoriesFeedback(): string { return validate.categories(this.form.categories); },
         tagsFeedback(): string { return validate.tags(this.form.tags); },
-        pagesFeedback(): string { return validate.pages(this.form.pages); }
+        pagesFeedback(): string { return validate.pages(this.form.pages); },
+        formData(): Form { return Object.assign({}, this.form, { name: this.name }); },
+        validForm(): boolean { return validForm(this.formData, false); }
     },
     watch: {
-        form: { deep: true, handler() {
+        formData: { deep: true, handler() {
             let state = 'normal';
             if (this.loaded) {
                 state = 'succes';
@@ -199,7 +201,6 @@ export default Vue.extend({
     },
     methods: {
         state, // make the state function available in the html
-        validForm(): boolean { return validForm(this.form, false); },
 
         loadFormData(): void {
             this.cancelState = 'loading';
@@ -220,7 +221,7 @@ export default Vue.extend({
             e.preventDefault();
             this.saveState = 'loading';
             const error = () => this.saveState = 'error';
-            axios.put('/api/competition/save', serialize(this.form)).then(res => {
+            axios.put('/api/competition/save', serialize(this.formData)).then(res => {
                 res.data.error ? error() : this.loadFormData();
             }).catch(() => error());
         },
