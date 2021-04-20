@@ -1,6 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
-import { Hint } from '../challenges/Hint';
-import { Solve } from './Solve';
+import { Hint, Solve } from '../../../database';
 
 @Entity()
 export class UsedHint {

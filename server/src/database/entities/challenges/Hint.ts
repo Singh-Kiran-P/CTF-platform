@@ -1,6 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany } from 'typeorm';
-import { UsedHint } from '../connections/UsedHint';
-import { Challenge } from './Challenge';
+import { UsedHint, Challenge } from '../../../database';
 
 @Entity()
 export class Hint {

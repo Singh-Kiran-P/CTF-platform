@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import axios from 'axios';
 import VueRouter from 'vue-router';
+import Roles from '@shared/roles';
 Vue.use(VueRouter);
 
 type Route = { path: string, name: string, src: string, meta?: {} };
@@ -43,49 +44,48 @@ const pages: { [page: string]: Route } = {
 
 // define which pages are available to which user type (excluding uploaded pages)
 const routes: { [page: string]: Route[] } = {
-    visitor: [
+    [Roles.VISITOR]: [
         pages.login,
-        pages.register,
-        pages.teams, // TODO: remove this
-        pages.adminPanel // TODO: remove this
+        pages.register
     ],
-    participant: [
+    [Roles.PARTICIPANT]: [
         pages.leaderboard,
         pages.teams,
         pages.logout
     ],
-    admin: [
+    [Roles.ORGANIZER]: [
         pages.leaderboard,
         pages.teams,
-        pages.adminPanel
+        pages.adminPanel,
+        pages.logout
     ]
 };
 
-// TODO: choose available routes based on user type (visitor, participant or organizer)
-const availableRoutes: Route[] = routes.visitor;
-
-// PageNotFound shown when no page matches the url
-availableRoutes.push({
-    path: '/:catchAll(.*)*',
-    name: 'Error 404',
-    src: 'PageNotFound.vue',
-    meta: { hidden: true }
-});
-
 // retrieve all uploaded pages
-axios.get('/api/competition/pages').then(response => {
-    let uploadedPages: Route[] = response.data.map((page: any) => ({
+Promise.all([
+    axios.get('/api/auth/role'),
+    axios.get('/api/competition/pages')
+]).then(([roleResponse, pagesResponse]) => {
+    let availableRoutes: Route[] = pagesResponse.data.map((page: any) => ({
         path: page.path,
         name: page.name,
         src: page.source
-    }));
+    })).concat(routes[roleResponse.data]);
+
+    // PageNotFound shown when no page matches the url
+    availableRoutes.push({
+        path: '/:catchAll(.*)*',
+        name: 'Error 404',
+        src: 'PageNotFound.vue',
+        meta: { hidden: true }
+    });
 
     const router = new VueRouter({ // TODO: use history mode
-        routes: uploadedPages.concat(availableRoutes).map(route => ({ // always add all uploaded pages to the front of the routes list
+        routes: availableRoutes.map(route => ({ // always add all uploaded pages to the front of the routes list
             path: route.path,
             name: route.name,
             meta: route.meta,
-            component: route.src.endsWith('vue') ? () => import(`../pages/${route.src}`) : { template: `<iframe src="pages/${route.src}"/>` }
+            component: route.src.endsWith('vue') ? () => import(`../pages/${route.src}`) : { template: `<iframe src="/pages${route.src}"/>` }
             // include vue pages directly into the html using a lazy loaded import, with the root directory for src in '/src/pages/'
             // include html pages using an iframe so they dont inherit any styling, with the root directory for src in '/public/pages/'
         }))

@@ -26,15 +26,14 @@ import Vue from 'vue';
 export default Vue.extend({
     name: 'PageBar',
     created() { // store all available routes in pages
-        this.pages = { left: [], right: [] };
-            this.$router.getRoutes().forEach(route => {
-                if (route.meta?.hidden) return;
-                const page = {
-                    name: route.name?.toString() || route.path.toString(),
-                    path: route.path.toString()
-                };
-                route.meta?.right ? this.pages.right.push(page) : this.pages.left.push(page);
-            });
+        this.$router.getRoutes().forEach(route => {
+            if (route.meta?.hidden) return;
+            const page = {
+                name: route.name?.toString() || route.path.toString(),
+                path: route.path.toString()
+            };
+            route.meta?.right ? this.pages.right.push(page) : this.pages.left.push(page);
+        });
     },
     data: () => ({
         pages: { left: [] as { path: string, name: string }[], right: [] as { path: string, name: string }[] }

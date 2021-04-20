@@ -1,26 +1,15 @@
 // functions to validate the competition form
 
 import { File as UFile } from 'formidable';
+import { state, validInput, validateString } from './validate';
 
 type Category = { name: string, priority: number };
 type Tag = { name: string, description: string };
 type Page = { name: string, path: string, source: string, html: File | UFile | null, zip: File | UFile | null };
 type Form = { name: string, categories: Category[], tags: Tag[], pages: Page[] };
 
-const state = (...feedback: string[]): boolean => feedback.every(string => string.length == 0);
-const validInput = (feedback: string, ...inputs: string[]): boolean => state(feedback) && inputs.every(input =>input.length > 0);
-
 const validForm = (f: Form, checkType: boolean = true): boolean => {
     return (!checkType || is.form(f)) && state(validate.name(f.name), validate.categories(f.categories), validate.tags(f.tags), validate.pages(f.pages));
-}
-
-const validateString = (input: string, name: string, min: number, max: number, required: boolean = true, unique: string[] = []): string => {
-    let l = input.length;
-    if (required && !input) return `${name} is required`;
-    if (unique.indexOf(input) >= 0) return `${name} already exists`;
-    if (l && min >= 0 && l < min) return `${name} must be at least ${min} characters`;
-    else if (max >= 0 && l > max) return `${name} must be at most ${max} characters`;
-    return '';
 }
 
 const validate = {

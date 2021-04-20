@@ -1,57 +1,66 @@
+import crypto from 'crypto';
+import express from 'express';
 import passport from 'passport';
-import passportLocal from 'passport-local';
-const LocalStrategy = passportLocal.Strategy;
-//import passportJWT from 'passport-jwt';
-//const JWTStrategy = passportJWT.Strategy;
-//const ExtractJWT = passportJWT.ExtractJwt;
-import DB from '../database';
-import { Account } from '../database/entities/accounts/Account';
-import { validPassword } from './passportUtils';
-import Errors from './Errors';
+import DB, { Account } from '../database';
+import { Strategy as LocalStrategy } from 'passport-local';
 
-//if fieldnames in frontend are different from 'username' and 'password' these have to be set
+// passport setup
+
+// the html fieldnames used in the frontend
 const htmlFieldNames = {
     usernameField: 'username',
     passwordField: 'password'
 }
 
-const strategy = new LocalStrategy(htmlFieldNames, 
-    (username: string, password: string,  done ) => {
-        DB.repo(Account).findOne({
-            where: {name: username},
-            relations: ['category']})
-            .then((account: Account) => {
-                //No account with this username found
-                if (!account) {
-                    console.log('not found');
-                    return done(null, false, {message: Errors.USER_NOT_FOUND})
-                }
-                console.log(account);
-                if(validPassword(password, account.password, account.salt)) {
-                    console.log('found and correct password');
-                    return done(null, account);
-                } else {
-                    console.log('found')
-                    return done(null, false, {message: Errors.WRONG_PASSWORD});
-                }
-            })
-            .catch((err) => {
-                done(err); //server or database error, no auth error.
-            });
-    }
-);
+const strategy = new LocalStrategy(htmlFieldNames, (username: string, password: string, done) => {
+    DB.repo(Account).findOne({ where: { name: username } }).then(account => {
+        if (!account) done('User does not exist');
+        else if (validatePassword(password, account.password, account.salt)) done(null, account);
+        else done('Invalid password');
+    }).catch(() => done('Error retrieving users'));
+});
 
-passport.use(strategy);
-
-//session serialization and unserialization
 passport.serializeUser((account: Account, done) => {
     done(null, account.id);
 });
 
 passport.deserializeUser((accountId: number, done) => {
-    DB.repo(Account).findOne(accountId)
-        .then((account: Account) => {
-            done(null, account);
-        })
-        .catch(err => done(err))
+    DB.repo(Account).findOne(accountId).then(account => {
+        done(null, account);
+    }).catch(() => done('Error retrieving users'));
 });
+
+
+
+// auth functions
+
+const getAccount = (req: express.Request): Account => req.user as Account;
+
+const isAuth = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    if (req.isAuthenticated()) next();
+    else res.json({ error: 'You are not authorized to view this page' });
+}
+
+const isAdmin = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    if(req.isAuthenticated() && getAccount(req).admin) next();
+    else res.json({ error: 'You are not authorized to view this page' });
+}
+
+
+
+// hash functions
+
+// see https://tools.ietf.org/html/rfc8018
+const hash = (password: string, salt: string) => crypto.pbkdf2Sync(password, salt, 12345, 64, 'sha512').toString('hex');
+
+const generatePassword = (password: string) => {
+    let salt = crypto.randomBytes(32).toString('hex');
+    let hashed = hash(password, salt);
+    return { salt: salt, hash: hashed };
+}
+
+const validatePassword = (password: string, hashed: string, salt: string) => { 
+    return hashed == hash(password, salt);
+}
+
+export { strategy, isAuth, isAdmin, getAccount, generatePassword };

@@ -199,15 +199,15 @@ export default Vue.extend({
     },
     methods: {
         state, // make the state function available in the html
-        validForm() { return validForm(this.form, false) },
+        validForm(): boolean { return validForm(this.form, false); },
 
         loadFormData(): void {
             this.cancelState = 'loading';
             this.add.category = '';
             this.add.tag = { name: '', description: '' };
             this.add.page = { name: '', path: '', html: null, zip: null };
-            axios.get('/api/competition/data').then(response => {
-                let data: Form = response.data;
+            axios.get('/api/competition/data').then(res => {
+                let data: Form = res.data;
                 if (!validForm(data)) return this.cancelState = 'error';
                 this.loaded = true;
                 this.form = data;
@@ -220,8 +220,8 @@ export default Vue.extend({
             e.preventDefault();
             this.saveState = 'loading';
             const error = () => this.saveState = 'error';
-            axios.put('/api/competition/save', serialize(this.form)).then(response => {
-                response.data.error ? error() : this.loadFormData();
+            axios.put('/api/competition/save', serialize(this.form)).then(res => {
+                res.data.error ? error() : this.loadFormData();
             }).catch(() => error());
         },
 

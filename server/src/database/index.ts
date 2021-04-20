@@ -1,3 +1,4 @@
+import path from 'path';
 import 'reflect-metadata';
 import dotenv from 'dotenv';
 import EventEmitter = require('events');
@@ -36,7 +37,7 @@ class Database extends EventEmitter {
             synchronize: true,
             logging: true,
             entities: [
-                __dirname + '/entities/*/*.js'
+                path.join(__dirname, '/entities/*/*.js')
             ]
         }).then(async conn => {
             this.conn = conn;
@@ -111,7 +112,7 @@ export { Account } from './entities/accounts/Account';
 export { Category } from './entities/accounts/Category';
 export { Team } from './entities/accounts/Team';
 export { Attachment } from './entities/challenges/Attachment';
-export { Challenge } from './entities/challenges/Challenge';
+export { Challenge, ChallengeType } from './entities/challenges/Challenge';
 export { Hint } from './entities/challenges/Hint';
 export { Question } from './entities/challenges/Question';
 export { Round } from './entities/challenges/Round';
@@ -119,7 +120,7 @@ export { Tag } from './entities/challenges/Tag';
 export { Competition, CompetitionRepo } from './entities/competition/Competition';
 export { Page } from './entities/competition/Page';
 export { Sponsor } from './entities/competition/Sponsor';
-export { Attempt } from './entities/connections/Attempt';
+export { Attempt, AttemptType } from './entities/connections/Attempt';
 export { Environment } from './entities/connections/Environment';
 export { Solve } from './entities/connections/Solve';
 export { UsedHint } from './entities/connections/UsedHint';

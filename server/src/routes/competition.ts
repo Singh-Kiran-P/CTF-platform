@@ -6,24 +6,26 @@ import express from 'express';
 import path from 'path';
 const router = express.Router();
 
-router.get('/pages', (_, res) => {
-    DB.repo(Page).find().then(pages => res.send(pages));
-});
+const respond = <T>(promise: Promise<T>, res: express.Response, result: (data: T) => any = data => data) => {
+    promise.then(data => res.send(result(data))).catch(err => res.json({ error: 'Error fetching data: ' + err }));
+}
+
+router.get('/categories', (_, res) => respond(DB.repo(Category).find({ order: { priority: 'ASC' } }), res, categories => categories.map(category => category.name)));
+router.get('/pages', (_, res) => respond(DB.repo(Page).find(), res));
+router.get('/tags', (_, res) => respond(DB.repo(Tag).find(), res));
 
 router.get('/data', (_, res) => {
-    Promise.all([
+    respond(Promise.all([
         DB.crepo(CompetitionRepo).instance(),
         DB.repo(Category).find({ order: { priority: 'ASC' } }),
         DB.repo(Tag).find(),
         DB.repo(Page).find()
-    ]).then(([competition, categories, tags, pages]) => {
-        res.json({
-            name: competition?.name || '',
-            categories: categories,
-            tags: tags,
-            pages: pages
-        });
-    }).catch(err => res.json({ error: 'Error fetching data: ' + err }));
+    ]), res, ([competition, categories, tags, pages]) => ({
+        name: competition?.name || '',
+        categories: categories,
+        tags: tags,
+        pages: pages
+    }));
 });
 
 router.put('/save', (req, res) => {
@@ -33,13 +35,13 @@ router.put('/save', (req, res) => {
     let uploads: Promise<void>[] = [];
     data.pages.forEach(page => {
         if (!page.html) return;
-        page.source = `${page.path}/page/${page.html.name}`;
+        page.source = `${page.path}/_page/${page.html.name}`;
         let dir = path.dirname('/client/public/pages' + page.source);
         uploads.push(upload(dir, page.html as UFile));
         if (!page.zip) return;
         uploads.push(upload(dir, page.zip as UFile)); // TODO: unzip
     });
-    
+
     const error = (err: any, action: string): any => res.json({ error: `Error ${action}: ` + JSON.stringify(err) });
     Promise.all(uploads).then(() => Promise.all([
         DB.crepo(CompetitionRepo).setName(data.name),

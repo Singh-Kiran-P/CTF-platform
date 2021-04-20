@@ -4,18 +4,17 @@
     "scripts": {
         "build": "tsc -b",
         "client": "npm run client --prefix ../client",
-        "server": " npm run build && concurrently --kill-others  \"tsc --watch\" \"nodemon dist/server/src\"",
+        "server": "npm run build && concurrently --kill-others  \"tsc --watch\" \"nodemon dist/server/src\"",
         "dev": "concurrently --kill-others  \"npm run client\" \"npm run server\""
     },
     "nodemonConfig": {
+        "exec": "ts-node -r tsconfig-paths/register",
         "ignore": [
             ".git",
             "node_modules"
-        ],
-        "exec": "ts-node -r tsconfig-paths/register"
+        ]
     },
     "dependencies": {
-        "connect-typeorm": "^1.1.4",
         "crypto": "^1.0.1",
         "express-session": "^1.17.1",
         "passport": "^0.4.1",

@@ -12,7 +12,7 @@ import axios from 'axios';
 export default Vue.extend({
     name: 'Teams',
     created() {
-        axios.get('/api/auth/test').then((response) => console.log('none')).catch((err)=>console.log(err)); //test authorisation level of currrent logged in user
+        //axios.get('/api/auth/test').then((response) => console.log('none')).catch((err)=>console.log(err)); //test authorisation level of currrent logged in user
     }
 });
 </script>

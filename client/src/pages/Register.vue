@@ -94,14 +94,8 @@ export default Vue.extend({
         onSubmit(e: Event): void {
             e.preventDefault();
             axios.post('/api/auth/register', {username: this.form.username.value, password: this.form.password.value, category: this.form.category}).then(response => {
-                if(response.data.error) {
-                    if(response.data.error === "USER_ALREADY_EXISTS") {
-                        this.form.username.serverError = "An account with this username already exists";
-                    } else {
-                        console.log(response.data.error);
-                        //notify unknown server error?
-                    }
-                } else {
+                if(response.data.error) this.form.username.serverError = response.data.error;
+                else {
                     console.log("succes!");
                     this.$router.push({name: 'Login'})
                 }
@@ -121,9 +115,8 @@ export default Vue.extend({
             return feedback.length == 0;
         },
         loadFormCategories(): void {
-            axios.get('/api/auth/loadCategories').then(response => {
-                let data = response.data;
-                this.categories = data.categories;
+            axios.get('/api/competition/categories').then(response => {
+                this.categories = response.data;
             });
         },
         onChangeUsername(e: Event) {
