@@ -143,13 +143,13 @@ import axios from 'axios';
 import Collapse from '@/components/Collapse.vue';
 import StatusButton from '@/components/StatusButton.vue';
 import { state, validInput, validForm, validate, Category, Tag, Page, Form } from '@shared/validation/competitionForm';
-import { serialize } from '@shared/objectFormdata';
+import { serialize } from '@shared/objectFormData';
 
 export default Vue.extend({
     name: 'AdminPanel',
     components: {
         Collapse,
-        StatusButton 
+        StatusButton
     },
     created() {
         this.loadFormData();
