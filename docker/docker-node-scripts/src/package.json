@@ -5,6 +5,7 @@
     "scripts": {
         "make": "node make-challege-image.js",
         "create": "node create-container+start.js",
+        "createCompose": "node createWithCompose.js",
         "start": "node make-start-challenge-container.js",
         "info": "node getinfo.js"
     },
@@ -13,6 +14,7 @@
     "dependencies": {
         "dockerode": "^3.2.1",
         "dockerode-build": "^1.1.6",
+        "dockerode-compose": "^1.0.2",
         "path": "^0.12.7",
         "pump": "^3.0.0"
     }
