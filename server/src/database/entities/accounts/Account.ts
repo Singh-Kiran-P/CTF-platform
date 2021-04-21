@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
 import { Attempt, Solve, Category, Team } from '../../../database';
 import { generatePassword } from '../../../auth/passport';
 
@@ -19,10 +19,10 @@ export class Account {
     @Column()
     admin: boolean;
 
-    @ManyToOne(_ => Category, category => category.accounts, { nullable: true, onDelete: 'SET NULL' })
+    @ManyToOne(_ => Category, category => category.accounts, { nullable: true, onDelete: 'SET NULL', eager: true })
     category: Category;
 
-    @ManyToOne(_ => Team, team => team.accounts, { nullable: true })
+    @ManyToOne(_ => Team, team => team.accounts, { nullable: true, eager: true })
     team: Team;
 
     @OneToMany(_ => Solve, solve => solve.account)

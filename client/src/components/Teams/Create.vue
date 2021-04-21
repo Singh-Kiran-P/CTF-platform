@@ -1,19 +1,18 @@
 <template>
     <div id="Create">
         <b-form @submit="onSubmit($event)">
-            <b-form-group id=input-group-teamname label=Teamname label-for=teamname>
+            <b-form-group label=Teamname label-for=teamname>
                 <b-form-input
                     id=teamname
-                    name=teamname
                     type=text
-                    v-model="form.teamname.value"
+                    v-model="form.teamname"
                     placeholder="Enter a name for your team"
-                    required
                     :state="state(teamnameFeedback)"
+                    v-on:input="ceateFeedback = ''"
                 ></b-form-input> 
                 <b-form-invalid-feedback>{{teamnameFeedback}}</b-form-invalid-feedback>
             </b-form-group>        
-            <b-button type=submit variant=primary>Create Team</b-button>
+            <StatusButton type=submit block variant=primary :state="createState" normal=Create loading="Creating" succes="Created" :disabled="!validForm()"/>
         </b-form>
     </div>
 </template>
@@ -21,48 +20,52 @@
 <script lang="ts">
 import Vue from 'vue';
 import axios from 'axios';
+import StatusButton from '@/components/StatusButton.vue';
+import { state, validInput, validateString, regexPassword, regexName } from '@shared/validate';
 
 export default Vue.extend({
     name: 'Create',
+    components: {
+        StatusButton
+    },
+    created() {
+
+    },
     data: () => ({
         form: {
-            teamname: {
-                value: '',
-                serverError: ''
-            }
-        }
+            teamname: ''
+        },
+        createState: 'normal',
+        createFeedback: ''
     }),
     computed: {
-        teamnameFeedback(): string { return this.feedback(this.form.teamname, 'teamname', true, 4, 32, []); },
+        teamnameFeedback(): string { return this.validateTeamname(); },
+    },
+    watch: {
+        form: {deep: true, handler() { this.createState = 'normal'; }}
     },
     methods: {
+        validForm(): boolean { return validInput(this.teamnameFeedback, this.form.teamname) && state(this.createFeedback); },
         onSubmit(e: Event): void {
             e.preventDefault();
-            axios.post('/api/team/register', {teamname: this.form.teamname.value}).then(response => {
-                if(response.data.error) {
-                    if(response.data.error === "TEAM_ALREADY_EXISTS") {
-                        this.form.teamname.serverError = "A team with this name already exists";
-                    } else {
-                        console.log(response.data.error);
-                    }
-                } else {
-                    console.log("succes!");
-                    this.$router.replace('Team');
-                }
+            this.createState = 'loading';
+            const error = (err: string = '') => {
+                this.createState = 'error';
+                this.createFeedback = err;
+            }
+            axios.post('/api/team/register', {teamname: this.form.teamname}).then(response => {
+                if(response.data.error) return error(response.data.error);
+                this.createState = 'succes';
+                this.$router.replace('Team');
             }).catch(err => alert(err));
-            // TODO: store in database and perform server side validation
         },
-        feedback(input: any, name: string, required: boolean, min: number, max: number, others: string[]): string {
-            let l = input.value.length;
-            if(input.serverError) return input.serverError;
-            if (required && l == 0) return `${name} is required`;
-            if (others.includes(input.value)) return `${name} already exists`;
-            if (l && l < min) return `${name} must be at least ${min} characters`;
-            else if (l > max) return `${name} must be at most ${max} characters`;
-            return '';
-        },
-        state(feedback: string): boolean {
-            return feedback.length == 0;
+        validateTeamname(): string {
+            let feedback = '';
+            feedback = validateString(this.form.teamname, 'Teamname', 4, 32, false);
+            if(feedback == '' && this.form.teamname.length > 0) {
+                return regexName(this.form.teamname, 'Teamname');
+            }
+            return feedback;
         }
     }
 });

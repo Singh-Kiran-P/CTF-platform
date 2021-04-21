@@ -42,8 +42,15 @@ const isAuth = (req: express.Request, res: express.Response, next: express.NextF
 }
 
 const isAdmin = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    console.log(getAccount(req));
     if(req.isAuthenticated() && getAccount(req).admin) next();
     else res.json({ error: 'You are not authorized to view this page' });
+}
+
+const hasTeam = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    let acc: Account = getAccount(req);
+    if (acc.team != null) next();
+    else res.json({ error: 'You are not part of a team' });
 }
 
 
@@ -63,4 +70,4 @@ const validatePassword = (password: string, hashed: string, salt: string) => {
     return hashed == hash(password, salt);
 }
 
-export { strategy, isAuth, isAdmin, getAccount, generatePassword };
+export { strategy, isAuth, isAdmin, hasTeam, getAccount, generatePassword };

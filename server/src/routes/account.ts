@@ -1,5 +1,5 @@
-import Router from 'express';
-const router = Router();
+import express from 'express';
+const router = express.Router();
 import DB, { Team, Account, Category } from '../database';
 import { isAuth, isAdmin } from '../auth/passport';
 

@@ -8,7 +8,7 @@
             </b-container>
         </div>
 
-        <div class=buttons>
+        <div class=buttons v-if="isCaptain">
             <b-button-group>
                 <b-button variant="outline-primary">
                     <b-icon icon="tools"></b-icon> Settings
@@ -23,7 +23,8 @@
         </div>
 
         <div class=members>
-            <b-table sticky-header striped :items="members" :fields="members_fields">
+            <label for="member-table">Members</label>
+            <b-table id=member-table sticky-header striped :items="members" :fields="members_fields">
                 <!--<template #cell(name)="data">-->
                     <!-- `data.value` is the value after formatted by the Formatter -->
                     <!--<a :href="`#${data.value}`">{{ data.value }}</a>
@@ -32,7 +33,8 @@
         </div>
 
         <div class=solves>
-            <b-table sticky-header striped :items="solves" :fields="solves_fields">
+            <label for="solves-table">Solves</label>
+            <b-table id=solves-table sticky-header striped :items="solves" :fields="solves_fields">
                 <template #cell(name)="data">
                     <!-- `data.value` is the value after formatted by the Formatter -->
                     <a :href="`#${data.value}`">{{ data.value }}</a>
@@ -56,6 +58,7 @@ export default Vue.extend({
             points: 0,
             uuid: 0
         },
+        isCaptain: false,
         members_fields: [
             {key: 'name', sortable:true},
             {key: 'points', sortable: true}
@@ -77,6 +80,7 @@ export default Vue.extend({
 
         },
         solvesProvider() {
+            if(this.team.uuid==0) return [];
             // Here we don't set isBusy prop, so busy state will be
             // handled by table itself
             // this.isBusy = true
@@ -110,6 +114,21 @@ export default Vue.extend({
         this.solves.push({name: 'challenge2', category:'test', value: 100, date: '10/2/2021'});
         this.solves.push({name: 'challenge3', category:'lol', value: 100, date: '10/2/2021'});
         this.solves.push({name: 'challenge4', category:'find', value: 100, date: '10/2/2021'});
+
+        //Todo get uuid via link if given
+        //axios.get('/team/info/' + this.team.uuid)
+        //else -> get uuid with get request
+        axios.get('/api/team/infoDashboard').then((response) => {
+            this.team = response.data.info;
+            this.isCaptain = response.data.isCaptain;
+            
+            axios.get('/api/team/getMembers/'+this.team.uuid).then((response)=>{
+                this.members = response.data;
+            }).catch((err)=>{alert(err)});
+
+        }).catch((err)=>{alert(err)});
+
+
     }
     
 });
@@ -129,6 +148,7 @@ span {
     color: var(--primary);
     width: 100%;
     text-align: center;
+    margin-bottom: 1rem;
 }
 .buttons {
     padding: 1rem;
@@ -144,5 +164,9 @@ span {
 }
 table {
     border: 1px solid lightgray;
+}
+label {
+    size: 3rem;
+    font-weight: bold;
 }
 </style>

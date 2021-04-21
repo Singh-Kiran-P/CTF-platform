@@ -47,7 +47,7 @@
 import Vue from 'vue';
 import axios from 'axios';
 import StatusButton from '@/components/StatusButton.vue';
-import { state, validInput, validateString, regexPassword, regexUsername } from '@shared/validate';
+import { state, validInput, validateString, regexPassword, regexName } from '@shared/validate';
 
 export default Vue.extend({
     name: 'Register',
@@ -110,7 +110,7 @@ export default Vue.extend({
             let feedback = '';
             feedback = validateString(this.form.username, 'Username', 4, 32, false);
             if(feedback == '' && this.form.username.length > 0) {
-                return regexUsername(this.form.username);
+                return regexName(this.form.username, 'Username');
             }
             return feedback;
         }

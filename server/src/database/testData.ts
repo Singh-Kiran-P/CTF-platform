@@ -1,4 +1,5 @@
 import DB, { Team, Competition, Category, Tag, Account, Page } from '../database';
+import { TeamRepoCustom } from './entities/accounts/Team';
 
 /**
  * loads test entries into the database
@@ -45,16 +46,24 @@ async function loadTestData() {
         new Account('BOB!', 'password', categories[4])
     ]);
 
+    const teamRepo = new TeamRepoCustom;
+    let teams: Team[] = [teamRepo.saveWithCaptain('Team 1', accounts[1]),
+    teamRepo.saveWithCaptain('Team 2', accounts[2]),
+    teamRepo.saveWithCaptain('Team 3', accounts[3])];
+    //teamRepo.addUserToTeam(teams[0], accounts[4]);
+
+    /*
     let teams: Team[] = await save([
-        new Team('Team 1', accounts[0]),
-        new Team('Team 2', accounts[1]),
+        new Team('Team 1', accounts[1]),
+        new Team('Team 2', accounts[2]),
         new Team('Team 3', accounts[3])
     ]);
-
-    for (let i = 0; i < accounts.length; ++i) { // give every account a team
+    */
+    /*
+    for (let i = 0; i < accounts.length; ++i) { // give every account a team, COMMENT IF TESTING TEAM CONSTRUCTOR
         accounts[i].team = teams[Math.round(i * (teams.length - 1) / (accounts.length - 1))];
         await DB.repo(Account).update(accounts[i].id, accounts[i]);
-    }
+    }*/
 }
 
 /**

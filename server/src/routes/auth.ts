@@ -2,7 +2,7 @@ import express from 'express';
 import passport from 'passport';
 import Roles from '@shared/roles';
 import DB, { Account, Category } from '../database';
-import { getAccount, generatePassword } from '../auth/passport';
+import { getAccount, generatePassword, isAdmin } from '../auth/passport';
 const router = express.Router();
 
 router.post('/login', (req, res, next) => {
@@ -19,7 +19,6 @@ router.post('/login', (req, res, next) => {
 
 router.post('/register', (req, res, next) => {
     req.body = req.fields;
-    console.log(req.body);
     const accountRepo = DB.repo(Account);
     accountRepo.findOne({name: req.body.username}).then((acc : Account) => {
         if(acc) return res.json({error: "Username already in use"});
