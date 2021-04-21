@@ -25,6 +25,6 @@ module.exports = {
         }
     },
     chainWebpack: config => {
-        config.resolve.alias.set('@shared', path.resolve('../shared/src')) 
+        config.resolve.alias.set('@shared', path.resolve('../shared/src'))
     }
 };

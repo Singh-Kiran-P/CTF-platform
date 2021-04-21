@@ -6,11 +6,15 @@ import formidable from 'express-formidable';
 import { strategy } from './auth/passport';
 import routes from './routes';
 import DB from "./database";
+const expressip = require('express-ip');
 dotenv.config();
 
 // setup express
 const app = express();
 app.use(formidable());
+
+// setup to get Ip address
+app.use(expressip().getIpInfoMiddleware);
 
 let sess = {
     resave: false,

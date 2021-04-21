@@ -1,14 +1,12 @@
 import express, { json } from "express";
+const RequestIp = require('@supercharge/request-ip')
 
 const router = express.Router();
 
 
 router.get("/ip", (req, res) => {
-    const RequestIp = require('@supercharge/request-ip')
-
     const ip = RequestIp.getClientIp(req)
-    console.log(ip);
-
+    console.log(ip); // ip address of the user
     res.send(ip);
 });
 

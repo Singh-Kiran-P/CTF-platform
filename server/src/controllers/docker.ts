@@ -29,10 +29,6 @@ function createChallengeImage(jsonObj: any) {
     });
 }
 
-function randomIntFromInterval(min: number, max: number) { // min and max included
-    return Math.floor(Math.random() * (max - min + 1) + min);
-}
-
 // TODO: check if user is choosing the right challengeImage (from DB)
 function createChallengeContainer(jsonObj: any) {
     let configData = _createPortConfig(jsonObj.ports);
@@ -82,6 +78,10 @@ function _giveRandomPort(openPorts: Number[]): string {
             return port.toString();
         }
     }
+}
+
+function randomIntFromInterval(min: number, max: number) { // min and max included
+    return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
 export default {
