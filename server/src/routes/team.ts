@@ -1,9 +1,7 @@
 import express from 'express';
 const router = express.Router();
-import DB, { Team, Account, Category, Solve, Hint, UsedHint } from '../database';
-import TeamRepoCustom from '../database';
+import DB, { Team, Account, Solve, UsedHint } from '../database';
 import { isAuth, hasTeam, getAccount } from '../auth/passport';
-import { access } from 'fs-extra';
 
 const respond = <T>(promise: Promise<T>, res: express.Response, result: (data: T) => any = data => data) => {
     promise.then(data => res.send(result(data))).catch(err => res.json({ error: 'Error fetching data: ' + err }));
@@ -24,60 +22,22 @@ router.post('/register', isAuth, (req, res) => {
     }).catch((err) => { return res.json({ error: 'Cannot retrieve data from DB' });});
 });
 
-router.post('/join/:uuid', isAuth, (req, res)=>{
-
+router.post('/join/:invite', isAuth, (req, res)=>{
+    let invite: string = req.params.invite;
+    let acc: Account = getAccount(req);
+    console.log(invite);
+    DB.repo(Team).findOne({where: {inviteCode: invite}, relations:['accounts']}).then((team: Team)=>{
+        if(!team) return res.json({error: 'Invalid invite link'});
+        if(team.memberCount() >= 4) return res.json({error: 'Team is full, please contact the captain'});
+        if(acc.team) return res.json({error: 'You are already in a team'});
+        DB.repo(Account).update(acc.id, {team: team}).then(()=>{return res.json({})}).catch((err)=>{res.json({error: 'Server error: '+err})});
+    }).catch((err)=>{res.json({error: 'Server error: '+err})});
 });
 
 router.get('/infoDashboard', isAuth, hasTeam, (req, res) => { 
     var acc: Account = getAccount(req);   
     res.redirect('/api/team/infoDashboard/' + acc.team.id);
 })
-
-//TODO: get placement, deduct solve.usedHints for each solve from points
-/*router.get('/infoDashboard/:uuid', (req, res) => {
-    let isCaptain: boolean = false;
-    let uuid: string = req.params.uuid;
-    let data = {name: '', placement: 0, points: 0, uuid: uuid};
-
-    Promise.all([
-        DB.repo(Team).findOne({where: {id: uuid}, relations: ['captain']}),
-        DB.repo(Solve).find({where: {team: uuid}, relations: ['challenge']}),
-    ]).then(([team, solves])=> {
-        if(req.user) {
-            let acc: Account = getAccount(req);
-            if(team.captain.id == acc.id || acc.admin) isCaptain = true;
-        }
-        data.name = team.name;
-        solves.forEach((solve: Solve)=>{
-            data.points += solve.challenge.points;
-        });
-        res.json({info: data, isCaptain: isCaptain});
-    }).catch((err)=> console.log(err));
-    //get name, points and captain
-    /*DB.repo(Team).findOne({where: {id: req.params.uuid}, join: {
-        alias: 'team',
-        leftJoinAndSelect: {
-            captain: 'team.captain'
-        }
-    }}).then((team: Team)=>{
-        console.log(team);
-        if(req.user) {
-            let acc: Account = getAccount(req);
-            if(team.captain.id == acc.id || acc.admin) isCaptain = true;
-        }
-        data.name = team.name;
-        team.solves.forEach((solve: Solve)=> {
-            data.points += solve.challenge.points;
-            solve.usedHints.forEach((usedHint: UsedHint)=> {
-                data.points -= usedHint.hint.cost;
-            });
-        });
-        //TODO: get placement
-        let result = {info: data, isCaptain: isCaptain};
-        console.log(result);
-        return res.json({niks: 'i'});
-    }).catch((err)=>{console.log(err); return res.json({error: err})});*/
-//});
 
 //TODO: get placement
 router.get('/infoDashboard/:uuid', (req, res) => {
@@ -119,18 +79,6 @@ router.get('/getMembers/:uuid', (req, res) => {
         });
         res.json(data);            
     }).catch((err)=>{console.log(err);res.json({error: 'Error retrieving members'})});
-    
-    /*DB.repo(Account).find({where: {team: uuid}, relations: ['solves', 'solves.challenge']}).then((members: Account[]) => 
-        {
-            members.forEach((member: Account) => {
-                let points: number = 0;
-                member.solves.forEach((solve: Solve)=> {
-                    points += solve.challenge.points;
-                });
-                data.push({name: member.name, points: points});
-            });
-            res.json(data);            
-        }).catch((err)=>{console.log(err);res.json({error: 'Error retrieving members'})});*/
 });
 
 //TODO: testing

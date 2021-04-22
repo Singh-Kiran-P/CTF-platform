@@ -42,7 +42,6 @@ const isAuth = (req: express.Request, res: express.Response, next: express.NextF
 }
 
 const isAdmin = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    console.log(getAccount(req));
     if(req.isAuthenticated() && getAccount(req).admin) next();
     else res.json({ error: 'You are not authorized to view this page' });
 }

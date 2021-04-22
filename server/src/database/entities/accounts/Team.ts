@@ -1,6 +1,6 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany, OneToOne, JoinColumn, Repository, EntityRepository } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany, OneToOne, JoinColumn, Repository, AfterInsert } from 'typeorm';
 import DB,{ Environment, Attempt, Solve, Account } from '../../../database';
-
+import { generatePassword } from '../../../auth/passport';
 @Entity()
 export class Team {
     @PrimaryGeneratedColumn("uuid")
@@ -8,6 +8,9 @@ export class Team {
 
     @Column({unique: true})
     name: string;
+
+    @Column({nullable: true})
+    inviteCode: string;
 
     @OneToOne(_ => Account)
     @JoinColumn()
@@ -25,10 +28,20 @@ export class Team {
     @OneToMany(_ => Environment, environment => environment.team)
     environments: Environment[];
 
+    @AfterInsert() 
+    generateInvite() {
+        let inviteData = generatePassword(this.id);
+        DB.repo(Team).update(this.id, {inviteCode: inviteData.hash});
+    }
+
     constructor(name: string, creator: Account) {
         this.name = name;
         if (!creator) return;
         this.captain = creator;
+    }
+
+    memberCount(): number {
+        return this.accounts.length;
     }
 }
 

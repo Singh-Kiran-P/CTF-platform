@@ -29,9 +29,14 @@
                     <!-- `data.value` is the value after formatted by the Formatter -->
                     <!--<a :href="`#${data.value}`">{{ data.value }}</a>
                 </template>-->
-                <template v-slot:cell(name)="data">
-                    <span>{{data.item.name}}</span>
-                    <b-icon-star v-if="data.item.captain"></b-icon-star>
+                <template v-slot:cell(name)="row">
+                    <span>{{row.item.name}}</span>
+                    <b-icon-star v-if="row.item.captain"></b-icon-star>
+                </template>
+                <template v-if="isCaptain" v-slot:cell(remove)="row">
+                    <b-button class=mx-auto size=sm variant="danger">
+                        <b-icon-trash></b-icon-trash>
+                    </b-button>
                 </template>
                 <template #table-busy>
                     <div class="text-center text-primary my-2">
@@ -50,8 +55,8 @@
                     <a :href="`#${data.value}`">{{ data.value }}</a>
                 </template>-->
                 <!--correctly loading info for category and description on hover-->
-                <template v-slot:cell(category)="data">
-                    <span v-b-tooltip.hover :title="data.item.category.description">{{data.item.category.name}}</span>
+                <template v-slot:cell(category)="row">
+                    <span v-b-tooltip.hover :title="row.item.category.description">{{row.item.category.name}}</span>
                 </template>
                 <!--define table busy state spinner-->
                 <template #table-busy>
@@ -98,39 +103,49 @@ export default Vue.extend({
     computed: {
     },
     methods: {
-    },
-    created() {
-        //Testdata when not using axios
-        /*this.members.push({name: 'lander', points: 1000});
-        this.members.push({name: 'kiran', points: 1000});
-        this.members.push({name: 'senn', points: 850});
-        this.members.push({name: 'random', points: 11000});
-
-        this.solves.push({name: 'challenge1', category:{name:'find', description:'finding'}, value: 100, date: '10/2/2021'});
-        this.solves.push({name: 'challenge2', category:{name:'find', description:'finding'}, value: 100, date: '10/2/2021'});
-        this.solves.push({name: 'challenge3', category:{name:'find', description:'finding'}, value: 100, date: '10/2/2021'});
-        */
-        //Todo get uuid via link if given
-        //axios.get('/team/info/' + this.team.uuid)
-        //else -> get uuid with get request
-        axios.get('/api/team/infoDashboard').then((response) => {
-            this.team = response.data.info;
-            this.isCaptain = response.data.isCaptain;
-            
+        memberEx() {
+            console.log(this.members);
+            console.log(this.members.some(item=>item.name == "kiran"));
+        },
+        getMembers() {
             axios.get('/api/team/getMembers/'+this.team.uuid).then((response)=>{
-                this.members = response.data;
-                this.members_isLoading = false;
-            }).catch((err)=>{alert(err)});
-
+                    if(response.data.error) return alert(response.data.error);
+                    this.members = response.data;
+                    this.members_isLoading = false;
+                }).catch((err)=>{alert(err)});
+        },
+        getSolves() {
             axios.get('/api/team/getSolves/'+this.team.uuid).then((response)=>{
+                    if(response.data.error) return alert(response.data.error);
                     this.solves = response.data;
                     this.solves_isLoading = false;
                 }).catch((err)=>{alert(err)});
+        }
+    },
+    created() {
+        //Testdata when not using axios
+        /*this.members.push({name: 'lander', points: 1000, captain: false});
+        this.members.push({name: 'kiran', points: 1000, captain: true});
+        this.members.push({name: 'senn', points: 850, captain: false});
+        this.members.push({name: 'random', points: 11000, captain: false});
+        this.members_isLoading = false;
+        this.memberEx();
+        this.solves.push({name: 'challenge1', category:{name:'find', description:'finding'}, value: 100, date: '10/2/2021'});
+        this.solves.push({name: 'challenge2', category:{name:'find', description:'finding'}, value: 100, date: '10/2/2021'});
+        this.solves.push({name: 'challenge3', category:{name:'find', description:'finding'}, value: 100, date: '10/2/2021'})
+        this.solves_isLoading = false;
+        */
+        //Todo get uuid via link if given
+        //else -> get uuid with get request
+        axios.get('/api/team/infoDashboard').then((response) => {
+            if(response.data.error) return alert(response.data.error);
+            this.team = response.data.info;
+            this.isCaptain = response.data.isCaptain;
+            if(this.isCaptain) this.members_fields.push({ key: 'remove', sortable: false });
+            this.getMembers();
+            this.getSolves();            
         }).catch((err)=>{alert(err)});
-
-
     }
-    
 });
 </script>
 
@@ -171,7 +186,7 @@ label {
     size: 3rem;
     font-weight: bold;
 }
-.b-icon {
+td > .b-icon {
     margin-left: var(--margin);
 }
 </style>

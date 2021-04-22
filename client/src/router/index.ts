@@ -29,6 +29,12 @@ const pages: { [page: string]: Route } = {
         name: 'Team',
         src: 'Team.vue',
     },
+    joinTeam: {
+        path: '/team/join/:invite',
+        name: 'joinTeam',
+        src: 'joinTeam.vue',
+        meta: {hidden: true}
+    },
     leaderboard: {
         path: '/leaderboard',
         name: 'Leaderboard',
@@ -57,6 +63,7 @@ const routes: { [page: string]: Route[] } = {
         pages.leaderboard,
         pages.teams,
         pages.team,
+        pages.joinTeam,
         pages.logout
     ],
     [Roles.ORGANIZER]: [

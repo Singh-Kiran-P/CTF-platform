@@ -50,6 +50,5 @@ export default Vue.extend({
 <style scoped lang="scss">
 span {
     font-weight: bold;
-    display: block;
 }
 </style>
