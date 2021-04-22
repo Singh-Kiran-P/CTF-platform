@@ -1,7 +1,7 @@
 // functions to validate the competition form
 
 import { File as UFile } from 'formidable';
-import { state, validInput, validateString } from './validate';
+import { state, validInput, validateString, is as isp } from '../validation';
 
 type Category = { name: string, priority: number };
 type Tag = { name: string, description: string };
@@ -25,15 +25,15 @@ const validate = {
     },
     tags: (tags: Tag[]): string => '',
 
-    category: (category: Category, categories: Category[], required: boolean = false): string => {
+    category: (category: Category, categories: Category[], required: boolean = true): string => {
         if (!required && !category.name) return '';
         return validateString(category.name, 'Category', 3, 32, required, categories.map(x => x.name));
     },
-    tag: (tag: Tag, tags: Tag[] = [], required: boolean = false): string => {
+    tag: (tag: Tag, tags: Tag[] = [], required: boolean = true): string => {
         if (!required && !tag.name) return '';
         return validateString(tag.name, 'Tag name', 3, 32, required, tags.map(x => x.name));
     },
-    page: (page: Page, pages: Page[], required: boolean = false): string => {
+    page: (page: Page, pages: Page[], required: boolean = true): string => {
         let r = '';
         if (!r) r = validateString(page.name, 'Page name', 3, 32, required);
         if (!r && page.path && !page.path.startsWith('/')) r = `Page path must start with '/'`;
@@ -50,21 +50,17 @@ const validate = {
 
 const is = { // check if a given variable with type any is a Form
     form: (form: any): boolean => {
-        return is.object(form) && is.string(form.name) && is.array(form.categories, is.category) && is.array(form.tags, is.tag) && is.array(form.pages, is.page);
+        return isp.object(form) && isp.string(form.name) && isp.array(form.categories, is.category) && isp.array(form.tags, is.tag) && isp.array(form.pages, is.page);
     },
     category: (category: any): boolean => {
-        return is.object(category) && is.string(category.name) && is.number(category.priority);
+        return isp.object(category) && isp.string(category.name) && isp.number(category.priority);
     },
     tag: (tag: any): boolean => {
-        return is.object(tag) && is.string(tag.name) && is.string(tag.description);
+        return isp.object(tag) && isp.string(tag.name) && isp.string(tag.description);
     },
     page: (page: any): boolean => {
-        return is.object(page) && is.string(page.name) && is.string(page.path) && is.string(page.source);
-    },
-    string: (v: any): boolean => typeof v == 'string',
-    number: (v: any): boolean => typeof v == 'number',
-    object: (v: any): boolean => v && typeof v == 'object',
-    array: (v: any, t: (x: any) => boolean): boolean => Array.isArray(v) && (v as any[]).every(x => t(x))
+        return isp.object(page) && isp.string(page.name) && isp.string(page.path) && isp.string(page.source);
+    }
 }
 
 export { state, validInput, validForm, validateString, validate, Category, Tag, Page, Form };

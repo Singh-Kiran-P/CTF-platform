@@ -27,7 +27,7 @@
                 </b-form-group>
             </b-form-group>
             <StatusButton type=submit block variant=primary :state="loginState" normal=Login loading="Logging in" succes="Logged in" :disabled="!validForm()"/>
-            <router-link to="/register">Don't have an account yet? Register</router-link>
+            <router-link :to="{ name: 'Register' }">Don't have an account yet? Register</router-link>
         </b-form>
     </div>
 </template>
@@ -36,7 +36,7 @@
 import Vue from 'vue';
 import axios from 'axios';
 import StatusButton from '@/components/StatusButton.vue';
-import { state, validInput, validateString } from '@shared/validate';
+import { state, validInput, validateString } from '@shared/validation';
 
 export default Vue.extend({
     name: 'Login',
@@ -52,15 +52,17 @@ export default Vue.extend({
         loginFeedback: ''
     }),
     computed: {
-        usernameFeedback(): string { return validateString(this.form.username, 'Username', 4, 32, false); },
-        passwordFeedback(): string { return validateString(this.form.password, 'Password', 6, 32, false); }
+        username(): string { return this.form.username.trim(); },
+        password(): string { return this.form.password; },
+        usernameFeedback(): string { return validateString(this.username, 'Username', 4, 32, false); },
+        passwordFeedback(): string { return validateString(this.password, 'Password', 6, 32, false); }
     },
     watch: {
         form: { deep: true, handler() { this.loginState = 'normal'; }}
     },
     methods: {
         state,
-        validForm(): boolean { return validInput(this.usernameFeedback, this.form.username) && validInput(this.passwordFeedback, this.form.password) && state(this.loginFeedback); },
+        validForm(): boolean { return validInput(this.usernameFeedback, this.username) && validInput(this.passwordFeedback, this.password) && state(this.loginFeedback); },
 
         onSubmit(e: Event): void {
             e.preventDefault();
@@ -69,7 +71,7 @@ export default Vue.extend({
                 this.loginState = 'error';
                 this.loginFeedback = err;
             }
-            axios.post('/api/auth/login', { username: this.form.username, password: this.form.password }).then(response => {
+            axios.post('/api/auth/login', { username: this.username, password: this.password }).then(response => {
                 if(response.data.error) return error(response.data.error);
                 this.loginState = 'succes';
                 location.replace('/#/'); // TODO: use history mode, remove hash
