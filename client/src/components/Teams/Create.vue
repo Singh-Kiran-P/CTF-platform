@@ -8,7 +8,7 @@
                     v-model="form.teamname"
                     placeholder="Enter a name for your team"
                     :state="state(teamnameFeedback)"
-                    v-on:input="ceateFeedback = ''"
+                    v-on:input="resetCreateFeedback"
                 ></b-form-input> 
                 <b-form-invalid-feedback>{{teamnameFeedback}}</b-form-invalid-feedback>
             </b-form-group>        
@@ -60,13 +60,19 @@ export default Vue.extend({
             }).catch(err => alert(err));
         },
         validateTeamname(): string {
+            console.log(this.createFeedback);
+            if(this.createFeedback != '') return this.createFeedback;
             let feedback = '';
             feedback = validateString(this.form.teamname, 'Teamname', 4, 32, false);
             if(feedback == '' && this.form.teamname.length > 0) {
                 return regexName(this.form.teamname, 'Teamname');
             }
             return feedback;
-        }
+        },
+        resetCreateFeedback() {
+            this.createFeedback = "";
+        },
+        state
     }
 });
 </script>

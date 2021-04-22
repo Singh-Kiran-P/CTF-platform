@@ -23,6 +23,7 @@ export class Account {
     category: Category;
 
     @ManyToOne(_ => Team, team => team.accounts, { nullable: true, eager: true })
+    @JoinColumn()
     team: Team;
 
     @OneToMany(_ => Solve, solve => solve.account)

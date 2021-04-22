@@ -24,20 +24,37 @@
 
         <div class=members>
             <label for="member-table">Members</label>
-            <b-table id=member-table sticky-header striped :items="members" :fields="members_fields">
+            <b-table id=member-table sticky-header striped :items="members" :fields="members_fields" :busy="members_isLoading">
                 <!--<template #cell(name)="data">-->
                     <!-- `data.value` is the value after formatted by the Formatter -->
                     <!--<a :href="`#${data.value}`">{{ data.value }}</a>
                 </template>-->
+                <template #table-busy>
+                    <div class="text-center text-primary my-2">
+                        <b-spinner class="align-middle"></b-spinner>
+                        <strong>Loading...</strong>
+                    </div>
+                </template>
             </b-table>
         </div>
 
         <div class=solves>
             <label for="solves-table">Solves</label>
-            <b-table id=solves-table sticky-header striped :items="solves" :fields="solves_fields">
-                <template #cell(name)="data">
-                    <!-- `data.value` is the value after formatted by the Formatter -->
+            <b-table id=solves-table sticky-header striped :items="solves" :fields="solves_fields" :busy="solves_isLoading">
+                <!--<template #cell(name)="data">
+                    `data.value` is the value after formatted by the Formatter
                     <a :href="`#${data.value}`">{{ data.value }}</a>
+                </template>-->
+                <!--correctly loading info for category and description on hover-->
+                <template v-slot:cell(category)="data">
+                    <span v-b-tooltip.hover :title="data.item.category.description">{{data.item.category.name}}</span>
+                </template>
+                <!--define table busy state spinner-->
+                <template #table-busy>
+                    <div class="text-center text-primary my-2">
+                        <b-spinner class="align-middle"></b-spinner>
+                        <strong>Loading...</strong>
+                    </div>
                 </template>
             </b-table>
         </div>
@@ -59,62 +76,36 @@ export default Vue.extend({
             uuid: 0
         },
         isCaptain: false,
+        members_isLoading: true,
         members_fields: [
             {key: 'name', sortable:true},
             {key: 'points', sortable: true}
         ],
         members: [] as { name: string, points: number }[],
+        solves_isLoading: true,
         solves_fields: [
             { key: 'name', sortable: true},
-            { key: 'category', sortable: true},
+            { key: 'category', label: 'Category', sortable: true},
             { key: 'value', sortable: true},
             { key: 'date', sortable: true},
         ],
-        solves: [] as { name: string, category: string, value: number, date: string} []
+        solves: [] as { name: string, category: {name: string, description: string}, value: number, date: string} []
     }),
     computed: {
-
     },
     methods: {
-        memberProvider() {
-
-        },
-        solvesProvider() {
-            if(this.team.uuid==0) return [];
-            // Here we don't set isBusy prop, so busy state will be
-            // handled by table itself
-            // this.isBusy = true
-            let promise = axios.get('/some/url')
-
-            return promise.then((response) => {
-            const items = response.data
-            // Here we could override the busy state, setting isBusy to false
-            // this.isBusy = false
-            return(items)
-            }).catch(error => {
-            // Here we could override the busy state, setting isBusy to false
-            // this.isBusy = false
-            // Returning an empty array, allows table to correctly handle
-            // internal busy state in case of error
-            return []
-            })
-        } 
     },
     created() {
-        this.members.push({name: 'lander', points: 1000});
+        //Testdata when not using axios
+        /*this.members.push({name: 'lander', points: 1000});
         this.members.push({name: 'kiran', points: 1000});
         this.members.push({name: 'senn', points: 850});
         this.members.push({name: 'random', points: 11000});
 
-        this.solves.push({name: 'challenge1', category:'find', value: 100, date: '10/2/2021'});
-        this.solves.push({name: 'challenge2', category:'test', value: 100, date: '10/2/2021'});
-        this.solves.push({name: 'challenge3', category:'lol', value: 100, date: '10/2/2021'});
-        this.solves.push({name: 'challenge4', category:'find', value: 100, date: '10/2/2021'});
-        this.solves.push({name: 'challenge1', category:'find', value: 100, date: '10/2/2021'});
-        this.solves.push({name: 'challenge2', category:'test', value: 100, date: '10/2/2021'});
-        this.solves.push({name: 'challenge3', category:'lol', value: 100, date: '10/2/2021'});
-        this.solves.push({name: 'challenge4', category:'find', value: 100, date: '10/2/2021'});
-
+        this.solves.push({name: 'challenge1', category:{name:'find', description:'finding'}, value: 100, date: '10/2/2021'});
+        this.solves.push({name: 'challenge2', category:{name:'find', description:'finding'}, value: 100, date: '10/2/2021'});
+        this.solves.push({name: 'challenge3', category:{name:'find', description:'finding'}, value: 100, date: '10/2/2021'});
+        */
         //Todo get uuid via link if given
         //axios.get('/team/info/' + this.team.uuid)
         //else -> get uuid with get request
@@ -124,8 +115,13 @@ export default Vue.extend({
             
             axios.get('/api/team/getMembers/'+this.team.uuid).then((response)=>{
                 this.members = response.data;
+                this.members_isLoading = false;
             }).catch((err)=>{alert(err)});
 
+            axios.get('/api/team/getSolves/'+this.team.uuid).then((response)=>{
+                    this.solves = response.data;
+                    this.solves_isLoading = false;
+                }).catch((err)=>{alert(err)});
         }).catch((err)=>{alert(err)});
 
 
@@ -135,13 +131,15 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-span {
+.info span {
     font-weight: bold;
-    display: block;
+    
 }
 .info {
     padding: 3rem;
     margin: auto;
+    display: flex;
+    flex-direction: column;
 }
 .header {
     background-color: #343a40f3;

@@ -16,10 +16,10 @@ export class Team {
     @OneToMany(_ => Account, account => account.team)
     accounts: Account[];
 
-    @OneToMany(_ => Solve, solve => solve.account)
+    @OneToMany(_ => Solve, solve => solve.team)
     solves: Solve[];
 
-    @OneToMany(_ => Attempt, attempt => attempt.account)
+    @OneToMany(_ => Attempt, attempt => attempt.team)
     attempts: Attempt[];
 
     @OneToMany(_ => Environment, environment => environment.team)
@@ -29,11 +29,6 @@ export class Team {
         this.name = name;
         if (!creator) return;
         this.captain = creator;
-    }    
-
-    public get memberCount(): number {
-        console.log(this.accounts);
-        return this.accounts.length;
     }
 }
 
@@ -55,7 +50,7 @@ export class TeamRepoCustom extends Repository<Team> {
         if(!team || !account) return false;
         console.log('passed');
         ///DB.repo(Team).findOne({where: {id: team.id}, relations:['accounts']}).then((t: Team)=>{console.log(t.memberCount); if(t.memberCount>4) return false;}).catch(()=>{return false;})
-        DB.repo(Team).findOne({where: {id: team.id}, relations:['accounts']}).then((t: Team)=>{console.log(t.memberCount); if(t.memberCount>4) return false;}).catch(()=>{return false;})
+        //DB.repo(Team).findOne({where: {id: team.id}, relations:['accounts']}).then((t: Team)=>{console.log(t.memberCount); if(t.memberCount>4) return false;}).catch(()=>{return false;})
         account.team = team;
         DB.repo(Account).save(account).then(()=> {return true;}).catch(()=>{return false;});
         return true;
