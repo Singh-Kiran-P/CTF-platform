@@ -1,4 +1,6 @@
 import DB, { Team, Competition, Category, Tag, Account, Page } from '../database';
+import { DockerManagement } from './entities/docker/DockerManagement';
+import { DockerOpenPort } from './entities/docker/DockerOpenPort';
 
 /**
  * loads test entries into the database
@@ -55,6 +57,17 @@ async function loadTestData() {
         accounts[i].team = teams[Math.round(i * (teams.length - 1) / (accounts.length - 1))];
         await DB.repo(Account).update(accounts[i].id, accounts[i]);
     }
+
+    let dockerManagement: DockerManagement = (await save([
+        new DockerManagement(500,5400)
+    ]))[0];
+
+    let dockerOpenPort: DockerOpenPort[] = (await save([
+        new DockerOpenPort(80),
+        new DockerOpenPort(4000),
+        new DockerOpenPort(9000),
+    ]));
+
 }
 
 /**

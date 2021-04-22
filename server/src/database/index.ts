@@ -18,7 +18,7 @@ interface DatabaseEvents {
  * Database class to connect to the database and provide help functions to access it
  */
 class Database extends EventEmitter {
-    loadTestData: boolean = false; // empties and loads test data into the database before connecting if true
+    loadTestData: boolean = true; // empties and loads test data into the database before connecting if true
     conn: Connection = null;
 
     constructor() {
@@ -70,6 +70,11 @@ class Database extends EventEmitter {
             return this.conn.getCustomRepository(entity);
         }
     }
+    connection(){
+        if (this.conn) {
+            return this.conn;
+        }
+    }
 
     /**
      * allows for efficiently updating the database to a new list of entities, if you want to use this function ask Lander how to use it
@@ -91,6 +96,8 @@ class Database extends EventEmitter {
             }).catch(err => reject(err));
         });
     }
+
+
 }
 
 declare interface Database {
@@ -130,3 +137,8 @@ export { Attempt, AttemptType } from './entities/connections/Attempt';
 export { Environment } from './entities/connections/Environment';
 export { Solve } from './entities/connections/Solve';
 export { UsedHint } from './entities/connections/UsedHint';
+
+export {DockerChallengeContainer} from './entities/docker/DockerChallengeContainer';
+export {DockerChallengeImage} from './entities/docker/DockerChallengeImage';
+export {DockerManagement, DockerManagementRepo} from './entities/docker/DockerManagement';
+export {DockerOpenPort} from './entities/docker/DockerOpenPort'

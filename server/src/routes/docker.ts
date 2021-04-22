@@ -7,6 +7,7 @@ import express, { json } from "express";
 import Docker from "dockerode";
 import DockerController from "../controllers/docker";
 import { isAdmin, isAuth } from "../auth/passport";
+import DB, { DockerManagement, DockerManagementRepo, DockerOpenPort } from '../database';
 
 const docker = new Docker({ socketPath: "/var/run/docker.sock" });
 const router = express.Router();
@@ -53,7 +54,7 @@ router.post("/createChallengeContainer", (req, res, next) => {
     // let jsonObj = {challengeImage: req.fields.challengeImage, ports: ["8080/tcp"], containerName: 'challenge_TEAM4' };
     // console.log(req.fields);
 
-    let jsonObj = {challengeImage: req.fields.challengeImage, ports: ["8080/tcp"], containerName: req.fields.containerName };
+    let jsonObj = { challengeImage: req.fields.challengeImage, ports: ["8080/tcp"], containerName: req.fields.containerName };
     DockerController.createChallengeContainer(jsonObj)
         .then((ports) => {
             res.json({ ports: ports, message: `Challenge container created/started http://localhost:${ports}`, statusCode: 200 });
@@ -68,7 +69,7 @@ router.post("/createChallengeContainer", (req, res, next) => {
  * Started container [Only those where the team have access]
  * - Req: [id]
  */
-router.post("/startContainer",isAuth, (req, res) => {
+router.post("/startContainer", isAuth, (req, res) => {
     let id = req.fields.id.toString();
     let container = docker.getContainer(id);
     container.start((err, data) => {
@@ -82,7 +83,7 @@ router.post("/startContainer",isAuth, (req, res) => {
 /**
  * id can be de container id OR name of the container
  */
-router.post("/stopContainer",isAuth, (req, res) => {
+router.post("/stopContainer", isAuth, (req, res) => {
     let id = req.fields.id.toString();
     let container = docker.getContainer(id);
     container.stop((err, data) => {
@@ -107,6 +108,19 @@ router.post("/resetContainer", isAuth, (req, res) => {
             res.json({ statusCode: 200, msg: "Container reset successfully" });
         else res.json(err);
     });
+});
+
+// Gives the DockerManagement Entity
+router.get("/dockerConfig", async (req, res) => {
+    const dockerManagementRepo = DB.crepo(DockerManagementRepo)
+    const a = (await dockerManagementRepo.instance());
+
+    const dockerOpenPort = DB.repo(DockerOpenPort);
+    (await dockerOpenPort.find().then(d => {
+        res.send(d);
+    }));
+
+
 });
 
 export default { path: "/docker", router };

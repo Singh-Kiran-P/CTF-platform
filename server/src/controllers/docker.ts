@@ -5,6 +5,7 @@ import { rejects } from 'node:assert';
 import { resolve } from 'node:path';
 var build = require('dockerode-build')
 var docker = new Docker({ socketPath: '/var/run/docker.sock' });
+import DB, { DockerChallengeImage, DockerManagementRepo, DockerOpenPort } from '../database';
 
 function getAllRunningContainers() {
     let data: any = [];
@@ -30,10 +31,9 @@ function createChallengeImage(jsonObj: any) {
 }
 
 // TODO: check if user is choosing the right challengeImage (from DB)
-function createChallengeContainer(jsonObj: any) {
-    let configData = _createPortConfig(jsonObj.ports);
-    // console.log(configData.portBindings);
-    // console.log(jsonObj);
+async function createChallengeContainer(jsonObj: any) {
+    let configData: { portBindings: object, openPorts: number[] } = await _createPortConfig(jsonObj.ports);
+    console.log(configData);
 
     return new Promise<Object>((resolve, reject) => {
         docker.createContainer(
@@ -60,24 +60,53 @@ function createChallengeContainer(jsonObj: any) {
     });
 }
 
-function _createPortConfig(ports: string[]) {
+async function _createPortConfig(ports: string[]) {
+
     let openPorts: Array<Number> = [];
     let portBindings: { [port: string]: { HostPort: string }[] } = {};
-    ports.forEach(port => {
-        portBindings[port] = [{ HostPort: _giveRandomPort(openPorts) }];
-    });
-    return { openPorts: openPorts, portBindings: portBindings };
+    for (let i = 0; i < ports.length; i++) {
+        let p = await _giveRandomPort();
+        openPorts.push(p)
+        portBindings[ports[i]] = [{ HostPort: p.toString() }];
+    }
+    return new Promise<any>((resolve) => {
+        resolve({ openPorts: openPorts, portBindings: portBindings });
+    })
 }
 
-// TODO: Check open ports (from DB)
-function _giveRandomPort(openPorts: Number[]): string {
-    while (true) {
-        let port: Number = randomIntFromInterval(500, 5000)
-        if (!openPorts.includes(port)) {
-            openPorts.push(port)
-            return port.toString();
-        }
-    }
+
+function _giveRandomPort() {
+    return new Promise<number>((resolve) => {
+
+        const dockerManagementRepo = DB.crepo(DockerManagementRepo);
+        let lowerBoundPort: number;
+        let upperBoundPort: number;
+
+        dockerManagementRepo
+            .instance()
+            .then(data => {
+                lowerBoundPort = data.lowerBoundPort;
+                upperBoundPort = data.upperBoundPort;
+            })
+            .then(() => {
+                let flag: boolean = true
+                let port: number;
+
+                const dockerOpenPort = DB.repo(DockerOpenPort);
+                return dockerOpenPort.find();
+
+            })
+            .then((d) => {
+                let port_: number = randomIntFromInterval(lowerBoundPort, upperBoundPort);
+                const portIsOpen = d.find((item) => { return item.openPorts == port_ });
+
+                if (portIsOpen == undefined) {
+                    const dockerOpenPort = DB.repo(DockerOpenPort);
+                    dockerOpenPort.save(new DockerOpenPort(port_));
+                    resolve(port_)
+                }
+            });
+    });
 }
 
 function randomIntFromInterval(min: number, max: number) { // min and max included
