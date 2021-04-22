@@ -56,7 +56,7 @@ export default Vue.extend({
             axios.post('/api/team/register', {teamname: this.form.teamname}).then(response => {
                 if(response.data.error) return error(response.data.error);
                 this.createState = 'succes';
-                this.$router.replace('Team');
+                this.$router.go(0); // page reload
             }).catch(err => alert(err));
         },
         validateTeamname(): string {
