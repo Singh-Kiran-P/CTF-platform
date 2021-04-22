@@ -103,9 +103,24 @@ router.get('/infoDashboard/:uuid', (req, res) => {
 });
 
 router.get('/getMembers/:uuid', (req, res) => {
-    let data: {name: string, points: number}[] = [];
+    let data: {name: string, points: number, captain: boolean}[] = [];
     let uuid: string = req.params.uuid;
-    DB.repo(Account).find({where: {team: uuid}, relations: ['solves', 'solves.challenge']}).then((members: Account[]) => 
+
+    Promise.all([
+        DB.repo(Account).find({where: {team: uuid}, relations: ['solves', 'solves.challenge']}),
+        DB.repo(Team).findOne({where: {id: uuid}, relations: ['captain']})
+    ]).then(([members, team]: [Account[], Team])=> {
+        members.forEach((member: Account) => {
+            let points: number = 0;
+            member.solves.forEach((solve: Solve)=> {
+                points += solve.challenge.points;
+            });
+            data.push({name: member.name, points: points, captain: team.captain.id == member.id});
+        });
+        res.json(data);            
+    }).catch((err)=>{console.log(err);res.json({error: 'Error retrieving members'})});
+    
+    /*DB.repo(Account).find({where: {team: uuid}, relations: ['solves', 'solves.challenge']}).then((members: Account[]) => 
         {
             members.forEach((member: Account) => {
                 let points: number = 0;
@@ -115,7 +130,7 @@ router.get('/getMembers/:uuid', (req, res) => {
                 data.push({name: member.name, points: points});
             });
             res.json(data);            
-        }).catch((err)=>{console.log(err);res.json({error: 'Error retrieving members'})});
+        }).catch((err)=>{console.log(err);res.json({error: 'Error retrieving members'})});*/
 });
 
 //TODO: testing

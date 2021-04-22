@@ -29,6 +29,10 @@
                     <!-- `data.value` is the value after formatted by the Formatter -->
                     <!--<a :href="`#${data.value}`">{{ data.value }}</a>
                 </template>-->
+                <template v-slot:cell(name)="data">
+                    <span>{{data.item.name}}</span>
+                    <b-icon-star v-if="data.item.captain"></b-icon-star>
+                </template>
                 <template #table-busy>
                     <div class="text-center text-primary my-2">
                         <b-spinner class="align-middle"></b-spinner>
@@ -81,7 +85,7 @@ export default Vue.extend({
             {key: 'name', sortable:true},
             {key: 'points', sortable: true}
         ],
-        members: [] as { name: string, points: number }[],
+        members: [] as { name: string, points: number, captain: boolean }[],
         solves_isLoading: true,
         solves_fields: [
             { key: 'name', sortable: true},
@@ -136,7 +140,7 @@ export default Vue.extend({
     
 }
 .info {
-    padding: 3rem;
+    padding: var(--triple-margin);
     margin: auto;
     display: flex;
     flex-direction: column;
@@ -146,17 +150,17 @@ export default Vue.extend({
     color: var(--primary);
     width: 100%;
     text-align: center;
-    margin-bottom: 1rem;
+    margin-bottom: var(--margin);
 }
 .buttons {
-    padding: 1rem;
+    padding: var(--margin);
     margin: auto;
     display: flex;
     flex-direction: row;
     justify-content: center;
 }
 .solves, .members {    
-    padding: 1rem;
+    padding: var(--margin);
     width: min(100%, 750px);
     margin: auto;
 }
@@ -166,5 +170,8 @@ table {
 label {
     size: 3rem;
     font-weight: bold;
+}
+.b-icon {
+    margin-left: var(--margin);
 }
 </style>

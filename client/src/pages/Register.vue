@@ -52,7 +52,6 @@
 import Vue from 'vue';
 import axios from 'axios';
 import StatusButton from '@/components/StatusButton.vue';
-import { state, validInput, validateString, regexPassword, regexName } from '@shared/validate';
 import { state, validateUsername, validatePassword, validForm, Form } from '@shared/validation/registerForm';
 
 export default Vue.extend({

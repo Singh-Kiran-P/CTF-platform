@@ -1,5 +1,5 @@
 <template>
-    <div id="Create">
+    <div class="create">
         <b-form @submit="onSubmit($event)">
             <b-form-group label=Teamname label-for=teamname>
                 <b-form-input
@@ -78,16 +78,19 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-.register {
-    padding: 1rem;
-}
-form {
-    padding-top: 1rem;
+.create {
     display: flex;
-    align-items: center;
     justify-content: center;
-    flex-direction: column;
-    width: 50%;
-    margin: auto;
+    padding: var(--double-margin);
+    padding-bottom: 0;
 }
+
+form {
+    width: min(100%, 500px);
+}
+
+form > .form-group {
+    margin-bottom: var(--double-margin);
+}
+
 </style>
