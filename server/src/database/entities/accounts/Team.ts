@@ -12,10 +12,10 @@ export class Team {
     @OneToMany(_ => Account, account => account.team)
     accounts: Account[];
 
-    @OneToMany(_ => Solve, solve => solve.account)
+    @OneToMany(_ => Solve, solve => solve.team)
     solves: Solve[];
 
-    @OneToMany(_ => Attempt, attempt => attempt.account)
+    @OneToMany(_ => Attempt, attempt => attempt.team)
     attempts: Attempt[];
 
     @OneToMany(_ => Environment, environment => environment.team)

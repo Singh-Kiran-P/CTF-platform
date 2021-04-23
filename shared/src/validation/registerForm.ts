@@ -15,8 +15,7 @@ const validateUsername = (name: string, required: boolean = true): string => {
 const validatePassword = (password: string, confirmPassword: string, required: boolean = true): string => {
     let feedback = validateString(password, 'Password', 6, -1, required);
     if (!feedback && password) feedback = regexPassword(password);
-    if (!feedback && (required || confirmPassword) && password != confirmPassword)
-        return 'Passwords do not match';
+    if (!feedback && (required || confirmPassword) && password != confirmPassword) return 'Passwords do not match';
     return feedback;
 }
 

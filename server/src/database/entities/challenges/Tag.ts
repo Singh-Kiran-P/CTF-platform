@@ -12,11 +12,15 @@ export class Tag {
     @Column()
     description: string;
 
+    @Column()
+    order: number;
+
     @OneToMany(_ => Challenge, challenge => challenge.tag)
     challenges: Challenge[];
 
-    constructor(name: string, description: string) {
+    constructor(name: string, description: string, order: number) {
         this.name = name;
         this.description = description;
+        this.order = order;
     }
 }

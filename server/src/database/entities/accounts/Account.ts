@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany } from 'typeorm';
 import { Attempt, Solve, Category, Team } from '../../../database';
-import { generatePassword } from '../../../auth/passport';
+import { generatePassword } from '../../../auth';
 
 @Entity()
 export class Account {

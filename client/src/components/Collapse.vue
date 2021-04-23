@@ -1,9 +1,7 @@
 <template>
     <div>
         <label @click="visible = !visible">{{label}}</label>
-        <b-button :class="['icon', visible ? 'danger' : 'primary']" @click="visible = !visible">
-            <font-awesome-icon icon=chevron-down />
-        </b-button>
+        <IconButton icon="chevron-down" :class="visible ? 'danger' : 'primary'" @click="visible = !visible"/>
         <b-collapse :visible="visible">
             <slot/>
         </b-collapse>
@@ -12,9 +10,13 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import IconButton from './IconButton.vue';
 
 export default Vue.extend({
     name: 'Collapse',
+    components: {
+        IconButton
+    },
     props: {
         label: String
     },
@@ -25,8 +27,6 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import '@/assets/css/iconButton.scss';
-
 label {
     display: inline;
     margin-bottom: 0;

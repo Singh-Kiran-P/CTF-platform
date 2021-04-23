@@ -1,0 +1,175 @@
+/**
+ * used in profile.php to style the profile page
+ */
+
+#profilePage {
+    width: min(750px, calc(100% - var(--screenPadding)));
+}
+
+#profilePage form, #profilePage .viewProfile {
+    width: min(500px, max(100%, var(--minimumWidth)));
+}
+
+#profilePage form button {
+    width: calc(50% - calc(var(--margin) / 2));
+}
+
+#editProfileAvatarContainer {
+    position: relative;
+}
+
+#profilePage #editProfileAvatarContainer input[type=file] {
+    display: none;
+}
+
+#editProfileAvatarImage, #editProfileAvatarSelectImage {
+    width: min(200px, 100%);
+    height: 100%;
+}
+
+#editProfileAvatarSelectImage {
+    position: absolute;
+    cursor: pointer;
+    z-index: 1;
+}
+
+#editProfileAvatarSelectImage img {
+    width: 50%;
+    border-radius: 50%;
+    background-color: var(--gray);
+}
+
+#editProfileAvatarSelectImage {
+    opacity: 0.5;
+}
+
+@media (hover: hover) {
+    #editProfileAvatarSelectImage:hover {
+        opacity: 1;
+    }
+
+    #editProfileAvatarSelectImage:hover ~ #editProfileAvatarImage {
+        opacity: 0.5;
+    }
+}
+
+#profilePage .viewProfile .profileDisplay {
+    width: 100%;
+    margin-bottom: calc(var(--margin) * 2);
+    display: flex;
+}
+
+#profilePage .viewProfile .profileDisplay img.avatar {
+    width: min(200px, 100%);
+    margin-right: calc(var(--margin) * 2);
+    vertical-align: top;
+    flex-shrink: 0;
+}
+
+#profilePage .viewProfile .profileDisplay .profileInformation {
+    max-height: 200px;
+    display: inline-flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+@media (max-width: 500px) {
+    #profilePage .viewProfile .profileDisplay {
+        flex-direction: column;
+    }
+
+    #profilePage .viewProfile .profileDisplay > img.avatar {
+        margin-left: 50%;
+        transform: translateX(-50%);
+        margin-bottom: calc(var(--margin) * 2);
+    }
+}
+
+#profilePage .viewProfile .profileDisplay .profileInformation .nameContainer {
+    flex-shrink: 0;
+}
+
+#profilePage .viewProfile .profileInformation .listSeperator {
+    margin-bottom: 0;
+}
+
+#profilePage .viewProfile .profileInformation .buttons {
+    display: flex;
+    float: right;
+}
+
+#profilePage .viewProfile .profileInformation .button {
+    height: var(--largeFontSize);
+    line-height: calc(var(--largeFontSize) + 4px);
+    margin-left: var(--margin);
+    padding: var(--margin);
+    padding-bottom: 0;
+    padding-top: 0;
+    border-radius: 100vh;
+    background-color: var(--lightgray);
+    cursor: default;
+}
+
+@media (hover: hover) {
+    #profilePage .viewProfile .profileInformation .button:hover, #profilePage .viewProfile .profileInformation .button:focus-visible {
+        color: white;
+    }
+
+    #profilePage .viewProfile .profileInformation .button:hover img, #profilePage .viewProfile .profileInformation .button:focus-visible img {
+        filter: invert(1);
+    }
+
+    #profilePage .viewProfile .profileInformation .edit:hover, #profilePage .viewProfile .profileInformation .edit:focus-visible {
+        background-color: var(--blue);
+    }
+
+    #profilePage .viewProfile .profileInformation .logout:hover, #profilePage .viewProfile .profileInformation .logout:focus-visible {
+        background-color: var(--orange);
+    }
+}
+
+#profilePage .viewProfile .profileInformation .button span {
+    line-height: 1;
+    padding-bottom: 1px;
+    display: inline-block;
+    font-size: var(--smallFontSize);
+}
+
+#profilePage .viewProfile .profileInformation .button img {
+    height: var(--smallFontSize);
+    margin-bottom: 1px;
+}
+
+#profilePage .viewProfile .profileInformation .name {
+    max-width: 100%;
+    display: inline-block;
+    font-size: var(--largeFontSize);
+    font-weight: bold;
+    line-height: 1;
+}
+
+#profilePage .viewProfile .profileInformation .information {
+    display: flex;
+    line-height: 0;
+    overflow: hidden;
+    margin-top: var(--margin);
+}
+
+#profilePage .viewProfile .profileInformation .information span {
+    display: inline-block;
+    line-height: var(--largeFontSize);
+    font-size: var(--mediumFontSize);
+}
+
+#profilePage .viewProfile .profileInformation .information img {
+    height: var(--largeFontSize);
+    margin-right: var(--margin);
+    flex-shrink: 0;
+    flex-grow: 0;
+}
+
+#profilePage .viewProfile .profileInformation .description {
+    display: block;
+    margin-top: var(--margin);
+    white-space: pre-wrap;
+}

@@ -9,7 +9,7 @@
                         v-model="form.username"
                         placeholder="Enter username"
                         :state="state(usernameFeedback)"
-                        v-on:input="registerFeedback = ''"
+                        v-on:input="usernameError = ''"
                     />
                     <b-form-invalid-feedback>{{usernameFeedback}}</b-form-invalid-feedback>
                 </b-form-group>
@@ -21,14 +21,12 @@
                         v-model="form.password"
                         placeholder="Enter password"
                         :state="state(passwordFeedback)"
-                        v-on:input="registerFeedback = ''"
                     />
                     <b-form-input
                         type=password
                         v-model="form.confirmPassword"
                         placeholder="Confirm password"
                         :state="state(passwordFeedback)"
-                        v-on:input="registerFeedback = ''"
                     />
                     <b-form-invalid-feedback>{{passwordFeedback}}</b-form-invalid-feedback>
                 </b-form-group>
@@ -38,12 +36,14 @@
                         id=category
                         v-model="form.category"
                         :options="categories"
-                        :state="true"
+                        :state="state(categoryFeedback)"
+                        v-on:input="categoryFeedback = ''"
                     />
+                    <b-form-invalid-feedback>{{categoryFeedback}}</b-form-invalid-feedback>
                 </b-form-group>
             </b-form-group>
             <StatusButton type=submit block variant=primary :state="registerState" normal=Register loading="Registering" succes="Registered" :disabled="!validForm"/>
-            <router-link :to="{ name: 'Login'}">Already have an account? Log in</router-link>
+            <router-link :to="{ name: 'Login' }">Already have an account? Log in</router-link>
         </b-form>
     </div>
 </template>
@@ -52,7 +52,8 @@
 import Vue from 'vue';
 import axios from 'axios';
 import StatusButton from '@/components/StatusButton.vue';
-import { state, validateUsername, validatePassword, validForm, Form } from '@shared/validation/registerForm';
+import { validateUsername, validatePassword, validForm, Form } from '@shared/validation/registerForm';
+import { state, is } from '@shared/validation';
 
 export default Vue.extend({
     name: 'Register',
@@ -71,7 +72,9 @@ export default Vue.extend({
         },
         categories: [{ value: '', text: 'Select category', disabled: true }] as any[],
         registerState: 'normal',
-        registerFeedback: ''
+        registerFeedback: '',
+        usernameError: '',
+        categoryFeedback: ''
     }),
     
     computed: {
@@ -79,13 +82,16 @@ export default Vue.extend({
         password(): string { return this.form.password; },
         confirmPassword(): string { return this.form.confirmPassword; },
         category(): string { return this.form.category; },
-        usernameFeedback(): string { return validateUsername(this.username, false); },
+        usernameFeedback(): string { return this.usernameError || validateUsername(this.username, false); },
         passwordFeedback(): string { return validatePassword(this.password, this.confirmPassword, false); },
         formData(): Form { return { username: this.username, password: this.password, confirmPassword: this.confirmPassword, category: this.category }; },
-        validForm(): boolean { return validForm(this.formData) && state(this.registerFeedback); }
+        validForm(): boolean { return validForm(this.formData) && state(this.usernameFeedback); }
     },
     watch: {
-        formData: {deep: true, handler() { this.registerState = 'normal'; }}
+        formData: {deep: true, handler() {
+            this.registerState = 'normal';
+            this.registerFeedback = '';
+        }}
     },
     methods: {
         state,
@@ -93,20 +99,24 @@ export default Vue.extend({
         onSubmit(e: Event): void {
             e.preventDefault();
             this.registerState = 'loading';
-            const error = (err: string = '') => {
+            const error = (err?: any) => {
                 this.registerState = 'error';
-                this.registerFeedback = err;
+                if (is.string(err)) this.registerFeedback = err;
+                else if (is.object(err)) {
+                    if (is.string(err.username)) this.usernameError = err.username;
+                    if (is.string(err.category)) this.categoryFeedback = err.category;
+                }
             }
             axios.post('/api/auth/register', this.formData).then(response => {
                 if(response.data.error) return error(response.data.error);
                 this.registerState = 'succes';
-                location.replace('/#/'); // TODO: use history mode, remove hash
                 location.reload();
+                location.replace('/');
             }).catch(() => error());
         },
         loadFormCategories(): void {
             axios.get('/api/competition/categories').then(response => {
-                if (response.data.error) return; // TODO: show error?
+                if (response.data.error) return this.categoryFeedback = response.data.error;
                 this.categories = this.categories.concat(response.data);
             });
         }
@@ -123,7 +133,7 @@ export default Vue.extend({
 }
 
 form {
-    width: min(100%, 500px);
+    width: min(100%, var(--breakpoint-sm));
 }
 
 form > .form-group {

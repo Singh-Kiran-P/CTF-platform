@@ -10,6 +10,9 @@ export class Page {
 
     @Column()
     source: string
+    
+    @Column()
+    order: number;
 
     @Column()
     authentication: number; // TODO: enum? remove this?
@@ -17,10 +20,11 @@ export class Page {
     @Column()
     visibility: boolean; // TODO: remove this?
 
-    constructor(name: string, path: string, source: string) {
+    constructor(name: string, path: string, source: string, order: number) {
         this.name = name;
         this.path = path;
         this.source = source;
+        this.order = order;
         this.authentication = 0;
         this.visibility = true;
     }

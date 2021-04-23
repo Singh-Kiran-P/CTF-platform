@@ -3,7 +3,7 @@ import passport from 'passport';
 import Roles from '@shared/roles';
 import DB, { Account, Category } from '../database';
 import { validForm, Form } from '@shared/validation/registerForm'; 
-import { getAccount } from '../auth/passport';
+import { getAccount } from '../auth';
 const router = express.Router();
 
 router.post('/login', (req, res, next) => {
@@ -21,14 +21,14 @@ router.post('/login', (req, res, next) => {
 
 router.post('/register', (req, res) => {
     let data = req.fields as Form;
-    const error = (err?: string) => res.json({ error: err || 'Could not register user' });
+    const error = (err?: any) => res.json({ error: err || 'Could not register user' });
     if (!validForm(data)) return error();
     Promise.all([
         DB.repo(Account).findOne({ name: data.username }),
         DB.repo(Category).findOne({ name: data.category })
     ]).then(([account, category]) => {
-        if (!category) return error('Category does not exist');
-        if (account) return error('Username already exists');
+        if (!category) return error({ category: 'Category does not exist' });
+        if (account) return error({ username: 'Username already exists' });
         DB.repo(Account).save(new Account(data.username, data.password, category)).then(account => {
             if (!account) error();
             req.login(account, err => {

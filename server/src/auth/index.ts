@@ -14,9 +14,9 @@ const htmlFieldNames = {
 
 const strategy = new LocalStrategy(htmlFieldNames, (username: string, password: string, done) => {
     DB.repo(Account).findOne({ where: { name: username } }).then(account => {
-        if (!account) done('User does not exist');
+        if (!account) done({ username: 'User does not exist' });
         else if (validatePassword(password, account.password, account.salt)) done(null, account);
-        else done('Invalid password');
+        else done({ password: 'Invalid password' });
     }).catch(() => done('Error retrieving users'));
 });
 
@@ -38,12 +38,12 @@ const getAccount = (req: express.Request): Account => req.user as Account;
 
 const isAuth = (req: express.Request, res: express.Response, next: express.NextFunction) => {
     if (req.isAuthenticated()) next();
-    else res.json({ error: 'You are not authorized to view this page' });
+    else res.json({ error: 'Unauthorized request' });
 }
 
 const isAdmin = (req: express.Request, res: express.Response, next: express.NextFunction) => {
     if(req.isAuthenticated() && getAccount(req).admin) next();
-    else res.json({ error: 'You are not authorized to view this page' });
+    else res.json({ error: 'Unauthorized request' });
 }
 
 

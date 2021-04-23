@@ -10,13 +10,13 @@ export class Category {
     name: string;
 
     @Column()
-    priority: number;
+    order: number;
 
     @OneToMany(_ => Account, account => account.category)
     accounts: Account[];
 
-    constructor(name: string, priority: number) {
+    constructor(name: string, order: number) {
         this.name = name;
-        this.priority = priority;
+        this.order = order;
     }
 }

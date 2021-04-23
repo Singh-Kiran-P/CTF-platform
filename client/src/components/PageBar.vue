@@ -1,6 +1,6 @@
 <template>
     <div id=pageBar>
-        <b-navbar toggleable=md type=dark variant=dark>
+        <b-navbar toggleable=sm type=dark variant=dark>
             <b-navbar-toggle target=nav-collapse />
             
             <b-collapse id=nav-collapse is-nav>
@@ -42,7 +42,13 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-a.router-link-exact-active, a:hover, a:focus-visible {
+@media (hover: hover) {
+    a.router-link-exact-active, a:hover, a:focus-visible {
+        color: var(--primary) !important;
+    }
+}
+
+a.router-link-exact-active {
     color: var(--primary) !important;
 }
 </style>
