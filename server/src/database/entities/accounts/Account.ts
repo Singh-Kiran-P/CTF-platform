@@ -22,7 +22,7 @@ export class Account {
     @ManyToOne(_ => Category, category => category.accounts, { nullable: true, onDelete: 'SET NULL', eager: true })
     category: Category;
 
-    @ManyToOne(_ => Team, team => team.accounts, { nullable: true, eager: true })
+    @ManyToOne(_ => Team, team => team.accounts, { nullable: true, onDelete: 'SET NULL', eager: true,  })
     @JoinColumn()
     team: Team;
 

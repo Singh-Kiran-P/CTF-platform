@@ -22,16 +22,26 @@ router.post('/register', isAuth, (req, res) => {
     }).catch((err) => { return res.json({ error: 'Cannot retrieve data from DB' });});
 });
 
+router.post('/delete/:uuid', isAuth, (req, res)=>{
+    let uuid: string = req.params.uuid;
+    let acc: Account = getAccount(req);
+    const teamRepo = DB.repo(Team);
+    teamRepo.findOne({where: {id: uuid}, relations: ['captain']}).then((team: Team)=>{
+        if(!team) return res.json({error: 'Team not found'});
+        if(!(team.captain.id == acc.id || acc.admin)) return res.json({error: 'You are not authorized to delete the team'});
+        teamRepo.delete(uuid).then(()=>{return res.json({})}).catch((err)=>{res.json({error: 'Error removing team'})});
+    }).catch((err)=>{res.json({error: 'Db error: '+err})});
+});
+
 router.post('/join/:invite', isAuth, (req, res)=>{
     let invite: string = req.params.invite;
     let acc: Account = getAccount(req);
-    console.log(invite);
+    if(acc.team) return res.json({error: 'You are already in a team'});
     DB.repo(Team).findOne({where: {inviteCode: invite}, relations:['accounts']}).then((team: Team)=>{
         if(!team) return res.json({error: 'Invalid invite link'});
         if(team.memberCount() >= 4) return res.json({error: 'Team is full, please contact the captain'});
-        if(acc.team) return res.json({error: 'You are already in a team'});
         DB.repo(Account).update(acc.id, {team: team}).then(()=>{return res.json({})}).catch((err)=>{res.json({error: 'Server error: '+err})});
-    }).catch((err)=>{res.json({error: 'Server error: '+err})});
+    }).catch((err)=>{res.json({error: 'Db error: '+err})});
 });
 
 router.get('/infoDashboard', isAuth, hasTeam, (req, res) => { 
@@ -41,15 +51,15 @@ router.get('/infoDashboard', isAuth, hasTeam, (req, res) => {
 
 //TODO: get placement
 router.get('/infoDashboard/:uuid', (req, res) => {
-    let isCaptain: boolean = false;
+    let isCaptainOrAdmin: boolean = false;
     let uuid: string = req.params.uuid;
-    let data = {name: '', placement: 0, points: 0, uuid: uuid};
+    let data = {name: '', placement: 0, points: 0, uuid: uuid, inviteCode: ''};
 
     DB.repo(Team).findOne({where: {id: uuid}, relations:['captain', 'solves', 'solves.challenge', 'solves.usedHints', 'solves.usedHints.hint']}).then((team: Team)=>{
-        console.log(team);
+        if(!team) return res.json({error: 'Team not found'});
         if(req.user) {
             let acc: Account = getAccount(req);
-            if(team.captain.id == acc.id || acc.admin) isCaptain = true;
+            if(team.captain.id == acc.id || acc.admin) {isCaptainOrAdmin = true; data.inviteCode = team.inviteCode;}
         }
         data.name = team.name;
         team.solves.forEach((solve: Solve)=>{
@@ -58,7 +68,7 @@ router.get('/infoDashboard/:uuid', (req, res) => {
                 data.points -= usedHint.hint.cost
             })
         });
-        res.json({info: data, isCaptain: isCaptain});
+        res.json({info: data, isCaptainOrAdmin: isCaptainOrAdmin});
     }).catch((err)=>{res.json({error: 'Error retrieving data'});});
 });
 
@@ -92,6 +102,19 @@ router.get('/getSolves/:uuid', (req, res) => {
             });
             res.json(data);            
         }).catch((err)=>{res.json({error: 'Error retrieving solves'})});
+});
+
+router.post('/removeMember/:uuid/:memberName', isAuth, (req, res)=> {
+    let uuid: string = req.params.uuid;
+    let memberName: string = req.params.memberName;
+    let reqAcc: Account = getAccount(req);
+    DB.repo(Team).findOne({where: {id: uuid}, relations: ['captain', 'accounts']}).then((team: Team)=> {
+        if(!(team.captain.id == reqAcc.id || reqAcc.admin)) return res.json({error: 'You are not authorized to remove a member'});
+        if(!(team.accounts.some(member=>member.name == memberName))) return res.json({error: 'User to remove is not part of the team'});
+        DB.repo(Account).update({name: memberName}, {team: null} ).then(()=>{
+            return res.json({});
+        }).catch((error)=>{return res.json({error: 'Cannot remove member'})});
+    }).catch((error)=>{return res.json({error: 'Cannot find team'})});
 });
 
 export default { path: '/team', router };
