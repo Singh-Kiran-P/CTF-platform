@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany, OneToOne, JoinColumn, Repository, AfterInsert } from 'typeorm';
 import DB,{ Environment, Attempt, Solve, Account } from '../../../database';
-import { generatePassword } from '../../../auth/passport';
+import { generatePassword } from '../../../auth/index';
 @Entity()
 export class Team {
     @PrimaryGeneratedColumn("uuid")

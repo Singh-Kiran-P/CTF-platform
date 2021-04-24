@@ -48,8 +48,6 @@ async function loadTestData() {
     let teams: Team[] = [teamRepo.saveWithCaptain('Team 1', accounts[1]),
     teamRepo.saveWithCaptain('Team 2', accounts[2]),
     teamRepo.saveWithCaptain('Team 3', accounts[3])];
-    //teamRepo.addUserToTeam(teams[0], accounts[4]);
-
     /*
     let teams: Team[] = await save([
         new Team('Team 1', accounts[1]),

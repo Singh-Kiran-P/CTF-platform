@@ -5,6 +5,7 @@ import EventEmitter = require('events');
 import { Connection, createConnection, EntityTarget, ObjectType, Repository } from 'typeorm';
 import loadTestData from './testData';
 import { truncate } from 'fs-extra';
+import {remove} from '../files';
 dotenv.config();
 
 // TODO: create entity CRUD operations (custom entity repositories)

@@ -1,7 +1,7 @@
 import express from 'express';
 const router = express.Router();
 import DB, { Team, Account, Solve, UsedHint } from '../database';
-import { isAuth, hasTeam, getAccount } from '../auth/passport';
+import { isAuth, hasTeam, getAccount } from '../auth/index';
 
 const respond = <T>(promise: Promise<T>, res: express.Response, result: (data: T) => any = data => data) => {
     promise.then(data => res.send(result(data))).catch(err => res.json({ error: 'Error fetching data: ' + err }));
