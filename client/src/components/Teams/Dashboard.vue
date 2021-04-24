@@ -172,7 +172,8 @@ export default Vue.extend({
             this.modal_invite.copied = true;
         },
         generateInviteLink(): string {
-            if(this.team.inviteCode != '') return this.$route.path + '/join/' + this.team.inviteCode;
+            console.log()
+            if(this.team.inviteCode != '') return window.location.origin + '/team/join/' + this.team.inviteCode;
             return '';
         },
         deleteTeam(e:Event) {
