@@ -1,7 +1,6 @@
 <template>
-    <div class="Teams">
-        <component v-if="noError" :is="createOrDashboard" />
-        <span v-else class=error>Error</span>
+    <div class="Team">
+        <component :is="createOrDashboard" />
     </div>
 </template>
 
@@ -13,15 +12,15 @@ import Dashboard from '../components/Teams/Dashboard.vue';
 import Loading from '../components/Loading.vue'
 
 export default Vue.extend({
-    name: 'Teams',
+    name: 'Team',
     components: {
+        Create,
         Dashboard,
         Loading
     },
     data: () => ({ 
         isLoading: true,
-        noError: false,
-        hasTeam: false,
+        hasTeam: false
     }),
     created() {
         axios.get('/api/account/hasTeam').then((response) => {
@@ -50,5 +49,6 @@ export default Vue.extend({
 <style scoped lang="scss">
 span {
     font-weight: bold;
+    display: block;
 }
 </style>

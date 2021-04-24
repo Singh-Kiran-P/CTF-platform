@@ -24,6 +24,17 @@ const pages: { [page: string]: Route } = {
         src: 'Logout.vue',
         meta: { right: true }
     },
+    team: {
+        path: '/team',
+        name: 'Team',
+        src: 'Team.vue',
+    },
+    joinTeam: {
+        path: '/team/join/:invite',
+        name: 'joinTeam',
+        src: 'joinTeam.vue',
+        meta: {hidden: true}
+    },
     leaderboard: {
         path: '/leaderboard',
         name: 'Leaderboard',
@@ -51,6 +62,8 @@ const routes: { [page: string]: Route[] } = {
     [Roles.PARTICIPANT]: [
         pages.leaderboard,
         pages.teams,
+        pages.team,
+        pages.joinTeam,
         pages.logout
     ],
     [Roles.ORGANIZER]: [

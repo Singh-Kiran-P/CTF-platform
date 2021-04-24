@@ -46,6 +46,12 @@ const isAdmin = (req: express.Request, res: express.Response, next: express.Next
     else res.json({ error: 'Unauthorized request' });
 }
 
+const hasTeam = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    let acc: Account = getAccount(req);
+    if (acc.team != null) next();
+    else res.json({ error: 'You are not part of a team' });
+}
+
 
 
 // hash functions
@@ -63,4 +69,4 @@ const validatePassword = (password: string, hashed: string, salt: string) => {
     return hashed == hash(password, salt);
 }
 
-export { strategy, isAuth, isAdmin, getAccount, generatePassword };
+export { strategy, isAuth, isAdmin, hasTeam, getAccount, generatePassword };

@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div id=Collapse>
         <label @click="visible = !visible">{{label}}</label>
         <IconButton icon="chevron-down" :class="visible ? 'danger' : 'primary'" @click="visible = !visible"/>
         <b-collapse :visible="visible">
