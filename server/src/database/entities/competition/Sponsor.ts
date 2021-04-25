@@ -1,9 +1,15 @@
-import { Entity, Column, PrimaryColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class Sponsor {
-    @PrimaryColumn()
+    @PrimaryGeneratedColumn()
+    id: number;
+
+    @Column()
     link: string;
+
+    @Column()
+    name: string;
 
     @Column()
     icon: string;
@@ -11,7 +17,8 @@ export class Sponsor {
     @Column()
     order: number;
 
-    constructor(link: string, icon: string, order: number) {
+    constructor(name: string, link: string, icon: string, order: number) {
+        this.name = name;
         this.link = link;
         this.icon = icon;
         this.order = order;

@@ -5,8 +5,8 @@ import fse from 'fs-extra';
 import path from 'path';
 import fs from 'fs';
 
-const parentDir = (p: string, n: number = 1): string => n == 0 ? p : parentDir(path.dirname(p), n - 1);
-const fileName = (p: string): string => path.basename(p);
+const parentDir = (p: string, n: number = 1): string => p ? (n == 0 ? p : parentDir(path.dirname(p), n - 1)) : '';
+const fileName = (p: string): string => p ? path.basename(p) : '';
 
 type Err = NodeJS.ErrnoException;
 const Root = parentDir(require.main.filename, 5);
@@ -66,7 +66,7 @@ const unzip = (zip: string) => {
 /**
  * calls each given call after the previous one resolved, resolves after all calls resolved or rejects upon any calls rejecting
  */
-const chain = (...calls: (() => Promise<void>)[]) => {
+const chain = (...calls: (() => Promise<any>)[]) => {
     calls = calls.filter(call => call);
     return new Promise<void>((resolve, reject) => {
         let call = (i: number) => {

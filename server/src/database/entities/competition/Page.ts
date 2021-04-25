@@ -1,15 +1,18 @@
-import { Entity, Column, PrimaryColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class Page {
-    @PrimaryColumn()
+    @PrimaryGeneratedColumn()
+    id: number;
+
+    @Column()
     path: string;
 
     @Column()
     name: string;
 
     @Column()
-    source: string
+    source: string;
     
     @Column()
     order: number;

@@ -16,7 +16,7 @@
                             <b-form-input v-else type=text v-model="category.name" placeholder="Enter category name" :state="state(categoryFeedback(category))"/>
                             <b-form-invalid-feedback>{{categoryFeedback(category)}}</b-form-invalid-feedback>
                         </div>
-                        <IconButton class=info icon=pen icon2=save :toggled="category.editable" :disabled="!state(categoryFeedback(category))" @click="editCategory(category)"/>
+                        <IconButton class=info icon=pen icon2=save :toggled="category.editable" :disabled="category.editable && !state(categoryFeedback(category))" @click="editCategory(category)"/>
                         <IconButton class=primary icon=chevron-down @click="categoryDown(category)"/>
                         <IconButton class=danger icon=times @click="removeCategory(category)"/>
                     </div>
@@ -42,7 +42,7 @@
                                 <b-form-invalid-feedback>{{tagFeedback(tag)}}</b-form-invalid-feedback>
                             </template>
                         </div>
-                        <IconButton class=info icon=pen icon2=save :toggled="tag.editable" :disabled="!state(tagFeedback(tag))" @click="editTag(tag)"/>
+                        <IconButton class=info icon=pen icon2=save :toggled="tag.editable" :disabled="tag.editable && !state(tagFeedback(tag))" @click="editTag(tag)"/>
                         <IconButton class=primary icon=chevron-down @click="tagDown(tag)"/>
                         <IconButton class=danger icon=times @click="removeTag(tag)"/>
                     </div>
@@ -74,12 +74,11 @@
                                     <b-form-file class=half accept=".html" v-model="page.html" :placeholder="htmlPlaceholder(page)" :state="state(pageFeedback(page))"/>
                                     <b-form-file class=half accept=".zip" v-model="page.zip" :placeholder="zipPlaceholder(page)" :state="state(pageFeedback(page))"/>
                                     <b-form-invalid-feedback>{{pageFeedback(page)}}</b-form-invalid-feedback>
-                                    <span v-if="page.html && page.source" class=info>You are uploading a new page, old depencies will be removed</span>
-                                    <span v-if="!page.html && page.zip" class=info>New dependencies will only be saved if you upload a new page</span>
+                                    <span v-if="page.html && page.source" class=info>You are uploading a new page, any old depencies will be removed</span>
                                 </template>
                             </span>
                         </div>
-                        <IconButton class=info icon=pen icon2=save :toggled="page.editable" :disabled="!state(pageFeedback(page))" @click="editPage(page)"/>
+                        <IconButton class=info icon=pen icon2=save :toggled="page.editable" :disabled="page.editable && !state(pageFeedback(page))" @click="editPage(page)"/>
                         <IconButton class=primary icon=chevron-down @click="pageDown(page)"/>
                         <IconButton class=danger icon=times @click="removePage(page)"/>
                     </div>
@@ -99,8 +98,13 @@
                 <Collapse label="Competition sponsors">
                     <div class=list-item v-for="sponsor in form.sponsors" :key="sponsor.order">
                         <div class=item-content>
-                            <span v-if="!sponsor.editable" class=item-name>{{sponsor.link}}</span>
-                            <b-form-input v-else type=text v-model="sponsor.link" placeholder="Enter sponsor link" :state="state(sponsorFeedback(sponsor))"/>
+                            <span v-if="!sponsor.editable" class=item-name>{{sponsor.name}}</span>
+                            <b-form-input v-else type=text v-model="sponsor.name" placeholder="Enter sponsor name" :state="state(sponsorFeedback(sponsor))"/>
+                            <span :class="['item-description', { marginTop: sponsor.editable }]">
+                                <span class=item-category>Link</span>
+                                <span v-if="!sponsor.editable" class=item-value>{{sponsor.link}}</span>
+                                <b-form-input v-else type=text v-model="sponsor.link" placeholder="Enter sponsor link" :state="state(sponsorFeedback(sponsor))"/>
+                            </span>
                             <span :class="['item-description', { marginTop: sponsor.editable }]">
                                 <span class=item-category>Icon</span>
                                 <span v-if="!sponsor.editable" class=item-value>{{icon(sponsor)}}</span>
@@ -108,13 +112,14 @@
                                 <b-form-invalid-feedback>{{sponsorFeedback(sponsor)}}</b-form-invalid-feedback>
                             </span>
                         </div>
-                        <IconButton class=info icon=pen icon2=save :toggled="sponsor.editable" :disabled="!state(sponsorFeedback(sponsor))" @click="editSponsor(sponsor)"/>
+                        <IconButton class=info icon=pen icon2=save :toggled="sponsor.editable" :disabled="sponsor.editable && !state(sponsorFeedback(sponsor))" @click="editSponsor(sponsor)"/>
                         <IconButton class=primary icon=chevron-down @click="sponsorDown(sponsor)"/>
                         <IconButton class=danger icon=times @click="removeSponsor(sponsor)"/>
                     </div>
                     <div class=add-list-item>
-                        <b-form-input type=text v-model="add.sponsor.link" placeholder="Enter new sponsor link" :state="state(newSponsorFeedback)"/>
+                        <b-form-input type=text v-model="add.sponsor.name" placeholder="Enter new sponsor name" :state="state(newSponsorFeedback)"/>
                         <b-button type=button variant=primary :disabled="!validNewSponsor" @click="addSponsor()"><font-awesome-icon icon=plus /></b-button>
+                        <b-form-input type=text v-model="add.sponsor.link" placeholder="Enter new sponsor link" :state="state(newSponsorFeedback)"/>
                         <b-form-file accept=".jpg, .jpeg, .png" v-model="add.sponsor.img" placeholder="Upload sponsor icon" :state="state(newSponsorFeedback)"/>
                         <b-form-invalid-feedback>{{newSponsorFeedback}}</b-form-invalid-feedback>
                     </div>
@@ -161,7 +166,7 @@ export default Vue.extend({
             category: '',
             tag: { name: '', description: '' },
             page: { name: '', path: '', html: null as File | null, zip: null as File | null },
-            sponsor: { link: '', img: null as File | null }
+            sponsor: { name: '', link: '', img: null as File | null }
         },
         loaded: false,
         saveState: 'normal',
@@ -218,7 +223,7 @@ export default Vue.extend({
             this.add.category = '';
             this.add.tag = { name: '', description: '' };
             this.add.page = { name: '', path: '', html: null, zip: null };
-            this.add.sponsor = { link: '', img: null };
+            this.add.sponsor = { name: '', link: '', img: null };
             axios.get('/api/competition/data').then(res => {
                 let data: Form = res.data;
                 if (!validForm(data)) return this.cancelState = 'error';
@@ -286,7 +291,7 @@ export default Vue.extend({
 
         icon(sponsor: Sponsor): string { return sponsor.img ? sponsor.img.name || '' : path.basename(sponsor.icon); },
         imgPlaceholder(sponsor?: Sponsor): string { return sponsor && (sponsor.img || sponsor.icon) ? this.icon(sponsor) : 'Upload sponsor icon'; },
-        sval(sponsor: Sponsor): Sponsor { return Object.assign({}, sponsor, { link: sponsor.link.trim() }); },
+        sval(sponsor: Sponsor): Sponsor { return Object.assign({}, sponsor, { name: sponsor.name.trim(), link: sponsor.link.trim() }); },
         sponsorFeedback(sponsor: Sponsor, add: boolean = false): string { return validate.sponsor(this.sval(sponsor), this.formData.sponsors, add); },
         sponsorDown(sponsor: Sponsor): void { this.moveDown(this.form.sponsors, x => x.link == sponsor.link); },
         removeSponsor(sponsor: Sponsor): void { this.form.sponsors = this.form.sponsors.filter((x: Sponsor) => x.link != sponsor.link); },
@@ -294,7 +299,7 @@ export default Vue.extend({
         addSponsor(): void {
             if (!this.validNewSponsor) return;
             this.form.sponsors.push(this.newSponsor);
-            this.add.sponsor = { link: '', img: null };
+            this.add.sponsor = { name: '', link: '', img: null };
         },
     }
 });
@@ -350,7 +355,6 @@ span.info {
     .item-description {
         display: flex;
         flex-wrap: wrap;
-        white-space: pre-wrap;
     }
     
     .item-category {
