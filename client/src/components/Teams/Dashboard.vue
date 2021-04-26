@@ -24,6 +24,7 @@
 
         <div class=members>
             <label for="member-table">Members</label>
+            <span class=error :v-if="membersLoadingError != ''">{{membersLoadingError}}</span>
             <b-table id=member-table sticky-header striped :items="members" :fields="members_fields" :busy="members_isLoading">
                 <template v-slot:cell(name)="row">
                     <span>{{row.item.name}}</span>
@@ -45,6 +46,7 @@
 
         <div class=solves>
             <label for="solves-table">Solves</label>
+            <span class=error :v-if="solvesLoadingError != ''">{{solvesLoadingError}}</span>
             <b-table id=solves-table sticky-header striped :items="solves" :fields="solves_fields" :busy="solves_isLoading">
                 <!--correctly loading info for category and description on hover-->
                 <template v-slot:cell(category)="row">
@@ -80,7 +82,8 @@
             </div>
             <template #modal-footer>
                 <b-button class="float-right" @click="modal_delete.open=false"> Cancel </b-button>
-                <b-button class="float-right" variant="danger" @click="deleteTeam($event)"> Confirm </b-button>
+                <!--<b-button class="float-right" variant="danger" @click="deleteTeam($event)"> Confirm </b-button>-->
+                <StatusButton class="float-right" variant=danger :state="modal_delete.deletingState" normal="Confirm" loading="Deleting" succes="Deleted" @click="deleteTeam($event)"/>
             </template>
         </b-modal>
         
@@ -89,10 +92,14 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import StatusButton from '@/components/StatusButton.vue';
 import axios, { AxiosResponse } from 'axios';
 
 export default Vue.extend({
     name: 'Dashboard',
+    components: {
+        StatusButton
+    },
     data: () => ({
         team: {
             name: 'teamname',
@@ -104,12 +111,14 @@ export default Vue.extend({
         isCaptainOrAdmin: false,
         removingMember: false,
         members_isLoading: true,
+        membersLoadingError: '',
         members_fields: [
             {key: 'name', sortable:true},
             {key: 'points', sortable: true}
         ] as {key: string, sortable?: boolean, tdClass?: string}[],
         members: [] as { name: string, points: number, captain: boolean }[],
         solves_isLoading: true,
+        solvesLoadingError: '',
         solves_fields: [
             { key: 'name', sortable: true},
             { key: 'category', label: 'Category', sortable: true},
@@ -122,7 +131,8 @@ export default Vue.extend({
             copied: false
         },
         modal_delete: {
-            open: false
+            open: false,
+            deletingState: 'normal'
         }
     }),
     computed: {
@@ -131,18 +141,18 @@ export default Vue.extend({
         getMembers() {
             this.members_isLoading = true;
             axios.get('/api/team/getMembers/'+this.team.uuid).then((response)=>{
-                    if(response.data.error) return alert(response.data.error);
+                    if(response.data.error) { this.membersLoadingError = response.data.error; this.members_isLoading = false; return; }
                     this.members = response.data;
                     this.members_isLoading = false;
-                }).catch((err)=>{alert(err)});
+                }).catch((err)=>{this.membersLoadingError = err; this.members_isLoading = false; return;});
         },
         getSolves() {
             this.solves_isLoading = true;
             axios.get('/api/team/getSolves/'+this.team.uuid).then((response)=>{
-                    if(response.data.error) return alert(response.data.error);
+                    if(response.data.error) { this.solvesLoadingError = response.data.error; this.solves_isLoading = false; return; }
                     this.solves = response.data;
                     this.solves_isLoading = false;
-                }).catch((err)=>{alert(err)});
+                }).catch((err)=>{this.solvesLoadingError = err; this.solves_isLoading = false; return;});
         },
         removeMember(name:string, event: Event) {
             event.preventDefault();
@@ -178,10 +188,11 @@ export default Vue.extend({
         },
         deleteTeam(e:Event) {
             e.preventDefault();
+            this.modal_delete.deletingState = 'loading'
             axios.post('/api/team/delete/'+this.team.uuid).then((response)=>{
-                    if(response.data.error) return alert(response.data.error);
+                    if(response.data.error) return this.modal_delete.deletingState = 'error';
                     this.$router.go(0); //reload
-                }).catch((err)=>{alert(err)});
+                }).catch((err)=>{this.modal_delete.deletingState = 'error'});
         },
         fallbackCopyTextToClipboard(text: string) {
             var textArea = document.createElement("textarea");
@@ -261,6 +272,12 @@ export default Vue.extend({
     padding: var(--margin);
     width: min(100%, 750px);
     margin: auto;
+    /*display: flex;
+    flex-direction: column;*/
+}
+.error {
+    color: red;
+    margin-left: var(--margin);
 }
 table {
     border: 1px solid lightgray;

@@ -91,10 +91,11 @@ router.get('/getMembers/:uuid', (req, res) => {
     }).catch((err)=>{console.log(err);res.json({error: 'Error retrieving members'})});
 });
 
-//TODO: testing
+
 router.get('/getSolves/:uuid', (req, res) => {
     let data: {name: string, category: {name: string, description: string}, value: number, date: number}[] = [];
     let uuid: string = req.params.uuid;
+
     DB.repo(Solve).find({where: {team: uuid}, relations: ['challenge', 'challenge.tag']}).then((solves: Solve[]) => 
         {
             solves.forEach((solve: Solve) => {
