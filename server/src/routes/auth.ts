@@ -2,38 +2,44 @@ import express from 'express';
 import passport from 'passport';
 import Roles from '@shared/roles';
 import DB, { Account, Category } from '../database';
-import { getAccount, generatePassword } from '../auth/passport';
+import { validForm, Form } from '@shared/validation/registerForm'; 
+import { getAccount } from '../auth';
 const router = express.Router();
 
 router.post('/login', (req, res, next) => {
+    const error = (err?: string) => res.json({ error: err || 'Could not login user' });
     req.body = req.fields;
     passport.authenticate('local', (err, user) => {
-        if (err) return res.json({ error: err });
-        if (!user) return res.json({ error: 'Error authenticating user' });
+        if (err) return error(err);
+        if (!user) return error();
         req.login(user, err => {
-            if (err) return res.json({ error: err });
-            return res.json({ message: 'Logged in successfully!' });
+            if (err) return error();
+            res.json({});
         });
     })(req, res, next);
 });
 
-router.post('/register', (req, res, next) => {
-    req.body = req.fields;
-    console.log(req.body);
-    const accountRepo = DB.repo(Account);
-    accountRepo.findOne({ name: req.body.username }).then((acc: Account) => {
-        if (acc) return res.json({ error: "Username already in use" });
-        DB.repo(Category).findOne({ name: req.body.category }).then((category: Category) => {
-            const newAccount = new Account(req.body.username, req.body.password, category);
-            accountRepo.save(newAccount).then((account: Account) => {
-                req.login(account, err => { if (err) return res.json({ error: err }); });
-                return res.json({});
-            }).catch((err) => { return res.json({ error: err }) });
-        }).catch((err) => { return res.json({ error: err }) });
-    }).catch((err) => { return res.json({ error: err }); });
+router.post('/register', (req, res) => {
+    let data = req.fields as Form;
+    const error = (err?: any) => res.json({ error: err || 'Could not register user' });
+    if (!validForm(data)) return error();
+    Promise.all([
+        DB.repo(Account).findOne({ name: data.username }),
+        DB.repo(Category).findOne({ name: data.category })
+    ]).then(([account, category]) => {
+        if (!category) return error({ category: 'Category does not exist' });
+        if (account) return error({ username: 'Username already exists' });
+        DB.repo(Account).save(new Account(data.username, data.password, category)).then(account => {
+            if (!account) error();
+            req.login(account, err => {
+                if (err) return error('Could not login user');
+                res.json({});
+            });
+        }).catch(() => error());
+    }).catch(() => error());
 });
 
-router.get('/logout', (req, res, next) => {
+router.get('/logout', (req, res) => {
     req.logout();
     res.json({});
 })

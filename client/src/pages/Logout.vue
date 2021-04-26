@@ -12,8 +12,8 @@ export default Vue.extend({
     name: 'Logout',
     created() {
         axios.get("/api/auth/logout").then(() => {
-            location.replace('/#/login'); // TODO: use history mode, remove hash
             location.reload();
+            location.replace('/login');
         });
     }
 });

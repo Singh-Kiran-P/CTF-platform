@@ -1,15 +1,21 @@
-import { Entity, Column, PrimaryColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class Page {
-    @PrimaryColumn()
+    @PrimaryGeneratedColumn()
+    id: number;
+
+    @Column()
     path: string;
 
     @Column()
     name: string;
 
     @Column()
-    source: string
+    source: string;
+    
+    @Column()
+    order: number;
 
     @Column()
     authentication: number; // TODO: enum? remove this?
@@ -17,10 +23,11 @@ export class Page {
     @Column()
     visibility: boolean; // TODO: remove this?
 
-    constructor(name: string, path: string, source: string) {
+    constructor(name: string, path: string, source: string, order: number) {
         this.name = name;
         this.path = path;
         this.source = source;
+        this.order = order;
         this.authentication = 0;
         this.visibility = true;
     }

@@ -1,0 +1,170 @@
+/**
+ * used in subject.php.php to style the subject page
+ */
+
+#subjectPage {
+    width: min(750px, calc(100% - var(--screenPadding)));
+}
+
+#subjectPage form, #subjectPage .deleteSubject, #subjectPage .viewSubject {
+    width: min(500px, max(100%, var(--minimumWidth)));
+}
+
+#subjectPage .subheader {
+    margin-top: calc(var(--margin) * 2);
+}
+
+#subjectPage form input[type=date], #subjectPage form input[type=time], #subjectPage form button, #subjectPage .deleteSubject button {
+    width: calc(50% - calc(var(--margin) / 2));
+}
+
+@media (max-width: 400px) {
+    #subjectPage form input[type=date] {
+        width: 100%;
+    }
+}
+
+#subjectPage form textarea {
+    margin-bottom: calc(var(--margin) / 2);
+}
+
+#subjectPage form textarea ~ label {
+    font-weight: initial;
+}
+
+#subjectPage form textarea ~ label input[type=file] {
+    width: initial;
+    margin-top: calc(var(--margin) / 2);
+}
+
+@media (hover: hover) {
+    #clearAttachmentsCheckbox:hover ~ label[for=clearAttachmentsCheckbox].checkbox {
+        filter: brightness(85%);
+    }
+}
+
+#clearAttachmentsCheckbox:checked ~ label[for=clearAttachmentsCheckbox].checkbox {
+    border: none;
+    background-color: var(--orange);
+}
+
+#subjectPage label[for=clearAttachmentsCheckbox]:not(.checkbox) {
+    vertical-align: calc((var(--mediumFontSize) - var(--smallFontSize)) / 2);
+}
+
+#subjectPage form span.centerText {
+    font-size: var(--mediumFontSize);
+    font-weight: initial;
+}
+
+#subjectPage .viewSubject > span.name {
+    max-width: 100%;
+    margin-bottom: var(--margin);
+    font-size: var(--largeFontSize);
+    display: inline-block;
+    font-weight: bold;
+    line-height: 1;
+}
+
+#subjectPage .viewSubject > span.description {
+    display: block;
+    white-space: pre-wrap;
+}
+
+#subjectPage .viewSubject > a > .organizer span {
+    display: inline-block;
+    line-height: var(--largeFontSize);
+    font-size: var(--mediumFontSize);
+    font-weight: bold;
+}
+
+#subjectPage .viewSubject > a > .organizer img {
+    height: var(--largeFontSize);
+    margin-left: var(--margin);
+}
+
+@media (hover: hover) {
+    #subjectPage .viewSubject > a:hover > .organizer span, #subjectPage .viewSubject > a:focus-visible > .organizer span {
+        text-decoration: underline;
+    }
+
+    #subjectPage .viewSubject > a:hover > .organizer img, #subjectPage .viewSubject > a:focus-visible > .organizer img {
+        filter: brightness(85%);
+    }
+}
+
+#subjectPage .viewSubject > .information {
+    line-height: 0;
+    overflow: hidden;
+    display: inline-flex;
+    margin-top: var(--margin);
+}
+
+#subjectPage .viewSubject > .information span {
+    display: inline-block;
+    line-height: var(--largeFontSize);
+    font-size: var(--mediumFontSize);
+}
+
+#subjectPage .viewSubject > .information img {
+    height: var(--largeFontSize);
+    margin-right: var(--margin);
+}
+
+@media (max-width: 420px) {
+    #subjectPage .viewSubject > .information {
+        float: initial;
+    }
+}
+
+#subjectPage .attachments {
+    height: 150px;
+    margin-top: var(--margin);
+}
+
+#subjectPage .reservations {
+    height: 260px;
+    margin-bottom: 0;
+}
+
+#subjectPage .reservations .day {
+    width: 200px;
+    padding: var(--margin);
+    overflow-y: initial;
+    white-space: initial;
+    display: inline-flex;
+    flex-direction: column;
+    background-color: white;
+}
+
+#subjectPage .reservations .day .date {
+    width: 100%;
+    display: block;
+    flex-shrink: 0;
+    font-weight: bold;
+    text-align: center;
+    border-bottom: 2px solid black;
+}
+
+#subjectPage .reservations input[type=checkbox] + label {
+    display: block;
+    margin-top: var(--margin);
+    padding: calc(var(--margin) / 2);
+    background-color: var(--lightgray);
+    border-radius: var(--borderRadius);
+}
+
+@media (hover: hover) {
+    #subjectPage .reservations input[type=checkbox] + label:hover {
+        filter: brightness(85%);
+    }
+}
+
+#subjectPage .reservations input[type=checkbox]:checked + label {
+    background-color: var(--orange);
+    color: white;
+}
+
+#subjectPage .viewSubject form button {
+    width: 100%
+}

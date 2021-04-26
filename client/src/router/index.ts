@@ -24,6 +24,17 @@ const pages: { [page: string]: Route } = {
         src: 'Logout.vue',
         meta: { right: true }
     },
+    team: {
+        path: '/team',
+        name: 'Team',
+        src: 'Team.vue',
+    },
+    joinTeam: {
+        path: '/team/join/:invite',
+        name: 'joinTeam',
+        src: 'joinTeam.vue',
+        meta: {hidden: true}
+    },
     leaderboard: {
         path: '/leaderboard',
         name: 'Leaderboard',
@@ -34,10 +45,10 @@ const pages: { [page: string]: Route } = {
         name: 'Teams',
         src: 'Teams.vue'
     },
-    adminPanel: {
-        path: '/adminPanel',
-        name: 'Admin Panel',
-        src: 'AdminPanel.vue',
+    config: {
+        path: '/config',
+        name: 'Config',
+        src: 'Config.vue',
         meta: { right: true }
     },
     dockerTesting: {
@@ -56,13 +67,14 @@ const routes: { [page: string]: Route[] } = {
     ],
     [Roles.PARTICIPANT]: [
         pages.leaderboard,
-        pages.teams,
-        pages.logout,
+        pages.team,
+        pages.joinTeam,
+        pages.logout
     ],
     [Roles.ORGANIZER]: [
         pages.leaderboard,
         pages.teams,
-        pages.adminPanel,
+        pages.config,
         pages.dockerTesting,
         pages.logout
     ]
@@ -81,21 +93,24 @@ Promise.all([
 
     // PageNotFound shown when no page matches the url
     availableRoutes.push({
-        path: '/:catchAll(.*)*',
+        path: '/*',
         name: 'Error 404',
         src: 'PageNotFound.vue',
         meta: { hidden: true }
     });
 
-    const router = new VueRouter({ // TODO: use history mode
-        routes: availableRoutes.map(route => ({ // always add all uploaded pages to the front of the routes list
-            path: route.path,
-            name: route.name,
-            meta: route.meta,
-            component: route.src.endsWith('vue') ? () => import(`../pages/${route.src}`) : { template: `<iframe src="/pages${route.src}"/>` }
-            // include vue pages directly into the html using a lazy loaded import, with the root directory for src in '/src/pages/'
-            // include html pages using an iframe so they dont inherit any styling, with the root directory for src in '/public/pages/'
-        }))
+    const router = new VueRouter({
+        mode: 'history',
+        routes: [{ path: '/',  meta: { hidden: true }, component: { template: '<router-view/>' },
+            children: availableRoutes.map(route => ({
+                path: route.path.slice(1),
+                name: route.name,
+                meta: route.meta,
+                component: route.src.endsWith('vue') ? () => import(`../pages/${route.src}`) : { template: `<iframe src="${route.src}"/>` }
+                // include vue pages directly into the html using a lazy loaded import, with the root directory for src in '/src/pages/'
+                // include html pages using an iframe so they dont inherit any styling, with the root directory for src in '/public/pages/'
+            }))
+        }]
     });
 
     // update the document title to the page name on route

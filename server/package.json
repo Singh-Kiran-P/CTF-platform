@@ -16,27 +16,6 @@
             "node_modules"
         ]
     },
-    "devDependencies": {
-        "@types/dockerode": "^3.2.3",
-        "@types/dotenv": "^8.2.0",
-        "@types/express": "^4.17.11",
-        "@types/express-formidable": "^1.0.4",
-        "@types/express-session": "^1.17.3",
-        "@types/fs-extra": "^9.0.9",
-        "@types/node": "^14.14.37",
-        "@types/passport": "^1.0.6",
-        "@types/passport-local": "^1.0.33",
-        "@types/pump": "^1.1.1",
-        "@types/shelljs": "^0.8.8",
-        "fs-extra": "^9.1.0",
-        "nodemon": "^2.0.7",
-        "npm-run-all": "^4.1.5",
-        "rimraf": "^2.7.1",
-        "shelljs": "^0.8.4",
-        "ts-node": "^9.1.1",
-        "tsconfig-paths": "^3.9.0",
-        "typescript": "^4.2.3"
-    },
     "dependencies": {
         "@supercharge/request-ip": "^1.1.2",
         "adm-zip": "^0.5.5",
@@ -67,4 +46,47 @@
         "typeorm": "^0.2.32",
         "typeorm-store": "^1.2.0"
     }
+    "dependencies": {
+        "bunyan": "^1.8.15",
+        "concurrently": "^6.0.0",
+        "crypto": "^1.0.1",
+        "dotenv": "^8.2.0",
+        "ejs": "^3.1.6",
+        "express": "^4.17.1",
+        "express-formidable": "^1.2.0",
+        "express-session": "^1.17.1",
+        "extract-zip": "^2.0.1",
+        "livereload": "^0.9.3",
+        "morgan": "^1.10.0",
+        "passport": "^0.4.1",
+        "passport-local": "^1.0.0",
+        "pg": "^8.5.1",
+        "reflect-metadata": "^0.1.13",
+        "socket.io": "^4.0.1",
+        "tslib": "^2.2.0",
+        "typeorm": "^0.2.32",
+        "typeorm-store": "^1.2.0"
+    },
+    "devDependencies": {
+        "@types/dockerode": "^3.2.3",
+        "@types/dotenv": "^8.2.0",
+        "@types/express": "^4.17.11",
+        "@types/express-formidable": "^1.0.4",
+        "@types/express-session": "^1.17.3",
+        "@types/fs-extra": "^9.0.9",
+        "@types/node": "^14.14.37",
+        "@types/passport": "^1.0.6",
+        "@types/passport-local": "^1.0.33",
+        "@types/pump": "^1.1.1",
+        "@types/shelljs": "^0.8.8",
+        "fs-extra": "^9.1.0",
+        "nodemon": "^2.0.7",
+        "npm-run-all": "^4.1.5",
+        "rimraf": "^2.7.1",
+        "shelljs": "^0.8.4",
+        "ts-node": "^9.1.1",
+        "tsconfig-paths": "^3.9.0",
+        "typescript": "^4.2.3"
+    },
+   
 }

@@ -28,9 +28,9 @@ const regexPassword = (input: string): string => {
     return '';
 }
 
-const regexUsername = (input: string): string => {
+const regexName = (input: string, name: string): string => {
     if (!/^[a-zA-Z0-9_.]*$/.test(input)) {
-        return 'Username can only contain alphanumerical characters or \'_.\'';
+        return `${name} can only contain alphanumerical characters or \'_.\'`;
     }
     if (/(_\.)/.test(input)) {
         return '\'_\' can\'t be followed by \'.\'';
@@ -47,4 +47,4 @@ const regexUsername = (input: string): string => {
     return '';
 }
 
-export { state, validInput, validateString, regexPassword, regexUsername };
+export { state, validInput, validateString, regexPassword, regexName };

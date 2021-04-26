@@ -1,17 +1,26 @@
-import { Entity, Column, PrimaryColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class Sponsor {
-    @PrimaryColumn()
+    @PrimaryGeneratedColumn()
+    id: number;
+
+    @Column()
+    link: string;
+
+    @Column()
     name: string;
 
     @Column()
     icon: string;
 
     @Column()
-    link: string;
+    order: number;
 
-    constructor() {
-        // TODO
+    constructor(name: string, link: string, icon: string, order: number) {
+        this.name = name;
+        this.link = link;
+        this.icon = icon;
+        this.order = order;
     }
 }
