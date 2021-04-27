@@ -13,7 +13,8 @@
         "exec": "ts-node -r tsconfig-paths/register",
         "ignore": [
             ".git",
-            "node_modules"
+            "node_modules/*",
+            "public/*"
         ]
     },
     "dependencies": {
@@ -32,6 +33,7 @@
         "express-ip": "^1.0.4",
         "express-public-ip": "^1.0.1",
         "express-session": "^1.17.1",
+        "extract-zip": "^2.0.1",
         "ip": "^1.1.5",
         "livereload": "^0.9.3",
         "morgan": "^1.10.0",
@@ -44,8 +46,7 @@
         "socket.io": "^4.0.1",
         "tslib": "^2.2.0",
         "typeorm": "^0.2.32",
-        "typeorm-store": "^1.2.0",
-        "extract-zip": "^2.0.1"
+        "typeorm-store": "^1.2.0"
     },
     "devDependencies": {
         "@types/dockerode": "^3.2.3",

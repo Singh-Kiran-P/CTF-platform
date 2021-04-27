@@ -55,6 +55,7 @@ services:
     volumes:
       - ./server:/ctf/server
       - ./shared:/ctf/shared
+      - ./shared:/ctf/client
       # For accessing docker works ONLY in Linux
       - /var/run/docker.sock:/var/run/docker.sock
     working_dir: /ctf/server

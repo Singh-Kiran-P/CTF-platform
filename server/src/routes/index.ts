@@ -1,12 +1,10 @@
 import auth from './auth';
 import team from './team';
 import account from './account';
-import express = require("express"); //comment
-const router = express.Router(); //comment
 import competition from './competition';
 import docker from './docker';
 import util from './util';
-
+import pages from './pages';
 
 export default [
     competition,
@@ -15,4 +13,6 @@ export default [
     auth,
     util,
     team,
+    pages,
+
 ];

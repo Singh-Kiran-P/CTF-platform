@@ -21,8 +21,7 @@ const upload = (root: string, ...paths: (UFile | File)[]) => {
         if (!files) return resolve();
         fs.mkdir(root, { recursive: true }, err => {
             if (err) return reject(err);
-            let c = files.length;
-            files.forEach(file => fs.rename(file.path, `${root}/${file.name}`, count(v => c = set(c, v), resolve, reject)));
+            Promise.all(files.map(file => fse.move(file.path, `${root}/${file.name}`))).then(() => resolve()).catch(err => reject(err));
         });
     });
 }

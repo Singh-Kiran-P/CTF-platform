@@ -1,4 +1,4 @@
-FROM mrsingh00/node-docker
+FROM mrsingh00/node16-docker
 
 WORKDIR /home/node/app
 

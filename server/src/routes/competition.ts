@@ -60,7 +60,7 @@ router.put('/save', isAdmin, (req, res) => {
         });
     }
 
-    const uploaddir = '/client/public/'; // TODO: store in server
+    const uploaddir = '/server/public/'; // TODO: store in server
 
     uploadFiles(data.pages, uploaddir,
         page => Boolean(page.html),
@@ -78,14 +78,17 @@ router.put('/save', isAdmin, (req, res) => {
         (sponsor, dir) => upload(dir, sponsor.img),
         (p, dir) => p.icon = `${dir}/${p.img?.name || fileName(p.icon)}`);
 
-    const error = (action: string): any => res.json({ error: `Error ${action}`});
+    const error = (action: string): any => {
+        res.json({ error: `Error ${action}`})
+        console.log(action);
+    }
     Promise.all([chain(() => Promise.all(moves), () => Promise.all(secondaryUploads.map(upload => upload()))), ...initialUploads]).then(() => Promise.all([
         DB.crepo(CompetitionRepo).setName(data.name),
         DB.setRepo(DB.repo(Category), data.categories.map(x => new Category(x.name, x.order)), x => [x.name]),
         DB.setRepo(DB.repo(Tag), data.tags.map(x => new Tag(x.name, x.description, x.order)), x => [x.name]),
         DB.setRepo(DB.repo(Page), data.pages.map(x => new Page(x.name, x.path, x.source, x.order)), x => [x.path], x => [parentDir(uploaddir + x.source)]),
         DB.setRepo(DB.repo(Sponsor), data.sponsors.map(x => new Sponsor(x.name, x.link, x.icon, x.order)), x => [x.name], x => [parentDir(uploaddir + x.icon)])
-    ]).then(() => res.json({})).catch(() => error('saving'))).catch(() => error('uploading'));
+    ]).then(() => res.json({})).catch((err) => error(err))).catch((err) => error(err));
 });
 
 export default { path: '/competition', router };
