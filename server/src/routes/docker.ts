@@ -6,7 +6,7 @@
 import express, { json } from "express";
 import Docker from "dockerode";
 import DockerController from "../controllers/docker";
-import { isAdmin, isAuth } from "../auth/passport";
+import { isAdmin, isAuth } from "../auth";
 import DB, { DockerManagement, DockerManagementRepo, DockerOpenPort } from '../database';
 
 const docker = new Docker({ socketPath: "/var/run/docker.sock" });

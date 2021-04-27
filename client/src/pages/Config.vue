@@ -139,7 +139,7 @@ import Collapse from '@/components/Collapse.vue';
 import IconButton from '@/components/IconButton.vue';
 import StatusButton from '@/components/StatusButton.vue';
 import { state, validInput, validForm, validate, Category, Tag, Page, Sponsor, Form } from '@shared/validation/competitionForm';
-import { serialize } from '@shared/objectFormdata';
+import { serialize } from '@shared/objectFormData';
 import path from 'path';
 
 type Edit = { editable?: boolean };
@@ -346,23 +346,23 @@ span.info {
         flex-grow: 1;
         width: 0;
     }
-    
+
     .item-name {
         display: block;
         font-weight: bold;
     }
-    
+
     .item-description {
         display: flex;
         flex-wrap: wrap;
     }
-    
+
     .item-category {
         width: 5rem;
         color: var(--gray);
         display: inline-block;
     }
-    
+
     .item-category ~ * {
         width: 0;
         flex-grow: 1;
@@ -371,11 +371,11 @@ span.info {
     .item-category ~ span:not(.item-value), .item-category ~ .invalid-feedback {
         width: 100%;
     }
-    
+
     .item-description.marginTop {
         margin-top: var(--margin);
     }
-    
+
     textarea {
         margin-top: var(--margin);
     }
@@ -397,7 +397,7 @@ span.info {
         width: 100%;
         margin-top: var(--margin);
     }
-    
+
     input:first-of-type {
         width: 0;
         flex-grow: 1;

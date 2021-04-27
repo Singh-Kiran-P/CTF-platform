@@ -1,7 +1,7 @@
 import DB, { Category, CompetitionRepo, Page, Sponsor, Tag } from '../database';
 import { parentDir, fileName, upload, move, remove, unzip, chain } from '../files';
 import { validForm, Form } from '@shared/validation/competitionForm';
-import { deserialize } from '@shared/objectFormdata';
+import { deserialize } from '@shared/objectFormData';
 import { FindManyOptions } from 'typeorm';
 import { isAdmin } from '../auth';
 import express from 'express';
