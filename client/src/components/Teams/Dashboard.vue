@@ -35,8 +35,7 @@
                 </template>
                 <template #table-busy>
                     <div class="text-center text-primary my-2">
-                        <b-spinner class="align-middle"></b-spinner>
-                        <strong>Loading...</strong>
+                        <b-spinner variant="primary" label="Spinning"></b-spinner>
                     </div>
                 </template>
             </b-table>
@@ -52,24 +51,27 @@
                 </template>
                 <template #table-busy>
                     <div class="text-center text-primary my-2">
-                        <b-spinner class="align-middle"></b-spinner>
-                        <strong>Loading...</strong>
+                          <b-spinner variant="primary" label="Spinning"></b-spinner>
                     </div>
                 </template>
             </b-table>
         </div>
 
-        <b-modal id="invite-modal" centered v-model="modal_invite.open" ok-only>
+        <b-modal id="invite-modal" centered v-model="modal_invite.open">
             <template #modal-title>
                 Invite link
             </template>
             <div class=invite-modal-content>
-                <span>{{generateInviteLink()}}</span>
+                <span>{{this.inviteLink}}</span>
                 <b-button class="clipboard-btn" size=sm variant="primary" @click="copyInvite($event)" >
                         <b-icon-clipboard-check v-if="modal_invite.copied"></b-icon-clipboard-check>
                         <b-icon-clipboard v-else></b-icon-clipboard>
                 </b-button>
             </div>
+            <template #modal-footer id=invite-modal-footer>
+                <StatusButton class=float-right variant=info :state="modal_invite.renewState" normal="Generate new link" loading="Generating" succes="Succes" @click="generateNewLink($event)"/>
+                <!--<b-button class=float-right variant=primary @click="modal_invite.open=false"> Close </b-button>-->
+            </template>
         </b-modal>
         <b-modal id="delete-modal" centered v-model="modal_delete.open">
             <template #modal-title>
@@ -79,8 +81,7 @@
                 <span>Are you sure you want to delete your team?</span>
             </div>
             <template #modal-footer>
-                <b-button class="float-right" @click="modal_delete.open=false"> Cancel </b-button>
-                <!--<b-button class="float-right" variant="danger" @click="deleteTeam($event)"> Confirm </b-button>-->
+                <!--<b-button class="float-right" @click="modal_delete.open=false"> Cancel </b-button>-->
                 <StatusButton class="float-right" variant=danger :state="modal_delete.deletingState" normal="Confirm" loading="Deleting" succes="Deleted" @click="deleteTeam($event)"/>
             </template>
         </b-modal>
@@ -104,8 +105,8 @@ export default Vue.extend({
             placement: 0,
             points: 0,
             uuid: '',
-            inviteCode: ''            
         },
+        inviteLink: '',         
         isCaptainOrAdmin: false,
         removingMember: false,
         members_isLoading: true,
@@ -126,13 +127,19 @@ export default Vue.extend({
         solves: [] as { name: string, category: {name: string, description: string}, value: number, date: string} [],
         modal_invite: {
             open: false,
-            copied: false
+            copied: false,
+            renewState: 'normal'
         },
         modal_delete: {
             open: false,
             deletingState: 'normal'
         }
     }),
+    watch: {
+        team: { deep: true, handler() {
+            return;
+        }}
+    },
     computed: {
     },
     methods: {
@@ -165,6 +172,7 @@ export default Vue.extend({
         createdHandleResponse(response: AxiosResponse) {
             if(response.data.error) return alert(response.data.error);
             this.team = response.data.info;
+            this.inviteLink = this.generateInviteLink(response.data.info.inviteCode);
             this.isCaptainOrAdmin = response.data.isCaptainOrAdmin;
             if(this.isCaptainOrAdmin) this.members_fields.push({ key: 'remove', sortable: false, tdClass: 'text-center' }); //add remove field if captain or admin
             this.getMembers();
@@ -174,16 +182,24 @@ export default Vue.extend({
             e.preventDefault();
             this.modal_invite.copied = false;
             this.modal_invite.open = true;
+            this.modal_invite.renewState = 'normal'
         },
         copyInvite(e:Event) {
             e.preventDefault();
-            this.copyTextToClipboard(this.generateInviteLink());
+            this.copyTextToClipboard(this.inviteLink);
             this.modal_invite.copied = true;
         },
-        generateInviteLink(): string {
-            console.log()
-            if(this.team.inviteCode != '') return window.location.origin + '/team/join/' + this.team.inviteCode;
-            return '';
+        generateInviteLink(inviteCode: string): string {
+            return window.location.origin + '/team/join/' + inviteCode;
+        },
+        generateNewLink(e:Event) {
+            e.preventDefault();
+            this.modal_invite.renewState = 'loading'
+            axios.post('/api/team/newInviteLink/'+this.team.uuid).then((response)=>{
+                if(response.data.error) return this.modal_invite.renewState = 'error';
+                this.inviteLink = this.generateInviteLink(response.data.inviteCode);
+                this.modal_invite.renewState = 'succes';
+            }).catch((err)=>{this.modal_invite.renewState = 'error'});
         },
         deleteTeam(e:Event) {
             e.preventDefault();

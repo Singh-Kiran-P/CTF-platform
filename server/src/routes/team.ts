@@ -1,7 +1,7 @@
 import express from 'express';
 const router = express.Router();
 import DB, { Team, Account, Solve, UsedHint } from '../database';
-import { isAuth, hasTeam, getAccount } from '../auth/index';
+import { isAuth, hasTeam, getAccount, generatePassword } from '../auth/index';
 
 const respond = <T>(promise: Promise<T>, res: express.Response, result: (data: T) => any = data => data) => {
     promise.then(data => res.send(result(data))).catch(err => res.json({ error: 'Error fetching data: ' + err }));
@@ -30,6 +30,18 @@ router.post('/delete/:uuid', isAuth, (req, res)=>{
         if(!team) return res.json({error: 'Team not found'});
         if(!(team.captain.id == acc.id || acc.admin)) return res.json({error: 'You are not authorized to delete the team'});
         teamRepo.delete(uuid).then(()=>{return res.json({})}).catch((err)=>{res.json({error: 'Error removing team'})});
+    }).catch((err)=>{res.json({error: 'Db error: '+err})});
+});
+
+router.post('/newInviteLink/:uuid', isAuth, (req, res)=>{
+    let uuid: string = req.params.uuid;
+    let acc: Account = getAccount(req);
+    const teamRepo = DB.repo(Team);
+    teamRepo.findOne({where: {id: uuid}, relations: ['captain']}).then((team: Team)=>{
+        if(!team) return res.json({error: 'Team not found'});
+        if(!(team.captain.id == acc.id || acc.admin)) return res.json({error: 'You are not authorized to delete the team'});
+        let code = generatePassword(team.id).hash;
+        teamRepo.update(team.id, {inviteCode: code}).then(()=>{return res.json({inviteCode: code})}).catch((err)=>{res.json({error: 'Error generating new link'})});
     }).catch((err)=>{res.json({error: 'Db error: '+err})});
 });
 
