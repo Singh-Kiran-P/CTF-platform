@@ -109,6 +109,7 @@ router.post('/removeMember/:uuid/:memberName', isAuth, (req, res)=> {
     let uuid: string = req.params.uuid;
     let memberName: string = req.params.memberName;
     let reqAcc: Account = getAccount(req);
+
     DB.repo(Team).findOne({where: {id: uuid}, relations: ['captain', 'accounts']}).then((team: Team)=> {
         if(!(team.captain.id == reqAcc.id || reqAcc.admin)) return res.json({error: 'You are not authorized to remove a member'});
         if(!(team.accounts.some(member=>member.name == memberName))) return res.json({error: 'User to remove is not part of the team'});

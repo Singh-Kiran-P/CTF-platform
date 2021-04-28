@@ -31,9 +31,7 @@
                     <b-icon-star id=captainIcon v-if="row.item.captain"></b-icon-star>
                 </template>
                 <template v-if="isCaptainOrAdmin" v-slot:cell(remove)="row">
-                    <b-button v-if="!row.item.captain" :disabled="removingMember" size=sm variant="danger" @click="removeMember(row.item.name, $event)">
-                        <b-icon-trash></b-icon-trash>
-                    </b-button>
+                    <StatusButton v-if="!row.item.captain" :disabled="removingMember" size=sm variant=danger :state="row.item.removingState" normal="Remove" loading="Removing" succes="Removed" @click="removeMember(row.item, $event)"/>
                 </template>
                 <template #table-busy>
                     <div class="text-center text-primary my-2">
@@ -116,7 +114,7 @@ export default Vue.extend({
             {key: 'name', sortable:true},
             {key: 'points', sortable: true}
         ] as {key: string, sortable?: boolean, tdClass?: string}[],
-        members: [] as { name: string, points: number, captain: boolean }[],
+        members: [] as { name: string, points: number, captain: boolean, removingState: 'normal' }[],
         solves_isLoading: true,
         solvesLoadingError: '',
         solves_fields: [
@@ -154,14 +152,15 @@ export default Vue.extend({
                     this.solves_isLoading = false;
                 }).catch((err)=>{this.solvesLoadingError = err; this.solves_isLoading = false; return;});
         },
-        removeMember(name:string, event: Event) {
+        removeMember(member: { name: string, points: number, captain: boolean, removingState: string }, event: Event) {
             event.preventDefault();
             this.removingMember = true;
-            axios.post(`/api/team/removeMember/${this.team.uuid}/${name}`).then((response)=>{
-                if(response.data.error) return alert(response.data.error);
+            member.removingState = 'loading';
+            axios.post(`/api/team/removeMember/${this.team.uuid}/${member.name}`).then((response)=>{
+                if(response.data.error) {this.removingMember = false; member.removingState = 'error'; return;};
                 this.getMembers();
                 this.removingMember=false;
-            }).catch((err)=>{alert(err)});
+            }).catch((err)=>{this.removingMember = false; member.removingState = 'error'; return;});
         },
         createdHandleResponse(response: AxiosResponse) {
             if(response.data.error) return alert(response.data.error);

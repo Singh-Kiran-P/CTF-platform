@@ -1,5 +1,5 @@
 <template>
-    <b-button :type="type" :block="block" :variant="variant" :disabled="disabled || isLoading || isSucces" @click="$emit('click', $event)">
+    <b-button :size="size" :type="type" :block="block" :variant="variant" :disabled="disabled || isLoading || isSucces" @click="$emit('click', $event)">
         <b-spinner v-if="isLoading" small label=loading... />
         <font-awesome-icon v-if="isSucces" icon=check />
         <font-awesome-icon v-if="isError" icon=times />
@@ -20,7 +20,8 @@ export default Vue.extend({
         state: String,
         normal: String,
         loading: String,
-        succes: String
+        succes: String,
+        size: String
     },
     computed: {
         isLoading(): boolean { return this.state == 'loading'; },
