@@ -1,6 +1,6 @@
-FROM mrsingh00/node16-docker
+FROM mrsingh00/node14-docker
 
-WORKDIR /home/node/app
+WORKDIR /ctf/server
 
 # COPY package*.json ./
 

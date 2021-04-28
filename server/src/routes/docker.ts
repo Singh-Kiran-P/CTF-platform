@@ -13,20 +13,24 @@ const docker = new Docker({ socketPath: "/var/run/docker.sock" });
 const router = express.Router();
 
 
-router.get("/containers", isAuth, isAdmin, (req, res) => {
+router.get("/containers",isAuth, isAdmin, (req, res) => {
     docker.listContainers((err, containers) => {
+        console.log(err);
+        console.log(containers);
+
+
         res.json(containers);
     });
 });
 
-router.get("/containers", isAuth, isAdmin, (req, res) => {
-    let id = (req.query as any).Id;
-    var container = docker.getContainer(id);
-    container.inspect(function (err, data) {
-        if (err == null) res.json(data);
-        else res.json(err);
-    });
-});
+// router.get("/containers", isAuth, isAdmin, (req, res) => {
+//     let id = (req.query as any).Id;
+//     var container = docker.getContainer(id);
+//     container.inspect(function (err, data) {
+//         if (err == null) res.json(data);
+//         else res.json(err);
+//     });
+// });
 
 router.get("/images", isAuth, isAdmin, (req, res) => {
     docker.listImages((err, images) => {
