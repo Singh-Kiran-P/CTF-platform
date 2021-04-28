@@ -1,7 +1,7 @@
 import express from 'express';
 const router = express.Router();
 import DB, { Team, Account, Solve, UsedHint } from '../database';
-import { isAuth, hasTeam, getAccount } from '../auth/index';
+import { isAuth, hasTeam, getAccount, generatePassword } from '../auth/index';
 
 const respond = <T>(promise: Promise<T>, res: express.Response, result: (data: T) => any = data => data) => {
     promise.then(data => res.send(result(data))).catch(err => res.json({ error: 'Error fetching data: ' + err }));
@@ -30,6 +30,18 @@ router.post('/delete/:uuid', isAuth, (req, res)=>{
         if(!team) return res.json({error: 'Team not found'});
         if(!(team.captain.id == acc.id || acc.admin)) return res.json({error: 'You are not authorized to delete the team'});
         teamRepo.delete(uuid).then(()=>{return res.json({})}).catch((err)=>{res.json({error: 'Error removing team'})});
+    }).catch((err)=>{res.json({error: 'Db error: '+err})});
+});
+
+router.post('/newInviteLink/:uuid', isAuth, (req, res)=>{
+    let uuid: string = req.params.uuid;
+    let acc: Account = getAccount(req);
+    const teamRepo = DB.repo(Team);
+    teamRepo.findOne({where: {id: uuid}, relations: ['captain']}).then((team: Team)=>{
+        if(!team) return res.json({error: 'Team not found'});
+        if(!(team.captain.id == acc.id || acc.admin)) return res.json({error: 'You are not authorized to delete the team'});
+        let code = generatePassword(team.id).hash;
+        teamRepo.update(team.id, {inviteCode: code}).then(()=>{return res.json({inviteCode: code})}).catch((err)=>{res.json({error: 'Error generating new link'})});
     }).catch((err)=>{res.json({error: 'Db error: '+err})});
 });
 
@@ -91,10 +103,11 @@ router.get('/getMembers/:uuid', (req, res) => {
     }).catch((err)=>{console.log(err);res.json({error: 'Error retrieving members'})});
 });
 
-//TODO: testing
+
 router.get('/getSolves/:uuid', (req, res) => {
     let data: {name: string, category: {name: string, description: string}, value: number, date: number}[] = [];
     let uuid: string = req.params.uuid;
+
     DB.repo(Solve).find({where: {team: uuid}, relations: ['challenge', 'challenge.tag']}).then((solves: Solve[]) => 
         {
             solves.forEach((solve: Solve) => {
@@ -108,6 +121,7 @@ router.post('/removeMember/:uuid/:memberName', isAuth, (req, res)=> {
     let uuid: string = req.params.uuid;
     let memberName: string = req.params.memberName;
     let reqAcc: Account = getAccount(req);
+
     DB.repo(Team).findOne({where: {id: uuid}, relations: ['captain', 'accounts']}).then((team: Team)=> {
         if(!(team.captain.id == reqAcc.id || reqAcc.admin)) return res.json({error: 'You are not authorized to remove a member'});
         if(!(team.accounts.some(member=>member.name == memberName))) return res.json({error: 'User to remove is not part of the team'});
