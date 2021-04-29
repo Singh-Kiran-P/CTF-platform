@@ -5,7 +5,7 @@ import { rejects } from 'node:assert';
 import { resolve } from 'node:path';
 var build = require('dockerode-build')
 var docker = new Docker({ socketPath: '/var/run/docker.sock' });
-import DB, { DockerChallengeImage, DockerManagementRepo, DockerOpenPort } from '../database';
+import DB, { DockerChallengeContainer, DockerChallengeImage, DockerManagementRepo, DockerOpenPort } from '../database';
 
 function getAllRunningContainers() {
     let data: any = [];
@@ -44,11 +44,16 @@ async function createChallengeContainer(jsonObj: any) {
                     PortBindings: configData.portBindings
                 }
             },
-            (err, container) => {
+            async (err, container) => {
                 if (err) {
                     reject(err);
                 } else {
-                    container.start((err, data) => {
+                    const challenge = DB.repo(DockerChallengeContainer);
+                    let ports: string[];
+
+                    let d = new DockerChallengeContainer(jsonObj.containerName, configData.openPorts, jsonObj.challengeImage);
+                    await challenge.save(d);
+                    container.start(async (err, data) => {
                         if (err)
                             reject(err);
                         else {
@@ -109,6 +114,12 @@ function _giveRandomPort() {
     });
 }
 
+async function getImage(name: string) {
+    const challenge = DB.repo(DockerChallengeImage);
+    let i = await challenge.findOne({ name: name });
+    return i;
+}
+
 function randomIntFromInterval(min: number, max: number) { // min and max included
     return Math.floor(Math.random() * (max - min + 1) + min);
 }
@@ -116,7 +127,8 @@ function randomIntFromInterval(min: number, max: number) { // min and max includ
 export default {
     getAllRunningContainers,
     createChallengeImage,
-    createChallengeContainer
+    createChallengeContainer,
+    getImage
 }
 
 

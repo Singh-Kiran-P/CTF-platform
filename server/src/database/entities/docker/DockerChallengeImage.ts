@@ -4,20 +4,17 @@ import { DockerChallengeContainer } from "./DockerChallengeContainer";
 
 @Entity()
 export class DockerChallengeImage {
-    @PrimaryColumn({ unique: true })
-    id: number
+    @PrimaryColumn()
+    name: string
 
-    @Column({ unique: true })
-    name: number
-
-    @Column("int", { array: true })
-    innerPorts: number[];
+    @Column("text", { array: true })
+    innerPorts: string[];
 
     @OneToOne(() => Challenge, Challenge => Challenge.challengeImage,{nullable : true})
     challenge: Challenge
 
-    @OneToMany(() => DockerChallengeContainer, DockerChallengeContainer => DockerChallengeContainer.image,{nullable : true})
-    container: DockerChallengeContainer[]
+    // @OneToMany(() => DockerChallengeContainer, DockerChallengeContainer => DockerChallengeContainer.image,{nullable : true})
+    // container: DockerChallengeContainer[]
 
     @Column()
     size: number
@@ -27,4 +24,10 @@ export class DockerChallengeImage {
 
     @UpdateDateColumn({ type: "timestamp" })
     updatedAt: number;
+
+    constructor(name:string , ports:string[],size:number) {
+        this.name = name;
+        this.innerPorts = ports;
+        this.size = size;
+    }
 }

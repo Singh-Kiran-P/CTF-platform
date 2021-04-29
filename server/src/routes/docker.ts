@@ -7,13 +7,29 @@ import express, { json } from "express";
 import Docker from "dockerode";
 import DockerController from "../controllers/docker";
 import { isAdmin, isAuth } from "../auth";
-import DB, { DockerManagement, DockerManagementRepo, DockerOpenPort } from '../database';
+import DB, { DockerChallengeContainer, DockerChallengeImage, DockerManagement, DockerManagementRepo, DockerOpenPort } from '../database';
 
 const docker = new Docker({ socketPath: "/var/run/docker.sock" });
 const router = express.Router();
 
+router.get("/dockerConfigPorts", isAdmin, isAuth, async (req, res) => {
+    const dockerManagementRepo = DB.crepo(DockerManagementRepo)
+    const data = (await dockerManagementRepo.instance());
+    res.json(data);
+})
+router.post("/dockerConfigPorts", isAdmin, isAuth, async (req, res) => {
+    let upperBoundPort = Number.parseInt(req.fields.upperBoundPort.toString());
+    let lowerBoundPort = Number.parseInt(req.fields.lowerBoundPort.toString());
 
-router.get("/containers",isAuth, isAdmin, (req, res) => {
+    const dockerManagementRepo = DB.crepo(DockerManagementRepo)
+    dockerManagementRepo.setLowerBoundPort(lowerBoundPort);
+    dockerManagementRepo.setUpperBoundPort(upperBoundPort)
+
+    res.json({ message: "Ports range updated to [ "+ lowerBoundPort+ " - "+ upperBoundPort+ " ]", statusCode: 200 });
+})
+
+
+router.get("/containers", isAuth, isAdmin, (req, res) => {
     docker.listContainers((err, containers) => {
         console.log(err);
         console.log(containers);
@@ -38,6 +54,7 @@ router.get("/images", isAuth, isAdmin, (req, res) => {
     });
 });
 
+//upload zip , unzip , get path to unzipped folder
 router.post("/createChallengeImage", isAuth, isAdmin, (req, res, next) => {
     let jsonObj = req.fields;
     DockerController.createChallengeImage(jsonObj)
@@ -54,19 +71,31 @@ router.post("/createChallengeImage", isAuth, isAdmin, (req, res, next) => {
  * - A team can access this to create a container for a challenge
  * @param req: [challengeImage]
  */
-router.post("/createChallengeContainer", (req, res, next) => {
-    // let jsonObj = {challengeImage: req.fields.challengeImage, ports: ["8080/tcp"], containerName: 'challenge_TEAM4' };
-    // console.log(req.fields);
+router.post("/createChallengeContainer", async (req, res, next) => {
+    let name: string = req.fields.challengeImage.toString();
+    console.log(name);
 
-    let jsonObj = { challengeImage: req.fields.challengeImage, ports: ["8080/tcp"], containerName: req.fields.containerName };
-    DockerController.createChallengeContainer(jsonObj)
-        .then((ports) => {
-            res.json({ ports: ports, message: `Challenge container created/started http://localhost:${ports}`, statusCode: 200 });
-        })
-        .catch((err) => {
-            console.log(err.json);
-            res.send({ message: err.message, statusCode: 404 });
-        });
+    let image = await DockerController.getImage(name)
+    console.log(image);
+
+    if (image != undefined) {
+
+        // get ports from image entity
+        let jsonObj = { challengeImage: name, ports: image.innerPorts, containerName: req.fields.containerName };
+        DockerController.createChallengeContainer(jsonObj)
+            .then((ports) => {
+                res.json({ ports: ports, message: `Challenge container created/started http://localhost:${ports}`, statusCode: 200 });
+            })
+            .catch((err) => {
+                console.log(err.json);
+                res.json({ message: err.message, statusCode: 404 });
+            });
+
+    }
+    else {
+        res.json({ message: "Image not found!", statusCode: 404 });
+    }
+
 });
 
 /**
@@ -114,6 +143,9 @@ router.post("/resetContainer", isAuth, (req, res) => {
     });
 });
 
+
+/********************** TESTING ROUTES ********************/
+
 // Gives the DockerManagement Entity
 router.get("/dockerConfig", async (req, res) => {
     const dockerManagementRepo = DB.crepo(DockerManagementRepo)
@@ -121,10 +153,40 @@ router.get("/dockerConfig", async (req, res) => {
 
     const dockerOpenPort = DB.repo(DockerOpenPort);
     (await dockerOpenPort.find().then(d => {
-        res.send(d);
+        res.send(a);
     }));
+});
 
+// Gives the DockerManagement Entity
+router.get("/dockerConfig_", async (req, res) => {
+    const dockerManagementRepo = DB.crepo(DockerManagementRepo)
+    await dockerManagementRepo.setUpperBoundPort(5);
+    const a = (await dockerManagementRepo.instance());
+});
 
+router.get("/dockerConfig_i", (req, res) => {
+    const challenge = DB.repo(DockerChallengeContainer);
+    challenge.createQueryBuilder("DockerChallengeContainer")
+        .leftJoinAndSelect("DockerChallengeContainer.image", "x")
+        .getMany().then(d => {
+            res.send(d);
+        })
+});
+
+router.get("/dockerConfig_createChallengeContainer", async (req, res) => {
+    const challenge = DB.repo(DockerChallengeImage);
+    let d = new DockerChallengeImage("hello", ["80/tcp"], 25);
+    await challenge.save(d);
+
+    let image = await DockerController.getImage("hesllo")
+
+    if (image != undefined) {
+        res.json({ statusCode: 200, data: d });
+
+    }
+    else {
+        res.json({ statusCode: 404, msg: "Image not found" });
+    }
 });
 
 export default { path: "/docker", router };

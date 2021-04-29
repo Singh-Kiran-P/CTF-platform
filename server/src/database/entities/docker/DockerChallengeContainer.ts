@@ -1,28 +1,33 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, OneToOne, PrimaryColumn, Unique, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryColumn, Unique, UpdateDateColumn } from "typeorm";
 import { Challenge } from "../challenges/Challenge";
 import { DockerChallengeImage } from "./DockerChallengeImage";
 
 @Entity()
 export class DockerChallengeContainer {
-    @PrimaryColumn({ unique: true })
-    id: string
-
-    @Column({ unique: true })
+    @PrimaryColumn()
     name: string
 
     @Column("int", { array: true })
     ports: number[];
 
-    @Column("float")
-    size: number
+    @Column({ name: 'imageId' })
+    imageId: string
 
-    @ManyToOne(_ => DockerChallengeImage, DockerChallengeImage => DockerChallengeImage.container)
-    image: DockerChallengeImage
+    @ManyToOne(() => DockerChallengeImage,{ nullable: false })
+    @JoinColumn({ name: "imageId" })
+    image: DockerChallengeImage;
 
     @CreateDateColumn()
     createdAt: string
 
     @UpdateDateColumn({ type: "timestamp" })
     updatedAt: number
+
+    constructor(name: string, ports: number[],  imageId: string) {
+        this.name = name;
+        this.ports = ports;
+        this.imageId = imageId;
+
+    }
 
 }

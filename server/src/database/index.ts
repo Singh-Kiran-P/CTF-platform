@@ -36,7 +36,7 @@ class Database extends EventEmitter {
             username: process.env.DB_USER,
             password: process.env.DB_PASSWORD,
             synchronize: true,
-            logging: false,
+            logging: true,
             entities: [
                 path.join(__dirname, '/entities/*/*.js')
             ]
