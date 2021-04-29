@@ -3,6 +3,7 @@ import { parentDir, fileName, upload, move, remove, unzip, chain } from '../file
 import { validForm, Form } from '@shared/validation/competitionForm';
 import { deserialize } from '@shared/objectFormData';
 import { FindManyOptions } from 'typeorm';
+import { uploaddir } from './uploads';
 import { isAdmin } from '../auth';
 import express from 'express';
 const router = express.Router();
@@ -60,11 +61,9 @@ router.put('/save', isAdmin, (req, res) => {
         });
     }
 
-    const uploaddir = '/server/public/'; // TODO: store in server
-
     uploadFiles(data.pages, uploaddir,
         page => Boolean(page.html),
-        page => `pages${page.path.length == 1 ? '' : page.path}/_page`,
+        page => `/pages${page.path.length == 1 ? '' : page.path}/_page`,
         page => parentDir(page.source),
         _ => '_temp',
         (page, dir) => chain(() => upload(dir, page.html, page.zip), page.zip ? () => unzip(`${dir}/${page.zip.name}`) : null),
@@ -72,7 +71,7 @@ router.put('/save', isAdmin, (req, res) => {
 
     uploadFiles(data.sponsors, uploaddir,
         sponsor => Boolean(sponsor.img),
-        sponsor => `sponsors/${sponsor.name}`,
+        sponsor => `/sponsors/${sponsor.name}`,
         sponsor => parentDir(sponsor.icon),
         sponsor => '_' + sponsor.name,
         (sponsor, dir) => upload(dir, sponsor.img),
@@ -88,7 +87,7 @@ router.put('/save', isAdmin, (req, res) => {
         DB.setRepo(DB.repo(Tag), data.tags.map(x => new Tag(x.name, x.description, x.order)), x => [x.name]),
         DB.setRepo(DB.repo(Page), data.pages.map(x => new Page(x.name, x.path, x.source, x.order)), x => [x.path], x => [parentDir(uploaddir + x.source)]),
         DB.setRepo(DB.repo(Sponsor), data.sponsors.map(x => new Sponsor(x.name, x.link, x.icon, x.order)), x => [x.name], x => [parentDir(uploaddir + x.icon)])
-    ]).then(() => res.json({})).catch((err) => error(err))).catch((err) => error(err));
+    ]).then(() => res.json({})).catch(() => error('saving'))).catch(err => { console.log(err); error('uploading'); });
 });
 
 export default { path: '/competition', router };

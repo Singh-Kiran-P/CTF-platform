@@ -14,7 +14,8 @@
         "ignore": [
             ".git",
             "node_modules/*",
-            "public/*"
+            "public/*",
+            "uploads/*"
         ]
     },
     "dependencies": {

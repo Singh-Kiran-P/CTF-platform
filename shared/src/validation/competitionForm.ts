@@ -44,7 +44,7 @@ const validate = {
         if (!r && page.path.startsWith('/api')) r = `Page path cannot start with '/api'`;
         let invalidChars = page.path.replace(/([a-zA-Z0-9\/\-]+)/g, '');
         if (!r && invalidChars) r = `Page path cannot contain the following characters: '${invalidChars}'`;
-        if (!r && /\/\//.test(page.path)) r = `Page path cannot have multiple '/'s in a row`;
+        if (!r && page.path.includes('//')) r = `Page path cannot have multiple '/'s in a row`;
         if (!r && page.path.length > 1 && page.path.endsWith('/')) r = `Page path cannot end with '/'`;
         if (!r) r = validateString(page.path, 'Page path', 1, 32, !add, pages.map(x => x.path), !add);
         if (!r && !add && !page.source && !page.html) r = 'Page source is required';

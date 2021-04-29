@@ -106,9 +106,9 @@ Promise.all([
                 path: route.path.slice(1),
                 name: route.name,
                 meta: route.meta,
-                component: route.src.endsWith('vue') ? () => import(`../pages/${route.src}`) : { template: `<iframe src="/api/pages/${route.src}"/>` }
+                component: route.src.endsWith('vue') ? () => import(`../pages/${route.src}`) : { template: `<iframe src="/api/uploads${route.src}"/>` }
                 // include vue pages directly into the html using a lazy loaded import, with the root directory for src in '/src/pages/'
-                // include html pages using an iframe so they dont inherit any styling, with the root directory for src in '/public/pages/'
+                // include html pages using an iframe so they dont inherit any styling, the src requesting the html file from the server
             }))
         }]
     });

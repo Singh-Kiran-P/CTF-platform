@@ -20,7 +20,7 @@ async function loadTestData() {
     ]))[0];
 
     let pages: Page[] = await save([
-        new Page('Test', '/', 'pages/_page/register.html', 1)
+        new Page('Test', '/', '/pages/_page/testpage2.html', 1)
     ]);
 
     let categories: Category[] = await save([
@@ -52,6 +52,7 @@ async function loadTestData() {
     let teams: Team[] = [teamRepo.saveWithCaptain('Team 1', accounts[1]),
     teamRepo.saveWithCaptain('Team 2', accounts[2]),
     teamRepo.saveWithCaptain('Team 3', accounts[3])];
+
     /*
 
     let teams: Team[] = await save([
