@@ -6,6 +6,9 @@ import { resolve } from 'node:path';
 var build = require('dockerode-build')
 var docker = new Docker({ socketPath: '/var/run/docker.sock' });
 import DB, { DockerChallengeContainer, DockerChallengeImage, DockerManagementRepo, DockerOpenPort } from '../database';
+import { deserialize } from '@shared/objectFormData';
+import { uploaddir } from '@/routes/uploads';
+import { unzip_, upload } from '@/files';
 
 function getAllRunningContainers() {
     let data: any = [];
@@ -17,16 +20,68 @@ function getAllRunningContainers() {
     return data;
 }
 
+
+async function getImage(name: string) {
+    const challenge = DB.repo(DockerChallengeImage);
+    let i = await challenge.findOne({ name: name });
+    return i;
+}
+
+function makeImage(data: any) {
+    console.log(data);
+    let ports: string[] = data.innerPorts.split(",");
+
+
+    return new Promise<void>(async (resolve, reject) => {
+        let image = await getImage(data.name);
+        if (image == undefined) {
+            // save image data to DB
+            const DockerChallengeImageRepo = DB.repo(DockerChallengeImage);
+            let image = new DockerChallengeImage(data.name, ports, 25);
+            await DockerChallengeImageRepo.save(image);
+            // upload / unzip
+            let dir = `${uploaddir}/challenges/compressed/`;
+            let destination = `${uploaddir}/challenges/${data.name}/`;
+
+
+            upload(dir, data.file)
+                .then(() => {
+                    unzip_(`${dir}/${data.file.name}`, destination)
+                        .then(() => {
+                            createChallengeImage({ 'dir': destination, 'name': data.name }).catch((err) => { reject(err) });
+                            resolve();
+                        })
+                        .catch((err) => {
+                            console.log(err);
+
+                        })
+
+                })
+                .catch((err) => {
+                    console.log("hello:" + err);
+
+                });
+        }
+        else {
+            reject("Something went wrong!")
+            console.log("noke");
+
+        }
+
+    });
+}
 // TODO: Get challenge files dynamically
 function createChallengeImage(jsonObj: any) {
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
         pump(
-            build(`${__dirname}/../../public/uploads/Challenges/uncompressed/test-challenge/Dockerfile`, { t: jsonObj.name }),
+            build(`${__dirname}/../../../../..${jsonObj.dir}Dockerfile`, { t: jsonObj.name }),
             process.stdout,
             (err) => {
                 reject(err);
             }
         )
+
+        resolve();
     });
 }
 
@@ -79,7 +134,6 @@ async function _createPortConfig(ports: string[]) {
     })
 }
 
-
 function _giveRandomPort() {
     return new Promise<number>((resolve) => {
 
@@ -114,12 +168,6 @@ function _giveRandomPort() {
     });
 }
 
-async function getImage(name: string) {
-    const challenge = DB.repo(DockerChallengeImage);
-    let i = await challenge.findOne({ name: name });
-    return i;
-}
-
 function randomIntFromInterval(min: number, max: number) { // min and max included
     return Math.floor(Math.random() * (max - min + 1) + min);
 }
@@ -128,7 +176,7 @@ export default {
     getAllRunningContainers,
     createChallengeImage,
     createChallengeContainer,
-    getImage
+    getImage, makeImage
 }
 
 

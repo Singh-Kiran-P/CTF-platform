@@ -63,7 +63,7 @@ const pages: { [page: string]: Route } = {
 const routes: { [page: string]: Route[] } = {
     [Roles.VISITOR]: [
         pages.login,
-        pages.register
+        pages.register,
     ],
     [Roles.PARTICIPANT]: [
         pages.leaderboard,

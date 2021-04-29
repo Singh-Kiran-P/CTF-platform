@@ -11,6 +11,7 @@ import { deserialize } from '@shared/objectFormData';
 import { parentDir, fileName, upload, move, remove, unzip, chain, unzip_ } from '../files';
 
 import DB, { DockerChallengeContainer, DockerChallengeImage, DockerManagement, DockerManagementRepo, DockerOpenPort } from '../database';
+import { uploaddir } from "./uploads";
 
 const docker = new Docker({ socketPath: "/var/run/docker.sock" });
 const router = express.Router();
@@ -51,7 +52,7 @@ router.get("/containers", isAuth, isAdmin, (req, res) => {
 //     });
 // });
 
-router.get("/images", isAuth, isAdmin, (req, res) => {
+router.get("/images", (req, res) => {
     docker.listImages((err, images) => {
         res.json(images);
     });
@@ -62,6 +63,8 @@ router.post("/createChallengeImage", isAuth, isAdmin, (req, res, next) => {
     let jsonObj = req.fields;
     DockerController.createChallengeImage(jsonObj)
         .then(() => {
+            console.log("created");
+
             res.json({ message: "Challenge image started", statusCode: 200 });
         })
         .catch((err) => {
@@ -148,19 +151,15 @@ router.post("/resetContainer", isAdmin, (req, res) => {
 
 router.post("/makeImage", isAdmin, (req, res) => {
     let data = deserialize(req);
-    let dir = "/server/uploads/challenges/compressed/"
-    let destination = `/server/uploads/challenges/${data.name}/`;
 
-    upload(dir, data.file).then(() => {
-        unzip_(`${dir}/${data.file.name}`, destination).then(() => {
-            console.log("oke");
-            res.json({ msg: "Uploaded successfully!", statusCode: 200 });
-        }).catch((err) => {
-            console.log(err);
+    DockerController.makeImage(data)
+        .then(() => {
+            res.json({ message: `Challenge image created successfully`, statusCode: 200 });
         })
-    }).catch((err) => {
-        console.log(err);
-    })
+        .catch((err) => {
+            res.json({ message: err, statusCode: 404 });
+        });
+
 });
 
 
