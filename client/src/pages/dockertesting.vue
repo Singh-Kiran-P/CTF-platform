@@ -94,11 +94,68 @@
         <pre class="m-0">{{ form_createChallenge }}</pre>
       </b-card> -->
         </div>
+
+        <div class="create">
+            <h2>Create Challenge Image</h2>
+            <b-form
+                @submit="onSubmit_createImage($event)"
+                @reset="onReset_createImage($event)"
+                v-if="show"
+            >
+                <b-form-group
+                    id="input-group-1"
+                    label="Challenge Image name:"
+                    label-for="input-1"
+                    required
+                >
+                    <b-form-input
+                        id="input-1"
+                        v-model="form_createImage.name"
+                        type="Challenge Image name:"
+                        placeholder="Enter Challenge Image name"
+                        required
+                    ></b-form-input>
+                </b-form-group>
+
+                <b-form-group
+                    id="input-group-1"
+                    label="Inner ports:"
+                    label-for="input-1"
+                    required
+                >
+                    <b-form-input
+                        id="input-1"
+                        v-model="form_createImage.innerPorts"
+                        type="Inner ports:"
+                        placeholder="Enter Inner ports"
+                        required
+                    ></b-form-input>
+                </b-form-group>
+
+                <b-form-group id="input-group-1" label-for="input-1" required>
+                    <!-- Upload -->
+                    <b-form-file
+                        accept=".zip"
+                        v-model="form_createImage.file"
+                        placeholder="Upload Docker files as .zip"
+                    />
+                </b-form-group>
+                <b-card class="mt-3" header="Form Data Result">
+                    <pre class="m-0">{{ form_createImage }}</pre>
+                </b-card>
+                <b-button type="submit" variant="primary">Create</b-button>
+                <b-button type="reset" variant="danger">Reset</b-button>
+            </b-form>
+            <!-- <b-card class="mt-3" header="Form Data Result">
+        <pre class="m-0">{{ form_createChallenge }}</pre>
+      </b-card> -->
+        </div>
     </div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
+import { serialize } from "@shared/objectFormData";
 
 import axios from "axios";
 
@@ -110,6 +167,11 @@ export default Vue.extend({
         this.getConfigPorts();
     },
     data: () => ({
+        form_createImage: {
+            name: "",
+            innerPorts: "",
+            file: null as File | null,
+        },
         containers: [] as {
             Name: string;
             Image: string;
@@ -164,6 +226,28 @@ export default Vue.extend({
             this.$nextTick(() => {
                 this.show = true;
             });
+        },
+        onSubmit_createImage(e: Event) {
+            e.preventDefault();
+            this.createImage();
+        },
+        onReset_createImage(e: Event) {
+            e.preventDefault();
+            // Reset our form values
+            this.form_createImage.name = "";
+            this.form_createImage.innerPorts = "";
+            this.form_createImage.file = null;
+
+            // Trick to reset/clear native browser form validation state
+            this.show = false;
+            this.$nextTick(() => {
+                this.show = true;
+            });
+        },
+        createImage(): void {
+            axios
+                .post("/api/docker/makeImage", serialize(this.form_createImage))
+                .then((res) => {});
         },
         getContainers(): void {
             //TODO: Multiple ports

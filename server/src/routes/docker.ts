@@ -7,6 +7,9 @@ import express, { json } from "express";
 import Docker from "dockerode";
 import DockerController from "../controllers/docker";
 import { isAdmin, isAuth } from "../auth";
+import { deserialize } from '@shared/objectFormData';
+import { parentDir, fileName, upload, move, remove, unzip, chain, unzip_ } from '../files';
+
 import DB, { DockerChallengeContainer, DockerChallengeImage, DockerManagement, DockerManagementRepo, DockerOpenPort } from '../database';
 
 const docker = new Docker({ socketPath: "/var/run/docker.sock" });
@@ -25,7 +28,7 @@ router.post("/dockerConfigPorts", isAdmin, isAuth, async (req, res) => {
     dockerManagementRepo.setLowerBoundPort(lowerBoundPort);
     dockerManagementRepo.setUpperBoundPort(upperBoundPort)
 
-    res.json({ message: "Ports range updated to [ "+ lowerBoundPort+ " - "+ upperBoundPort+ " ]", statusCode: 200 });
+    res.json({ message: "Ports range updated to [ " + lowerBoundPort + " - " + upperBoundPort + " ]", statusCode: 200 });
 })
 
 
@@ -133,7 +136,7 @@ router.post("/stopContainer", isAuth, (req, res) => {
  * Remove container
  * Make new container with de base challenge image *
  */
-router.post("/resetContainer", isAuth, (req, res) => {
+router.post("/resetContainer", isAdmin, (req, res) => {
     let id = req.body.id;
     let container = docker.getContainer(id);
     container.stop((err, data) => {
@@ -142,6 +145,24 @@ router.post("/resetContainer", isAuth, (req, res) => {
         else res.json(err);
     });
 });
+
+router.post("/makeImage", isAdmin, (req, res) => {
+    let data = deserialize(req);
+    let dir = "/server/uploads/challenges/compressed/"
+    let destination = `/server/uploads/challenges/${data.name}/`;
+
+    upload(dir, data.file).then(() => {
+        unzip_(`${dir}/${data.file.name}`, destination).then(() => {
+            console.log("oke");
+            res.json({ msg: "Uploaded successfully!", statusCode: 200 });
+        }).catch((err) => {
+            console.log(err);
+        })
+    }).catch((err) => {
+        console.log(err);
+    })
+});
+
 
 
 /********************** TESTING ROUTES ********************/
