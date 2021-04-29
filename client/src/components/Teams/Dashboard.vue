@@ -24,20 +24,18 @@
 
         <div class=members>
             <label for="member-table">Members</label>
+            <span class=error :v-if="membersLoadingError != ''">{{membersLoadingError}}</span>
             <b-table id=member-table sticky-header striped :items="members" :fields="members_fields" :busy="members_isLoading">
                 <template v-slot:cell(name)="row">
                     <span>{{row.item.name}}</span>
                     <b-icon-star id=captainIcon v-if="row.item.captain"></b-icon-star>
                 </template>
                 <template v-if="isCaptainOrAdmin" v-slot:cell(remove)="row">
-                    <b-button v-if="!row.item.captain" :disabled="removingMember" size=sm variant="danger" @click="removeMember(row.item.name, $event)">
-                        <b-icon-trash></b-icon-trash>
-                    </b-button>
+                    <StatusButton v-if="!row.item.captain" :disabled="removingMember" size=sm variant=danger :state="row.item.removingState" normal="Remove" loading="Removing" succes="Removed" @click="removeMember(row.item, $event)"/>
                 </template>
                 <template #table-busy>
                     <div class="text-center text-primary my-2">
-                        <b-spinner class="align-middle"></b-spinner>
-                        <strong>Loading...</strong>
+                        <b-spinner variant="primary" label="Spinning"></b-spinner>
                     </div>
                 </template>
             </b-table>
@@ -45,6 +43,7 @@
 
         <div class=solves>
             <label for="solves-table">Solves</label>
+            <span class=error :v-if="solvesLoadingError != ''">{{solvesLoadingError}}</span>
             <b-table id=solves-table sticky-header striped :items="solves" :fields="solves_fields" :busy="solves_isLoading">
                 <!--correctly loading info for category and description on hover-->
                 <template v-slot:cell(category)="row">
@@ -52,24 +51,27 @@
                 </template>
                 <template #table-busy>
                     <div class="text-center text-primary my-2">
-                        <b-spinner class="align-middle"></b-spinner>
-                        <strong>Loading...</strong>
+                          <b-spinner variant="primary" label="Spinning"></b-spinner>
                     </div>
                 </template>
             </b-table>
         </div>
 
-        <b-modal id="invite-modal" centered v-model="modal_invite.open" ok-only>
+        <b-modal id="invite-modal" centered v-model="modal_invite.open">
             <template #modal-title>
                 Invite link
             </template>
             <div class=invite-modal-content>
-                <span>{{generateInviteLink()}}</span>
+                <span>{{this.inviteLink}}</span>
                 <b-button class="clipboard-btn" size=sm variant="primary" @click="copyInvite($event)" >
                         <b-icon-clipboard-check v-if="modal_invite.copied"></b-icon-clipboard-check>
                         <b-icon-clipboard v-else></b-icon-clipboard>
                 </b-button>
             </div>
+            <template #modal-footer id=invite-modal-footer>
+                <StatusButton class=float-right variant=info :state="modal_invite.renewState" normal="Generate new link" loading="Generating" succes="Succes" @click="generateNewLink($event)"/>
+                <!--<b-button class=float-right variant=primary @click="modal_invite.open=false"> Close </b-button>-->
+            </template>
         </b-modal>
         <b-modal id="delete-modal" centered v-model="modal_delete.open">
             <template #modal-title>
@@ -79,8 +81,8 @@
                 <span>Are you sure you want to delete your team?</span>
             </div>
             <template #modal-footer>
-                <b-button class="float-right" @click="modal_delete.open=false"> Cancel </b-button>
-                <b-button class="float-right" variant="danger" @click="deleteTeam($event)"> Confirm </b-button>
+                <!--<b-button class="float-right" @click="modal_delete.open=false"> Cancel </b-button>-->
+                <StatusButton class="float-right" variant=danger :state="modal_delete.deletingState" normal="Confirm" loading="Deleting" succes="Deleted" @click="deleteTeam($event)"/>
             </template>
         </b-modal>
         
@@ -89,27 +91,33 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import StatusButton from '@/components/StatusButton.vue';
 import axios, { AxiosResponse } from 'axios';
 
 export default Vue.extend({
     name: 'Dashboard',
+    components: {
+        StatusButton
+    },
     data: () => ({
         team: {
             name: 'teamname',
             placement: 0,
             points: 0,
             uuid: '',
-            inviteCode: ''            
         },
+        inviteLink: '',         
         isCaptainOrAdmin: false,
         removingMember: false,
         members_isLoading: true,
+        membersLoadingError: '',
         members_fields: [
             {key: 'name', sortable:true},
             {key: 'points', sortable: true}
         ] as {key: string, sortable?: boolean, tdClass?: string}[],
-        members: [] as { name: string, points: number, captain: boolean }[],
+        members: [] as { name: string, points: number, captain: boolean, removingState: 'normal' }[],
         solves_isLoading: true,
+        solvesLoadingError: '',
         solves_fields: [
             { key: 'name', sortable: true},
             { key: 'category', label: 'Category', sortable: true},
@@ -119,43 +127,52 @@ export default Vue.extend({
         solves: [] as { name: string, category: {name: string, description: string}, value: number, date: string} [],
         modal_invite: {
             open: false,
-            copied: false
+            copied: false,
+            renewState: 'normal'
         },
         modal_delete: {
-            open: false
+            open: false,
+            deletingState: 'normal'
         }
     }),
+    watch: {
+        team: { deep: true, handler() {
+            return;
+        }}
+    },
     computed: {
     },
     methods: {
         getMembers() {
             this.members_isLoading = true;
             axios.get('/api/team/getMembers/'+this.team.uuid).then((response)=>{
-                    if(response.data.error) return alert(response.data.error);
+                    if(response.data.error) { this.membersLoadingError = response.data.error; this.members_isLoading = false; return; }
                     this.members = response.data;
                     this.members_isLoading = false;
-                }).catch((err)=>{alert(err)});
+                }).catch((err)=>{this.membersLoadingError = err; this.members_isLoading = false; return;});
         },
         getSolves() {
             this.solves_isLoading = true;
             axios.get('/api/team/getSolves/'+this.team.uuid).then((response)=>{
-                    if(response.data.error) return alert(response.data.error);
+                    if(response.data.error) { this.solvesLoadingError = response.data.error; this.solves_isLoading = false; return; }
                     this.solves = response.data;
                     this.solves_isLoading = false;
-                }).catch((err)=>{alert(err)});
+                }).catch((err)=>{this.solvesLoadingError = err; this.solves_isLoading = false; return;});
         },
-        removeMember(name:string, event: Event) {
+        removeMember(member: { name: string, points: number, captain: boolean, removingState: string }, event: Event) {
             event.preventDefault();
             this.removingMember = true;
-            axios.post(`/api/team/removeMember/${this.team.uuid}/${name}`).then((response)=>{
-                if(response.data.error) return alert(response.data.error);
+            member.removingState = 'loading';
+            axios.post(`/api/team/removeMember/${this.team.uuid}/${member.name}`).then((response)=>{
+                if(response.data.error) {this.removingMember = false; member.removingState = 'error'; return;};
                 this.getMembers();
                 this.removingMember=false;
-            }).catch((err)=>{alert(err)});
+            }).catch((err)=>{this.removingMember = false; member.removingState = 'error'; return;});
         },
         createdHandleResponse(response: AxiosResponse) {
             if(response.data.error) return alert(response.data.error);
             this.team = response.data.info;
+            this.inviteLink = this.generateInviteLink(response.data.info.inviteCode);
             this.isCaptainOrAdmin = response.data.isCaptainOrAdmin;
             if(this.isCaptainOrAdmin) this.members_fields.push({ key: 'remove', sortable: false, tdClass: 'text-center' }); //add remove field if captain or admin
             this.getMembers();
@@ -165,23 +182,32 @@ export default Vue.extend({
             e.preventDefault();
             this.modal_invite.copied = false;
             this.modal_invite.open = true;
+            this.modal_invite.renewState = 'normal'
         },
         copyInvite(e:Event) {
             e.preventDefault();
-            this.copyTextToClipboard(this.generateInviteLink());
+            this.copyTextToClipboard(this.inviteLink);
             this.modal_invite.copied = true;
         },
-        generateInviteLink(): string {
-            console.log()
-            if(this.team.inviteCode != '') return window.location.origin + '/team/join/' + this.team.inviteCode;
-            return '';
+        generateInviteLink(inviteCode: string): string {
+            return window.location.origin + '/team/join/' + inviteCode;
+        },
+        generateNewLink(e:Event) {
+            e.preventDefault();
+            this.modal_invite.renewState = 'loading'
+            axios.post('/api/team/newInviteLink/'+this.team.uuid).then((response)=>{
+                if(response.data.error) return this.modal_invite.renewState = 'error';
+                this.inviteLink = this.generateInviteLink(response.data.inviteCode);
+                this.modal_invite.renewState = 'succes';
+            }).catch((err)=>{this.modal_invite.renewState = 'error'});
         },
         deleteTeam(e:Event) {
             e.preventDefault();
+            this.modal_delete.deletingState = 'loading'
             axios.post('/api/team/delete/'+this.team.uuid).then((response)=>{
-                    if(response.data.error) return alert(response.data.error);
+                    if(response.data.error) return this.modal_delete.deletingState = 'error';
                     this.$router.go(0); //reload
-                }).catch((err)=>{alert(err)});
+                }).catch((err)=>{this.modal_delete.deletingState = 'error'});
         },
         fallbackCopyTextToClipboard(text: string) {
             var textArea = document.createElement("textarea");
@@ -261,6 +287,12 @@ export default Vue.extend({
     padding: var(--margin);
     width: min(100%, 750px);
     margin: auto;
+    /*display: flex;
+    flex-direction: column;*/
+}
+.error {
+    color: red;
+    margin-left: var(--margin);
 }
 table {
     border: 1px solid lightgray;

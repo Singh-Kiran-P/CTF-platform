@@ -1,9 +1,6 @@
 <template>
-    <div id="Loading">
-        <div class="loading">
-            <b-spinner name=loading_icon label="Loading"></b-spinner>
-        </div>
-        <label for="loading_icon">Loading</label>
+    <div class="loading">
+        <b-spinner variant=primary type=grow label="Loading..."/>
     </div>
 </template>
 
@@ -18,16 +15,13 @@ export default Vue.extend({
 
 <style scoped lang="scss">
 .loading {
-    margin: auto;
-    position: absolute;
-    top: 50%;
-    left: 47%;
-    -ms-transform: translateY(-50%);
-    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
-label {
-    position: absolute;
-    left: 46%;
-    top: 44%;
+
+.spinner-grow {
+    width: 25vmin;
+    height: 25vmin;
 }
 </style>

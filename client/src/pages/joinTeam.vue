@@ -34,6 +34,9 @@ export default Vue.extend({
 .joinTeam {
     text-align: center;
 }
+.joinTeam {
+    padding: var(--triple-margin);
+}
 .error {
     margin-top: var(--triple-margin);
 }
