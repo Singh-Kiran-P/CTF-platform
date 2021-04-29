@@ -19,11 +19,8 @@ const upload = (root: string, ...paths: (UFile | File)[]) => {
     let files = paths.filter((f: any) => is.object(f) && is.string(f.name) && is.string(f.path)).map(f => f as UFile);
     return new Promise<void>((resolve, reject) => {
         if (!files) return resolve();
-        fs.mkdir(root, { recursive: true }, err => {
-            if (err) return reject(err);
-            let c = files.length;
-            files.forEach(file => fs.rename(file.path, `${root}/${file.name}`, count(v => c = set(c, v), resolve, reject)));
-        });
+        let c = files.length;
+        files.forEach(file => fse.move(file.path, `${root}/${file.name}`, count(v => c = set(c, v), resolve, reject)));
     });
 }
 
@@ -93,4 +90,4 @@ const count = (c: (v?: number) => number, resolve: () => void, reject: (err: any
     }
 }
 
-export { UFile, parentDir, fileName, upload, move, remove, unzip, chain };
+export { UFile, Root, parentDir, fileName, upload, move, remove, unzip, chain };

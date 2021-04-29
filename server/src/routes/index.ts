@@ -1,14 +1,13 @@
 import auth from './auth';
 import team from './team';
 import account from './account';
-import express = require("express"); //comment
-const router = express.Router(); //comment
+import uploads from './uploads';
 import competition from './competition';
-
 
 export default [
     competition,
     auth,
     team,
+    uploads,
     account
 ];
