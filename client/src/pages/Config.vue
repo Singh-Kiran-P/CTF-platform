@@ -128,6 +128,7 @@
 
             <StatusButton type=button variant=danger :state="cancelState" normal=Cancel loading=Loading succes=Loaded :disabled="saveState == 'loading'" @click="onCancel()"/>
             <StatusButton type=submit variant=primary :state="saveState" normal=Save loading=Saving succes=Saved :disabled="!validForm || cancelState == 'loading'"/>
+            <span>{{savedMessage}}</span>
         </b-form>
     </div>
 </template>
@@ -170,7 +171,8 @@ export default Vue.extend({
         },
         loaded: false,
         saveState: 'normal',
-        cancelState: 'normal'
+        cancelState: 'normal',
+        savedMessage: ''
     }),
     computed: {
         name(): string { return this.form.name.trim(); },
@@ -211,6 +213,7 @@ export default Vue.extend({
                 state = 'succes';
                 this.loaded = false;
             }
+            else this.savedMessage = '';
             this.saveState = state;
             this.cancelState = state;
         }}
@@ -239,7 +242,9 @@ export default Vue.extend({
             this.saveState = 'loading';
             const error = () => this.saveState = 'error';
             axios.put('/api/competition/save', serialize(this.formData)).then(res => {
-                res.data.error ? error() : this.loadFormData();
+                if (res.data.error) return error();
+                this.loadFormData();
+                this.savedMessage = 'Some changes might require a reload to take effect';
             }).catch(() => error());
         },
 
@@ -449,10 +454,14 @@ $breakpoint-sm: 576px;
 
 form > button {
     width: calc(50% - var(--margin) / 2);
-    margin-bottom: var(--double-margin);
 }
 
 form > .btn-danger {
     margin-right: var(--margin);
+}
+
+form > :last-child {
+    display: block;
+    padding-bottom: var(--double-margin);
 }
 </style>
