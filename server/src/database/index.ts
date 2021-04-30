@@ -19,7 +19,7 @@ interface DatabaseEvents {
  * Database class to connect to the database and provide help functions to access it
  */
 class Database extends EventEmitter {
-    loadTestData: boolean = true; // empties and loads test data into the database before connecting if true
+    loadTestData: boolean = false; // empties and loads test data into the database before connecting if true
     conn: Connection = null;
 
     constructor() {

@@ -1,6 +1,7 @@
 /**
  * All routes in this file are protected!
  * Only admins can access them
+ * //TODO: stop/start challenge protected for teams
  */
 
 import express, { json } from "express";
@@ -198,7 +199,7 @@ router.get("/dockerConfig_createChallengeContainer", async (req, res) => {
     let d = new DockerChallengeImage("hello", ["80/tcp"], 25);
     await challenge.save(d);
 
-    let image = await DockerController.getImage("hesllo")
+    let image = await DockerController.getImage("hello")
 
     if (image != undefined) {
         res.json({ statusCode: 200, data: d });
