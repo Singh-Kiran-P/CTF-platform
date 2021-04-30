@@ -35,7 +35,7 @@ app.use(passport.session());
 // this ensures that the database is already connected in every single route listener
 app.all(/./, (_, __, next) => {
     if (DB.connected()) next();
-    else DB.on('connect', () => next());
+    else DB.once('connect', () => next());
 });
 
 // register all routes

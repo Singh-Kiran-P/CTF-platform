@@ -22,7 +22,8 @@ const is = {
     string: (v: any): boolean => typeof v == 'string',
     number: (v: any): boolean => typeof v == 'number',
     object: (v: any): boolean => v && typeof v == 'object',
-    array: (v: any, t: (x: any) => boolean): boolean => Array.isArray(v) && (v as any[]).every(x => t(x))
+    date: (v: any): boolean => is.string(v) && !isNaN(Date.parse(v)),
+    array: (v: any, t: (x: any) => boolean): boolean => Array.isArray(v) && (v as any[]).every(x => t(x)),
 }
 
 export { state, validInput, validateString, regexName, is };

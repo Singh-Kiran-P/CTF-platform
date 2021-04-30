@@ -5,6 +5,7 @@ import EventEmitter = require('events');
 import { Connection, createConnection, EntityTarget, ObjectType, Repository } from 'typeorm';
 import { chain, remove } from '../files';
 import loadTestData from './testData';
+import express from 'express';
 dotenv.config();
 
 // TODO: create entity CRUD operations (custom entity repositories)
@@ -68,6 +69,13 @@ class Database extends EventEmitter {
         if (this.conn) {
             return this.conn.getCustomRepository(entity);
         }
+    }
+
+    /**
+     * allows for easily responding to an axios request with data fetched from the database
+     */
+    respond<E>(promise: Promise<E>, res: express.Response, result: (data: E) => any = data => data): void {
+        promise.then(data => res.send(result(data))).catch(() => res.json({ error: 'Error fetching data' }));
     }
 
     /**

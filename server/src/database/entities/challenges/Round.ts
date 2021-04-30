@@ -10,15 +10,17 @@ export class Round {
     name: string;
 
     @Column()
-    start: number;
+    start: string;
 
     @Column()
-    end: number;
+    end: string;
 
     @OneToMany(_ => Challenge, challenge => challenge.round)
     challenges: Challenge[];
 
-    constructor() {
-        // TODO
+    constructor(name: string, start: string, end: string) {
+        this.name = name;
+        this.start = start;
+        this.end = end;
     }
 }

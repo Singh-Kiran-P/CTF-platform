@@ -207,7 +207,7 @@ export default Vue.extend({
         validForm(): boolean { return validForm(this.formData, false); }
     },
     watch: {
-        form: { deep: true, handler() {
+        formData: { deep: true, handler() {
             let state = 'normal';
             if (this.loaded) {
                 state = 'succes';
@@ -227,12 +227,16 @@ export default Vue.extend({
             this.add.tag = { name: '', description: '' };
             this.add.page = { name: '', path: '', html: null, zip: null };
             this.add.sponsor = { name: '', link: '', img: null };
+            const error = () => {
+                this.cancelState = 'error';
+                this.saveState = 'normal';
+            }
             axios.get('/api/competition/data').then(res => {
                 let data: Form = res.data;
-                if (!validForm(data)) return this.cancelState = 'error';
+                if (!validForm(data)) return error();
                 this.loaded = true;
                 this.form = data;
-            }).catch(() => this.cancelState = 'error');
+            }).catch(() => error());
         },
         onCancel(): void {
             this.loadFormData();

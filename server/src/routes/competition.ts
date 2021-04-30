@@ -10,18 +10,14 @@ const router = express.Router();
 
 const order: FindManyOptions = { order: { order: 'ASC' } };
 
-const respond = <E>(promise: Promise<E>, res: express.Response, result: (data: E) => any = data => data) => {
-    promise.then(data => res.send(result(data))).catch(() => res.json({ error: 'Error fetching data' }));
-}
-
-router.get('/categories', (_, res) => respond(DB.repo(Category).find(order), res, categories => categories.map(category => category.name)));
-router.get('/name', (_, res) => respond(DB.crepo(CompetitionRepo).instance(), res, competition => competition.name));
-router.get('/sponsors', (_, res) => respond(DB.repo(Sponsor).find(order), res));
-router.get('/pages', (_, res) => respond(DB.repo(Page).find(order), res));
-router.get('/tags', (_, res) => respond(DB.repo(Tag).find(order), res));
+router.get('/categories', (_, res) => DB.respond(DB.repo(Category).find(order), res, categories => categories.map(category => category.name)));
+router.get('/name', (_, res) => DB.respond(DB.crepo(CompetitionRepo).instance(), res, competition => competition.name));
+router.get('/sponsors', (_, res) => DB.respond(DB.repo(Sponsor).find(order), res));
+router.get('/pages', (_, res) => DB.respond(DB.repo(Page).find(order), res));
+router.get('/tags', (_, res) => DB.respond(DB.repo(Tag).find(order), res));
 
 router.get('/data', (_, res) => {
-    respond(Promise.all([
+    DB.respond(Promise.all([
         DB.crepo(CompetitionRepo).instance(),
         DB.repo(Category).find(order),
         DB.repo(Tag).find(order),

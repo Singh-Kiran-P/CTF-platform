@@ -1,5 +1,6 @@
-import DB, { Team, Competition, Category, Tag, Account, Page } from '../database';
+import DB, { Team, Competition, Category, Tag, Account, Page, Round } from '../database';
 import { TeamRepoCustom } from './entities/accounts/Team';
+import { Challenge } from './entities/challenges/Challenge';
 
 /**
  * loads test entries into the database
@@ -31,6 +32,12 @@ async function loadTestData() {
         new Tag('Crypto', 'Yeah so this is like cryptography and stuff', 1),
         new Tag('Networking', 'WEB', 2),
         new Tag('idk anymore man', 'What is Lorem Ipsum? Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.', 3)
+    ]);
+
+    let rounds: Round[] = await save([
+        new Round('First round!!', new Date(2021, 5, 1, 10).toISOString(), new Date(2021, 5, 1, 11).toISOString()),
+        new Round('GIVE IT UP FOR ROUND 22@', new Date(2021, 5, 1, 11, 30).toISOString(), new Date(2021, 5, 1, 12, 30).toISOString()),
+        new Round('~le tour final est arrivé~', new Date(2021, 5, 1, 13).toISOString(), new Date(2021, 5, 1, 14).toISOString())
     ]);
 
     let admin = new Account('admin', 'password');

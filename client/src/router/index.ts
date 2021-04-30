@@ -50,6 +50,11 @@ const pages: { [page: string]: Route } = {
         name: 'Config',
         src: 'Config.vue',
         meta: { right: true }
+    },
+    rounds: {
+        path: '/rounds',
+        name: 'Rounds',
+        src: 'Rounds.vue'
     }
 };
 
@@ -68,6 +73,7 @@ const routes: { [page: string]: Route[] } = {
     [Roles.ORGANIZER]: [
         pages.leaderboard,
         pages.teams,
+        pages.rounds,
         pages.config,
         pages.logout
     ]

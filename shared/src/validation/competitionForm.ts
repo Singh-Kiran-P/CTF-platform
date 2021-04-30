@@ -39,28 +39,28 @@ const validate = {
         return validateString(tag.name, 'Tag name', 3, 32, !add, tags.map(x => x.name), !add);
     },
     page: (page: Page, pages: Page[], add: boolean = false): string => {
-        let r = validateString(page.name, 'Page name', 3, 32, !add);
-        if (!r && page.path && !page.path.startsWith('/')) r = `Page path must start with '/'`;
-        if (!r && page.path.startsWith('/api')) r = `Page path cannot start with '/api'`;
+        let v = validateString(page.name, 'Page name', 3, 32, !add);
+        if (!v && page.path && !page.path.startsWith('/')) v = `Page path must start with '/'`;
+        if (!v && page.path.startsWith('/api')) v = `Page path cannot start with '/api'`;
         let invalidChars = page.path.replace(/([a-zA-Z0-9\/\-]+)/g, '');
-        if (!r && invalidChars) r = `Page path cannot contain the following characters: '${invalidChars}'`;
-        if (!r && page.path.includes('//')) r = `Page path cannot have multiple '/'s in a row`;
-        if (!r && page.path.length > 1 && page.path.endsWith('/')) r = `Page path cannot end with '/'`;
-        if (!r) r = validateString(page.path, 'Page path', 1, 32, !add, pages.map(x => x.path), !add);
-        if (!r && !add && !page.source && !page.html) r = 'Page source is required';
-        if (!r && !add && page.zip && !page.html) r = 'New page dependencies require a new page source';
-        if (!r && page.html?.name && !page.html.name.endsWith('.html')) r = 'Page source must be a .html file';
-        if (!r && page.zip?.name && !page.zip.name.endsWith('.zip')) r = 'Page dependencies must be contained in a .zip file';
-        return r;
+        if (!v && invalidChars) v = `Page path cannot contain the following characters: '${invalidChars}'`;
+        if (!v && page.path.includes('//')) v = `Page path cannot have multiple '/'s in a row`;
+        if (!v && page.path.length > 1 && page.path.endsWith('/')) v = `Page path cannot end with '/'`;
+        if (!v) v = validateString(page.path, 'Page path', 1, 32, !add, pages.map(x => x.path), !add);
+        if (!v && !add && !page.source && !page.html) v = 'Page source is required';
+        if (!v && !add && page.zip && !page.html) v = 'New page dependencies require a new page source';
+        if (!v && page.html?.name && !page.html.name.endsWith('.html')) v = 'Page source must be a .html file';
+        if (!v && page.zip?.name && !page.zip.name.endsWith('.zip')) v = 'Page dependencies must be contained in a .zip file';
+        return v;
     },
     sponsor: (sponsor: Sponsor, sponsors: Sponsor[], add: boolean = false): string => {
-        let r = sponsor.name.startsWith('_') ? `Sponsor name cannot start with '_'` : '';
+        let v = sponsor.name.startsWith('_') ? `Sponsor name cannot start with '_'` : '';
         let invalidChars = sponsor.name.replace(/([a-zA-Z0-9 \,\!\?\.\'\"\&\_\-]+)/g, '');
-        if (!r && invalidChars) r = `Sponsor name cannot contain the following characters: '${invalidChars}'`;
-        if (!r) r = validateString(sponsor.name, 'Sponsor name', 3, 32, !add, sponsors.map(x => x.name), !add);
-        if (!r) r = validateString(sponsor.link, 'Sponsor link', -1, 128, !add);
-        if (!r && !add && !sponsor.icon && !sponsor.img) r = 'Sponsor icon is required';
-        return r;
+        if (!v && invalidChars) v = `Sponsor name cannot contain the following characters: '${invalidChars}'`;
+        if (!v) v = validateString(sponsor.name, 'Sponsor name', 3, 32, !add, sponsors.map(x => x.name), !add);
+        if (!v) v = validateString(sponsor.link, 'Sponsor link', -1, 128, !add);
+        if (!v && !add && !sponsor.icon && !sponsor.img) v = 'Sponsor icon is required';
+        return v;
     }
 }
 
@@ -83,4 +83,4 @@ const isf = { // check if a given variable with type any is a Form
     }
 }
 
-export { state, validInput, validForm, validateString, validate, Category, Tag, Page, Sponsor, Form };
+export { state, validInput, validateString, validForm, validate, Category, Tag, Page, Sponsor, Form };
