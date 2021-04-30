@@ -64,14 +64,16 @@ router.get('/infoDashboard', isAuth, hasTeam, (req, res) => {
 //TODO: get placement
 router.get('/infoDashboard/:uuid', (req, res) => {
     let isCaptainOrAdmin: boolean = false;
+    let isMember: boolean = false;
     let uuid: string = req.params.uuid;
     let data = {name: '', placement: 0, points: 0, uuid: uuid, inviteCode: ''};
 
-    DB.repo(Team).findOne({where: {id: uuid}, relations:['captain', 'solves', 'solves.challenge', 'solves.usedHints', 'solves.usedHints.hint']}).then((team: Team)=>{
+    DB.repo(Team).findOne({where: {id: uuid}, relations:['captain', 'accounts', 'solves', 'solves.challenge', 'solves.usedHints', 'solves.usedHints.hint']}).then((team: Team)=>{
         if(!team) return res.json({error: 'Team not found'});
         if(req.user) {
             let acc: Account = getAccount(req);
             if(team.captain.id == acc.id || acc.admin) {isCaptainOrAdmin = true; data.inviteCode = team.inviteCode;}
+            else if (team.accounts.some(member=>member.id == acc.id)) {isMember = true;}
         }
         data.name = team.name;
         team.solves.forEach((solve: Solve)=>{
@@ -80,7 +82,7 @@ router.get('/infoDashboard/:uuid', (req, res) => {
                 data.points -= usedHint.hint.cost
             })
         });
-        res.json({info: data, isCaptainOrAdmin: isCaptainOrAdmin});
+        res.json({info: data, isCaptainOrAdmin: isCaptainOrAdmin, isMember: isMember});
     }).catch((err)=>{res.json({error: 'Error retrieving data'});});
 });
 
