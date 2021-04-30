@@ -8,8 +8,8 @@
             </b-container>
         </div>
 
-        <div class=buttons v-if="isCaptainOrAdmin">
-            <b-button-group>
+        <div class=buttons>
+            <b-button-group v-if="isCaptainOrAdmin">
                 <!--<b-button variant="outline-primary">
                     <b-icon icon="tools"></b-icon> Settings
                 </b-button>-->
@@ -19,6 +19,9 @@
                 <b-button variant="outline-primary" @click="modal_delete.open=true">
                     <b-icon icon="trash-fill"></b-icon> Delete
                 </b-button>
+            </b-button-group>
+            <b-button-group v-else-if="isMember">
+                <StatusButton :disabled="leavingState == 'loading'" variant=danger :state="leavingState" normal="Leave Team" loading="Leaving" succes="Left" @click="leaveTeam"/>
             </b-button-group>
         </div>
 
@@ -108,6 +111,7 @@ export default Vue.extend({
         },
         inviteLink: '',         
         isCaptainOrAdmin: false,
+        isMember: false,
         removingMember: false,
         members_isLoading: true,
         membersLoadingError: '',
@@ -133,12 +137,10 @@ export default Vue.extend({
         modal_delete: {
             open: false,
             deletingState: 'normal'
-        }
+        },
+        leavingState: 'normal'
     }),
     watch: {
-        team: { deep: true, handler() {
-            return;
-        }}
     },
     computed: {
     },
@@ -174,6 +176,7 @@ export default Vue.extend({
             this.team = response.data.info;
             this.inviteLink = this.generateInviteLink(response.data.info.inviteCode);
             this.isCaptainOrAdmin = response.data.isCaptainOrAdmin;
+            this.isMember = response.data.isMember;
             if(this.isCaptainOrAdmin) this.members_fields.push({ key: 'remove', sortable: false, tdClass: 'text-center' }); //add remove field if captain or admin
             this.getMembers();
             this.getSolves();
@@ -237,6 +240,13 @@ export default Vue.extend({
                 return;
             }
             navigator.clipboard.writeText(text).then(()=>{return;}).catch((err)=>{alert('Error copying to clipboard')});
+        },
+        leaveTeam() {
+            this.leavingState = 'loading';
+            axios.post('/api/account/leaveTeam').then((response)=>{
+                    if(response.data.error) return this.leavingState = 'error';
+                    this.$router.go(0); //reload
+                }).catch((err)=>{this.leavingState = 'error'});
         }
     },
     created() {
