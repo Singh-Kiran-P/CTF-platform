@@ -5,10 +5,10 @@
                 <b-form-group label=Username label-for=username>
                     <b-form-input
                         id=username
-                        type=text
+                        type=text trim
                         v-model="form.username"
                         placeholder="Enter username"
-                        v-on:input="usernameFeedback = ''; passwordFeedback = ''"
+                        @input="usernameFeedback = ''; passwordFeedback = ''"
                         :state="state(usernameFeedback)"
                     />
                     <b-form-invalid-feedback>{{usernameFeedback}}</b-form-invalid-feedback>
@@ -20,7 +20,7 @@
                         type=password
                         v-model="form.password"
                         placeholder="Enter password"
-                        v-on:input="passwordFeedback = ''"
+                        @input="passwordFeedback = ''"
                         :state="state(passwordFeedback)"
                     />
                     <b-form-invalid-feedback>{{passwordFeedback}}</b-form-invalid-feedback>
@@ -53,10 +53,6 @@ export default Vue.extend({
         usernameFeedback: '',
         passwordFeedback: ''
     }),
-    computed: {
-        username(): string { return this.form.username.trim(); },
-        password(): string { return this.form.password; }
-    },
     watch: {
         form: { deep: true, handler() {
             this.loginState = 'normal';
@@ -65,7 +61,7 @@ export default Vue.extend({
     },
     methods: {
         state,
-        validForm(): boolean { return validInput(this.usernameFeedback, this.username) && validInput(this.passwordFeedback, this.password); },
+        validForm(): boolean { return validInput(this.usernameFeedback, this.form.username) && validInput(this.passwordFeedback, this.form.password); },
 
         onSubmit(e: Event): void {
             e.preventDefault();
@@ -78,7 +74,7 @@ export default Vue.extend({
                     if (is.string(err.password)) this.passwordFeedback = err.password;
                 }
             }
-            axios.post('/api/auth/login', { username: this.username, password: this.password }).then(response => {
+            axios.post('/api/auth/login', { username: this.form.username, password: this.form.password }).then(response => {
                 if(response.data.error) return error(response.data.error);
                 this.loginState = 'succes';
                 location.reload();

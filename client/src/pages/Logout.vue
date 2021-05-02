@@ -1,15 +1,17 @@
 <template>
-    <div class=logout>
-        <b-spinner variant=primary type=grow label="Logging out..."/>
-    </div>
+    <Loading/>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 import axios from 'axios';
+import Loading from '../components/Loading.vue';
 
 export default Vue.extend({
     name: 'Logout',
+    components: {
+        Loading
+    },
     created() {
         axios.get("/api/auth/logout").then(() => {
             location.reload();
@@ -18,16 +20,3 @@ export default Vue.extend({
     }
 });
 </script>
-
-<style scoped lang="scss">
-.logout {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.spinner-grow {
-    width: 25vmin;
-    height: 25vmin;
-}
-</style>

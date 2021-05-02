@@ -1,8 +1,8 @@
 <template>
-    <div id=Collapse>
+    <div>
         <label @click="visible = !visible">{{label}}</label>
         <IconButton icon="chevron-down" :class="visible ? 'danger' : 'primary'" @click="visible = !visible"/>
-        <b-collapse :visible="visible">
+        <b-collapse :visible="visible" :class="{ 'no-border': noborder}">
             <slot/>
         </b-collapse>
     </div>
@@ -18,7 +18,8 @@ export default Vue.extend({
         IconButton
     },
     props: {
-        label: String
+        label: String,
+        noborder: Boolean
     },
     data: () => ({
         visible: false
@@ -35,6 +36,9 @@ label {
 
 .collapse {
     margin-top: 0 !important;
+}
+
+.collapse:not(.no-border) {
     border-bottom: 2px solid black;
 }
 

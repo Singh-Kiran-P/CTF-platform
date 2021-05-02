@@ -35,9 +35,9 @@ async function loadTestData() {
     ]);
 
     let rounds: Round[] = await save([
-        new Round('First round!!', new Date(2021, 5, 1, 10).toISOString(), new Date(2021, 5, 1, 11).toISOString()),
-        new Round('GIVE IT UP FOR ROUND 22@', new Date(2021, 5, 1, 11, 30).toISOString(), new Date(2021, 5, 1, 12, 30).toISOString()),
-        new Round('~le tour final est arrivé~', new Date(2021, 5, 1, 13).toISOString(), new Date(2021, 5, 1, 14).toISOString())
+        new Round('First round!!', new Date(2021, 5, 1, 10).toJSON(), new Date(2021, 5, 1, 11).toJSON()),
+        new Round('GIVE IT UP FOR ROUND 22@', new Date(2021, 5, 1, 11, 30).toJSON(), new Date(2021, 5, 1, 12, 30).toJSON()),
+        new Round('~le tour final est arrivé~', new Date(2021, 5, 1, 13).toJSON(), new Date(2021, 5, 1, 14).toJSON())
     ]);
 
     let admin = new Account('admin', 'password');
