@@ -2,7 +2,7 @@
     <div class="date-time-picker">
         <span v-if="label">{{label}}</span>
         <div class=date-time>
-            <b-form-datepicker v-model="date" :state="state" placeholder="Select date" @input="onInput()" hide-header locale="en-GB"/>
+            <b-form-datepicker v-model="date" :state="state" placeholder="Select date" @input="onInput()" no-highlight-today hide-header locale="en-GB"/>
             <b-form-timepicker v-model="time" :state="state" placeholder="Select time" @input="onInput()" no-close-button hide-header locale="nl-BE"/>
         </div>
     </div>

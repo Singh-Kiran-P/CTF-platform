@@ -1,29 +1,27 @@
 // functions to validate the rounds form
 
 import { File as UFile } from 'formidable';
-import { state, validInput, validateString, is } from '../validation';
+import { state, validInput, validateString, validateList, is } from '../validation';
 
-type Challenge = { name: string, attachments: string, zip: File | UFile | null }; // TODO
-type Round = { name: string, start: string, end: string, challenges: Challenge[] };
+type Challenge = { name: string, order: number, attachments: string, zip: File | UFile | null }; // TODO
+type Round = { id? :number, name: string, start: string, end: string, challenges: Challenge[] | undefined };
 type Form = { rounds: Round[] };
 
 const sortRounds = (rounds: Round[]): Round[] => [...rounds].sort((a, b) => new Date(a.start) < new Date(b.start) ? -1 : 1);
 const times = (round: Round) => [round.start, round.end].map(time => new Date(time).getTime());
 
 const validForm = (f: Form, checkType: boolean = true): boolean => {
-    let valid = (!checkType || isf.form(f)) && state(validate.rounds(f.rounds));
-    return valid && f.rounds.every(r => state(validate.round(r, f.rounds), validate.challenges(r.challenges)) && r.challenges.every(c => state(validate.challenge(c, r.challenges))));
+    let v = (!checkType || isf.form(f)) && state(validate.rounds(f.rounds));
+    return v && f.rounds.every(r => state(validate.round(r, f.rounds)) && validChallenges(r.challenges, false));
+}
+
+const validChallenges = (challenges?: Challenge[], checkType: boolean = true): Boolean => {
+    return (!checkType || isf.challenges(challenges)) && state(validate.challenges(challenges)) && (challenges || []).every(c => state(validate.challenge(c, challenges)));
 }
 
 const validate = {
-    rounds: (rounds: Round[]): string => {
-        return rounds.length == 0 ? 'At least one round is required' : '';
-    },
-    challenges: (challenges: Challenge[]): string => {
-        let v = '';
-        // TODO
-        return v;
-    },
+    rounds: (rounds: Round[]): string => validateList(rounds, 'round', true),
+    challenges: (challenges?: Challenge[]): string => challenges ? validateList(challenges, 'challenge', true) : '',
 
     round: (round: Round, rounds: Round[], add: boolean = false): string => {
         let v = validateString(round.name, 'Round name', 3, 32, !add);
@@ -39,8 +37,9 @@ const validate = {
         });
         return v;
     },
-    challenge: (challenge: Challenge, challenges: Challenge[], add: boolean = false): string => {
-        let v = '';
+    challenge: (challenge: Challenge, challenges?: Challenge[], add: boolean = false): string => {
+        if (!challenges) return '';
+        let v = validateString(challenge.name, 'Challenge name', 3, 32, !add);
         // TODO
         return v;
     }
@@ -51,11 +50,14 @@ const isf = {
         return is.object(form) && is.array(form.rounds, isf.round);
     },
     round: (round: any): boolean => {
-        return is.object(round) && is.string(round.name) && is.date(round.start) && is.date(round.end) && is.array(round.challenges, isf.challenge)
+        return is.object(round) && is.string(round.name) && is.date(round.start) && is.date(round.end) && isf.challenges(round.challenges);
+    },
+    challenges: (challenges: any): boolean => {
+        return challenges == undefined || is.array(challenges, isf.challenge);
     },
     challenge: (challenge: any): boolean => {
-        return is.object(challenge); // TODO
+        return is.object(challenge) && is.string(challenge.name) && is.number(challenge.order); // TODO
     }
 }
 
-export { state, validInput, validateString, sortRounds, validForm, validate, Challenge, Round, Form };
+export { state, validInput, validateString, sortRounds, validForm, validChallenges, validate, Challenge, Round, Form };

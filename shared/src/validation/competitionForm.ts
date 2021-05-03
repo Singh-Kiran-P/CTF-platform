@@ -1,7 +1,7 @@
 // functions to validate the competition form
 
 import { File as UFile } from 'formidable';
-import { state, validInput, validateString, is } from '../validation';
+import { state, validInput, validateString, validateList, is } from '../validation';
 
 type Category = { name: string, order: number };
 type Tag = { name: string, description: string, order: number };
@@ -19,18 +19,11 @@ const validForm = (f: Form, checkType: boolean = true): boolean => {
 }
 
 const validate = {
-    name: (name: string): string => {
-        return validateString(name, 'Competition name', 3, 32);
-    },
-
-    categories: (categories: Category[]): string => {
-        return categories.length == 0 ? 'At least one category is required' : '';
-    },
-    pages: (pages: Page[]): string => {
-        return pages.findIndex(x => x.path == '/') < 0 ? `A page with path '/' is required` : '';
-    },
-    tags: (tags: Tag[]): string => '',
-    sponsors: (sponsors: Sponsor[]): string => '',
+    name: (name: string): string => validateString(name, 'Competition name', 3, 32),
+    categories: (categories: Category[]): string => validateList(categories, 'category', true),
+    pages: (pages: Page[]): string => pages.findIndex(x => x.path == '/') < 0 ? `A page with path '/' is required` : '',
+    tags: (tags: Tag[]): string => validateList(tags, 'tag', false),
+    sponsors: (sponsors: Sponsor[]): string => validateList(sponsors, 'sponsor', false),
 
     category: (category: Category, categories: Category[], add: boolean = false): string => {
         return validateString(category.name, 'Category', 3, 32, !add, categories.map(x => x.name), !add);

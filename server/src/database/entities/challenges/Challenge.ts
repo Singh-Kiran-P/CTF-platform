@@ -55,12 +55,26 @@ export class Challenge {
     flag: string;
 
     @Column()
+    order: number;
+
+    @Column()
     dockerfile: string;
 
     @Column()
     visibility: boolean;
 
-    constructor() {
+    constructor(round: Round, name: string, order: number) {
+        this.description = 'TODO';
+        this.points = 10;
+        this.type = ChallengeType.BASIC;
+        this.flag = 'TODO';
+        this.dockerfile = 'TODO';
+        this.visibility = false;
+        
+        this.name = name;
+        this.order = order;
+        if (!round) return;
+        this.round = round;
         // TODO
     }
 }

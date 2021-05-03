@@ -1,8 +1,8 @@
 <template>
     <div>
-        <label @click="visible = !visible">{{label}}</label>
-        <IconButton icon="chevron-down" :class="visible ? 'danger' : 'primary'" @click="visible = !visible"/>
-        <b-collapse :visible="visible" :class="{ 'no-border': noborder}">
+        <label @click="toggle()">{{label}}</label>
+        <IconButton icon="chevron-down" :loading="loading" :class="visible ? 'danger' : 'primary'" @click="toggle()"/>
+        <b-collapse :visible="visible" :class="{ 'no-border': noborder }">
             <slot/>
         </b-collapse>
     </div>
@@ -18,12 +18,34 @@ export default Vue.extend({
         IconButton
     },
     props: {
+        value: Boolean,
         label: String,
-        noborder: Boolean
+        noborder: Boolean,
+        loading: Boolean
     },
     data: () => ({
-        visible: false
-    })
+        state: false
+    }),
+    created() {
+        this.state = this.value;
+    },
+    computed: {
+        visible(): Boolean {
+            return this.state && !this.loading;
+        }
+    },
+    watch: {
+        value(): void {
+            this.state = this.value;
+        }
+    },
+    methods: {
+        toggle(): void {
+            this.state = !this.state;
+            this.$emit('input', this.state);
+            this.$emit('toggle');
+        }
+    }
 });
 </script>
 

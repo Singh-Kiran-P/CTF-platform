@@ -1,13 +1,17 @@
 import { sortRounds } from '@shared/validation/roundsForm';
-import DB, { Round } from '../database';
+import DB, { Challenge, Round } from '../database';
 import { isAdmin } from '../auth/index';
 import express from 'express';
 const router = express.Router();
 
 // TODO
 
-router.get('/data', isAdmin, (req, res) => {
-    DB.respond(DB.repo(Round).find({ relations: ['challenges'] }), res, rounds => ({ rounds: sortRounds(rounds as any[] /* TODO: !! NOT ANY !! */) }));
+router.get('/data', isAdmin, (_, res) => {
+    DB.respond(DB.repo(Round).find(), res, rounds => ({ rounds: sortRounds(rounds.map(round => Object.assign({}, round, { challenges: undefined }))) }));
+});
+
+router.get('/challenges/:round', isAdmin, (req, res) => {
+    DB.respond(DB.repo(Challenge).find({ where: { round: req.params.round }, order: { order: 'ASC' } }), res);
 });
 
 router.put('/save', isAdmin, (req, res) => {

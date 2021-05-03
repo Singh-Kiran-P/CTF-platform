@@ -16,7 +16,9 @@
                             <b-form-input v-else type=text trim v-model="category.name" placeholder="Enter category name" :state="state(categoryFeedback(category))"/>
                             <b-form-invalid-feedback>{{categoryFeedback(category)}}</b-form-invalid-feedback>
                         </div>
-                        <IconButton class=info icon=pen icon2=save :toggled="category.editable" :disabled="category.editable && !state(categoryFeedback(category))" @click="editCategory(category)"/>
+                        <IconButton class=info icon=pen icon2=save :toggled="category.editable" @click="editCategory(category)"
+                            :disabled="category.editable && !state(categoryFeedback(category))"
+                        />
                         <IconButton class=primary icon=chevron-down @click="categoryDown(category)"/>
                         <IconButton class=danger icon=times @click="removeCategory(category)"/>
                     </div>
@@ -112,7 +114,9 @@
                                 <b-form-invalid-feedback>{{sponsorFeedback(sponsor)}}</b-form-invalid-feedback>
                             </span>
                         </div>
-                        <IconButton class=info icon=pen icon2=save :toggled="sponsor.editable" :disabled="sponsor.editable && !state(sponsorFeedback(sponsor))" @click="editSponsor(sponsor)"/>
+                        <IconButton class=info icon=pen icon2=save :toggled="sponsor.editable" @click="editSponsor(sponsor)"
+                            :disabled="sponsor.editable && !state(sponsorFeedback(sponsor))"
+                        />
                         <IconButton class=primary icon=chevron-down @click="sponsorDown(sponsor)"/>
                         <IconButton class=danger icon=times @click="removeSponsor(sponsor)"/>
                     </div>
@@ -139,11 +143,12 @@ import axios from 'axios';
 import Collapse from '@/components/Collapse.vue';
 import IconButton from '@/components/IconButton.vue';
 import StatusButton from '@/components/StatusButton.vue';
+import { nextOrder, moveDown } from '@/assets/listFunctions';
 import { state, validInput, validForm, validate, Category, Tag, Page, Sponsor, Form } from '@shared/validation/competitionForm';
 import { serialize } from '@shared/objectFormdata';
 import path from 'path';
 
-type Edit = { editable?: boolean };
+type Editable = { editable?: boolean };
 
 export default Vue.extend({
     name: 'Config',
@@ -162,7 +167,7 @@ export default Vue.extend({
             tags: [],
             pages: [],
             sponsors: []
-        } as Form & { [name in 'categories' | 'tags' | 'pages' | 'sponsors']: Edit[] },
+        } as Form,
         add: {
             category: '',
             tag: { name: '', description: '' },
@@ -177,10 +182,10 @@ export default Vue.extend({
     computed: {
         nameFeedback(): string { return validate.name(this.form.name); },
 
-        newCategory(): Category { return { name: this.add.category, order: this.nextOrder(this.form.categories) }; },
-        newTag(): Tag { return Object.assign({}, this.add.tag, { order: this.nextOrder(this.form.tags) }); },
-        newPage(): Page { return Object.assign({}, this.add.page, { source: '', order: this.nextOrder(this.form.pages) } ); },
-        newSponsor(): Sponsor { return Object.assign({}, this.add.sponsor, { icon: '', order: this.nextOrder(this.form.sponsors) } ); },
+        newCategory(): Category { return { name: this.add.category, order: nextOrder(this.form.categories) }; },
+        newTag(): Tag { return Object.assign({}, this.add.tag, { order: nextOrder(this.form.tags) }); },
+        newPage(): Page { return Object.assign({}, this.add.page, { source: '', order: nextOrder(this.form.pages) } ); },
+        newSponsor(): Sponsor { return Object.assign({}, this.add.sponsor, { icon: '', order: nextOrder(this.form.sponsors) } ); },
 
         newCategoryFeedback(): string { return this.categoryFeedback(this.newCategory, true); },
         validNewCategory(): boolean { return validInput(this.newCategoryFeedback, this.newCategory.name); },
@@ -213,12 +218,14 @@ export default Vue.extend({
     methods: {
         state, // make the state function available in the html
 
-        loadFormData(): void {
+        loadFormData(clear: boolean = true): void {
             this.cancelState = 'loading';
-            this.add.category = '';
-            this.add.tag = { name: '', description: '' };
-            this.add.page = { name: '', path: '', html: null, zip: null };
-            this.add.sponsor = { name: '', link: '', img: null };
+            if (clear) {
+                this.add.category = '';
+                this.add.tag = { name: '', description: '' };
+                this.add.page = { name: '', path: '', html: null, zip: null };
+                this.add.sponsor = { name: '', link: '', img: null };
+            }
             const error = () => {
                 this.cancelState = 'error';
                 this.saveState = 'normal';
@@ -239,25 +246,15 @@ export default Vue.extend({
             const error = () => this.saveState = 'error';
             axios.put('/api/competition/save', serialize(this.form)).then(res => {
                 if (res.data.error) return error();
-                this.loadFormData();
+                this.loadFormData(false);
                 this.savedMessage = 'Some changes might require a reload to take effect';
             }).catch(() => error());
         },
 
-        nextOrder(list: any[]): number { return list.reduce((x, y) => Math.max(x, y.order), 0) + 1; },
-        moveDown(list: any[], predicate: (x: any) => boolean): void {
-            let i = list.findIndex(x => predicate(x));
-            if (i < 0 || i >= list.length - 1) return;
-            let temp = list[i];
-            let set = (x: any, y: any) => Object.assign({}, y, { order: x.order });
-            Vue.set(list, i, set(list[i], list[i + 1]));
-            Vue.set(list, i + 1, set(list[i + 1], temp));
-        },
-
         categoryFeedback(category: Category, add: boolean = false): string { return validate.category(category, this.form.categories, add); },
-        categoryDown(category: Category): void { this.moveDown(this.form.categories, x => x.name == category.name); },
-        removeCategory(category: Category): void { this.form.categories = this.form.categories.filter((x: Category) => x.name != category.name); },
-        editCategory(category: Category & Edit): void { if (!category.editable || state(this.categoryFeedback(category))) Vue.set(category, 'editable', !category.editable); },
+        categoryDown(category: Category): void { moveDown(this.form.categories, x => x.name == category.name); },
+        removeCategory(category: Category): void { this.form.categories = this.form.categories.filter(x => x.order != category.order); },
+        editCategory(category: Category & Editable): void { if (!category.editable || state(this.categoryFeedback(category))) Vue.set(category, 'editable', !category.editable); },
         addCategory(): void {
             if (!this.validNewCategory) return;
             this.form.categories.push(this.newCategory);
@@ -265,9 +262,9 @@ export default Vue.extend({
         },
 
         tagFeedback(tag: Tag, add: boolean = false): string { return validate.tag(tag, this.form.tags, add); },
-        tagDown(tag: Tag): void { this.moveDown(this.form.tags, x => x.name == tag.name); },
-        removeTag(tag: Tag): void { this.form.tags = this.form.tags.filter((x: Tag) => x.name != tag.name); },
-        editTag(tag: Tag & Edit): void { if (!tag.editable || state(this.tagFeedback(tag))) Vue.set(tag, 'editable', !tag.editable); },
+        tagDown(tag: Tag): void { moveDown(this.form.tags, x => x.name == tag.name); },
+        removeTag(tag: Tag): void { this.form.tags = this.form.tags.filter(x => x.order != tag.order); },
+        editTag(tag: Tag & Editable): void { if (!tag.editable || state(this.tagFeedback(tag))) Vue.set(tag, 'editable', !tag.editable); },
         addTag(): void {
             if (!this.validNewTag) return;
             this.form.tags.push(this.newTag);
@@ -278,9 +275,9 @@ export default Vue.extend({
         htmlPlaceholder(page: Page): string { return page && (page.html || page.source) ? this.source(page) : 'Upload page HTML'; },
         zipPlaceholder(page?: Page): string { return page?.zip ? page.zip.name || '' : (page?.source ? 'New page dependencies' : 'Upload page dependencies') },
         pageFeedback(page: Page, add: boolean = false): string { return validate.page(page, this.form.pages, add); },
-        pageDown(page: Page): void { this.moveDown(this.form.pages, x => x.path == page.path); },
-        removePage(page: Page): void { this.form.pages = this.form.pages.filter((x: Page) => x.path != page.path); },
-        editPage(page: Page & Edit): void { if (!page.editable || state(this.pageFeedback(page))) Vue.set(page, 'editable', !page.editable); },
+        pageDown(page: Page): void { moveDown(this.form.pages, x => x.path == page.path); },
+        removePage(page: Page): void { this.form.pages = this.form.pages.filter(x => x.order != page.order); },
+        editPage(page: Page & Editable): void { if (!page.editable || state(this.pageFeedback(page))) Vue.set(page, 'editable', !page.editable); },
         addPage(): void {
             if (!this.validNewPage) return;
             this.form.pages.push(this.newPage);
@@ -290,9 +287,9 @@ export default Vue.extend({
         icon(sponsor: Sponsor): string { return sponsor.img ? sponsor.img.name || '' : path.basename(sponsor.icon); },
         imgPlaceholder(sponsor?: Sponsor): string { return sponsor && (sponsor.img || sponsor.icon) ? this.icon(sponsor) : 'Upload sponsor icon'; },
         sponsorFeedback(sponsor: Sponsor, add: boolean = false): string { return validate.sponsor(sponsor, this.form.sponsors, add); },
-        sponsorDown(sponsor: Sponsor): void { this.moveDown(this.form.sponsors, x => x.link == sponsor.link); },
-        removeSponsor(sponsor: Sponsor): void { this.form.sponsors = this.form.sponsors.filter((x: Sponsor) => x.link != sponsor.link); },
-        editSponsor(sponsor: Sponsor & Edit): void { if (!sponsor.editable || state(this.sponsorFeedback(sponsor))) Vue.set(sponsor, 'editable', !sponsor.editable); },
+        sponsorDown(sponsor: Sponsor): void { moveDown(this.form.sponsors, x => x.link == sponsor.link); },
+        removeSponsor(sponsor: Sponsor): void { this.form.sponsors = this.form.sponsors.filter(x => x.order != sponsor.order); },
+        editSponsor(sponsor: Sponsor & Editable): void { if (!sponsor.editable || state(this.sponsorFeedback(sponsor))) Vue.set(sponsor, 'editable', !sponsor.editable); },
         addSponsor(): void {
             if (!this.validNewSponsor) return;
             this.form.sponsors.push(this.newSponsor);

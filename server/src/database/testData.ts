@@ -40,6 +40,16 @@ async function loadTestData() {
         new Round('~le tour final est arrivé~', new Date(2021, 5, 1, 13).toJSON(), new Date(2021, 5, 1, 14).toJSON())
     ]);
 
+    let challenges: Challenge[] = await save([
+        new Challenge(rounds[0], 'bruhrurh', 1),
+        new Challenge(rounds[0], 'come have fun here! (:', 4),
+        new Challenge(rounds[1], 'contitnitueing!', 4),
+        new Challenge(rounds[1], 'thius is onlyly the begine', 3),
+        new Challenge(rounds[1], 'warm up cuz utis abotu to get stemey', 1),
+        new Challenge(rounds[1], 'haha finif', 7),
+        new Challenge(rounds[2], 'huhgg FIN#', 2),
+    ]);
+
     let admin = new Account('admin', 'password');
     admin.admin = true;
     let accounts: Account[] = await save([
