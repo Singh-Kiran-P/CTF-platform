@@ -12,15 +12,19 @@ const validateString = (input: string, name: string, min: number, max: number, r
     return '';
 }
 
+const validateCharacters = (input: string, name: string, disallowed?: RegExp | boolean, allowed?: RegExp): string => {
+    if (typeof disallowed == 'boolean') disallowed = /([\\\/\:\*\?\<\>\"\|]+)/g;
+    let invalidChars = allowed ? input.replace(allowed, '') : '';
+    if (disallowed) invalidChars += input.match(disallowed)?.toString() || '';
+    return invalidChars ? `${name} cannot contain the following characters: '${invalidChars}'` : '';
+}
+
 const validateList = (list: any[], name: string, required: boolean): string => {
-    if (required && list.length == 0) return `At least one ${name} is required`;
-    return '';
+    return required && list.length == 0 ? `At least one ${name} is required` : '';
 };
 
 const regexName = (input: string, name: string): string => {
-    let invalidChars = input.replace(/([a-zA-Z0-9 \_\-]+)/g, '');
-    if (invalidChars) return `${name} cannot contain the following characters: '${invalidChars}'`;
-    return '';
+    return validateCharacters(input, name, undefined, /([a-zA-Z0-9 \_\-]+)/g);
 }
 
 const is = {
@@ -31,4 +35,4 @@ const is = {
     array: (v: any, t: (x: any) => boolean): boolean => Array.isArray(v) && (v as any[]).every(x => t(x)),
 }
 
-export { state, validInput, validateString, validateList, regexName, is };
+export { state, validInput, validateString, validateCharacters, validateList, regexName, is };

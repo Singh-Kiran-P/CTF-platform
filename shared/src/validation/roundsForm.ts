@@ -1,9 +1,9 @@
 // functions to validate the rounds form
 
 import { File as UFile } from 'formidable';
-import { state, validInput, validateString, validateList, is } from '../validation';
+import { state, validInput, validateString, validateCharacters, validateList, is } from '../validation';
 
-type Challenge = { name: string, order: number, attachments: string, zip: File | UFile | null }; // TODO
+type Challenge = { name: string, description: string, points: number, flag: string, attachments: string, order: number, zip: File | UFile | null }; // TODO
 type Round = { id? :number, name: string, start: string, end: string, challenges: Challenge[] | undefined };
 type Form = { rounds: Round[] };
 
@@ -24,7 +24,8 @@ const validate = {
     challenges: (challenges?: Challenge[]): string => challenges ? validateList(challenges, 'challenge', true) : '',
 
     round: (round: Round, rounds: Round[], add: boolean = false): string => {
-        let v = validateString(round.name, 'Round name', 3, 32, !add);
+        let v = validateCharacters(round.name, 'Round name', true);
+        if (!v) v = validateString(round.name, 'Round name', 3, 32, !add, rounds.map(r => r.name), !add);
         if (!v) v = validateString(round.start, 'Round start', -1, -1, !add);
         if (!v) v = validateString(round.end, 'Round end', -1, -1, !add);
         let [start, end] = times(round);
@@ -38,10 +39,11 @@ const validate = {
         return v;
     },
     challenge: (challenge: Challenge, challenges?: Challenge[], add: boolean = false): string => {
-        if (!challenges) return '';
-        let v = validateString(challenge.name, 'Challenge name', 3, 32, !add);
-        // TODO
-        return v;
+        let v = validateCharacters(challenge.name, 'Challenge name', true);
+        if (!v) v = validateString(challenge.name, 'Challenge name', 3, 32, !add, (challenges || []).map(c => c.name), !add);
+        if (!v && challenge.points < 0) v = 'Challenge points cannot be negative';
+        if (!v) v = validateString(challenge.flag, 'Challenge flag', 3, -1);
+        return v; // TODO
     }
 }
 
@@ -56,7 +58,8 @@ const isf = {
         return challenges == undefined || is.array(challenges, isf.challenge);
     },
     challenge: (challenge: any): boolean => {
-        return is.object(challenge) && is.string(challenge.name) && is.number(challenge.order); // TODO
+        let v = is.object(challenge) && is.string(challenge.name) && is.string(challenge.description) && is.number(challenge.points) && is.string(challenge.flag);
+        return v && is.number(challenge.order); // TODO
     }
 }
 

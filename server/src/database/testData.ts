@@ -41,13 +41,13 @@ async function loadTestData() {
     ]);
 
     let challenges: Challenge[] = await save([
-        new Challenge(rounds[0], 'bruhrurh', 1),
-        new Challenge(rounds[0], 'come have fun here! (:', 4),
-        new Challenge(rounds[1], 'contitnitueing!', 4),
-        new Challenge(rounds[1], 'thius is onlyly the begine', 3),
-        new Challenge(rounds[1], 'warm up cuz utis abotu to get stemey', 1),
-        new Challenge(rounds[1], 'haha finif', 7),
-        new Challenge(rounds[2], 'huhgg FIN#', 2),
+        new Challenge(rounds[0], 'bruhrurh', 'it begin herere!!\nare you excite?? epic cool? ye yes\n\njust watch out it wil be hard', 5, 'FLAG 1', 1),
+        new Challenge(rounds[0], 'come have fun here! (', 'hoo good job!\n...\n\n         more coming :)', 5, 'FLAG SECOND', 4),
+        new Challenge(rounds[1], 'contitnitueing!', 'haha yes hope you liked your break becuas eits babaout to get WILD!  CRAZY!', 10, 'cool flag B)', 4),
+        new Challenge(rounds[1], 'thius is onlyly the begine', 'harder and harder it will get yeees', 15, 'mmmmMMMMMMMMMMMMMMMMMMMMMM!', 3),
+        new Challenge(rounds[1], 'warm up cuz abotu to get stemey', 'i was just joking this one dont even got points LMAO\n\n\n\n\n\nepic owned', 0, 'usesless flag LOL', 1),
+        new Challenge(rounds[1], 'haha finif', 'BOO! yeah now it s hard cunt watch out ccd', 20, 'haha you wont even find this i bet', 7),
+        new Challenge(rounds[2], 'huhgg FIN#', 'Quest-ce que Lorem Ipsum? Lorem Ipsum est simplement un faux texte de lindustrie de limpression et de la composition. Lorem Ipsum a été le texte factice standard de lindustrie depuis les années 1500, quand un imprimeur inconnu a pris une galère de caractères et la brouillée pour en faire un livre de spécimens. Il a survécu non seulement cinq siècles, mais aussi le saut dans la composition électronique, demeurant essentiellement inchangé. Il a été popularisé dans les années 1960 avec la sortie de feuilles Letraset contenant des passages du Lorem Ipsum, et plus récemment avec un logiciel de publication assistée par ordinateur comme Aldus PageMaker comprenant des versions de Lorem Ipsum.', 999, 'tres bon', 2),
     ]);
 
     let admin = new Account('admin', 'password');

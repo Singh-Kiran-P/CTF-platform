@@ -63,15 +63,15 @@ export class Challenge {
     @Column()
     visibility: boolean;
 
-    constructor(round: Round, name: string, order: number) {
-        this.description = 'TODO';
-        this.points = 10;
+    constructor(round: Round, name: string, description: string, points: number, flag: string, order: number) {
         this.type = ChallengeType.BASIC;
-        this.flag = 'TODO';
         this.dockerfile = 'TODO';
         this.visibility = false;
         
         this.name = name;
+        this.description = description;
+        this.points = points;
+        this.flag = flag;
         this.order = order;
         if (!round) return;
         this.round = round;

@@ -1,4 +1,4 @@
-// basic functions for vue lists
+// general functions for vue lists
 
 import Vue from 'vue';
 

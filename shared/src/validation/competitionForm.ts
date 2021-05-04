@@ -1,7 +1,7 @@
 // functions to validate the competition form
 
 import { File as UFile } from 'formidable';
-import { state, validInput, validateString, validateList, is } from '../validation';
+import { state, validInput, validateString, validateCharacters, validateList, is } from '../validation';
 
 type Category = { name: string, order: number };
 type Tag = { name: string, description: string, order: number };
@@ -35,8 +35,7 @@ const validate = {
         let v = validateString(page.name, 'Page name', 3, 32, !add);
         if (!v && page.path && !page.path.startsWith('/')) v = `Page path must start with '/'`;
         if (!v && page.path.startsWith('/api')) v = `Page path cannot start with '/api'`;
-        let invalidChars = page.path.replace(/([a-zA-Z0-9\/\-]+)/g, '');
-        if (!v && invalidChars) v = `Page path cannot contain the following characters: '${invalidChars}'`;
+        if (!v) v = validateCharacters(page.path, 'Page path', undefined, /([a-zA-Z0-9\/\-]+)/g);
         if (!v && page.path.includes('//')) v = `Page path cannot have multiple '/'s in a row`;
         if (!v && page.path.length > 1 && page.path.endsWith('/')) v = `Page path cannot end with '/'`;
         if (!v) v = validateString(page.path, 'Page path', 1, 32, !add, pages.map(x => x.path), !add);
@@ -48,8 +47,7 @@ const validate = {
     },
     sponsor: (sponsor: Sponsor, sponsors: Sponsor[], add: boolean = false): string => {
         let v = sponsor.name.startsWith('_') ? `Sponsor name cannot start with '_'` : '';
-        let invalidChars = sponsor.name.replace(/([a-zA-Z0-9 \,\!\?\.\'\"\&\_\-]+)/g, '');
-        if (!v && invalidChars) v = `Sponsor name cannot contain the following characters: '${invalidChars}'`;
+        if (!v) v = validateCharacters(sponsor.name, 'Sponsor name', true);
         if (!v) v = validateString(sponsor.name, 'Sponsor name', 3, 32, !add, sponsors.map(x => x.name), !add);
         if (!v) v = validateString(sponsor.link, 'Sponsor link', -1, 128, !add);
         if (!v && !add && !sponsor.icon && !sponsor.img) v = 'Sponsor icon is required';

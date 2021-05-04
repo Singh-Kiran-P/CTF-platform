@@ -1,11 +1,11 @@
 <template>
-    <div class=rounds>
+    <div class=list-form>
         <b-form @submit="onSubmit($event)">
             <b-form-group :state="state(roundsFeedback)" :invalid-feedback="roundsFeedback">
-                <div class=round v-for="(round, i) in form.rounds" :key="i /* TODO */">
-                    <div class=round-content>
+            <div class="list-item nostyle round" v-for="(round, i) in form.rounds" :key="i /* TODO */">
+                    <div class=item-content>
                         <template v-if="!round.editable">
-                            <span class=round-name>{{round.name}}</span>
+                            <span class=item-name>{{round.name}}</span>
                             <span>{{timeDisplay(round)}}</span>
                         </template>
                         <template v-else>
@@ -18,12 +18,31 @@
                     <IconButton class=info icon=pen icon2=save :toggled="round.editable" :disabled="round.editable && !state(roundFeedback(round))" @click="editRound(round)"/>
                     <IconButton class=danger icon=times @click="removeRound(round)"/>
 
-                    <b-form-group :state="state(challengesFeedback(round))" :invalid-feedback="challengesFeedback(round)">
+                    <b-form-group class=challenges :state="state(challengesFeedback(round))" :invalid-feedback="challengesFeedback(round)">
                         <Collapse label=Challenges noborder v-model="round.visible" :loading="round.loading" @toggle="toggledRound(round)">
-                            <div class=challenge v-for="challenge in round.challenges" :key="challenge.order">
-                                <div class=challenge-content>
-                                    <span class=challenge-name>{{challenge.name}}</span>
-                                    bro a fuckign challegege?? :flusheded":
+                            <div class=list-item v-for="challenge in round.challenges" :key="challenge.order">
+                                <div class=item-content>
+                                    <template v-if="!challenge.editable">
+                                        <span class=item-name>{{challenge.name}}</span>
+                                        <span class=item-description>{{challenge.description}}</span>
+                                    </template>
+                                    <template v-else>
+                                        <b-form-input type=text trim v-model="challenge.name" placeholder="Enter challenge name" :state="state(challengeFeedback(round, challenge))"/>
+                                        <b-form-textarea max-rows="10" v-model="challenge.description" placeholder="Enter challenge description"
+                                            :state="state(challengeFeedback(round, challenge))"
+                                        />
+                                    </template>
+                                    <span :class="['item-description', { marginTop: challenge.editable }]">
+                                        <span class=item-category>Points</span>
+                                        <span v-if="!challenge.editable" class=item-value>{{challenge.points}}</span>
+                                        <b-form-input v-else type=number v-model="challenge.points" placeholder="Enter challenge points" :state="state(challengeFeedback(round, challenge))"/>
+                                    </span>
+                                    <span :class="['item-description', { marginTop: challenge.editable }]">
+                                        <span class=item-category>Flag</span>
+                                        <span v-if="!challenge.editable" class=item-value>{{challenge.flag}}</span>
+                                        <b-form-input v-else type=text trim v-model="challenge.flag" placeholder="Enter challenge flag" :state="state(challengeFeedback(round, challenge))"/>
+                                    </span>
+                                    <b-form-invalid-feedback>{{challengeFeedback(round, challenge)}}</b-form-invalid-feedback>
                                 </div>
                                 <IconButton class=info icon=pen icon2=save :toggled="challenge.editable" @click="editChallenge(round, challenge)"
                                     :disabled="challenge.editable && !state(challengeFeedback(round, challenge))"
@@ -31,12 +50,12 @@
                                 <IconButton class=primary icon=chevron-down @click="challengeDown(round, challenge)"/>
                                 <IconButton class=danger icon=times @click="removeChallenge(round, challenge)"/>
                             </div>
-                            <b-button class=add-challenge variant=primary block @click="addChallenge(round)">Add a new challenge</b-button>
+                            <b-button class=add-list-item variant=primary block @click="addChallenge(round)">Add a new challenge</b-button>
                         </Collapse>
                     </b-form-group>
                 </div>
                 <Collapse label="Add a new round">
-                    <div class=add-round>
+                    <div class=add-list-item>
                         <b-form-input type=text trim v-model="add.round.name" placeholder="Enter new round name" :state="state(newRoundFeedback)"/>
                         <b-button type=button variant=primary :disabled="!validNewRound" @click="addRound()"><font-awesome-icon icon=plus /></b-button>
                         <DateTimePicker v-model="add.round.start" :state="state(newRoundFeedback)" label="Starts at"/>
@@ -106,7 +125,7 @@ export default Vue.extend({
         validForm(): boolean { return validForm(this.formData, false); }
     },
     watch: {
-        formData: { deep: true, handler() {
+        formData: { deep: true, handler() { // TODO: ignore editable and visible and loading
             let state = 'normal';
             if (this.loaded) {
                 state = 'succes';
@@ -195,7 +214,7 @@ export default Vue.extend({
         removeChallenge(round: Round, challenge: Challenge): void { round.challenges = round.challenges?.filter(x => x.order != challenge.order) || []; },
         addChallenge(round: Round): void {
             if (round.challenges == undefined) round.challenges = [];
-            let add = { name: '', order: nextOrder(round.challenges), attachments: '', zip: null, editable: true };
+            let add = { name: '', description: '', points: 0, flag: '', order: nextOrder(round.challenges), attachments: '', zip: null, editable: true };
             round.challenges.push(add);
         },
         editChallenge(round: Round, challenge: Challenge & Editable): void {
@@ -206,99 +225,42 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-.rounds {
-    display: flex;
-    justify-content: center;
-    overflow-y: scroll !important;
-    padding: var(--double-margin);
-    padding-bottom: 0;
-}
-
-form {
-    width: min(100%, var(--breakpoint-md));
-}
-
-.round, .challenge {
-    display: flex;
-    flex-wrap: wrap;
-
-    .round-content, .challenge-content {
-        width: 0;
-        flex-grow: 1;
-        margin-right: var(--margin);
-        margin-bottom: var(--margin);
-    }
-}
+@import '@/assets/css/listform.scss';
 
 .round {
+    flex-wrap: wrap;
     border-bottom: 2px solid black;
+    
+    & > button {
+        background-color: var(--white);
+    }
 
     &:not(:last-of-type) {
         margin-bottom: var(--double-margin);
     }
     
-    .round-name {
-        display: block;
-        font-weight: bold;
+    .item-name {
         font-size: var(--font-large);
     }
 
     .date-time-picker {
         margin-top: var(--margin);
     }
-
-    & > button {
-        background-color: var(--white);
-    }
-
-    & > :last-child {
-        width: 100%;
-        margin-bottom: var(--margin);
-    }
 }
 
-.add-round {
+.challenges {
     width: 100%;
-    display: flex;
-    flex-wrap: wrap;
-    margin-top: var(--margin);
-    margin-bottom: var(--double-margin);
+    margin: var(--margin) 0;
 
-    input, .date-time-picker {
-        width: 100%;
-        margin-top: var(--margin);
+    .list-item {
+        .item-description {
+            white-space: pre-wrap;
+        }
     }
-    
-    input:first-of-type {
-        width: 0;
-        flex-grow: 1;
-        margin-top: 0;
-        margin-right: var(--margin);
-    }
-}
 
-.challenge {
-    padding: var(--margin);
-    margin-top: var(--margin);
-    border-radius: var(--border-radius);
-    background-color: var(--gray-light);
-
-    .challenge-name {
+    .add-list-item {
         display: block;
-        font-weight: bold;
+        margin-bottom: 0;
     }
-}
-
-.add-challenge {
-    margin-top: var(--margin);
-}
-
-form > button {
-    width: calc(50% - var(--margin) / 2);
-    margin-bottom: var(--double-margin);
-}
-
-form > .btn-danger {
-    margin-right: var(--margin);
 }
 </style>

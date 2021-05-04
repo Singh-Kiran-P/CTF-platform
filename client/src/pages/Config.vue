@@ -1,5 +1,5 @@
 <template>
-    <div class=config>
+    <div class=list-form>
         <b-form @submit="onSubmit($event)">
             <b-form-group>
                 <label for=competition-name>Competition name</label>
@@ -204,7 +204,7 @@ export default Vue.extend({
         validForm(): boolean { return validForm(this.form, false); }
     },
     watch: {
-        form: { deep: true, handler() {
+        form: { deep: true, handler() {  // TODO: ignore editable
             let state = 'normal';
             if (this.loaded) {
                 state = 'succes';
@@ -300,17 +300,7 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-.config {
-    display: flex;
-    justify-content: center;
-    overflow-y: scroll !important;
-    padding: var(--double-margin);
-    padding-bottom: 0;
-}
-
-form {
-    width: min(100%, var(--breakpoint-md));
-}
+@import '@/assets/css/listform.scss';
 
 form label {
     font-weight: bold;
@@ -323,55 +313,11 @@ span.info {
     margin-top: var(--half-margin);
 }
 
-.list-item, .add-list-item {
-    margin-top: var(--margin);
-}
-
 .list-item {
-    padding: var(--margin);
-    border-radius: var(--border-radius);
-    background-color: var(--gray-light);
-    display: flex;
-
-    .item-content {
-        width: 0;
-        flex-grow: 1;
-        margin-right: var(--margin);
-    }
-    
-    .item-name {
-        display: block;
-        font-weight: bold;
-    }
-    
-    .item-description {
-        display: flex;
-        flex-wrap: wrap;
-    }
-    
-    .item-category {
-        width: 5rem;
-        color: var(--gray);
-        display: inline-block;
-    }
-    
-    .item-category ~ * {
-        width: 0;
-        flex-grow: 1;
-    }
-
     .item-category ~ span:not(.item-value), .item-category ~ .invalid-feedback {
         width: 100%;
     }
     
-    .item-description.marginTop {
-        margin-top: var(--margin);
-    }
-    
-    textarea {
-        margin-top: var(--margin);
-    }
-
     .b-form-file.half:first-of-type {
         margin-right: var(--margin);
     }
@@ -379,22 +325,6 @@ span.info {
 }
 
 .add-list-item {
-    display: flex;
-    flex-wrap: wrap;
-    margin-bottom: var(--double-margin);
-
-    input, textarea, .b-form-file {
-        width: 100%;
-        margin-top: var(--margin);
-    }
-    
-    input:first-of-type {
-        width: 0;
-        flex-grow: 1;
-        margin-top: 0;
-        margin-right: var(--margin);
-    }
-
     .b-form-file.half {
         width: 0;
         flex-grow: 1;
@@ -409,14 +339,6 @@ span.info {
 $breakpoint-sm: 576px;
 @media (max-width: $breakpoint-sm) {
     .list-item {
-        .item-description {
-            flex-wrap: wrap;
-        }
-
-        .item-category ~ *:not(span) {
-            width: 100%;
-        }
-
         .b-form-file.half:first-of-type {
             margin-right: 0;
         }
@@ -438,11 +360,7 @@ $breakpoint-sm: 576px;
 }
 
 form > button {
-    width: calc(50% - var(--margin) / 2);
-}
-
-form > .btn-danger {
-    margin-right: var(--margin);
+    margin-bottom: 0;
 }
 
 form > :last-child {
