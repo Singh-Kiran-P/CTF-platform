@@ -8,6 +8,9 @@
         "jsx": "preserve",
         "sourceMap": true,
         "baseUrl": ".",
+        "importHelpers": true,
+        "experimentalDecorators": true,
+        "allowSyntheticDefaultImports": true,
         "types": [
             "webpack-env"
         ],

@@ -6,7 +6,7 @@ import { resolve } from 'node:path';
 var build = require('dockerode-build')
 var docker = new Docker({ socketPath: '/var/run/docker.sock' });
 import DB, { DockerChallengeContainer, DockerChallengeImage, DockerManagementRepo, DockerOpenPort } from '../database';
-import { deserialize } from '@shared/objectFormData';
+import { deserialize } from '@shared/objectFormdata';
 import { uploaddir } from '@/routes/uploads';
 import { unzip_, upload } from '@/files';
 

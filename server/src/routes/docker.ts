@@ -8,7 +8,7 @@ import express, { json } from "express";
 import Docker from "dockerode";
 import DockerController from "../controllers/docker";
 import { isAdmin, isAuth } from "../auth";
-import { deserialize } from '@shared/objectFormData';
+import { deserialize } from '@shared/objectFormdata';
 import { parentDir, fileName, upload, move, remove, unzip, chain, unzip_ } from '../files';
 
 import DB, { DockerChallengeContainer, DockerChallengeImage, DockerManagement, DockerManagementRepo, DockerOpenPort } from '../database';
@@ -34,12 +34,10 @@ router.post("/dockerConfigPorts", isAdmin, isAuth, async (req, res) => {
 })
 
 
-router.get("/containers", isAuth, isAdmin, (req, res) => {
+router.get("/containers",  (req, res) => {
     docker.listContainers((err, containers) => {
         console.log(err);
         console.log(containers);
-
-
         res.json(containers);
     });
 });

@@ -14,7 +14,9 @@ module.exports = {
                         "^/api": ""
                     }
                 },
+
             },
+            disableHostCheck: true,   // That solved it
             watchOptions: {
                 ignored: [
                     /node_modules/,

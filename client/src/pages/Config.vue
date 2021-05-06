@@ -140,7 +140,7 @@ import Collapse from '@/components/Collapse.vue';
 import IconButton from '@/components/IconButton.vue';
 import StatusButton from '@/components/StatusButton.vue';
 import { state, validInput, validForm, validate, Category, Tag, Page, Sponsor, Form } from '@shared/validation/competitionForm';
-import { serialize } from '@shared/objectFormData';
+import { serialize } from '@shared/objectFormdata';
 import path from 'path';
 
 type Edit = { editable?: boolean };

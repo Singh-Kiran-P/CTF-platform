@@ -58,23 +58,16 @@ import Vue from "vue";
 import axios from "axios";
 import StatusButton from "@/components/StatusButton.vue";
 import { state, validInput, is } from "@shared/validation";
-
+import { io } from "socket.io-client";
 export default Vue.extend({
     name: "Login",
     components: {
         StatusButton,
     },
-    created() {},
-    sockets: {
-        connect: function () {
-            console.log("socket connected");
-        },
-        customEmit: function (data) {
-            console.log(
-                'this method was fired by the socket server. eg: io.emit("customEmit", data)'
-            );
-        },
+    created() {
+        const socket = io("http://localhost:4000");
     },
+
     data: () => ({
         form: {
             username: "",
@@ -110,11 +103,6 @@ export default Vue.extend({
                 validInput(this.passwordFeedback, this.password)
             );
         },
-        clickButton: function (data: any) {
-            // $socket is socket.io-client instance
-            this.$socket.emit("emit_method", data);
-        },
-
         onSubmit(e: Event): void {
             e.preventDefault();
             this.loginState = "loading";

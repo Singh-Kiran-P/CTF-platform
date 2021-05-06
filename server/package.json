@@ -24,6 +24,7 @@
         "bunyan": "^1.8.15",
         "concurrently": "^6.0.0",
         "connect-typeorm": "^1.1.4",
+        "cors": "^2.8.5",
         "crypto": "^1.0.1",
         "dockerode": "^3.2.1",
         "dockerode-build": "^1.1.6",
@@ -47,7 +48,8 @@
         "socket.io": "^4.0.1",
         "tslib": "^2.2.0",
         "typeorm": "^0.2.32",
-        "typeorm-store": "^1.2.0"
+        "typeorm-store": "^1.2.0",
+        "vue-socket.io": "^3.0.10"
     },
     "devDependencies": {
         "@types/dockerode": "^3.2.3",

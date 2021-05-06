@@ -36,7 +36,7 @@ class Database extends EventEmitter {
             username: process.env.DB_USER,
             password: process.env.DB_PASSWORD,
             synchronize: true,
-            logging: true,
+            logging: false,
             entities: [
                 path.join(__dirname, '/entities/*/*.js')
             ]
@@ -44,7 +44,7 @@ class Database extends EventEmitter {
             this.conn = conn;
             await this.conn.query(`SET search_path TO ${process.env.DB_SCHEMA};`);
             if (this.loadTestData) await loadTestData();
-            console.log('Connected');
+            console.log('Connected to Database!');
 
             this.emit('connect');
         }).catch(error => this.emit('error', error));

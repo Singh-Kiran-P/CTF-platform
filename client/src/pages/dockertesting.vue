@@ -156,7 +156,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { serialize } from "@shared/objectFormData";
+import { serialize } from "@shared/objectFormdata";
 
 import axios from "axios";
 

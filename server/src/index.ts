@@ -1,5 +1,6 @@
 import dotenv from "dotenv";
 import express from "express";
+import cors from "cors";
 import passport from 'passport';
 import session from 'express-session';
 import formidable from 'express-formidable';
@@ -48,18 +49,21 @@ app.all(/./, (_, __, next) => {
 // register all routes
 routes.forEach(route => app.use(route.path, route.router));
 
+// CORS middleware
+app.use(cors())
 
-// Socket
-const httpServer = createServer();
-const options = { /* ... */ };
-const io = new Server(httpServer, options);
-
-io.on("connection", (socket: Socket) => {
-    socket.on('chat_message', (msg) => {
-        io.emit('chat_message', msg);
-    });
+app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE');
+    res.setHeader('Access-Control-Allow-HEaders', 'Content-Type, Authorization');
+    next();
 });
 
 // start the server
-// app.listen(process.env.SERVER_PORT);
-httpServer.listen(3000);
+const server = app.listen(process.env.SERVER_PORT);
+
+// Socket IO
+const io = require("./socket").init(server);
+io.on('connection', (_socket: any) => {
+    console.log('Client connected to socket!')
+})
