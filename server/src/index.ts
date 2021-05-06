@@ -1,15 +1,15 @@
-import dotenv from "dotenv";
-import express from "express";
-import cors from "cors";
+import dotenv from 'dotenv';
+import express from 'express';
+import cors from 'cors';
 import passport from 'passport';
 import session from 'express-session';
 import formidable from 'express-formidable';
-import { createServer } from "http";
-import { Server, Socket } from "socket.io";
+import { createServer } from 'http';
+import { Server, Socket } from 'socket.io';
 
 import { strategy } from './auth';
 import routes from './routes';
-import DB from "./database";
+import DB from './database';
 const expressip = require('express-ip');
 dotenv.config();
 
@@ -63,7 +63,10 @@ app.use((req, res, next) => {
 const server = app.listen(process.env.SERVER_PORT);
 
 // Socket IO
-const io = require("./socket").init(server);
-io.on('connection', (_socket: any) => {
-    console.log('Client connected to socket!')
+const socket = require('./socket').init(server);
+socket.on('connection', (_socket: any) => {
+    console.log('Client connected to socket!');
 })
+socket.on('disconnect', () => {
+    console.log('Client disconnected from socket!');
+});

@@ -1,7 +1,7 @@
-let io: any;
+let socket: any;
 module.exports = {
     init: (httpServer: any) => {
-        io = require('socket.io')(httpServer, {
+        socket = require('socket.io')(httpServer, {
             cors: {
                 origin: "*",
                 methods: ["GET", "POST"],
@@ -9,12 +9,12 @@ module.exports = {
                 credentials: true
             }
         });
-        return io;
+        return socket;
     },
     getIO: () => {
-        if (!io) {
+        if (!socket) {
             throw new Error('Websocket not initialized.');
         }
-        return io;
+        return socket;
     }
 }
