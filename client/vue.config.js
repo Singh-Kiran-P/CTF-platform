@@ -7,7 +7,7 @@ module.exports = {
             port: process.env.SERVER_PORT,
             proxy: {
                 "^/api": {
-                    target: `http://localhost:${process.env.API_SERVER}`,
+                    target: `http://${process.env.API_HOST}:${process.env.API_SERVER}`,
                     changeOrigin: true,
                     logLevel: "debug",
                     pathRewrite: {
@@ -19,11 +19,12 @@ module.exports = {
                 ignored: [
                     /node_modules/,
                     /public/
-                ]
+                ],
+                poll: true,
             }
         }
     },
     chainWebpack: config => {
-        config.resolve.alias.set('@shared', path.resolve('../shared/src')) 
+        config.resolve.alias.set('@shared', path.resolve('../shared/src'))
     }
 };

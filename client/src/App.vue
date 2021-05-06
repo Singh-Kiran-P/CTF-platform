@@ -12,7 +12,7 @@ import Vue from 'vue';
 import PageBar from '@/components/PageBar.vue';
 
 export default Vue.extend({
-    name: 'App',
+    name: "App",
     components: {
         PageBar
     },
@@ -47,7 +47,8 @@ export default Vue.extend({
     flex-direction: column;
 }
 
-#pageBar, #page {
+#pageBar,
+#page {
     width: 100%;
 }
 
@@ -58,7 +59,8 @@ export default Vue.extend({
     overflow: auto;
 }
 
-#page > iframe, #page > div {
+#page > iframe,
+#page > div {
     width: 100%;
     max-width: 100%;
     min-height: 100%;

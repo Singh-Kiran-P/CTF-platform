@@ -1,5 +1,9 @@
 import DB, { Team, Competition, Category, Tag, Account, Page } from '../database';
+import { DockerManagement } from './entities/docker/DockerManagement';
+import { DockerOpenPort } from './entities/docker/DockerOpenPort';
 import { TeamRepoCustom } from './entities/accounts/Team';
+import { DockerChallengeImage } from './entities/docker/DockerChallengeImage';
+import { DockerChallengeContainer } from './entities/docker/DockerChallengeContainer';
 
 /**
  * loads test entries into the database
@@ -50,6 +54,7 @@ async function loadTestData() {
     teamRepo.saveWithCaptain('Team 3', accounts[3])];
 
     /*
+
     let teams: Team[] = await save([
         new Team('Team 1', accounts[1]),
         new Team('Team 2', accounts[2]),
@@ -61,6 +66,25 @@ async function loadTestData() {
         accounts[i].team = teams[Math.round(i * (teams.length - 1) / (accounts.length - 1))];
         await DB.repo(Account).update(accounts[i].id, accounts[i]);
     }*/
+
+    let dockerManagement: DockerManagement = (await save([
+        new DockerManagement(500,5400)
+    ]))[0];
+
+    let dockerOpenPort: DockerOpenPort[] = (await save([
+        new DockerOpenPort(80),
+        new DockerOpenPort(4000),
+        new DockerOpenPort(9000),
+    ]));
+
+
+    let dockerimages: DockerChallengeImage[] = (await save([
+        new DockerChallengeImage("challenge1",["8080/tcp"],521)
+    ]));
+
+
+
+
 }
 
 /**

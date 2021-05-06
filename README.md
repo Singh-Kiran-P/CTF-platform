@@ -40,3 +40,13 @@ npm run server
 # Run client and server
 npm run dev
 ```
+
+## Docker
+```
+# Run all dockers
+docker-compose up
+# Delete all images / containers
+docker stop $(docker ps -a -q)
+docker rm $(docker ps -a -q)
+docker rmi -f $(docker images -a -q)
+```

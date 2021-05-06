@@ -1,0 +1,19 @@
+{
+    "folders": [
+        {
+            "path": "client"
+        },
+        {
+            "path": "server"
+        },
+        {
+            "path": "docker"
+        }
+    ],
+    "settings": {
+        "vetur.format.options.tabSize": 4,
+        "search.exclude": {
+            "**/package-lock.json": true
+        }
+    }
+}

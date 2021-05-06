@@ -9,16 +9,17 @@ dotenv.config();
 
 // TODO: create entity CRUD operations (custom entity repositories)
 
-interface DatabaseEvents { // defines all events the database can emit
-    'connect': () => void;
-    'error': (error: any) => void;
+interface DatabaseEvents {
+    // defines all events the database can emit
+    connect: () => void;
+    error: (error: any) => void;
 }
 
 /**
  * Database class to connect to the database and provide help functions to access it
  */
 class Database extends EventEmitter {
-    loadTestData: boolean = true; // empties and loads test data into the database before connecting if true
+    loadTestData: boolean = false; // empties and loads test data into the database before connecting if true
     conn: Connection = null;
 
     constructor() {
@@ -28,11 +29,10 @@ class Database extends EventEmitter {
 
     connect(): void {
         createConnection({
-            type: 'postgres',
+            type: "postgres",
             host: process.env.DB_HOST,
             port: parseInt(process.env.DB_PORT),
             database: process.env.DB_NAME,
-            schema: process.env.DB_SCHEMA,
             username: process.env.DB_USER,
             password: process.env.DB_PASSWORD,
             synchronize: true,
@@ -44,6 +44,8 @@ class Database extends EventEmitter {
             this.conn = conn;
             await this.conn.query(`SET search_path TO ${process.env.DB_SCHEMA};`);
             if (this.loadTestData) await loadTestData();
+            console.log('Connected');
+
             this.emit('connect');
         }).catch(error => this.emit('error', error));
     }
@@ -69,6 +71,11 @@ class Database extends EventEmitter {
             return this.conn.getCustomRepository(entity);
         }
     }
+    connection(){
+        if (this.conn) {
+            return this.conn;
+        }
+    }
 
     /**
      * allows for easily updating the given repository to a new list of entities, ask Lander for proper usage
@@ -87,19 +94,25 @@ class Database extends EventEmitter {
             }).catch(err => reject(err));
         });
     }
+
+
 }
 
-declare interface Database { // applies DatabaseEvents to Database to enable event checking
+declare interface Database {
+    // applies DatabaseEvents to Database to enable event checking
     on<U extends keyof DatabaseEvents>(
-        event: U, listener: DatabaseEvents[U]
+        event: U,
+        listener: DatabaseEvents[U]
     ): this;
 
     once<U extends keyof DatabaseEvents>(
-        event: U, listener: DatabaseEvents[U]
+        event: U,
+        listener: DatabaseEvents[U]
     ): this;
 
     emit<U extends keyof DatabaseEvents>(
-        event: U, ...args: Parameters<DatabaseEvents[U]>
+        event: U,
+        ...args: Parameters<DatabaseEvents[U]>
     ): boolean;
 }
 
@@ -122,3 +135,8 @@ export { Attempt, AttemptType } from './entities/connections/Attempt';
 export { Environment } from './entities/connections/Environment';
 export { Solve } from './entities/connections/Solve';
 export { UsedHint } from './entities/connections/UsedHint';
+
+export {DockerChallengeContainer} from './entities/docker/DockerChallengeContainer';
+export {DockerChallengeImage} from './entities/docker/DockerChallengeImage';
+export {DockerManagement, DockerManagementRepo} from './entities/docker/DockerManagement';
+export {DockerOpenPort} from './entities/docker/DockerOpenPort'

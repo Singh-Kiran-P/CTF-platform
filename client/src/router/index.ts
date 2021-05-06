@@ -50,6 +50,12 @@ const pages: { [page: string]: Route } = {
         name: 'Config',
         src: 'Config.vue',
         meta: { right: true }
+    },
+    dockerTesting: {
+        path: '/dockerTesting',
+        name: 'Docker Testing',
+        src: 'dockertesting.vue',
+        meta: { right: true }
     }
 };
 
@@ -57,7 +63,7 @@ const pages: { [page: string]: Route } = {
 const routes: { [page: string]: Route[] } = {
     [Roles.VISITOR]: [
         pages.login,
-        pages.register
+        pages.register,
     ],
     [Roles.PARTICIPANT]: [
         pages.leaderboard,
@@ -69,6 +75,7 @@ const routes: { [page: string]: Route[] } = {
         pages.leaderboard,
         pages.teams,
         pages.config,
+        pages.dockerTesting,
         pages.logout
     ]
 };

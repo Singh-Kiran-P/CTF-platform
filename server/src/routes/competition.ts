@@ -1,7 +1,7 @@
 import DB, { Category, CompetitionRepo, Page, Sponsor, Tag } from '../database';
 import { parentDir, fileName, upload, move, remove, unzip, chain } from '../files';
 import { validForm, Form } from '@shared/validation/competitionForm';
-import { deserialize } from '@shared/objectFormdata';
+import { deserialize } from '@shared/objectFormData';
 import { FindManyOptions } from 'typeorm';
 import { uploaddir } from './uploads';
 import { isAdmin } from '../auth';
@@ -77,7 +77,10 @@ router.put('/save', isAdmin, (req, res) => {
         (sponsor, dir) => upload(dir, sponsor.img),
         (p, dir) => p.icon = `${dir}/${p.img?.name || fileName(p.icon)}`);
 
-    const error = (action: string): any => res.json({ error: `Error ${action}`});
+    const error = (action: string): any => {
+        res.json({ error: `Error ${action}`})
+        console.log(action);
+    }
     Promise.all([chain(() => Promise.all(moves), () => Promise.all(secondaryUploads.map(upload => upload()))), ...initialUploads]).then(() => Promise.all([
         DB.crepo(CompetitionRepo).setName(data.name),
         DB.setRepo(DB.repo(Category), data.categories.map(x => new Category(x.name, x.order)), x => [x.name]),

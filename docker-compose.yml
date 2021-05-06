@@ -1,0 +1,73 @@
+# docker-compose.yml
+version: "3.7"
+
+services:
+  postgres:
+    container_name: postgres
+    restart: always
+    image: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ctf_platform
+    ports:
+      - '5432:5432'
+    volumes:
+      - ctf-db:/var/lib/postgresql/data
+    networks:
+      - mynet
+
+  portainer-dockerManager:
+    container_name: portainer-dockerManager
+    image: portainer/portainer-ce
+    command: -H unix:///var/run/docker.sock
+    restart: always
+    ports:
+      - 9000:9000
+      - 8000:8000
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+
+  vue-ui:
+    container_name: vue-ui
+    build:
+      context: ./client
+    ports:
+      - "80:80"
+    volumes:
+      - ./client:/ctf/client
+      - ./shared:/ctf/shared
+    working_dir: /ctf/client
+    networks:
+      - mynet
+
+  nodejs-server:
+    container_name: nodejs-server
+    build:
+      context: ./server
+    depends_on:
+      - postgres
+    links:
+      - postgres
+    ports:
+      - '4000:4000'
+    volumes:
+      - ./server:/ctf/server
+      - ./shared:/ctf/shared
+      - ./shared:/ctf/client
+      # For accessing docker works ONLY in Linux
+      - /var/run/docker.sock:/var/run/docker.sock
+    working_dir: /ctf/server
+    networks:
+      - mynet
+
+volumes:
+    ctf-db:
+    portainer_data:
+
+networks:
+  mynet:
+    driver: bridge
+    ipam:
+      driver: default

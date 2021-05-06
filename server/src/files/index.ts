@@ -60,6 +60,12 @@ const unzip = (zip: string) => {
     return extract(zip, { dir: parentDir(zip) });
 }
 
+const unzip_ = (zip: string,dis:string) => {
+    zip = Root + zip;
+    dis = Root + dis;
+    return extract(zip, { dir: dis });
+}
+
 /**
  * calls each given call after the previous one resolved, resolves after all calls resolved or rejects upon any calls rejecting
  */
@@ -90,4 +96,4 @@ const count = (c: (v?: number) => number, resolve: () => void, reject: (err: any
     }
 }
 
-export { UFile, Root, parentDir, fileName, upload, move, remove, unzip, chain };
+export { UFile, Root, parentDir, fileName, upload, move, remove, unzip,unzip_,chain };

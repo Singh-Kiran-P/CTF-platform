@@ -1,0 +1,13 @@
+version: "3.9"
+
+services:
+  postgres:
+    container_name: postgressss
+    restart: always
+    image: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ctf_platform
+    ports:
+      - '542:5432'
