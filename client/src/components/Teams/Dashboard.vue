@@ -136,9 +136,6 @@ export default Vue.extend({
         }
     }),
     watch: {
-        team: { deep: true, handler() {
-            return;
-        }}
     },
     computed: {
     },
@@ -199,6 +196,7 @@ export default Vue.extend({
                 if(response.data.error) return this.modal_invite.renewState = 'error';
                 this.inviteLink = this.generateInviteLink(response.data.inviteCode);
                 this.modal_invite.renewState = 'succes';
+                this.modal_invite.copied = false;
             }).catch((err)=>{this.modal_invite.renewState = 'error'});
         },
         deleteTeam(e:Event) {

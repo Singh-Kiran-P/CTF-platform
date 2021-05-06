@@ -1,7 +1,8 @@
 import express from 'express';
 const router = express.Router();
 import DB, { Team, Account, Solve, UsedHint } from '../database';
-import { isAuth, hasTeam, getAccount, generatePassword } from '../auth/index';
+import { isAuth, hasTeam, getAccount, generatePassword, isAdmin } from '../auth/index';
+import { ILike, Like } from 'typeorm';
 
 const respond = <T>(promise: Promise<T>, res: express.Response, result: (data: T) => any = data => data) => {
     promise.then(data => res.send(result(data))).catch(err => res.json({ error: 'Error fetching data: ' + err }));
@@ -74,12 +75,7 @@ router.get('/infoDashboard/:uuid', (req, res) => {
             if(team.captain.id == acc.id || acc.admin) {isCaptainOrAdmin = true; data.inviteCode = team.inviteCode;}
         }
         data.name = team.name;
-        team.solves.forEach((solve: Solve)=>{
-            data.points += solve.challenge.points;
-            solve.usedHints.forEach((usedHint: UsedHint)=>{
-                data.points -= usedHint.hint.cost
-            })
-        });
+        data.points = team.getPoints();
         res.json({info: data, isCaptainOrAdmin: isCaptainOrAdmin});
     }).catch((err)=>{res.json({error: 'Error retrieving data'});});
 });
@@ -129,6 +125,39 @@ router.post('/removeMember/:uuid/:memberName', isAuth, (req, res)=> {
             return res.json({});
         }).catch((error)=>{return res.json({error: 'Cannot remove member'})});
     }).catch((error)=>{return res.json({error: 'Cannot find team'})});
+});
+
+router.get('/getTeams', isAuth, isAdmin, (req, res)=>{
+    let params: any = req.query; 
+    const perPage: number = Number.parseInt(params.perPage);
+    const currentPage: number = Number.parseInt(params.currentPage);
+    const filter: string = params.filter;
+    const skip: number = (currentPage-1) * perPage;
+    console.log(perPage);
+    console.log(currentPage);
+    DB.repo(Team).findAndCount(
+        {
+            where: {name: ILike('%' + filter + '%') }, order: { name: "ASC" },
+            relations:['accounts', 'solves', 'solves.challenge', 'solves.usedHints', 'solves.usedHints.hint'],
+            take: perPage,
+            skip: skip
+        }
+    ).then((data: [Team[], number])=>{
+
+        let teamsDB: Team[] = data[0];
+        let amount: number = data[1];
+        let teamsData: {uuid: string, name: string, category: string, points: number}[] = [];
+
+        teamsDB.forEach((team: Team)=>{
+            let teamData: {uuid: string, name: string, category: string, points: number} = {uuid: '', name: '', category: '', points: 0};
+            teamData.uuid = team.id;
+            teamData.name = team.name;
+            teamData.category = team.getCategory().name;
+            teamData.points = team.getPoints();
+            teamsData.push(teamData);
+        });
+        return res.json({teams: teamsData, amount: amount});
+    }).catch((err)=>{return res.json({error: err})});
 });
 
 export default { path: '/team', router };
