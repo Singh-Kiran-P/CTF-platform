@@ -20,11 +20,13 @@
         "core-js": "^3.6.5",
         "dotenv": "^8.2.0",
         "object-to-formdata": "^4.1.0",
+        "socket.io-client": "^4.0.1",
         "sweetalert2": "^10.15.7",
         "vue": "^2.6.12",
         "vue-fontawesome": "^0.0.2",
         "vue-meta": "^2.4.0",
         "vue-router": "^3.2.0",
+        "vue-socket.io": "^3.0.10",
         "vue-sweetalert2": "^4.2.1",
         "vuelidate": "^0.7.6"
     },

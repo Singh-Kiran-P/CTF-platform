@@ -3,6 +3,9 @@ import express from "express";
 import passport from 'passport';
 import session from 'express-session';
 import formidable from 'express-formidable';
+import { createServer } from "http";
+import { Server, Socket } from "socket.io";
+
 import { strategy } from './auth';
 import routes from './routes';
 import DB from "./database";
@@ -41,5 +44,18 @@ app.all(/./, (_, __, next) => {
 // register all routes
 routes.forEach(route => app.use(route.path, route.router));
 
+
+// Socket
+const httpServer = createServer();
+const options = { /* ... */ };
+const io = new Server(httpServer, options);
+
+io.on("connection", (socket: Socket) => {
+    socket.on('chat_message', (msg) => {
+        io.emit('chat_message', msg);
+    });
+});
+
 // start the server
-app.listen(process.env.SERVER_PORT);
+// app.listen(process.env.SERVER_PORT);
+httpServer.listen(3000);

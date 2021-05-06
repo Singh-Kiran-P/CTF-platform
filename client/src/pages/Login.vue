@@ -1,91 +1,147 @@
 <template>
-    <div class=login>
+    <div class="login">
         <b-form @submit="onSubmit($event)">
-            <b-form-group :state="state(loginFeedback)" :invalid-feedback="loginFeedback">
-                <b-form-group label=Username label-for=username>
+            <b-form-group
+                :state="state(loginFeedback)"
+                :invalid-feedback="loginFeedback"
+            >
+                <b-form-group label="Username" label-for="username">
                     <b-form-input
-                        id=username
-                        type=text
+                        id="username"
+                        type="text"
                         v-model="form.username"
                         placeholder="Enter username"
-                        v-on:input="usernameFeedback = ''; passwordFeedback = ''"
+                        v-on:input="
+                            usernameFeedback = '';
+                            passwordFeedback = '';
+                        "
                         :state="state(usernameFeedback)"
                     />
-                    <b-form-invalid-feedback>{{usernameFeedback}}</b-form-invalid-feedback>
+                    <b-form-invalid-feedback>{{
+                        usernameFeedback
+                    }}</b-form-invalid-feedback>
                 </b-form-group>
 
-                <b-form-group label=Password label-for=password>
+                <b-form-group label="Password" label-for="password">
                     <b-form-input
-                        id=password
-                        type=password
+                        id="password"
+                        type="password"
                         v-model="form.password"
                         placeholder="Enter password"
                         v-on:input="passwordFeedback = ''"
                         :state="state(passwordFeedback)"
                     />
-                    <b-form-invalid-feedback>{{passwordFeedback}}</b-form-invalid-feedback>
+                    <b-form-invalid-feedback>{{
+                        passwordFeedback
+                    }}</b-form-invalid-feedback>
                 </b-form-group>
             </b-form-group>
-            <StatusButton type=submit block variant=primary :state="loginState" normal=Login loading="Logging in" succes="Logged in" :disabled="!validForm()"/>
-            <router-link :to="{ name: 'Register' }">Don't have an account yet? Register</router-link>
+            <StatusButton
+                type="submit"
+                block
+                variant="primary"
+                :state="loginState"
+                normal="Login"
+                loading="Logging in"
+                succes="Logged in"
+                :disabled="!validForm()"
+            />
+            <router-link :to="{ name: 'Register' }"
+                >Don't have an account yet? Register</router-link
+            >
         </b-form>
     </div>
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
-import axios from 'axios';
-import StatusButton from '@/components/StatusButton.vue';
-import { state, validInput, is } from '@shared/validation';
+import Vue from "vue";
+import axios from "axios";
+import StatusButton from "@/components/StatusButton.vue";
+import { state, validInput, is } from "@shared/validation";
 
 export default Vue.extend({
-    name: 'Login',
+    name: "Login",
     components: {
-        StatusButton
+        StatusButton,
+    },
+    created() {},
+    sockets: {
+        connect: function () {
+            console.log("socket connected");
+        },
+        customEmit: function (data) {
+            console.log(
+                'this method was fired by the socket server. eg: io.emit("customEmit", data)'
+            );
+        },
     },
     data: () => ({
         form: {
-            username: '',
-            password: ''
+            username: "",
+            password: "",
         },
-        loginState: 'normal',
-        loginFeedback: '',
-        usernameFeedback: '',
-        passwordFeedback: ''
+        loginState: "normal",
+        loginFeedback: "",
+        usernameFeedback: "",
+        passwordFeedback: "",
     }),
     computed: {
-        username(): string { return this.form.username.trim(); },
-        password(): string { return this.form.password; }
+        username(): string {
+            return this.form.username.trim();
+        },
+        password(): string {
+            return this.form.password;
+        },
     },
     watch: {
-        form: { deep: true, handler() {
-            this.loginState = 'normal';
-            this.loginFeedback = ''
-        }}
+        form: {
+            deep: true,
+            handler() {
+                this.loginState = "normal";
+                this.loginFeedback = "";
+            },
+        },
     },
     methods: {
         state,
-        validForm(): boolean { return validInput(this.usernameFeedback, this.username) && validInput(this.passwordFeedback, this.password); },
+        validForm(): boolean {
+            return (
+                validInput(this.usernameFeedback, this.username) &&
+                validInput(this.passwordFeedback, this.password)
+            );
+        },
+        clickButton: function (data: any) {
+            // $socket is socket.io-client instance
+            this.$socket.emit("emit_method", data);
+        },
 
         onSubmit(e: Event): void {
             e.preventDefault();
-            this.loginState = 'loading';
+            this.loginState = "loading";
             const error = (err?: any) => {
-                this.loginState = 'error';
+                this.loginState = "error";
                 if (is.string(err)) this.loginFeedback = err;
                 else if (is.object(err)) {
-                    if (is.string(err.username)) this.usernameFeedback = err.username;
-                    if (is.string(err.password)) this.passwordFeedback = err.password;
+                    if (is.string(err.username))
+                        this.usernameFeedback = err.username;
+                    if (is.string(err.password))
+                        this.passwordFeedback = err.password;
                 }
-            }
-            axios.post('/api/auth/login', { username: this.username, password: this.password }).then(response => {
-                if(response.data.error) return error(response.data.error);
-                this.loginState = 'succes';
-                location.reload();
-                location.replace('/');
-            }).catch(() => error());
+            };
+            axios
+                .post("/api/auth/login", {
+                    username: this.username,
+                    password: this.password,
+                })
+                .then((response) => {
+                    if (response.data.error) return error(response.data.error);
+                    this.loginState = "succes";
+                    location.reload();
+                    location.replace("/");
+                })
+                .catch(() => error());
         },
-    }
+    },
 });
 </script>
 
