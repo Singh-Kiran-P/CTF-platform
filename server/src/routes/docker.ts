@@ -1,35 +1,34 @@
 /**
+ * @auther Kiran Singh
  * All routes in this file are protected!
  * Only admins can access them
  * //TODO: stop/start challenge protected for teams
  */
+import { isAdmin, isAuth } from "@/auth";
 import express from "express";
 import controller from "../controllers/docker";
 
 const router = express.Router();
 
-router.get("/dockerConfigPorts",  controller.dockerConfigPorts_GET)
+router.get("/dockerConfigPorts", isAdmin, controller.dockerConfigPorts_GET)
 
-router.post("/dockerConfigPorts", controller.dockerConfigPorts_POST)
+router.post("/dockerConfigPorts", isAdmin, controller.dockerConfigPorts_POST)
 
-router.get("/containers",controller.containers_GET);
+router.get("/containers", isAdmin, controller.containers_GET);
 
-router.get("/images", controller.images_GET);
+router.get("/images", isAdmin, controller.images_GET);
 
-router.post("/makeImage", controller.makeImage_POST);
+router.post("/makeImage", isAdmin, controller.makeImage_POST);
 
-router.post("/createChallengeContainer",controller.createChallengeContainer_POST);
+router.post("/createChallengeContainer", isAuth, controller.createChallengeContainer_POST);
 
-router.post("/startContainer", controller.startContainer_POST);
+router.post("/startContainer", isAuth, controller.startContainer_POST);
 
-router.post("/stopContainer", controller.stopContainer_POST);
+router.post("/stopContainer", isAuth, controller.stopContainer_POST);
 
-router.post("/resetContainer",controller.resetContainer_POST);
+router.post("/resetContainer", isAuth, controller.resetContainer_POST);
 
 export default { path: "/docker", router };
-
-
-
 
 
 // /********************** TESTING ROUTES ********************/

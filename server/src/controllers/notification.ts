@@ -1,3 +1,6 @@
+/**
+ * @auther Kiran Singh
+ */
 import { Request, Response, NextFunction } from 'express';
 import DB, { Notification } from '../database';
 import socketIO from './socket';
@@ -60,9 +63,9 @@ function deleteAll_DELETE(req: Request, res: Response) {
     DB.conn.query('DELETE FROM Notification;').then(() => {
         res.json({ message: 'All notifications deleted successfully!', statusCode: 200 });
     })
-    .catch((err) => {
-        res.json({ message: err, statusCode: 404 });
-    })
+        .catch((err) => {
+            res.json({ message: err, statusCode: 404 });
+        })
 }
 
 export default {
