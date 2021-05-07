@@ -63,7 +63,9 @@ export default Vue.extend({
         },
 
         getRole(): void {
+
             axios.get("/api/auth/role").then((response) => {
+                console.log(response.data);
                 this.role = response.data;
             });
         },

@@ -17,7 +17,7 @@ router.post('/send', (req, res) => {
     let data = req.fields;
     notificationController.send(data)
         .then((data) => {
-            res.json({ message: 'Notification deleted successfully!', statusCode: 200 });
+            res.json({ message: 'Notification send successfully!', statusCode: 205 });
         })
         .catch(() => {
             res.send('error');
@@ -37,7 +37,7 @@ router.delete('/delete', isAdmin, (req, res) => {
         })
 });
 
-router.delete('/deleteAll', isAdmin, (req, res) => {
+router.delete('/deleteAll',  (req, res) => {
     notificationController.deleteAll().then(() => {
         res.json({ message: 'All notifications deleted successfully!', statusCode: 200 });
     })

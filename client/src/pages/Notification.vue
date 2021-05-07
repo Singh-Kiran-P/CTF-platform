@@ -36,15 +36,17 @@
         </div>
         <!-- Notifications -->
         <div class="create">
-            <b-card bg-variant="white" title="Card Title">
-                <b-card-text>
-                    With supporting text below as a natural lead-in to
-                    additional content.
-                </b-card-text>
-                <template #footer>
-                    <small class="text-muted">May 6th, 1:27:08 PM</small>
-                </template>
-            </b-card>
+            <div v-for="item in notification" :key="item">
+                <b-card class="card" bg-variant="dark"  text-variant="white" :title="item.title">
+
+                    <b-card-text>
+                        {{ item.msg }}
+                    </b-card-text>
+                    <template #footer>
+                        <small class="text-muted">{{ item.createdAt }}</small>
+                    </template>
+                </b-card>
+            </div>
         </div>
     </div>
 </template>
@@ -52,7 +54,7 @@
 <script lang="ts">
 import Vue from "vue";
 import axios from "axios";
-import PushNotification from "../components/PushNotification.vue";
+import Toast from "../assets/functions/toast";
 
 export default Vue.extend({
     name: "Notifcations",
@@ -61,9 +63,10 @@ export default Vue.extend({
     },
     data: () => ({
         notification: [] as {
-            Title: string;
-            Msg: string;
-            date_time: String;
+            id: number,
+            title: string;
+            msg: string;
+            createdAt: String;
         }[],
         form: {
             title: "",
@@ -71,14 +74,29 @@ export default Vue.extend({
         },
         show: true,
     }),
+    mounted() {
+        // setInterval(() => {
+        //     this.loadNotifications();
+        // }, 1000);
+    },
     methods: {
         onSubmit(e: Event) {
             e.preventDefault();
             this.sendNotfication();
         },
         loadNotifications(): void {
-            //TODO: Multiple ports
-            axios.get("/api/docker/containers").then((response) => {});
+            axios.get("/api/notification/getAll").then((response) => {
+                let data = response.data;
+                this.notification = [];
+                data.forEach((item: any) => {
+                    this.notification.push({
+                        id : item.id,
+                        title: item.title,
+                        msg: item.msg,
+                        createdAt: item.createdAt,
+                    });
+                });
+            });
         },
         sendNotfication(): void {
             let axiosConfig = {
@@ -88,23 +106,14 @@ export default Vue.extend({
                 },
             };
             axios
-                .post("/api/docker/dockerConfigPorts", {}, axiosConfig)
+                .post("/api/notification/send", this.form, axiosConfig)
                 .then((response) => {
                     let data = response.data;
                     if (data.statusCode === 200) {
-                        this.toast(data.message, "success");
+                        Toast.send(this, "Message", data.message, "success");
                     } else if (data.statusCode === 404)
-                        this.toast(data.message, "danger");
+                        Toast.send(this, "Message", data.message, "danger");
                 });
-        },
-        toast(message: string, type: string, append = false) {
-            this.$bvToast.toast(message, {
-                title: "Message",
-                toaster: "b-toaster-bottom-right",
-                variant: type,
-                solid: true,
-                appendToast: append,
-            });
         },
     },
 });
@@ -131,5 +140,9 @@ h2 {
     margin: 50px auto 20px auto;
     width: 50%;
     border-top: 1px solid black;
+}
+
+.card {
+    margin-top: 20px;
 }
 </style>
