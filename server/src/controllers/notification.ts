@@ -20,7 +20,7 @@ async function send(data: any) {
 
 function getAllNotifications() {
     let notificationRepo = DB.repo(Notification);
-    return notificationRepo.find();
+    return notificationRepo.find({});
 }
 
 function deleteById(_id: number) {
