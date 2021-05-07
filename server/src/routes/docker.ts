@@ -6,7 +6,7 @@
 
 import express, { json } from "express";
 import Docker from "dockerode";
-import DockerController from "../controllers/docker";
+import dockerController from "../controllers/docker";
 import { isAdmin, isAuth } from "../auth";
 import { deserialize } from '@shared/objectFormdata';
 import { parentDir, fileName, upload, move, remove, unzip, chain, unzip_ } from '../files';
@@ -60,7 +60,7 @@ router.get("/images", (req, res) => {
 //upload zip , unzip , get path to unzipped folder
 router.post("/createChallengeImage", isAuth, isAdmin, (req, res, next) => {
     let jsonObj = req.fields;
-    DockerController.createChallengeImage(jsonObj)
+    dockerController.createChallengeImage(jsonObj)
         .then(() => {
             console.log("created");
 
@@ -80,14 +80,14 @@ router.post("/createChallengeContainer", async (req, res, next) => {
     let name: string = req.fields.challengeImage.toString();
     console.log(name);
 
-    let image = await DockerController.getImage(name)
+    let image = await dockerController.getImage(name)
     console.log(image);
 
     if (image != undefined) {
 
         // get ports from image entity
         let jsonObj = { challengeImage: name, ports: image.innerPorts, containerName: req.fields.containerName };
-        DockerController.createChallengeContainer(jsonObj)
+        dockerController.createChallengeContainer(jsonObj)
             .then((ports) => {
                 res.json({ ports: ports, message: `Challenge container created/started http://localhost:${ports}`, statusCode: 200 });
             })
@@ -143,7 +143,7 @@ router.post("/resetContainer", isAdmin, (req, res) => {
     let container = docker.getContainer(id);
     container.stop((err, data) => {
         if (err == null)
-            res.json({ statusCode: 200, msg: "Container reset successfully" });
+            res.json({ statusCode: 200, message: "Container reset successfully" });
         else res.json(err);
     });
 });
@@ -151,7 +151,7 @@ router.post("/resetContainer", isAdmin, (req, res) => {
 router.post("/makeImage", isAdmin, (req, res) => {
     let data = deserialize(req);
 
-    DockerController.makeImage(data)
+    dockerController.makeImage(data)
         .then(() => {
             res.json({ message: `Challenge image created successfully`, statusCode: 200 });
         })
@@ -197,7 +197,7 @@ router.get("/dockerConfig_createChallengeContainer", async (req, res) => {
     let d = new DockerChallengeImage("hello", ["80/tcp"], 25);
     await challenge.save(d);
 
-    let image = await DockerController.getImage("hello")
+    let image = await dockerController.getImage("hello")
 
     if (image != undefined) {
         res.json({ statusCode: 200, data: d });

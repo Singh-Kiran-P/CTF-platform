@@ -52,21 +52,19 @@ routes.forEach(route => app.use(route.path, route.router));
 // CORS middleware
 app.use(cors())
 
-app.use((req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE');
-    res.setHeader('Access-Control-Allow-HEaders', 'Content-Type, Authorization');
-    next();
-});
+// app.use((req, res, next) => {
+//     // res.setHeader('Access-Control-Allow-Origin', '*');
+//     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE');
+//     res.setHeader('Access-Control-Allow-HEaders', 'Content-Type, Authorization');
+//     next();
+// });
 
 // start the server
 const server = app.listen(process.env.SERVER_PORT);
 
 // Socket IO
-const socket = require('./socket').init(server);
+import io from './controllers/socket';
+let socket = io.init(server);
 socket.on('connection', (_socket: any) => {
     console.log('Client connected to socket!');
 })
-socket.on('disconnect', () => {
-    console.log('Client disconnected from socket!');
-});

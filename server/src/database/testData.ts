@@ -68,23 +68,20 @@ async function loadTestData() {
     }*/
 
     let dockerManagement: DockerManagement = (await save([
-        new DockerManagement(500,5400)
+        new DockerManagement(500, 5400)
     ]))[0];
 
     let dockerOpenPort: DockerOpenPort[] = (await save([
         new DockerOpenPort(80),
         new DockerOpenPort(4000),
+        new DockerOpenPort(8000),
         new DockerOpenPort(9000),
     ]));
 
 
     let dockerimages: DockerChallengeImage[] = (await save([
-        new DockerChallengeImage("challenge1",["8080/tcp"],521)
+        new DockerChallengeImage("challenge1", ["8080/tcp"], 521)
     ]));
-
-
-
-
 }
 
 /**

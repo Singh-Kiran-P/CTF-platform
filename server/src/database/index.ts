@@ -71,7 +71,7 @@ class Database extends EventEmitter {
             return this.conn.getCustomRepository(entity);
         }
     }
-    connection(){
+    connection() {
         if (this.conn) {
             return this.conn;
         }
@@ -136,7 +136,9 @@ export { Environment } from './entities/connections/Environment';
 export { Solve } from './entities/connections/Solve';
 export { UsedHint } from './entities/connections/UsedHint';
 
-export {DockerChallengeContainer} from './entities/docker/DockerChallengeContainer';
-export {DockerChallengeImage} from './entities/docker/DockerChallengeImage';
-export {DockerManagement, DockerManagementRepo} from './entities/docker/DockerManagement';
-export {DockerOpenPort} from './entities/docker/DockerOpenPort'
+export { DockerChallengeContainer } from './entities/docker/DockerChallengeContainer';
+export { DockerChallengeImage } from './entities/docker/DockerChallengeImage';
+export { DockerManagement, DockerManagementRepo } from './entities/docker/DockerManagement';
+export { DockerOpenPort } from './entities/docker/DockerOpenPort'
+
+export { Notification } from './entities/notification/Notification'

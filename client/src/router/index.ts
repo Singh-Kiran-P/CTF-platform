@@ -33,7 +33,7 @@ const pages: { [page: string]: Route } = {
         path: '/team/join/:invite',
         name: 'joinTeam',
         src: 'joinTeam.vue',
-        meta: {hidden: true}
+        meta: { hidden: true }
     },
     leaderboard: {
         path: '/leaderboard',
@@ -56,6 +56,18 @@ const pages: { [page: string]: Route } = {
         name: 'Docker Testing',
         src: 'dockertesting.vue',
         meta: { right: true }
+    },
+    notification: {
+        path: '/Notification',
+        name: 'Notification',
+        src: 'Notification.vue',
+        meta: { right: true }
+    },
+    socketio: {
+        path: '/socketio',
+        name: 'socketio',
+        src: 'socketio.vue',
+        meta: { right: true }
     }
 };
 
@@ -64,6 +76,8 @@ const routes: { [page: string]: Route[] } = {
     [Roles.VISITOR]: [
         pages.login,
         pages.register,
+        pages.socketio,
+
     ],
     [Roles.PARTICIPANT]: [
         pages.leaderboard,
@@ -76,7 +90,8 @@ const routes: { [page: string]: Route[] } = {
         pages.teams,
         pages.config,
         pages.dockerTesting,
-        pages.logout
+        pages.logout,
+        pages.notification,
     ]
 };
 
@@ -101,7 +116,8 @@ Promise.all([
 
     const router = new VueRouter({
         mode: 'history',
-        routes: [{ path: '/',  meta: { hidden: true }, component: { template: '<router-view/>' },
+        routes: [{
+            path: '/', meta: { hidden: true }, component: { template: '<router-view/>' },
             children: availableRoutes.map(route => ({
                 path: route.path.slice(1),
                 name: route.name,

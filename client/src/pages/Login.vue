@@ -58,15 +58,12 @@ import Vue from "vue";
 import axios from "axios";
 import StatusButton from "@/components/StatusButton.vue";
 import { state, validInput, is } from "@shared/validation";
-import { io } from "socket.io-client";
 export default Vue.extend({
     name: "Login",
     components: {
         StatusButton,
     },
-    created() {
-        const socket = io("http://localhost:4000");
-    },
+    created() {},
 
     data: () => ({
         form: {
