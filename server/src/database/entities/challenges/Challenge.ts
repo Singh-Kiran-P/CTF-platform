@@ -21,7 +21,7 @@ export class Challenge {
     @ManyToOne(_ => Tag, tag => tag.challenges, { nullable: true })
     tag: Tag;
 
-    @ManyToOne(_ => Round, round => round.challenges, { nullable: false })
+    @ManyToOne(_ => Round, round => round.challenges, { nullable: false, onDelete: 'CASCADE' })
     round: Round;
 
     @OneToMany(_ => Attachment, attachment => attachment.challenge)
@@ -63,18 +63,19 @@ export class Challenge {
     @Column()
     visibility: boolean;
 
-    constructor(round: Round, name: string, description: string, points: number, flag: string, order: number) {
+    constructor(params?: { round: Round & { id: number }, name: string, description: string, points: number, flag: string, order: number }) {
+        if (!params) return;
+
+        // TODO
         this.type = ChallengeType.BASIC;
         this.dockerfile = 'TODO';
         this.visibility = false;
         
-        this.name = name;
-        this.description = description;
-        this.points = points;
-        this.flag = flag;
-        this.order = order;
-        if (!round) return;
-        this.round = round;
-        // TODO
+        this.name = params.name;
+        this.description = params.description;
+        this.points = params.points;
+        this.flag = params.flag;
+        this.order = params.order;
+        this.round = params.round;
     }
 }

@@ -18,9 +18,11 @@ export class Tag {
     @OneToMany(_ => Challenge, challenge => challenge.tag)
     challenges: Challenge[];
 
-    constructor(name: string, description: string, order: number) {
-        this.name = name;
-        this.description = description;
-        this.order = order;
+    constructor(params? : { name: string, description: string, order: number, id? : number }) {
+        if (!params) return;
+        this.id = params.id;
+        this.name = params.name;
+        this.description = params.description;
+        this.order = params.order;
     }
 }

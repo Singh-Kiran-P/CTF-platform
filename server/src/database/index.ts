@@ -2,7 +2,7 @@ import path from 'path';
 import 'reflect-metadata';
 import dotenv from 'dotenv';
 import EventEmitter = require('events');
-import { Connection, createConnection, EntityTarget, ObjectType, Repository } from 'typeorm';
+import { Connection, createConnection, EntityTarget, FindManyOptions, ObjectType, Repository } from 'typeorm';
 import { chain, remove } from '../files';
 import loadTestData from './testData';
 import express from 'express';
@@ -81,23 +81,27 @@ class Database extends EventEmitter {
     /**
      * allows for easily updating the given repository to a new list of entities, ask Lander for proper usage
      */
-    setRepo<E>(repo: Repository<E>, set: E[], id: (x: E) => any[], files: (x: E) => string[] = () => []) {
-        const equal = (x: any[], y: any[]): boolean => x.length == y.length && x.every((_, i) => x[i] == y[i]);
+    setRepo<E>(repo: Repository<E>, set: E[], where?: FindManyOptions<E>, files: (x: E) => string[] = () => []) {
+        const id = (x: any): number => x.id || -1;
         return new Promise<void>((resolve, reject) => {
-            repo.find().then(old => {
-                let [keep, discard]: E[][] = [set.filter(entry => !old.some(x => equal(id(entry), id(x)))), []];
-                old.forEach(entry => {
-                    let match = set.find(x => equal(id(entry), id(x)));
-                    match == undefined ? discard.push(entry) : keep.push(Object.assign(entry, match));
-                });
+            repo.find(where).then(old => {
+                let [keep, discard]: E[][] = [[], []];
+                [set, old].forEach(l => l.sort((a, b) => id(a) - id(b)));
+                for (let i = 0, j = 0, il = set.length, jl = old.length; i < il || j < jl; ++i, ++j) {
+                    while (i < il && (j >= jl || id(set[i]) < id(old[j]))) keep.push(set[i++]);
+                    while (j < jl && (i >= il || id(old[j]) < id(set[i]))) discard.push(old[j++]);
+                    if (i < il && j < jl && id(set[i]) == id(old[j])) keep.push(Object.assign({}, old[j], set[i]));
+                }
+
                 let removes = old.reduce((acc, c) => acc.concat(files(c)), ['']).filter(f => f && !set.some(x => files(x).includes(f))).map(f => () => remove(f));
-                chain(() => repo.remove(discard), () => Promise.all(removes.map(remove => remove())), () => repo.save(keep)).then(() => resolve()).catch(err => reject(err));
+                chain(() => repo.remove(discard), () => repo.save(keep), () => Promise.all(removes.map(remove => remove()))).then(() => resolve()).catch(err => reject(err));
             }).catch(err => reject(err));
         });
     }
 }
 
-declare interface Database { // applies DatabaseEvents to Database to enable event checking
+// applies DatabaseEvents to Database to enable event checking
+declare interface Database {
     on<U extends keyof DatabaseEvents>(
         event: U, listener: DatabaseEvents[U]
     ): this;

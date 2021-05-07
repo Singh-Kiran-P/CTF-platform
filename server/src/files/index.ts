@@ -1,7 +1,9 @@
+import { uploaddir } from '../routes/uploads';
 import { File as UFile } from 'formidable';
 import { is } from '@shared/validation';
+import fse, { mkdir } from 'fs-extra';
 import extract from 'extract-zip';
-import fse from 'fs-extra';
+import { ncp } from 'ncp';
 import path from 'path';
 import fs from 'fs';
 
@@ -10,6 +12,8 @@ const fileName = (p: string): string => p ? path.basename(p) : '';
 
 type Err = NodeJS.ErrnoException;
 const Root = parentDir(require.main.filename, 5);
+
+const createDir = (path: string) => new Promise<void>((resolve, reject) => mkdir(Root + path, { recursive: true }, err => err ? reject(err) : resolve()));
 
 /**
  * uploads the given UFiles to the given root directory
@@ -36,7 +40,13 @@ const move = (from: string, to: string) => {
     [from, to] = [from, to].map(path => Root + path);
     return new Promise<void>((resolve, reject) => {
         if (from == to) return resolve();
-        fse.move(from, to).then(() => rmup(from, () => resolve())).catch(err => reject(err));
+        mkdir(to, { recursive: true }, err => {
+            if (err) return reject(err);
+            ncp(from, to, { stopOnErr: true }, err => {
+                if (err) return reject(err);
+                remove(from.slice(Root.length)).then(() => resolve()).catch(() => reject(err));
+            });
+        });
     });
 }
 
@@ -63,12 +73,14 @@ const unzip = (zip: string) => {
 /**
  * calls each given call after the previous one resolved, resolves after all calls resolved or rejects upon any calls rejecting
  */
-const chain = (...calls: (() => Promise<any>)[]) => {
+const chain = (...calls: (() => Promise<any> | any)[]) => {
     calls = calls.filter(call => call);
     return new Promise<void>((resolve, reject) => {
         let call = (i: number) => {
             if (i == calls.length) return resolve();
-            calls[i]().then(() => call(i + 1)).catch(err => reject(err));
+            let r = calls[i]();
+            if (!(r instanceof Promise)) call(i + 1);
+            else r.then(() => call(i + 1)).catch(err => reject(err));
         }
         call(0);
     });
@@ -90,4 +102,31 @@ const count = (c: (v?: number) => number, resolve: () => void, reject: (err: any
     }
 }
 
-export { UFile, Root, parentDir, fileName, upload, move, remove, unzip, chain };
+/**
+ * uploads the given items, moving, deleting and replacing directories where needed
+ */
+const uploadFiles = <E>(items: E[], base: string, newFile: (e: E) => boolean, getTemp: (e: E) => string, getDir: (e: E) => string, getOld: (e: E) => string,
+    getUpload: (e: E, dir: string) => Promise<void>, set: (e: E, dir: string) => void, done?: (e: E) => void): Promise<void[]> => {
+    let moves: Promise<void>[] = [];
+    let initialUploads: Promise<void>[] = [];
+    let secondaryUploads: (() => Promise<void>)[] = [];
+    items.forEach(item => {
+        let file = newFile(item);
+        let [dir, old] = [getDir(item), getOld(item)];
+        let [bdir, bold] = [base + dir, base + old];
+        if (!file && (!old || dir == old)) return done(item);
+        let moving = dir != old && items.some(x => getDir(x) == old);
+        if (moving) {
+            let temp = `${parentDir(bold)}/${getTemp(item)}`;
+            moves.push(move(bold, temp));
+            bold = temp;
+        }
+        const upload = () => chain(() => remove(bdir, file && old ? bold : ''), file ? () => getUpload(item, bdir) : () => move(bold, bdir), () => done(item));
+        moving || items.some(x => getOld(x) == dir) ? secondaryUploads.push(upload) : initialUploads.push(upload());
+        set(item, dir);
+    });
+
+    return Promise.all([chain(() => Promise.all(moves), () => Promise.all(secondaryUploads.map(upload => upload()))), ...initialUploads]);
+}
+
+export { UFile, Root, parentDir, fileName, createDir, upload, move, remove, unzip, chain, uploadFiles, uploaddir };

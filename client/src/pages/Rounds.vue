@@ -112,7 +112,7 @@ export default Vue.extend({
         testDate: ''
     }),
     computed: {
-        newRound(): Round { return Object.assign({}, this.add.round, { challenges: [] }); },
+        newRound(): Round { return Object.assign({}, this.add.round, { folder: '', challenges: [] }); },
 
         newRoundFeedback(): string { return this.roundFeedback(this.newRound, true); },
         validNewRound(): boolean { return validInput(this.newRoundFeedback, this.newRound.name, this.newRound.start, this.newRound.end); },

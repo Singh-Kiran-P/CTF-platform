@@ -4,7 +4,7 @@ import { File as UFile } from 'formidable';
 import { state, validInput, validateString, validateCharacters, validateList, is } from '../validation';
 
 type Challenge = { name: string, description: string, points: number, flag: string, attachments: string, order: number, zip: File | UFile | null }; // TODO
-type Round = { id? :number, name: string, start: string, end: string, challenges: Challenge[] | undefined };
+type Round = { id? :number, name: string, folder: string, start: string, end: string, challenges: Challenge[] | undefined };
 type Form = { rounds: Round[] };
 
 const sortRounds = (rounds: Round[]): Round[] => [...rounds].sort((a, b) => new Date(a.start) < new Date(b.start) ? -1 : 1);
@@ -24,7 +24,8 @@ const validate = {
     challenges: (challenges?: Challenge[]): string => challenges ? validateList(challenges, 'challenge', true) : '',
 
     round: (round: Round, rounds: Round[], add: boolean = false): string => {
-        let v = validateCharacters(round.name, 'Round name', true);
+        let v = round.name.startsWith('_') ? `Round name cannot start with '_'` : '';
+        if (!v) v = validateCharacters(round.name, 'Round name', true);
         if (!v) v = validateString(round.name, 'Round name', 3, 32, !add, rounds.map(r => r.name), !add);
         if (!v) v = validateString(round.start, 'Round start', -1, -1, !add);
         if (!v) v = validateString(round.end, 'Round end', -1, -1, !add);
@@ -52,7 +53,7 @@ const isf = {
         return is.object(form) && is.array(form.rounds, isf.round);
     },
     round: (round: any): boolean => {
-        return is.object(round) && is.string(round.name) && is.date(round.start) && is.date(round.end) && isf.challenges(round.challenges);
+        return is.object(round) && is.string(round.name) && is.string(round.folder) && is.date(round.start) && is.date(round.end) && isf.challenges(round.challenges);
     },
     challenges: (challenges: any): boolean => {
         return challenges == undefined || is.array(challenges, isf.challenge);

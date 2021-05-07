@@ -10,6 +10,9 @@ export class Round {
     name: string;
 
     @Column()
+    folder: string;
+
+    @Column()
     start: string;
 
     @Column()
@@ -18,9 +21,12 @@ export class Round {
     @OneToMany(_ => Challenge, challenge => challenge.round)
     challenges: Challenge[];
 
-    constructor(name: string, start: string, end: string) {
-        this.name = name;
-        this.start = start;
-        this.end = end;
+    constructor(params?: { name: string, folder: string, start: string, end: string, id?: number }) {
+        if (!params) return;
+        this.id = params.id;
+        this.name = params.name;
+        this.folder = params.folder;
+        this.start = params.start;
+        this.end = params.end;
     }
 }
