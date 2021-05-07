@@ -83,7 +83,9 @@ const routes: { [page: string]: Route[] } = {
         pages.leaderboard,
         pages.team,
         pages.joinTeam,
-        pages.logout
+        pages.logout,
+        pages.notification,
+
     ],
     [Roles.ORGANIZER]: [
         pages.leaderboard,
