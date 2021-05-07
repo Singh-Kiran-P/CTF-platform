@@ -1,8 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import Docker = require('dockerode');
 import pump from 'pump';
-import { rejects } from 'node:assert';
-import { resolve } from 'node:path';
 var build = require('dockerode-build')
 var docker = new Docker({ socketPath: '/var/run/docker.sock' });
 import DB, { DockerChallengeContainer, DockerChallengeImage, DockerManagementRepo, DockerOpenPort } from '../database';
@@ -10,30 +8,49 @@ import { deserialize } from '@shared/objectFormdata';
 import { uploaddir } from '@/routes/uploads';
 import { unzip_, upload } from '@/files';
 
-function getAllRunningContainers() {
-    let data: any = [];
-    docker.listContainers(function (err, containers) {
-        containers.forEach(function (containerInfo) {
-            data.push([containerInfo]);
-        });
+async function dockerConfigPorts_GET(req: Request, res: Response) {
+    const dockerManagementRepo = DB.crepo(DockerManagementRepo)
+    const data = (await dockerManagementRepo.instance());
+    res.json(data);
+}
+async function dockerConfigPorts_POST(req: Request, res: Response) {
+    if (req.fields.upperBoundPort != undefined && req.fields.lowerBoundPort != undefined) {
+        let upperBoundPort = Number.parseInt(req.fields.upperBoundPort.toString());
+        let lowerBoundPort = Number.parseInt(req.fields.lowerBoundPort.toString());
+
+        const dockerManagementRepo = DB.crepo(DockerManagementRepo)
+        dockerManagementRepo.setLowerBoundPort(lowerBoundPort);
+        dockerManagementRepo.setUpperBoundPort(upperBoundPort)
+
+        res.json({ message: "Ports range updated to [ " + lowerBoundPort + " - " + upperBoundPort + " ]", statusCode: 200 });
+    }
+    else{
+        res.json({ message: "Error parsing json!", statusCode: 404 });
+
+    }
+}
+
+function containers_GET(req: Request, res: Response) {
+    docker.listContainers((err, containers) => {
+        console.log(err);
+        console.log(containers);
+        res.json(containers);
     });
-    return data;
 }
 
-
-async function getImage(name: string) {
-    const challenge = DB.repo(DockerChallengeImage);
-    let i = await challenge.findOne({ name: name });
-    return i;
+function images_GET(req: Request, res: Response) {
+    docker.listImages((err, images) => {
+        res.json(images);
+    });
 }
+function makeImage_POST(req: Request, res: Response) {
+    let data = deserialize(req);
 
-function makeImage(data: any) {
     console.log(data);
     let ports: string[] = data.innerPorts.split(",");
 
-
-    return new Promise<void>(async (resolve, reject) => {
-        let image = await getImage(data.name);
+    new Promise<void>(async (resolve, reject) => {
+        let image = await _getImage(data.name);
         if (image == undefined) {
             // save image data to DB
             const DockerChallengeImageRepo = DB.repo(DockerChallengeImage);
@@ -48,7 +65,7 @@ function makeImage(data: any) {
                 .then(() => {
                     unzip_(`${dir}/${data.file.name}`, destination)
                         .then(() => {
-                            createChallengeImage({ 'dir': destination, 'name': data.name }).catch((err) => { reject(err) });
+                            _createChallengeImage({ 'dir': destination, 'name': data.name }).catch((err) => { reject(err) });
                             resolve();
                         })
                         .catch((err) => {
@@ -68,10 +85,121 @@ function makeImage(data: any) {
 
         }
 
-    });
+    })
+        .then(() => {
+            res.json({ message: `Challenge image created successfully`, statusCode: 200 });
+        })
+        .catch((err) => {
+            res.json({ message: err, statusCode: 404 });
+        });
 }
-// TODO: Get challenge files dynamically
-function createChallengeImage(jsonObj: any) {
+
+/**
+ * Create isolated environment for a challenge and starts the container
+ * - A team can access this to create a container for a challenge
+ * @param req: [challengeImage]
+ */
+async function createChallengeContainer_POST(req: Request, res: Response) {
+    let name: string = req.fields.challengeImage.toString();
+    console.log(name);
+
+    let image = await _getImage(name)
+    console.log(image);
+
+    if (image != undefined) {
+
+        // get ports from image entity
+        let jsonObj = { challengeImage: name, ports: image.innerPorts, containerName: req.fields.containerName.toString() };
+        let configData: { portBindings: object, openPorts: number[] } = await _createPortConfig(jsonObj.ports);
+        console.log(configData);
+
+        new Promise<Object>((resolve, reject) => {
+            docker.createContainer(
+                {
+                    Image: jsonObj.challengeImage,
+                    name: jsonObj.containerName,
+                    HostConfig: {
+                        PortBindings: configData.portBindings
+                    }
+                },
+                async (err, container) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        const challenge = DB.repo(DockerChallengeContainer);
+                        let ports: string[];
+
+                        let d = new DockerChallengeContainer(jsonObj.containerName, configData.openPorts, jsonObj.challengeImage);
+                        await challenge.save(d);
+                        container.start(async (err, data) => {
+                            if (err)
+                                reject(err);
+                            else {
+                                resolve(configData.openPorts);
+                            }
+                        });
+                    }
+                });
+        }).then((ports) => {
+            res.json({ ports: ports, message: `Challenge container created/started http://localhost:${ports}`, statusCode: 200 });
+        })
+            .catch((err) => {
+                console.log(err.json);
+                res.json({ message: err.message, statusCode: 404 });
+            });
+
+    }
+    else {
+        res.json({ message: "Image not found!", statusCode: 404 });
+    }
+
+}
+
+/**
+ * Started container [Only those where the team have access]
+ * - Req: [id]
+ */
+function startContainer_POST(req: Request, res: Response) {
+    let id = req.fields.id.toString();
+    let container = docker.getContainer(id);
+    container.start((err, data) => {
+        if (err == null)
+            res.json({ msg: "Container started successfully", statusCode: 200 });
+        else res.json({ message: err.json.message, statusCode: 404 });
+    });
+
+}
+/**
+ * id can be de container id OR name of the container
+ */
+function stopContainer_POST(req: Request, res: Response) {
+    let id = req.fields.id.toString();
+    let container = docker.getContainer(id);
+    container.stop((err, data) => {
+        if (err == null)
+            res.json({ msg: "Container stopped successfully", statusCode: 200 });
+        else res.json({ message: err.json.message, statusCode: 404 });
+    });
+
+}
+// TODO: Make resetContainer route
+/**
+ *
+ * Stop container
+ * Remove container
+ * Make new container with de base challenge image *
+ */
+function resetContainer_POST(req: Request, res: Response) {
+    res.send("TODO");
+}
+
+async function _getImage(name: string) {
+    const challenge = DB.repo(DockerChallengeImage);
+    let i = await challenge.findOne({ name: name });
+    return i;
+}
+
+function _createChallengeImage(jsonObj: any) {
     return new Promise<void>((resolve, reject) => {
         pump(
             build(`${__dirname}/../../../../..${jsonObj.dir}Dockerfile`, { t: jsonObj.name }),
@@ -82,41 +210,6 @@ function createChallengeImage(jsonObj: any) {
         )
 
         resolve();
-    });
-}
-
-// TODO: check if user is choosing the right challengeImage (from DB)
-async function createChallengeContainer(jsonObj: any) {
-    let configData: { portBindings: object, openPorts: number[] } = await _createPortConfig(jsonObj.ports);
-    console.log(configData);
-
-    return new Promise<Object>((resolve, reject) => {
-        docker.createContainer(
-            {
-                Image: jsonObj.challengeImage,
-                name: jsonObj.containerName,
-                HostConfig: {
-                    PortBindings: configData.portBindings
-                }
-            },
-            async (err, container) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    const challenge = DB.repo(DockerChallengeContainer);
-                    let ports: string[];
-
-                    let d = new DockerChallengeContainer(jsonObj.containerName, configData.openPorts, jsonObj.challengeImage);
-                    await challenge.save(d);
-                    container.start(async (err, data) => {
-                        if (err)
-                            reject(err);
-                        else {
-                            resolve(configData.openPorts);
-                        }
-                    });
-                }
-            });
     });
 }
 
@@ -156,7 +249,7 @@ function _giveRandomPort() {
 
             })
             .then((d) => {
-                let port_: number = randomIntFromInterval(lowerBoundPort, upperBoundPort);
+                let port_: number = _randomIntFromInterval(lowerBoundPort, upperBoundPort);
                 const portIsOpen = d.find((item) => { return item.openPorts == port_ });
 
                 if (portIsOpen == undefined) {
@@ -168,15 +261,19 @@ function _giveRandomPort() {
     });
 }
 
-function randomIntFromInterval(min: number, max: number) { // min and max included
+function _randomIntFromInterval(min: number, max: number) {
     return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
 export default {
-    getAllRunningContainers,
-    createChallengeImage,
-    createChallengeContainer,
-    getImage, makeImage
+    dockerConfigPorts_GET,
+    dockerConfigPorts_POST,
+    containers_GET,
+    makeImage_POST,
+    images_GET,
+    createChallengeContainer_POST,
+    startContainer_POST,
+    stopContainer_POST,
+    resetContainer_POST,
 }
-
 
