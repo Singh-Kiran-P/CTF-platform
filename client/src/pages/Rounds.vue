@@ -2,7 +2,7 @@
     <div class=list-form>
         <b-form @submit="onSubmit($event)">
             <b-form-group :state="state(roundsFeedback)" :invalid-feedback="roundsFeedback">
-            <div class="list-item nostyle round" v-for="(round, i) in form.rounds" :key="i /* TODO */">
+            <div class="list-item nostyle round" v-for="(round, i) in form.rounds" :key="i">
                     <div class=item-content>
                         <template v-if="!round.editable">
                             <span class=item-name>{{round.name}}</span>

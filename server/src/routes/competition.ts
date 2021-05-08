@@ -35,14 +35,14 @@ router.put('/save', isAdmin, (req, res) => {
     let data: Form = deserialize(req) as Form;
     if (!validForm(data)) return res.json({ error: 'Invalid data' });
 
-    let pageUploads = uploadFiles(data.pages, uploaddir, page => Boolean(page.html), _ => [''], // TODO: does not work
+    let pageUploads = uploadFiles(data.pages, uploaddir, page => Boolean(page.html), _ => [''],
         _ => '_temp', page => `/pages${page.path.length == 1 ? '' : page.path}/_page`, page => parentDir(page.source),
         (page, dir) => chain(() => upload(dir, page.html, page.zip), page.zip ? () => unzip(`${dir}/${page.zip.name}`) : null),
-        (p, dir) => p.source = `${dir}/${p.html?.name || fileName(p.source)}`);
+        (p, dir, diff) => { if (diff) p.source = `${dir}/${p.html?.name || fileName(p.source)}`; });
 
-    let sponsorUploads = uploadFiles(data.sponsors, uploaddir, sponsor => Boolean(sponsor.img), _ => [''], // TODO: test
+    let sponsorUploads = uploadFiles(data.sponsors, uploaddir, sponsor => Boolean(sponsor.img), _ => [''],
         sponsor => '_' + sponsor.name, sponsor => `/sponsors/${sponsor.name}`, sponsor => parentDir(sponsor.icon), (sponsor, dir) => upload(dir, sponsor.img),
-        (p, dir) => p.icon = `${dir}/${p.img?.name || fileName(p.icon)}`);
+        (p, dir, diff) => { if (diff) p.icon = `${dir}/${p.img?.name || fileName(p.icon)}`; });
 
     const error = (action: string): any => res.json({ error: `Error ${action}`});
     Promise.all([pageUploads, sponsorUploads]).then(() => Promise.all([

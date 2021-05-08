@@ -7,7 +7,7 @@ import { ncp } from 'ncp';
 import path from 'path';
 import fs from 'fs';
 
-const parentDir = (p: string, n: number = 1): string => p ? (n == 0 ? p : parentDir(path.dirname(p), n - 1)) : '';
+const parentDir = (p: string, n: number = 1): string => p.length > 1 ? (n == 0 ? p : parentDir(path.dirname(p), n - 1)) : '';
 const fileName = (p: string): string => p ? path.basename(p) : '';
 
 type Err = NodeJS.ErrnoException;
@@ -37,9 +37,10 @@ const rmup = (path: string, cb: () => void): void => fs.rmdir(parentDir(path), e
  * moves the given path, rejects on error
  */
 const move = (from: string, to: string) => {
-    [from, to] = [from, to].map(path => Root + path);
+    [from, to] = [from, to].map(path => Root + path.toLowerCase());
     return new Promise<void>((resolve, reject) => {
-        if (from.toLowerCase() == to.toLowerCase()) return resolve();
+        if (from == to) return resolve();
+        if (to.startsWith(from)) return reject(`Error: Attempting to recursively move directories: ${from} -> ${to}`);
         mkdir(to, { recursive: true }, err => {
             if (err) return reject(err);
             ncp(from, to, { stopOnErr: true }, err => {
@@ -102,10 +103,9 @@ const count = (c: (v?: number) => number, resolve: () => void, reject: (err: any
 
 /**
  * uploads the given items, moving, deleting and replacing directories where needed
- * TODO: does not work for pages anymore
  */
 const uploadFiles = <E>(items: E[], base: string, newFile: (e: E) => boolean, getClear: (e: E) => string[], getTemp: (e: E) => string, getDir: (e: E) => string, getOld: (e: E) => string,
-    getUpload: (e: E, dir: string) => Promise<any>, done: (e: E, dir: string) => void = () => {}): Promise<void[]> => {
+    getUpload: (e: E, dir: string) => Promise<any>, done: (e: E, dir: string, diff: boolean) => void = () => {}): Promise<void[]> => {
     let moves: Promise<void>[] = [];
     let initialUploads: Promise<void>[] = [];
     let secondaryUploads: (() => Promise<void>)[] = [];
@@ -114,7 +114,7 @@ const uploadFiles = <E>(items: E[], base: string, newFile: (e: E) => boolean, ge
         let file = newFile(item);
         let [dir, old] = [lower(getDir(item)), lower(getOld(item))];
         let [bdir, bold] = [base + dir, base + (old || dir)];
-        if (!file && bdir == bold) return done(item, dir);
+        if (!file && bdir == bold) return done(item, dir, false);
         let moving = bdir != bold && items.some(x => lower(getDir(x)) == old);
         if (moving) {
             let temp = `${parentDir(bold)}/${lower(getTemp(item))}`;
@@ -122,7 +122,7 @@ const uploadFiles = <E>(items: E[], base: string, newFile: (e: E) => boolean, ge
             bold = temp;
         }
         const clear = () => chain(() => remove(!old || bdir != bold ? bdir : ''), () => move(bold, bdir), file ? () => remove(...getClear(item).map(x => bdir + x)) : () => {});
-        const upload = () => chain(clear, file ? () => getUpload(item, bdir) : () => {}, () => done(item, dir));
+        const upload = () => chain(clear, file ? () => getUpload(item, bdir) : () => {}, () => done(item, dir, true));
         moving || items.some(x => lower(getOld(x)) == dir) ? secondaryUploads.push(upload) : initialUploads.push(upload());
     });
 
