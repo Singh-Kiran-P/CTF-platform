@@ -42,7 +42,7 @@
     }
 
     .item-category {
-        width: 5rem;
+        min-width: 5rem;
         color: var(--gray);
         display: inline-block;
     }
@@ -52,8 +52,10 @@
         flex-grow: 1;
     }
 
-    textarea, .item-description.marginTop {
-        margin-top: var(--margin);
+    .item-content.editable {
+        textarea, .item-description {
+            margin-top: var(--margin);
+        }
     }
 }
 

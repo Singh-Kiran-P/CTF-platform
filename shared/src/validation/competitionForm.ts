@@ -9,8 +9,8 @@ type Page = { name: string, path: string, source: string, order: number, html: F
 type Sponsor = { name: string, link: string, icon: string, order: number, img: File | UFile | null };
 type Form = { name: string, categories: Category[], tags: Tag[], pages: Page[], sponsors: Sponsor[] };
 
-const validForm = (f: Form, checkType: boolean = true): boolean => {
-    let valid = (!checkType || isf.form(f));
+const validForm = (f: Form): boolean => {
+    let valid = isf.form(f);
     valid = valid && state(validate.name(f.name), validate.categories(f.categories), validate.tags(f.tags), validate.pages(f.pages), validate.sponsors(f.sponsors));
     valid = valid && f.categories.every(category => state(validate.category(category, f.categories)));
     valid = valid && f.tags.every(tag => state(validate.tag(tag, f.tags)));

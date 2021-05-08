@@ -93,7 +93,8 @@ class Database extends EventEmitter {
                     if (i < il && j < jl && id(set[i]) == id(old[j])) keep.push(Object.assign({}, old[j], set[i]));
                 }
 
-                let removes = old.reduce((acc, c) => acc.concat(files(c)), ['']).filter(f => f && !set.some(x => files(x).includes(f))).map(f => () => remove(f));
+                let lowerCompare = (x: string, y: string) => x.toLowerCase() == y.toLowerCase();
+                let removes = discard.reduce((acc, c) => acc.concat(files(c)), ['']).filter(f => f && !set.some(x => files(x).find(y => lowerCompare(f, y)))).map(f => () => remove(f));
                 chain(() => repo.remove(discard), () => repo.save(keep), () => Promise.all(removes.map(remove => remove()))).then(() => resolve()).catch(err => reject(err));
             }).catch(err => reject(err));
         });
@@ -121,7 +122,6 @@ export default instance;
 export { Account } from './entities/accounts/Account';
 export { Category } from './entities/accounts/Category';
 export { Team } from './entities/accounts/Team';
-export { Attachment } from './entities/challenges/Attachment';
 export { Challenge, ChallengeType } from './entities/challenges/Challenge';
 export { Hint } from './entities/challenges/Hint';
 export { Question } from './entities/challenges/Question';

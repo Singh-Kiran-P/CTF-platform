@@ -10,13 +10,13 @@ type Form = { rounds: Round[] };
 const sortRounds = (rounds: Round[]): Round[] => [...rounds].sort((a, b) => new Date(a.start) < new Date(b.start) ? -1 : 1);
 const times = (round: Round) => [round.start, round.end].map(time => new Date(time).getTime());
 
-const validForm = (f: Form, checkType: boolean = true): boolean => {
-    let v = (!checkType || isf.form(f)) && state(validate.rounds(f.rounds));
-    return v && f.rounds.every(r => state(validate.round(r, f.rounds)) && validChallenges(r.challenges, false));
+const validForm = (f: Form): boolean => {
+    let v = isf.form(f) && state(validate.rounds(f.rounds));
+    return v && f.rounds.every(r => state(validate.round(r, f.rounds)) && validChallenges(r.challenges));
 }
 
-const validChallenges = (challenges?: Challenge[], checkType: boolean = true): Boolean => {
-    return (!checkType || isf.challenges(challenges)) && state(validate.challenges(challenges)) && (challenges || []).every(c => state(validate.challenge(c, challenges)));
+const validChallenges = (challenges?: Challenge[]): Boolean => {
+    return (isf.challenges(challenges)) && state(validate.challenges(challenges)) && (challenges || []).every(c => state(validate.challenge(c, challenges)));
 }
 
 const validate = {
@@ -40,8 +40,11 @@ const validate = {
         return v;
     },
     challenge: (challenge: Challenge, challenges?: Challenge[], add: boolean = false): string => {
-        let v = validateCharacters(challenge.name, 'Challenge name', true);
+        let v = challenge.name.startsWith('_') ? `Challenge name cannot start with '_'` : '';
+        if (!v) v = validateCharacters(challenge.name, 'Challenge name', true);
         if (!v) v = validateString(challenge.name, 'Challenge name', 3, 32, !add, (challenges || []).map(c => c.name), !add);
+        if (!v && challenge.points !== 0 && !challenge.points) v = validateString('', 'Challenge Points', -1, -1); // TODO: does not work
+        if (!v && (!is.number(challenge.points)) || !Number.isInteger(challenge.points)) v = 'Challenge points must be a valid integer';
         if (!v && challenge.points < 0) v = 'Challenge points cannot be negative';
         if (!v) v = validateString(challenge.flag, 'Challenge flag', 3, -1);
         return v; // TODO

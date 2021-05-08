@@ -35,19 +35,19 @@ async function loadTestData() {
     ]);
 
     let rounds: Round[] = await save([
-        new Round({ name: 'First round!!', folder: '/rounds/First round!!/', start: new Date(2021, 5, 1, 10).toJSON(), end: new Date(2021, 5, 1, 11).toJSON() }),
-        new Round({ name: 'GIVE IT UP FOR ROUND 22@', folder: '/rounds/GIVE IT UP FOR ROUND 22@/', start: new Date(2021, 5, 1, 11, 30).toJSON(), end: new Date(2021, 5, 1, 12, 30).toJSON() }),
-        new Round({ name: '~le tour final est arrivé~', folder: '/rounds/~le tour final est arrivé~/', start: new Date(2021, 5, 1, 13).toJSON(), end: new Date(2021, 5, 1, 14).toJSON() })
+        new Round({ name: 'First round!!', folder: '/rounds/First round!!', start: new Date(2021, 5, 1, 10).toJSON(), end: new Date(2021, 5, 1, 11).toJSON() }),
+        new Round({ name: 'GIVE IT UP FOR ROUND 22@', folder: '/rounds/GIVE IT UP FOR ROUND 22@', start: new Date(2021, 5, 1, 11, 30).toJSON(), end: new Date(2021, 5, 1, 12, 30).toJSON() }),
+        new Round({ name: '~le tour final est arrivé~', folder: '/rounds/~le tour final est arrivé~', start: new Date(2021, 5, 1, 13).toJSON(), end: new Date(2021, 5, 1, 14).toJSON() })
     ]);
 
     let challenges: Challenge[] = await save([
-        new Challenge({ round: rounds[0], name: 'bruhrurh', description: 'it begin herere!!\nare you excite?? epic cool? ye yes\n\njust watch out it wil be hard', points: 5, flag: 'FLAG 1', order: 1 }),
-        new Challenge({ round: rounds[0], name: 'come have fun here! (', description: 'hoo good job!\n...\n\n         more coming :)', points: 5, flag: 'FLAG SECOND', order: 4 }),
-        new Challenge({ round: rounds[1], name: 'contitnitueing!', description: 'haha yes hope you liked your break becuas eits babaout to get WILD!  CRAZY!', points: 10, flag: 'cool flag B)', order: 4 }),
-        new Challenge({ round: rounds[1], name: 'thius is onlyly the begine', description: 'harder and harder it will get yeees', points: 15, flag: 'mmmmMMMMMMMMMMMMMMMMMMMMMM!', order: 3 }),
-        new Challenge({ round: rounds[1], name: 'warm up cuz abotu to get stemey', description: 'i was just joking this one dont even got points LMAO\n\n\n\n\n\nepic owned', points: 0, flag: 'usesless flag LOL', order: 1 }),
-        new Challenge({ round: rounds[1], name: 'haha finif', description: 'BOO! yeah now it s hard cunt watch out ccd', points: 20, flag: 'haha you wont even find this i bet', order: 7 }),
-        new Challenge({ round: rounds[2], name: 'huhgg FIN#', description: 'Quest-ce que Lorem Ipsum? Lorem Ipsum est simplement un faux texte de lindustrie de limpression et de la composition. Lorem Ipsum a été le texte factice standard de lindustrie depuis les années 1500, quand un imprimeur inconnu a pris une galère de caractères et la brouillée pour en faire un livre de spécimens. Il a survécu non seulement cinq siècles, mais aussi le saut dans la composition électronique, demeurant essentiellement inchangé. Il a été popularisé dans les années 1960 avec la sortie de feuilles Letraset contenant des passages du Lorem Ipsum, et plus récemment avec un logiciel de publication assistée par ordinateur comme Aldus PageMaker comprenant des versions de Lorem Ipsum.', points: 999, flag: 'tres bon', order: 2 })
+        new Challenge({ round: rounds[0], name: 'bruhrurh', description: 'it begin herere!!\nare you excite?? epic cool? ye yes\n\njust watch out it wil be hard', points: 5, flag: 'FLAG 1', attachments: '', order: 1 }),
+        new Challenge({ round: rounds[0], name: 'come have fun here! (', description: 'hoo good job!\n...\n\n         more coming :)', points: 5, flag: 'FLAG SECOND', attachments: '', order: 4 }),
+        new Challenge({ round: rounds[1], name: 'contitnitueing!', description: 'haha yes hope you liked your break becuas eits babaout to get WILD!  CRAZY!', points: 10, flag: 'cool flag B)', attachments: '', order: 4 }),
+        new Challenge({ round: rounds[1], name: 'thius is onlyly the begine', description: 'harder and harder it will get yeees', points: 15, flag: 'mmmmMMMMMMMMMMMMMMMMMMMMMM!', attachments: '', order: 3 }),
+        new Challenge({ round: rounds[1], name: 'warm up cuz abotu to get stemey', description: 'i was just joking this one dont even got points LMAO\n\n\n\n\n\nepic owned', points: 0, flag: 'usesless flag LOL', attachments: '', order: 1 }),
+        new Challenge({ round: rounds[1], name: 'haha finif', description: 'BOO! yeah now it s hard cunt watch out ccd', points: 20, flag: 'haha you wont even find this i bet', attachments: '', order: 7 }),
+        new Challenge({ round: rounds[2], name: 'huhgg FIN#', description: 'Quest-ce que Lorem Ipsum? Lorem Ipsum est simplement un faux texte de lindustrie de limpression et de la composition. Lorem Ipsum a été le texte factice standard de lindustrie depuis les années 1500, quand un imprimeur inconnu a pris une galère de caractères et la brouillée pour en faire un livre de spécimens. Il a survécu non seulement cinq siècles, mais aussi le saut dans la composition électronique, demeurant essentiellement inchangé. Il a été popularisé dans les années 1960 avec la sortie de feuilles Letraset contenant des passages du Lorem Ipsum, et plus récemment avec un logiciel de publication assistée par ordinateur comme Aldus PageMaker comprenant des versions de Lorem Ipsum.', points: 999, flag: 'tres bon', attachments: '', order: 2 })
     ]);
 
     let admin = new Account('admin', 'password');

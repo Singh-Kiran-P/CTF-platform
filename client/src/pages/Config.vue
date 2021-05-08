@@ -11,7 +11,7 @@
                 <Collapse label="Participant categories">
                     <span>The lowest category takes priority when deciding the category of a team.</span>
                     <div class=list-item v-for="category in form.categories" :key="category.order">
-                        <div class=item-content>
+                        <div :class="['item-content', { editable: category.editable }]">
                             <span v-if="!category.editable" class=item-name>{{category.name}}</span>
                             <b-form-input v-else type=text trim v-model="category.name" placeholder="Enter category name" :state="state(categoryFeedback(category))"/>
                             <b-form-invalid-feedback>{{categoryFeedback(category)}}</b-form-invalid-feedback>
@@ -33,7 +33,7 @@
             <b-form-group :state="state(tagsFeedback)" :invalid-feedback="tagsFeedback">
                 <Collapse label="Challenge tags">
                     <div class=list-item v-for="tag in form.tags" :key="tag.order">
-                        <div class=item-content>
+                        <div :class="['item-content', { editable: tag.editable }]">
                             <template v-if="!tag.editable">
                                 <span class=item-name>{{tag.name}}</span>
                                 <span class=item-description>{{tag.description}}</span>
@@ -61,15 +61,15 @@
                 <Collapse label="Available pages">
                     <span>Pages are ordered as shown below.</span>
                     <div class=list-item v-for="page in form.pages" :key="page.order">
-                        <div class=item-content>
+                        <div :class="['item-content', { editable: page.editable }]">
                             <span v-if="!page.editable" class=item-name>{{page.name}}</span>
                             <b-form-input v-else type=text trim v-model="page.name" placeholder="Enter page name" :state="state(pageFeedback(page))"/>
-                            <span :class="['item-description', { marginTop: page.editable }]">
+                            <span class=item-description>
                                 <span class=item-category>Path</span>
                                 <span v-if="!page.editable" class=item-value>{{page.path}}</span>
                                 <b-form-input v-else type=text trim v-model="page.path" placeholder="Enter page path" :state="state(pageFeedback(page))"/>
                             </span>
-                            <span :class="['item-description', { marginTop: page.editable }]">
+                            <span class=item-description>
                                 <span class=item-category>Source</span>
                                 <span v-if="!page.editable" class=item-value>{{source(page)}}</span>
                                 <template v-else>
@@ -99,15 +99,15 @@
             <b-form-group :state="state(sponsorsFeedback)" :invalid-feedback="sponsorsFeedback">
                 <Collapse label="Competition sponsors">
                     <div class=list-item v-for="sponsor in form.sponsors" :key="sponsor.order">
-                        <div class=item-content>
+                        <div :class="['item-content', { editable: sponsor.editable }]">
                             <span v-if="!sponsor.editable" class=item-name>{{sponsor.name}}</span>
                             <b-form-input v-else type=text trim v-model="sponsor.name" placeholder="Enter sponsor name" :state="state(sponsorFeedback(sponsor))"/>
-                            <span :class="['item-description', { marginTop: sponsor.editable }]">
+                            <span class=item-description>
                                 <span class=item-category>Link</span>
                                 <span v-if="!sponsor.editable" class=item-value>{{sponsor.link}}</span>
                                 <b-form-input v-else type=text trim v-model="sponsor.link" placeholder="Enter sponsor link" :state="state(sponsorFeedback(sponsor))"/>
                             </span>
-                            <span :class="['item-description', { marginTop: sponsor.editable }]">
+                            <span class=item-description>
                                 <span class=item-category>Icon</span>
                                 <span v-if="!sponsor.editable" class=item-value>{{icon(sponsor)}}</span>
                                 <b-form-file v-else accept=".jpg, .jpeg, .png" v-model="sponsor.img" :placeholder="imgPlaceholder(sponsor)" :state="state(sponsorFeedback(sponsor))"/>
@@ -201,10 +201,10 @@ export default Vue.extend({
         pagesFeedback(): string { return validate.pages(this.form.pages); },
         sponsorsFeedback(): string { return validate.sponsors(this.form.sponsors); },
 
-        validForm(): boolean { return validForm(this.form, false); }
+        validForm(): boolean { return validForm(this.form); }
     },
     watch: {
-        form: { deep: true, handler() {  // TODO: ignore editable
+        form: { deep: true, handler() {  // TODO: ignore editable?
             let state = 'normal';
             if (this.loaded) {
                 state = 'succes';

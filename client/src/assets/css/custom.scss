@@ -47,7 +47,7 @@ textarea {
 }
 
 // .custom-file-label styling must be defined here for some ungodly reason, dont ask me why
-.list-item:not(.nostyle) {
+.list-item:not(.nostyle) .item-content.editable {
     input, textarea, .custom-file-label, .custom-file-label::after {
         margin: 0;
         padding-top: 0;

@@ -1,5 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany } from 'typeorm';
-import { Environment, Solve, Attachment, Question, Round, Hint, Tag } from '../../../database';
+import { Environment, Solve, Question, Round, Hint, Tag } from '../../../database';
 
 export enum ChallengeType {
     QUIZ = 'quiz',
@@ -23,9 +23,6 @@ export class Challenge {
 
     @ManyToOne(_ => Round, round => round.challenges, { nullable: false, onDelete: 'CASCADE' })
     round: Round;
-
-    @OneToMany(_ => Attachment, attachment => attachment.challenge)
-    attachments: Attachment[];
 
     @OneToMany(_ => Hint, hint => hint.challenge)
     hints: Hint[];
@@ -58,24 +55,28 @@ export class Challenge {
     order: number;
 
     @Column()
+    attachments: string;
+
+    @Column()
     dockerfile: string;
 
     @Column()
-    visibility: boolean;
+    visibility: boolean; // TODO: remove this?
 
-    constructor(params?: { round: Round & { id: number }, name: string, description: string, points: number, flag: string, order: number }) {
+    constructor(params?: { round: Round, name: string, description: string, points: number, flag: string, attachments: string, order: number }) {
         if (!params) return;
 
         // TODO
         this.type = ChallengeType.BASIC;
-        this.dockerfile = 'TODO';
+        this.dockerfile = '';
         this.visibility = false;
         
+        this.round = params.round;
         this.name = params.name;
         this.description = params.description;
         this.points = params.points;
         this.flag = params.flag;
+        this.attachments = params.attachments;
         this.order = params.order;
-        this.round = params.round;
     }
 }

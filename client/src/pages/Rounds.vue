@@ -21,26 +21,39 @@
                     <b-form-group class=challenges :state="state(challengesFeedback(round))" :invalid-feedback="challengesFeedback(round)">
                         <Collapse label=Challenges noborder v-model="round.visible" :loading="round.loading" @toggle="toggledRound(round)">
                             <div class=list-item v-for="challenge in round.challenges" :key="challenge.order">
-                                <div class=item-content>
+                                <div :class="['item-content', { editable: challenge.editable }]">
                                     <template v-if="!challenge.editable">
                                         <span class=item-name>{{challenge.name}}</span>
                                         <span class=item-description>{{challenge.description}}</span>
                                     </template>
                                     <template v-else>
-                                        <b-form-input type=text trim v-model="challenge.name" placeholder="Enter challenge name" :state="state(challengeFeedback(round, challenge))"/>
+                                        <b-form-input type=text trim v-model="challenge.name" placeholder="Enter challenge name"
+                                            :state="state(challengeFeedback(round, challenge))"
+                                        />
                                         <b-form-textarea max-rows="10" v-model="challenge.description" placeholder="Enter challenge description"
                                             :state="state(challengeFeedback(round, challenge))"
                                         />
                                     </template>
-                                    <span :class="['item-description', { marginTop: challenge.editable }]">
+                                    <span class=item-description>
                                         <span class=item-category>Points</span>
                                         <span v-if="!challenge.editable" class=item-value>{{challenge.points}}</span>
-                                        <b-form-input v-else type=number v-model="challenge.points" placeholder="Enter challenge points" :state="state(challengeFeedback(round, challenge))"/>
+                                        <b-form-input v-else type=number :number="true" v-model="challenge.points" placeholder="Enter challenge points"
+                                            :state="state(challengeFeedback(round, challenge))"
+                                        />
                                     </span>
-                                    <span :class="['item-description', { marginTop: challenge.editable }]">
+                                    <span class=item-description>
                                         <span class=item-category>Flag</span>
                                         <span v-if="!challenge.editable" class=item-value>{{challenge.flag}}</span>
-                                        <b-form-input v-else type=text trim v-model="challenge.flag" placeholder="Enter challenge flag" :state="state(challengeFeedback(round, challenge))"/>
+                                        <b-form-input v-else type=text trim v-model="challenge.flag" placeholder="Enter challenge flag"
+                                            :state="state(challengeFeedback(round, challenge))"
+                                        />
+                                    </span>
+                                    <span class=item-description>
+                                        <span class=item-category>Attachments</span>
+                                        <span v-if="!challenge.editable" class=item-value>{{attachments(challenge)}}</span>
+                                        <b-form-file v-else accept=".zip" v-model="challenge.zip" :placeholder="zipPlaceholder(challenge)"
+                                            :state="state(challengeFeedback(round, challenge))"
+                                        />
                                     </span>
                                     <b-form-invalid-feedback>{{challengeFeedback(round, challenge)}}</b-form-invalid-feedback>
                                 </div>
@@ -81,6 +94,7 @@ import DateTimePicker from '@/components/DateTimePicker.vue';
 import { nextOrder, moveDown } from '@/assets/listFunctions';
 import { state, validInput, sortRounds, validForm, validChallenges, validate, Challenge, Round, Form } from '@shared/validation/roundsForm';
 import { serialize } from '@shared/objectFormdata';
+import path from 'path';
 
 type Editable = { editable?: boolean };
 type Visible = { visible?: boolean };
@@ -107,9 +121,7 @@ export default Vue.extend({
 
         loaded: false,
         saveState: 'normal',
-        cancelState: 'normal',
-
-        testDate: ''
+        cancelState: 'normal'
     }),
     computed: {
         newRound(): Round { return Object.assign({}, this.add.round, { folder: '', challenges: [] }); },
@@ -117,15 +129,12 @@ export default Vue.extend({
         newRoundFeedback(): string { return this.roundFeedback(this.newRound, true); },
         validNewRound(): boolean { return validInput(this.newRoundFeedback, this.newRound.name, this.newRound.start, this.newRound.end); },
 
-        roundsFeedback(): string { return validate.rounds(this.formData.rounds); },
+        roundsFeedback(): string { return validate.rounds(this.form.rounds); },
 
-        formData(): Form { return {
-            rounds: this.form.rounds // TODO
-        } },
-        validForm(): boolean { return validForm(this.formData, false); }
+        validForm(): boolean { return validForm(this.form); }
     },
     watch: {
-        formData: { deep: true, handler() { // TODO: ignore editable and visible and loading
+        form: { deep: true, handler() { // TODO: ignore editable and visible and loading?
             let state = 'normal';
             if (this.loaded) {
                 state = 'succes';
@@ -162,7 +171,7 @@ export default Vue.extend({
             e.preventDefault();
             this.saveState = 'loading';
             const error = () => this.saveState = 'error';
-            axios.put('/api/rounds/save', serialize(this.formData)).then(res => {
+            axios.put('/api/rounds/save', serialize(this.form)).then(res => {
                 res.data.error ? error() : this.loadFormData(false);
             }).catch(() => error());
         },
@@ -208,6 +217,8 @@ export default Vue.extend({
             });
         },
 
+        attachments(challenge: Challenge): string { return challenge.zip ? challenge.zip.name || '' : path.basename(challenge.attachments); },
+        zipPlaceholder(challenge?: Challenge): string { return challenge && (challenge.zip || challenge.attachments) ? this.attachments(challenge) : 'Upload challenge attachments'; },
         challengesFeedback(round: Round): string { return validate.challenges(round.challenges); },
         challengeDown(round: Round, challenge: Challenge): void { moveDown(round.challenges || [], x => x.name == challenge.name); },
         challengeFeedback(round: Round, challenge: Challenge, add: boolean = false): string { return validate.challenge(challenge, round.challenges, add); },

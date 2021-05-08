@@ -20,10 +20,10 @@ const createDir = (path: string) => new Promise<void>((resolve, reject) => mkdir
  */
 const upload = (root: string, ...paths: (UFile | File)[]) => {
     root = Root + root;
-    let files = paths.filter((f: any) => is.object(f) && is.string(f.name) && is.string(f.path)).map(f => f as UFile);
+    let files = paths.filter((f: any) => f && is.object(f) && is.string(f.name) && is.string(f.path)).map(f => f as UFile);
     return new Promise<void>((resolve, reject) => {
-        if (!files) return resolve();
         let c = files.length;
+        if (c == 0) return resolve();
         files.forEach(file => fse.move(file.path, `${root}/${file.name}`, count(v => c = set(c, v), resolve, reject)));
     });
 }
@@ -39,7 +39,7 @@ const rmup = (path: string, cb: () => void): void => fs.rmdir(parentDir(path), e
 const move = (from: string, to: string) => {
     [from, to] = [from, to].map(path => Root + path);
     return new Promise<void>((resolve, reject) => {
-        if (from == to) return resolve();
+        if (from.toLowerCase() == to.toLowerCase()) return resolve();
         mkdir(to, { recursive: true }, err => {
             if (err) return reject(err);
             ncp(from, to, { stopOnErr: true }, err => {
@@ -56,8 +56,8 @@ const move = (from: string, to: string) => {
 const remove = (...paths: string[]) => {
     paths = paths.filter(path => path).map(path => Root + path);
     return new Promise<void>((resolve, reject) => {
-        if (!paths) return resolve();
         let c = paths.length;
+        if (c == 0) return resolve();
         paths.forEach(path => fs.rm(path, { recursive: true }, count(v => c = set(c, v), resolve, reject, ['ENOENT'], cb => rmup(path, cb))));
     });
 }
@@ -78,9 +78,7 @@ const chain = (...calls: (() => Promise<any> | any)[]) => {
     return new Promise<void>((resolve, reject) => {
         let call = (i: number) => {
             if (i == calls.length) return resolve();
-            let r = calls[i]();
-            if (!(r instanceof Promise)) call(i + 1);
-            else r.then(() => call(i + 1)).catch(err => reject(err));
+            Promise.resolve(calls[i]()).then(() => call(i + 1)).catch(err => reject(err));
         }
         call(0);
     });
@@ -104,29 +102,31 @@ const count = (c: (v?: number) => number, resolve: () => void, reject: (err: any
 
 /**
  * uploads the given items, moving, deleting and replacing directories where needed
+ * TODO: does not work for pages anymore
  */
-const uploadFiles = <E>(items: E[], base: string, newFile: (e: E) => boolean, getTemp: (e: E) => string, getDir: (e: E) => string, getOld: (e: E) => string,
-    getUpload: (e: E, dir: string) => Promise<void>, set: (e: E, dir: string) => void, done?: (e: E) => void): Promise<void[]> => {
+const uploadFiles = <E>(items: E[], base: string, newFile: (e: E) => boolean, getClear: (e: E) => string[], getTemp: (e: E) => string, getDir: (e: E) => string, getOld: (e: E) => string,
+    getUpload: (e: E, dir: string) => Promise<any>, done: (e: E, dir: string) => void = () => {}): Promise<void[]> => {
     let moves: Promise<void>[] = [];
     let initialUploads: Promise<void>[] = [];
     let secondaryUploads: (() => Promise<void>)[] = [];
+    const lower = (string: string): string => string.toLowerCase();
     items.forEach(item => {
         let file = newFile(item);
-        let [dir, old] = [getDir(item), getOld(item)];
-        let [bdir, bold] = [base + dir, base + old];
-        if (!file && (!old || dir == old)) return done(item);
-        let moving = dir != old && items.some(x => getDir(x) == old);
+        let [dir, old] = [lower(getDir(item)), lower(getOld(item))];
+        let [bdir, bold] = [base + dir, base + (old || dir)];
+        if (!file && bdir == bold) return done(item, dir);
+        let moving = bdir != bold && items.some(x => lower(getDir(x)) == old);
         if (moving) {
-            let temp = `${parentDir(bold)}/${getTemp(item)}`;
+            let temp = `${parentDir(bold)}/${lower(getTemp(item))}`;
             moves.push(move(bold, temp));
             bold = temp;
         }
-        const upload = () => chain(() => remove(bdir, file && old ? bold : ''), file ? () => getUpload(item, bdir) : () => move(bold, bdir), () => done(item));
-        moving || items.some(x => getOld(x) == dir) ? secondaryUploads.push(upload) : initialUploads.push(upload());
-        set(item, dir);
+        const clear = () => chain(() => remove(!old || bdir != bold ? bdir : ''), () => move(bold, bdir), file ? () => remove(...getClear(item).map(x => bdir + x)) : () => {});
+        const upload = () => chain(clear, file ? () => getUpload(item, bdir) : () => {}, () => done(item, dir));
+        moving || items.some(x => lower(getOld(x)) == dir) ? secondaryUploads.push(upload) : initialUploads.push(upload());
     });
 
-    return Promise.all([chain(() => Promise.all(moves), () => Promise.all(secondaryUploads.map(upload => upload()))), ...initialUploads]);
+    return Promise.all([...initialUploads, chain(() => Promise.all(moves), () => Promise.all(secondaryUploads.map(upload => upload())))]);
 }
 
-export { UFile, Root, parentDir, fileName, createDir, upload, move, remove, unzip, chain, uploadFiles, uploaddir };
+export { UFile, Root, uploaddir, parentDir, fileName, createDir, upload, move, remove, unzip, chain, uploadFiles };
