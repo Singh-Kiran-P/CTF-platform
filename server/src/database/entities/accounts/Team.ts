@@ -14,10 +14,9 @@ export class Team {
     @Column({nullable: true})
     inviteCode: string;
 
-    @OneToOne(_ => Category)
+    /*@OneToOne(_ => Category)
     @JoinColumn()
-    category: Category;
-
+    category: Category;*/
 
     @OneToOne(_ => Account)
     @JoinColumn()
@@ -42,24 +41,22 @@ export class Team {
         DB.repo(Team).update(this.id, {inviteCode: inviteData.hash});
     }
 
-    @AfterUpdate()
+    /*@AfterUpdate()
     updateCategory() {
         let cat: Category = this.getCategory();
         if (cat != this.category)
             DB.repo(Team).update(this.id, {category: cat});
-    }
+    }*/
 
     constructor(name: string, creator: Account) {
         this.name = name;
         if (!creator) return;
         this.captain = creator;
-        this.category = creator.category;
+        //this.category = creator.category;
     }
-
     memberCount(): number {
         return this.accounts.length;
     }
-
     getPoints(): number {
         var points: number = 0;
         this.solves.forEach((solve: Solve)=>{
@@ -80,6 +77,9 @@ export class Team {
             }
         });
         return cat;
+    }
+    getCategoryName(): string {
+        return this.getCategory().name;
     }
 }
 

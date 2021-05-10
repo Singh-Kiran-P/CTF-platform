@@ -2,6 +2,7 @@ import Vue from 'vue';
 import axios from 'axios';
 import VueRouter from 'vue-router';
 import Roles from '@shared/roles';
+import Dashboard from '../pages/../components/Teams/Dashboard.vue'
 Vue.use(VueRouter);
 
 type Route = { path: string, name: string, src: string, meta?: {} };
@@ -29,6 +30,12 @@ const pages: { [page: string]: Route } = {
         name: 'Team',
         src: 'Team.vue',
     },
+    teamDashboard: {
+        path: '/team/:uuid',
+        name: 'TeamDashboard',
+        src: 'TeamDashboard.vue',
+        meta: {hidden:true}
+    },
     joinTeam: {
         path: '/team/join/:invite',
         name: 'joinTeam',
@@ -45,6 +52,11 @@ const pages: { [page: string]: Route } = {
         name: 'Teams',
         src: 'Teams.vue'
     },
+    users: {
+        path: '/users',
+        name: 'Users',
+        src: 'Users.vue'
+    },
     config: {
         path: '/config',
         name: 'Config',
@@ -58,17 +70,25 @@ const routes: { [page: string]: Route[] } = {
     [Roles.VISITOR]: [
         pages.login,
         pages.register,
-        pages.joinTeam
+        pages.joinTeam,
+        pages.teamDashboard,
+        pages.teams,
+        pages.users
     ],
     [Roles.PARTICIPANT]: [
         pages.leaderboard,
         pages.team,
+        pages.teamDashboard,
         pages.joinTeam,
+        pages.teams,
+        pages.users,
         pages.logout
     ],
     [Roles.ORGANIZER]: [
         pages.leaderboard,
+        pages.teamDashboard,
         pages.teams,
+        pages.users,
         pages.config,
         pages.logout
     ]
