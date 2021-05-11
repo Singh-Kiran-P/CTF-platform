@@ -1,7 +1,7 @@
 <template>
     <div>
-        <div class="create">
-            <h2>Notifications</h2>
+        <h2>Notifications</h2>
+        <div class="create" v-if="role === 'organizer'">
             <b-form @submit="onSubmit($event)" v-if="show">
                 <b-form-group
                     id="input-group-1"
@@ -37,8 +37,12 @@
         <!-- Notifications -->
         <div class="create">
             <div v-for="item in notification" :key="item">
-                <b-card class="card" bg-variant="dark"  text-variant="white" :title="item.title">
-
+                <b-card
+                    class="card"
+                    bg-variant="dark"
+                    text-variant="white"
+                    :title="item.title"
+                >
                     <b-card-text>
                         {{ item.msg }}
                     </b-card-text>
@@ -60,10 +64,11 @@ export default Vue.extend({
     name: "Notifcations",
     created() {
         this.loadNotifications();
+        this.getRole();
     },
     data: () => ({
         notification: [] as {
-            id: number,
+            id: number;
             title: string;
             msg: string;
             createdAt: String;
@@ -73,6 +78,7 @@ export default Vue.extend({
             msg: "",
         },
         show: true,
+        role: "",
     }),
     mounted() {
         // setInterval(() => {
@@ -90,7 +96,7 @@ export default Vue.extend({
                 this.notification = [];
                 data.forEach((item: any) => {
                     this.notification.push({
-                        id : item.id,
+                        id: item.id,
                         title: item.title,
                         msg: item.msg,
                         createdAt: item.createdAt,
@@ -114,6 +120,12 @@ export default Vue.extend({
                     } else if (data.statusCode === 404)
                         Toast.send(this, "Message", data.message, "danger");
                 });
+        },
+        getRole(): void {
+            axios.get("/api/auth/role").then((response) => {
+                console.log(response.data);
+                this.role = response.data;
+            });
         },
     },
 });
