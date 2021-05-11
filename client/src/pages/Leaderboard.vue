@@ -1,11 +1,11 @@
 <template>
-    <div class="leaderboard">
-        <span>This is the leaderboard</span>
-    </div>
+  <div class="leaderboard">
+    <span>This is the leaderboard</span>
+  </div>
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
+import Vue from "vue";
 
 export default Vue.extend({
     name: 'Leaderboard',
@@ -14,6 +14,6 @@ export default Vue.extend({
 
 <style scoped lang="scss">
 span {
-    font-size: 2rem;
+  font-size: 2rem;
 }
 </style>

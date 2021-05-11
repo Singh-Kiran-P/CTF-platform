@@ -1,29 +1,37 @@
 const path = require('path');
+var hostURL
+if (process.env.HOSTING == "DOCKER")
+    hostURL = `http://${process.env.VUE_APP_API_HOST_DOCKER}:${process.env.VUE_APP_API_SERVER}`;
+if (process.env.HOSTING == "LOCALHOST")
+    hostURL = `http://${process.env.VUE_APP_API_HOST}:${process.env.VUE_APP_API_SERVER}`;
 
 module.exports = {
     runtimeCompiler: true, // for lazy loading route pages and loading uploaded html pages
     configureWebpack: { // for connecting to back-end node server without localhost prefix
         devServer: {
-            port: process.env.SERVER_PORT,
+            port: process.env.VUE_APP_SERVER_PORT,
             proxy: {
                 "^/api": {
-                    target: `http://localhost:${process.env.API_SERVER}`,
+                    target: hostURL,
                     changeOrigin: true,
                     logLevel: "debug",
                     pathRewrite: {
                         "^/api": ""
                     }
                 },
+
             },
+            disableHostCheck: true,   // That solved it
             watchOptions: {
                 ignored: [
                     /node_modules/,
                     /public/
-                ]
+                ],
+                poll: true,
             }
         }
     },
     chainWebpack: config => {
-        config.resolve.alias.set('@shared', path.resolve('../shared/src')) 
+        config.resolve.alias.set('@shared', path.resolve('../shared/src'))
     }
 };

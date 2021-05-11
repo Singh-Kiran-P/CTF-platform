@@ -33,7 +33,7 @@ const pages: { [page: string]: Route } = {
         path: '/team/join/:invite',
         name: 'joinTeam',
         src: 'joinTeam.vue',
-        meta: {hidden: true}
+        meta: { hidden: true }
     },
     leaderboard: {
         path: '/leaderboard',
@@ -50,6 +50,24 @@ const pages: { [page: string]: Route } = {
         name: 'Config',
         src: 'Config.vue',
         meta: { right: true }
+    },
+    dockerTesting: {
+        path: '/dockerTesting',
+        name: 'Docker Testing',
+        src: 'dockertesting.vue',
+        meta: { right: true }
+    },
+    notification: {
+        path: '/Notification',
+        name: 'Notification',
+        src: 'Notification.vue',
+        meta: { right: true }
+    },
+    socketio: {
+        path: '/socketio',
+        name: 'socketio',
+        src: 'socketio.vue',
+        meta: { right: true }
     }
 };
 
@@ -57,19 +75,25 @@ const pages: { [page: string]: Route } = {
 const routes: { [page: string]: Route[] } = {
     [Roles.VISITOR]: [
         pages.login,
-        pages.register
+        pages.register,
+        pages.socketio,
+
     ],
     [Roles.PARTICIPANT]: [
         pages.leaderboard,
         pages.team,
         pages.joinTeam,
-        pages.logout
+        pages.logout,
+        pages.notification,
+
     ],
     [Roles.ORGANIZER]: [
         pages.leaderboard,
         pages.teams,
         pages.config,
-        pages.logout
+        pages.dockerTesting,
+        pages.logout,
+        pages.notification,
     ]
 };
 
@@ -94,7 +118,8 @@ Promise.all([
 
     const router = new VueRouter({
         mode: 'history',
-        routes: [{ path: '/',  meta: { hidden: true }, component: { template: '<router-view/>' },
+        routes: [{
+            path: '/', meta: { hidden: true }, component: { template: '<router-view/>' },
             children: availableRoutes.map(route => ({
                 path: route.path.slice(1),
                 name: route.name,

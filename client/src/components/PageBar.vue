@@ -6,14 +6,22 @@
             
             <b-collapse id=nav-collapse is-nav>
                 <b-navbar-nav>
-                    <b-nav-item v-for="page in pages.left" :key="page.path" :to="page.path">
-                        {{page.name}}
+                    <b-nav-item
+                        v-for="page in pages.left"
+                        :key="page.path"
+                        :to="page.path"
+                    >
+                        {{ page.name }}
                     </b-nav-item>
                 </b-navbar-nav>
 
-                <b-navbar-nav class=ml-auto>
-                    <b-nav-item v-for="page in pages.right" :key="page.path" :to="page.path">
-                        {{page.name}}
+                <b-navbar-nav class="ml-auto">
+                    <b-nav-item
+                        v-for="page in pages.right"
+                        :key="page.path"
+                        :to="page.path"
+                    >
+                        {{ page.name }}
                     </b-nav-item>
                 </b-navbar-nav>
             </b-collapse>
@@ -32,9 +40,11 @@ export default Vue.extend({
             if (route.meta?.hidden) return;
             const page = {
                 name: route.name?.toString() || route.path.toString(),
-                path: route.path.toString()
+                path: route.path.toString(),
             };
-            route.meta?.right ? this.pages.right.push(page) : this.pages.left.push(page);
+            route.meta?.right
+                ? this.pages.right.push(page)
+                : this.pages.left.push(page);
         });
 
         axios.get('/api/competition/name').then(res => {

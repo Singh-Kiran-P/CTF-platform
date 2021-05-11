@@ -1,16 +1,24 @@
-import dotenv from "dotenv";
-import express from "express";
+import dotenv from 'dotenv';
+import express from 'express';
+import cors from 'cors';
 import passport from 'passport';
 import session from 'express-session';
 import formidable from 'express-formidable';
+import { createServer } from 'http';
+import { Server, Socket } from 'socket.io';
+
 import { strategy } from './auth';
 import routes from './routes';
-import DB from "./database";
+import DB from './database';
+const expressip = require('express-ip');
 dotenv.config();
 
 // setup express
 const app = express();
 app.use(formidable());
+
+// setup to get Ip address
+app.use(expressip().getIpInfoMiddleware);
 
 let sess = {
     resave: false,
@@ -41,5 +49,22 @@ app.all(/./, (_, __, next) => {
 // register all routes
 routes.forEach(route => app.use(route.path, route.router));
 
+// CORS middleware
+app.use(cors())
+
+// app.use((req, res, next) => {
+//     // res.setHeader('Access-Control-Allow-Origin', '*');
+//     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE');
+//     res.setHeader('Access-Control-Allow-HEaders', 'Content-Type, Authorization');
+//     next();
+// });
+
 // start the server
-app.listen(process.env.SERVER_PORT);
+const server = app.listen(process.env.SERVER_PORT);
+
+// Socket IO
+import io from './controllers/socket';
+let socket = io.init(server);
+socket.on('connection', (_socket: any) => {
+    console.log('Client connected to socket!');
+})

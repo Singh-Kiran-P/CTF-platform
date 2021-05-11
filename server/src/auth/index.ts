@@ -65,7 +65,7 @@ const generatePassword = (password: string) => {
     return { salt: salt, hash: hashed };
 }
 
-const validatePassword = (password: string, hashed: string, salt: string) => { 
+const validatePassword = (password: string, hashed: string, salt: string) => {
     return hashed == hash(password, salt);
 }
 

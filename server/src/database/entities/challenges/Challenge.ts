@@ -1,5 +1,6 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany, OneToOne } from 'typeorm';
 import { Environment, Solve, Attachment, Question, Round, Hint, Tag } from '../../../database';
+import { DockerChallengeImage } from '../docker/DockerChallengeImage';
 
 export enum ChallengeType {
     QUIZ = 'quiz',
@@ -57,8 +58,8 @@ export class Challenge {
     @Column()
     dockerfile: string;
 
-    @Column()
-    visibility: boolean;
+    @OneToOne(() => DockerChallengeImage, image => image.challenge, {nullable: true})
+    challengeImage: DockerChallengeImage
 
     constructor() {
         // TODO
