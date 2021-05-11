@@ -51,22 +51,16 @@ const pages: { [page: string]: Route } = {
         src: 'Config.vue',
         meta: { right: true }
     },
-    dockerTesting: {
-        path: '/dockerTesting',
-        name: 'Docker Testing',
-        src: 'dockertesting.vue',
+    docker: {
+        path: '/docker',
+        name: 'Docker',
+        src: 'Docker.vue',
         meta: { right: true }
     },
-    notification: {
-        path: '/Notification',
-        name: 'Notification',
-        src: 'Notification.vue',
-        meta: { right: true }
-    },
-    socketio: {
-        path: '/socketio',
-        name: 'socketio',
-        src: 'socketio.vue',
+    notifications: {
+        path: '/notifications',
+        name: 'Notifications',
+        src: 'Notifications.vue',
         meta: { right: true }
     }
 };
@@ -76,24 +70,22 @@ const routes: { [page: string]: Route[] } = {
     [Roles.VISITOR]: [
         pages.login,
         pages.register,
-        pages.socketio,
-
     ],
     [Roles.PARTICIPANT]: [
         pages.leaderboard,
         pages.team,
         pages.joinTeam,
+        pages.notifications,
         pages.logout,
-        pages.notification,
 
     ],
     [Roles.ORGANIZER]: [
         pages.leaderboard,
         pages.teams,
         pages.config,
-        pages.dockerTesting,
+        pages.docker,
+        pages.notifications,
         pages.logout,
-        pages.notification,
     ]
 };
 
