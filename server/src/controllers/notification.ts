@@ -57,6 +57,11 @@ function deleteById_DELETE(req: Request, res: Response) {
             res.json({ message: err, statusCode: 404 });
         })
 
+    // emit socket
+    let socket = socketIO.getIO();
+    socket.emit('notificationUpdate', {});
+
+
 }
 
 function deleteAll_DELETE(req: Request, res: Response) {
@@ -66,6 +71,10 @@ function deleteAll_DELETE(req: Request, res: Response) {
         .catch((err) => {
             res.json({ message: err, statusCode: 404 });
         })
+
+    // emit socket
+    let socket = socketIO.getIO();
+    socket.emit('notificationUpdate', {});
 }
 
 export default {

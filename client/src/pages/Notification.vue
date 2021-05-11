@@ -25,29 +25,32 @@
                     <b-form-textarea
                         id="textarea-formatter"
                         v-model="form.msg"
-                        placeholder="Type hier your message"
-                        :formatter="formatter"
+                        placeholder="Type here your message"
                         rows="4"
                     ></b-form-textarea>
                 </b-form-group>
-
                 <b-button type="submit" variant="primary">Send</b-button>
             </b-form>
         </div>
         <!-- Notifications -->
         <div class="create">
-            <div v-for="item in notification" :key="item">
-                <b-card
-                    class="card"
-                    bg-variant="dark"
-                    text-variant="white"
-                    :title="item.title"
-                >
+            <div v-for="item in notifications" :key="item.id">
+                <b-card class="card" bg-variant="dark" text-variant="white">
+                    <h3>{{ item.title }}</h3>
+
                     <b-card-text>
                         {{ item.msg }}
                     </b-card-text>
                     <template #footer>
                         <small class="text-muted">{{ item.createdAt }}</small>
+                        <b-button
+                            v-if="role === 'organizer'"
+                            class="buttonDel"
+                            type="button"
+                            variant="danger"
+                            @click="deleteNotification(item.id)"
+                            >Delete</b-button
+                        >
                     </template>
                 </b-card>
             </div>
@@ -65,9 +68,17 @@ export default Vue.extend({
     created() {
         this.loadNotifications();
         this.getRole();
+
+        this.$socket.$subscribe("notification", (data: any) => {
+            this.notifications.push(data);
+        });
+
+        this.$socket.$subscribe("notificationUpdate", (data: any) => {
+            this.loadNotifications();
+        });
     },
     data: () => ({
-        notification: [] as {
+        notifications: [] as {
             id: number;
             title: string;
             msg: string;
@@ -80,11 +91,6 @@ export default Vue.extend({
         show: true,
         role: "",
     }),
-    mounted() {
-        // setInterval(() => {
-        //     this.loadNotifications();
-        // }, 1000);
-    },
     methods: {
         onSubmit(e: Event) {
             e.preventDefault();
@@ -93,15 +99,7 @@ export default Vue.extend({
         loadNotifications(): void {
             axios.get("/api/notification/getAll").then((response) => {
                 let data = response.data;
-                // this.notification = [];
-                data.forEach((item: any) => {
-                    this.notification.push({
-                        id: item.id,
-                        title: item.title,
-                        msg: item.msg,
-                        createdAt: item.createdAt,
-                    });
-                });
+                this.notifications = data;
             });
         },
         sendNotfication(): void {
@@ -119,13 +117,37 @@ export default Vue.extend({
                         Toast.send(this, "Message", data.message, "success");
                     } else if (data.statusCode === 404)
                         Toast.send(this, "Message", data.message, "danger");
-                }).catch();
+                })
+                .catch();
         },
         getRole(): void {
             axios.get("/api/auth/role").then((response) => {
                 console.log(response.data);
                 this.role = response.data;
             });
+        },
+        deleteNotification(id: number): void {
+            let axiosConfig = {
+                headers: {
+                    "Content-Type": "application/json;charset=UTF-8",
+                    "Access-Control-Allow-Origin": "*",
+                },
+            };
+            axios
+                .delete("/api/notification/deleteById", { data: { id: id } })
+                .then((response) => {
+                    let data = response.data;
+                    if (data.statusCode === 200) {
+                        Toast.send(this, "Message", data.message, "success");
+                    } else if (data.statusCode === 404)
+                        Toast.send(this, "Message", data.message, "danger");
+                })
+                .then(() => {
+                    this.loadNotifications();
+                })
+                .catch();
+
+            this.notifications = this.notifications.filter((x) => x.id != id);
         },
     },
 });
@@ -156,5 +178,9 @@ h2 {
 
 .card {
     margin-top: 20px;
+}
+.buttonDel {
+    position: relative;
+    float: right;
 }
 </style>
