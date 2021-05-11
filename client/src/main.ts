@@ -8,6 +8,11 @@ import '@sweetalert2/theme-dark/dark.css';
 import '@/assets/icons/fontAwesomeIcons';
 import App from '@/App.vue';
 import router from '@/router';
+import { io } from "socket.io-client";
+import VueSocketIOExt from "vue-socket.io-extended";
+import * as dotenv from 'dotenv';
+dotenv.config();
+
 Vue.config.productionTip = false;
 Vue.use(Vuelidate);
 Vue.use(BootstrapVue);
@@ -16,13 +21,11 @@ Vue.use(VueSweetalert2, {});
 Vue.use(VueMeta, { refreshOnceOnNavigation: true });
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 
-import { io } from "socket.io-client"
-import VueSocketIOExt from "vue-socket.io-extended"
-const socket = io("http://localhost:4000")
+
+
+let hostURL = `http://${process.env.VUE_APP_API_HOST}:${process.env.VUE_APP_API_SERVER}`;
+const socket = io(hostURL)
 Vue.use(VueSocketIOExt, socket);
-
-
-
 
 router.onReady = router => {
     new Vue({

@@ -19,7 +19,7 @@ interface DatabaseEvents {
  * Database class to connect to the database and provide help functions to access it
  */
 class Database extends EventEmitter {
-    loadTestData: boolean = false; // empties and loads test data into the database before connecting if true
+    loadTestData: boolean = (process.env.DB_LOAD_DATA == 'true') ? true : false; // empties and loads test data into the database before connecting if true
     conn: Connection = null;
 
     constructor() {
@@ -28,15 +28,32 @@ class Database extends EventEmitter {
     }
 
     connect(): void {
+        var DB_HOST: string = "";
+        var DB_USER: string = "";
+        var DB_PASSWORD: string = "";
+        var DB_NAME: string = "";
+        if (process.env.HOSTING == "DOCKER") {
+            DB_HOST = process.env.DB_HOST_DOCKER;
+            DB_USER = process.env.DB_USER_DOCKER;
+            DB_PASSWORD = process.env.DB_PASSWORD_DOCKER;
+            DB_NAME = process.env.DB_NAME_DOCKER;
+        }
+        if (process.env.HOSTING == "LOCALHOST") {
+            DB_HOST = process.env.DB_HOST;
+            DB_USER = process.env.DB_USER;
+            DB_PASSWORD = process.env.DB_PASSWORD;
+            DB_NAME = process.env.DB_NAME;
+
+        }
         createConnection({
             type: "postgres",
-            host: process.env.DB_HOST,
+            host: DB_HOST,
             port: parseInt(process.env.DB_PORT),
-            database: process.env.DB_NAME,
-            username: process.env.DB_USER,
-            password: process.env.DB_PASSWORD,
+            database: DB_NAME,
+            username: DB_USER,
+            password: DB_PASSWORD,
             synchronize: true,
-            logging: false,
+            logging: (process.env.DB_LOGGING == 'true') ? true : false,
             entities: [
                 path.join(__dirname, '/entities/*/*.js')
             ]

@@ -93,7 +93,7 @@ export default Vue.extend({
         loadNotifications(): void {
             axios.get("/api/notification/getAll").then((response) => {
                 let data = response.data;
-                this.notification = [];
+                // this.notification = [];
                 data.forEach((item: any) => {
                     this.notification.push({
                         id: item.id,
@@ -119,7 +119,7 @@ export default Vue.extend({
                         Toast.send(this, "Message", data.message, "success");
                     } else if (data.statusCode === 404)
                         Toast.send(this, "Message", data.message, "danger");
-                });
+                }).catch();
         },
         getRole(): void {
             axios.get("/api/auth/role").then((response) => {

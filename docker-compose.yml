@@ -9,7 +9,7 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: ctf_platform
+      POSTGRES_DB: ctf-platform
     ports:
       - '5432:5432'
     volumes:
