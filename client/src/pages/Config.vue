@@ -17,8 +17,7 @@
                             <b-form-invalid-feedback>{{categoryFeedback(category)}}</b-form-invalid-feedback>
                         </div>
                         <IconButton class=info icon=pen icon2=save :toggled="category.editable" @click="editCategory(category)"
-                            :disabled="category.editable && !state(categoryFeedback(category))"
-                        />
+                            :disabled="category.editable && !state(categoryFeedback(category))"/>
                         <IconButton class=primary icon=chevron-down @click="categoryDown(category)"/>
                         <IconButton class=danger icon=times @click="removeCategory(category)"/>
                     </div>
@@ -115,8 +114,7 @@
                             </span>
                         </div>
                         <IconButton class=info icon=pen icon2=save :toggled="sponsor.editable" @click="editSponsor(sponsor)"
-                            :disabled="sponsor.editable && !state(sponsorFeedback(sponsor))"
-                        />
+                            :disabled="sponsor.editable && !state(sponsorFeedback(sponsor))"/>
                         <IconButton class=primary icon=chevron-down @click="sponsorDown(sponsor)"/>
                         <IconButton class=danger icon=times @click="removeSponsor(sponsor)"/>
                     </div>
@@ -204,7 +202,7 @@ export default Vue.extend({
         validForm(): boolean { return validForm(this.form); }
     },
     watch: {
-        form: { deep: true, handler() {  // TODO: ignore editable?
+        form: { deep: true, handler() {
             let state = 'normal';
             if (this.loaded) {
                 state = 'succes';
@@ -252,7 +250,7 @@ export default Vue.extend({
         },
 
         categoryFeedback(category: Category, add: boolean = false): string { return validate.category(category, this.form.categories, add); },
-        categoryDown(category: Category): void { moveDown(this.form.categories, x => x.name == category.name); },
+        categoryDown(category: Category): void { moveDown(this.form.categories, category.order); },
         removeCategory(category: Category): void { this.form.categories = this.form.categories.filter(x => x.order != category.order); },
         editCategory(category: Category & Editable): void { if (!category.editable || state(this.categoryFeedback(category))) Vue.set(category, 'editable', !category.editable); },
         addCategory(): void {
@@ -262,7 +260,7 @@ export default Vue.extend({
         },
 
         tagFeedback(tag: Tag, add: boolean = false): string { return validate.tag(tag, this.form.tags, add); },
-        tagDown(tag: Tag): void { moveDown(this.form.tags, x => x.name == tag.name); },
+        tagDown(tag: Tag): void { moveDown(this.form.tags, tag.order); },
         removeTag(tag: Tag): void { this.form.tags = this.form.tags.filter(x => x.order != tag.order); },
         editTag(tag: Tag & Editable): void { if (!tag.editable || state(this.tagFeedback(tag))) Vue.set(tag, 'editable', !tag.editable); },
         addTag(): void {
@@ -275,7 +273,7 @@ export default Vue.extend({
         htmlPlaceholder(page: Page): string { return page && (page.html || page.source) ? this.source(page) : 'Upload page HTML'; },
         zipPlaceholder(page?: Page): string { return page?.zip ? page.zip.name || '' : (page?.source ? 'New page dependencies' : 'Upload page dependencies') },
         pageFeedback(page: Page, add: boolean = false): string { return validate.page(page, this.form.pages, add); },
-        pageDown(page: Page): void { moveDown(this.form.pages, x => x.path == page.path); },
+        pageDown(page: Page): void { moveDown(this.form.pages, page.order); },
         removePage(page: Page): void { this.form.pages = this.form.pages.filter(x => x.order != page.order); },
         editPage(page: Page & Editable): void { if (!page.editable || state(this.pageFeedback(page))) Vue.set(page, 'editable', !page.editable); },
         addPage(): void {
@@ -287,7 +285,7 @@ export default Vue.extend({
         icon(sponsor: Sponsor): string { return sponsor.img ? sponsor.img.name || '' : path.basename(sponsor.icon); },
         imgPlaceholder(sponsor?: Sponsor): string { return sponsor && (sponsor.img || sponsor.icon) ? this.icon(sponsor) : 'Upload sponsor icon'; },
         sponsorFeedback(sponsor: Sponsor, add: boolean = false): string { return validate.sponsor(sponsor, this.form.sponsors, add); },
-        sponsorDown(sponsor: Sponsor): void { moveDown(this.form.sponsors, x => x.link == sponsor.link); },
+        sponsorDown(sponsor: Sponsor): void { moveDown(this.form.sponsors, sponsor.order); },
         removeSponsor(sponsor: Sponsor): void { this.form.sponsors = this.form.sponsors.filter(x => x.order != sponsor.order); },
         editSponsor(sponsor: Sponsor & Editable): void { if (!sponsor.editable || state(this.sponsorFeedback(sponsor))) Vue.set(sponsor, 'editable', !sponsor.editable); },
         addSponsor(): void {

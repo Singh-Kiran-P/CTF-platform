@@ -41,7 +41,7 @@ router.put('/save', isAdmin, (req, res) => {
         (p, dir, diff) => { if (diff) p.source = `${dir}/${p.html?.name || fileName(p.source)}`; });
 
     let sponsorUploads = uploadFiles(data.sponsors, uploaddir, sponsor => Boolean(sponsor.img), _ => [''],
-        sponsor => '_' + sponsor.name, sponsor => `/sponsors/${sponsor.name}`, sponsor => parentDir(sponsor.icon), (sponsor, dir) => upload(dir, sponsor.img),
+        sponsor => `_${sponsor.name}`, sponsor => `/sponsors/${sponsor.name}`, sponsor => parentDir(sponsor.icon), (sponsor, dir) => upload(dir, sponsor.img),
         (p, dir, diff) => { if (diff) p.icon = `${dir}/${p.img?.name || fileName(p.icon)}`; });
 
     const error = (action: string): any => res.json({ error: `Error ${action}`});

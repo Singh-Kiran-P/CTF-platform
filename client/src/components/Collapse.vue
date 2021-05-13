@@ -30,7 +30,7 @@ export default Vue.extend({
         this.state = this.value;
     },
     computed: {
-        visible(): Boolean {
+        visible(): boolean {
             return this.state && !this.loading;
         }
     },

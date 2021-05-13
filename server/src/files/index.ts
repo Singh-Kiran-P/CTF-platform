@@ -40,7 +40,7 @@ const move = (from: string, to: string) => {
     [from, to] = [from, to].map(path => Root + path.toLowerCase());
     return new Promise<void>((resolve, reject) => {
         if (from == to) return resolve();
-        if (to.startsWith(from)) return reject(`Error: Attempting to recursively move directories: ${from} -> ${to}`);
+        if (to.startsWith(from + (from.endsWith('/') ? '' : '/'))) return reject(`Error: Attempting to recursively move directories: ${from} -> ${to}`);
         mkdir(to, { recursive: true }, err => {
             if (err) return reject(err);
             ncp(from, to, { stopOnErr: true }, err => {

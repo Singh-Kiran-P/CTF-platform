@@ -81,9 +81,12 @@ class Database extends EventEmitter {
     /**
      * allows for easily updating the given repository to a new list of entities, ask Lander for proper usage
      */
-    setRepo<E>(repo: Repository<E>, set: E[], where?: FindManyOptions<E>, files: (x: E) => string[] = () => []) {
+    setRepo<E>(repo: Repository<E>, set: E[], where: FindManyOptions<E>, files: (x: E) => string[], returnRepo: true): Promise<E[]>;
+    setRepo<E>(repo: Repository<E>, set: E[], where?: FindManyOptions<E>, files?: (x: E) => string[], returnRepo?: false): Promise<void>;
+    setRepo<E>(repo: Repository<E>, set: E[], where: FindManyOptions<E> = {}, files: (x: E) => string[] = () => [], returnRepo: boolean = false) {
         const id = (x: any): number => x.id || -1;
-        return new Promise<void>((resolve, reject) => {
+        return new Promise<void | E[]>((resolve, reject) => {
+            const done = () => returnRepo ? repo.find(where).then(items => resolve(items)).catch(err => reject(err)) : resolve();
             repo.find(where).then(old => {
                 let [keep, discard]: E[][] = [[], []];
                 [set, old].forEach(l => l.sort((a, b) => id(a) - id(b)));
@@ -95,7 +98,7 @@ class Database extends EventEmitter {
 
                 let lowerCompare = (x: string, y: string) => x.toLowerCase() == y.toLowerCase();
                 let removes = discard.reduce((acc, c) => acc.concat(files(c)), ['']).filter(f => f && !set.some(x => files(x).find(y => lowerCompare(f, y)))).map(f => () => remove(f));
-                chain(() => repo.remove(discard), () => repo.save(keep), () => Promise.all(removes.map(remove => remove()))).then(() => resolve()).catch(err => reject(err));
+                chain(() => repo.remove(discard), () => repo.save(keep), () => Promise.all(removes.map(remove => remove()))).then(() => done()).catch(err => reject(err));
             }).catch(err => reject(err));
         });
     }

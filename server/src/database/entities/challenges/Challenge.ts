@@ -1,40 +1,16 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany } from 'typeorm';
 import { Environment, Solve, Question, Round, Hint, Tag } from '../../../database';
+import { ChallengeType } from '@shared/validation/roundsForm';
 
-export enum ChallengeType {
-    QUIZ = 'quiz',
-    BASIC = 'basic',
-    INTERACTIVE = 'interactive'
-}
+export { ChallengeType };
 
 @Entity()
 export class Challenge {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @ManyToOne(_ => Challenge, challenge => challenge.following, { nullable: true })
-    previous: Challenge;
-
-    @OneToMany(_ => Challenge, challenge => challenge.previous)
-    following: Challenge[]
-
-    @ManyToOne(_ => Tag, tag => tag.challenges, { nullable: true })
-    tag: Tag;
-
     @ManyToOne(_ => Round, round => round.challenges, { nullable: false, onDelete: 'CASCADE' })
     round: Round;
-
-    @OneToMany(_ => Hint, hint => hint.challenge)
-    hints: Hint[];
-
-    @OneToMany(_ => Question, question => question.quiz)
-    questions: Question[];
-
-    @OneToMany(_ => Environment, environment => environment.challenge)
-    environments: Environment[];
-
-    @OneToMany(_ => Solve, solve => solve.challenge)
-    solves: Solve[];
 
     @Column()
     name: string;
@@ -42,41 +18,58 @@ export class Challenge {
     @Column()
     description: string;
 
+    @ManyToOne(_ => Tag, tag => tag.challenges, { nullable: true })
+    tag: Tag;
+
     @Column()
     points: number;
-
-    @Column({ type: 'enum', enum: ChallengeType })
-    type: ChallengeType;
 
     @Column()
     flag: string;
 
     @Column()
+    attachment: string;
+
+    @OneToMany(_ => Hint, hint => hint.challenge)
+    hints: Hint[];
+
+    @Column()
     order: number;
 
-    @Column()
-    attachments: string;
+    @Column({ type: 'enum', enum: ChallengeType })
+    type: ChallengeType;
 
     @Column()
-    dockerfile: string;
+    docker: string;
 
-    @Column()
-    visibility: boolean; // TODO: remove this?
+    @OneToMany(_ => Question, question => question.quiz)
+    questions: Question[];
 
-    constructor(params?: { round: Round, name: string, description: string, points: number, flag: string, attachments: string, order: number }) {
+    @ManyToOne(_ => Challenge, challenge => challenge.following, { nullable: true })
+    previous: Challenge;
+
+    @OneToMany(_ => Challenge, challenge => challenge.previous)
+    following: Challenge[]
+
+    @OneToMany(_ => Solve, solve => solve.challenge)
+    solves: Solve[];
+
+    @OneToMany(_ => Environment, environment => environment.challenge)
+    environments: Environment[]; // TODO: remove this?
+
+    constructor(params?: { round: Round, name: string, description: string, tag: Tag | null, points: number, flag: string, order: number, type: ChallengeType, id?: number,
+        attachment: string, docker: string }) { // TODO: previous
         if (!params) return;
-
-        // TODO
-        this.type = ChallengeType.BASIC;
-        this.dockerfile = '';
-        this.visibility = false;
-        
+        this.id = params.id;
         this.round = params.round;
         this.name = params.name;
         this.description = params.description;
+        this.tag = params.tag;
         this.points = params.points;
         this.flag = params.flag;
-        this.attachments = params.attachments;
+        this.attachment = params.attachment;
+        this.docker = params.docker;
         this.order = params.order;
+        this.type = params.type;
     }
 }

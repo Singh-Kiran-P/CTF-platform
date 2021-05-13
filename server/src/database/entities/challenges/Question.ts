@@ -18,7 +18,12 @@ export class Question {
     @Column()
     order: number;
 
-    constructor() {
-        // TODO
+    constructor(params?: { quiz: Challenge, question: string, answer: string, order: number, id?: number }) {
+        if (!params) return;
+        this.id = params.id;
+        this.quiz = params.quiz;
+        this.question = params.question;
+        this.answer = params.answer;
+        this.order = params.order;
     }
 }
