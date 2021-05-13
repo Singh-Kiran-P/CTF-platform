@@ -41,13 +41,12 @@ const validate = {
         if (!v) v = validateString(page.path, 'Page path', 1, 32, !add, pages.map(x => x.path), !add);
         if (!v && !add && !page.source && !page.html) v = 'Page source is required';
         if (!v && !add && page.zip && !page.html) v = 'New page dependencies require a new page source';
-        if (!v && page.html?.name && !page.html.name.endsWith('.html')) v = 'Page source must be a .html file';
-        if (!v && page.zip?.name && !page.zip.name.endsWith('.zip')) v = 'Page dependencies must be contained in a .zip file';
+        if (!v && page.html && !page.html.name?.endsWith('.html')) v = 'Page source must be a .html file';
+        if (!v && page.zip && !page.zip.name?.endsWith('.zip')) v = 'Page dependencies must be contained in a .zip file';
         return v;
     },
     sponsor: (sponsor: Sponsor, sponsors: Sponsor[], add: boolean = false): string => {
-        let v = sponsor.name.startsWith('_') ? `Sponsor name cannot start with '_'` : '';
-        if (!v) v = validateCharacters(sponsor.name, 'Sponsor name', true);
+        let v = validateCharacters(sponsor.name, 'Sponsor name', true);
         if (!v) v = validateString(sponsor.name, 'Sponsor name', 3, 32, !add, sponsors.map(x => x.name), !add);
         if (!v) v = validateString(sponsor.link, 'Sponsor link', -1, 128, !add);
         if (!v && !add && !sponsor.icon && !sponsor.img) v = 'Sponsor icon is required';
@@ -74,4 +73,4 @@ const isf = { // check if a given variable with type any is a Form
     }
 }
 
-export { state, validInput, validateString, validForm, validate, Category, Tag, Page, Sponsor, Form };
+export { state, validInput, validateString, validForm, validate, Category, Tag, Page, Sponsor, Form, isf };

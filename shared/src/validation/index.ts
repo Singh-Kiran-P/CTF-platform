@@ -12,7 +12,16 @@ const validateString = (input: string, name: string, min: number, max: number, r
     return '';
 }
 
+const validateNumber = (number: number, name: string, negative: boolean, min?: number, max?: number): string => {
+    if (!Number.isInteger(number)) return `${name} must be a valid integer`;
+    if (!negative && number < 0) return `${name} cannot be negative`;
+    if (min && number < min) return `${name} must be at least ${min}`;
+    if (max && number > max) return `${name} must be at most ${max}`;
+    return '';
+}
+
 const validateCharacters = (input: string, name: string, disallowed?: RegExp | boolean, allowed?: RegExp): string => {
+    if (disallowed && input.startsWith('_')) return `${name} cannot start with '_'`;
     if (typeof disallowed == 'boolean') disallowed = /([\\\/\:\*\?\<\>\"\|]+)/g;
     let invalidChars = allowed ? input.replace(allowed, '') : '';
     if (disallowed) invalidChars += input.match(disallowed)?.toString() || '';
@@ -35,4 +44,4 @@ const is = {
     array: (v: any, t: (x: any) => boolean): boolean => Array.isArray(v) && (v as any[]).every(x => t(x)),
 }
 
-export { state, validInput, validateString, validateCharacters, validateList, regexName, is };
+export { state, validInput, validateString, validateNumber, validateCharacters, validateList, regexName, is };
