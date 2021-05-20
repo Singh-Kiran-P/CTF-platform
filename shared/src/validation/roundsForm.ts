@@ -13,7 +13,7 @@ enum ChallengeType {
 type Question = { question: string, answer: string, order: number };
 type Hint = { name: string, content: string, cost: number, order: number };
 type Challenge = { id?: number, name: string, description: string, tag: Tag | null, points: number, flag: string, order: number, type: ChallengeType, hints: Hint[] | undefined,
-    attachment: string, attachFile: File | UFile | null, docker: string, dockerFile: File | UFile | null, questions: Question[] | undefined }; // TODO: previous
+    attachment: string, attachFile: File | UFile | null, docker: string, dockerFile: File | UFile | null, questions: Question[] | undefined, previous: number };
 type Round = { id? :number, name: string, folder: string, start: string, end: string, challenges: Challenge[] | undefined };
 type Form = { rounds: Round[] };
 
@@ -23,7 +23,8 @@ const times = (round: Round) => [round.start, round.end].map(time => new Date(ti
 const validForm = (f: Form): boolean => isf.form(f) && state(validate.rounds(f.rounds)) && f.rounds.every(r => state(validate.round(r, f.rounds)) && validChallenges(r.challenges));
 
 const validChallenges = (cs?: Challenge[]): boolean => {
-    return isf.challenges(cs) && state(validate.challenges(cs)) && (cs || []).every(c => state(validate.challenge(c, cs)) && validHints(c.hints) && validQuestions(c.questions));
+    let v = isf.challenges(cs) && state(validate.challenges(cs));
+    return v && (cs || []).every(c => state(validate.challenge(c, cs)) && validHints(c.hints) && (c.type != ChallengeType.QUIZ || validQuestions(c.questions)));
 }
 
 const validHints = (hints?: Hint[]): boolean => isf.hints(hints) && state(validate.hints(hints)) && (hints || []).every(h => state(validate.hint(h)));
@@ -33,7 +34,7 @@ const validate = {
     rounds: (rounds: Round[]): string => validateList(rounds, 'round', true),
     challenges: (challenges?: Challenge[]): string => challenges ? validateList(challenges, 'challenge', true) : '',
     hints: (hints?: Hint[]): string => hints ? validateList(hints, 'hint', false) : '',
-    questions: (questions?: Question[]): string => questions ? validateList(questions, 'question', false) : '', // TODO: require at least one question
+    questions: (questions?: Question[]): string => questions ? validateList(questions, 'question', true) : '',
 
     round: (round: Round, rounds: Round[], add: boolean = false): string => {
         let v = validateCharacters(round.name, 'Round name', true);
@@ -55,10 +56,12 @@ const validate = {
         if (!v) v = validateString(challenge.name, 'Challenge name', 3, 32, !add, (challenges || []).map(c => c.name), !add);
         if (!v) v = validateNumber(challenge.points, 'Challenge points', false);
         if (!v) v = validateString(challenge.flag, 'Challenge flag', -1, -1, !add);
+        if (!v && challenge.previous >= 0 && !challenges?.find(c => c.order == challenge.previous)) v = 'Previous TODO NAME challenge does not exist';
+        if (!v && challenge.previous >= challenge.order) v = 'Previous TODO NAME challenge must be ordered before this one';
         let docker = challenge.type == ChallengeType.INTERACTIVE;
         if (!v && docker && !challenge.docker && !challenge.dockerFile) v = 'Interactive challenges require a docker TODO HOW NAME';
         if (!v && docker && challenge.dockerFile && !challenge.dockerFile.name?.endsWith('.zip')) v = 'Challlenge docker TODO HWO ANME must be contained in a .zip file';
-        return v; // TODO
+        return v;
     },
     hint: (hint: Hint, add: boolean = false): string => {
         let v = validateString(hint.name, 'Hint name', 3, 32, !add);
@@ -83,8 +86,8 @@ const isf = {
 
     challenge: (challenge: any): boolean => {
         let v = is.object(challenge) && is.string(challenge.name) && is.string(challenge.description) && is.number(challenge.points) && is.string(challenge.flag);
-        v = v && is.string(challenge.attachment) && is.string(challenge.docker) && is.number(challenge.order);
-        return v && isf.tag(challenge.tag) && isf.type(challenge.type) && isf.hints(challenge.hints) && isf.questions(challenge.questions); // TODO
+        v = v && is.string(challenge.attachment) && is.string(challenge.docker) && is.number(challenge.order) && is.number(challenge.previous);
+        return v && isf.tag(challenge.tag) && isf.type(challenge.type) && isf.hints(challenge.hints) && isf.questions(challenge.questions);
     },
     tag: (tag: any): boolean => tag == null || iscf.tag(tag),
     type: (type: any): boolean => type == ChallengeType.BASIC || type == ChallengeType.QUIZ || type == ChallengeType.INTERACTIVE,

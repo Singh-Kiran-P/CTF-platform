@@ -34,6 +34,9 @@ export class Challenge {
     hints: Hint[];
 
     @Column()
+    previous: number;
+
+    @Column()
     order: number;
 
     @Column({ type: 'enum', enum: ChallengeType })
@@ -45,12 +48,6 @@ export class Challenge {
     @OneToMany(_ => Question, question => question.quiz)
     questions: Question[];
 
-    @ManyToOne(_ => Challenge, challenge => challenge.following, { nullable: true })
-    previous: Challenge;
-
-    @OneToMany(_ => Challenge, challenge => challenge.previous)
-    following: Challenge[]
-
     @OneToMany(_ => Solve, solve => solve.challenge)
     solves: Solve[];
 
@@ -58,7 +55,7 @@ export class Challenge {
     environments: Environment[]; // TODO: remove this?
 
     constructor(params?: { round: Round, name: string, description: string, tag: Tag | null, points: number, flag: string, order: number, type: ChallengeType, id?: number,
-        attachment: string, docker: string }) { // TODO: previous
+        attachment: string, docker: string, previous: number }) {
         if (!params) return;
         this.id = params.id;
         this.round = params.round;
@@ -69,6 +66,7 @@ export class Challenge {
         this.flag = params.flag;
         this.attachment = params.attachment;
         this.docker = params.docker;
+        this.previous = params.previous;
         this.order = params.order;
         this.type = params.type;
     }

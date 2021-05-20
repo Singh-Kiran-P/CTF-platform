@@ -36,6 +36,7 @@
                                         <span class=item-category>Type</span>
                                         <span class=item-value>{{typeText(challenge.type)}}</span>
                                     </span>
+                                    <b-form-invalid-feedback :state="state(challengeFeedback(round, challenge))">{{challengeFeedback(round, challenge)}}</b-form-invalid-feedback>
                                 </div>
                                 <div :class="{ 'edit-challenge-header': challenge.editable }">
                                     <span v-if="challenge.editable">Editing challenge</span>
@@ -62,8 +63,10 @@
                                         <b-form-file v-model="challenge.attachFile" :placeholder="attachPlaceholder(challenge)" :state="state(challengeFeedback(round, challenge))"/>
                                         <b-button type=button variant=danger @click="removeAttachment(challenge)"><font-awesome-icon icon=times /></b-button>
                                     </div>
+                                    <span class=input-tag>Previous TODO OTHER NAME</span>
+                                    <b-form-select v-model="challenge.previous" :options="previousList(round, challenge)" :state="state(challengeFeedback(round, challenge))"/>
                                     <span class=input-tag>Type</span>
-                                    <b-form-select v-model="challenge.type" :options="types" :state="state(challengeFeedback(round, challenge))"/>
+                                    <b-form-select v-model="challenge.type" :options="types" :state="state(challengeFeedback(round, challenge))" @input="changedType(challenge)"/>
                                     <template v-if="challenge.type == typeValues.INTERACTIVE">
                                         <span class=input-tag>Docker TODO HOW TO CALL THIS</span>
                                         <b-form-file accept=".zip" v-model="challenge.dockerFile" :placeholder="dockerPlaceholder(challenge)"
@@ -160,6 +163,7 @@ import { Question, Hint, Challenge, Round, Form, ChallengeType } from '@shared/v
 import { state, validate, validInput, sortRounds, validForm, validChallenges, validHints, validQuestions } from '@shared/validation/roundsForm';
 import { Tag } from '@shared/validation/competitionForm';
 import { serialize } from '@shared/objectFormdata';
+import { is } from '@shared/validation';
 import path from 'path';
 
 type Editable = { editable?: boolean };
@@ -266,7 +270,7 @@ export default Vue.extend({
                 }
                 if (!container.id) setItems([]);
                 else axios.get(request + container.id).then(res => {
-                    if (res.data.error || !getValid(res.data)) {
+                    if (res.data.error || (!is.array(res.data, _ => false) && !getValid(res.data))) {
                         Vue.set(container, visible, false);
                         setItems(undefined);
                     } else setItems(res.data);
@@ -307,15 +311,29 @@ export default Vue.extend({
         removeAttachment(challenge: Challenge): void { Vue.set(challenge, 'attachment', ''); Vue.set(challenge, 'attachFile', null); },
         challengesFeedback(round: Round): string { return validate.challenges(round.challenges); },
         challengeFeedback(round: Round, challenge: Challenge, add: boolean = false): string { return validate.challenge(challenge, round.challenges, add); },
-        challengeDown(round: Round, challenge: Challenge): void { moveDown(round.challenges || [], challenge.order); },
         removeChallenge(round: Round, challenge: Challenge): void { round.challenges = round.challenges?.filter(x => x.order != challenge.order) || []; },
+        challengeDown(round: Round, challenge: Challenge): void {
+            let order = challenge.order;
+            moveDown(round.challenges || [], challenge.order);
+            let next = round.challenges?.find(c => c.order > order)?.order || -1;
+            if (next > -1 && order > -1) round.challenges?.forEach(c => {
+                let set = c.previous == order ? next : (c.previous == next ? order : c.previous);
+                if (set != c.previous) Vue.set(c, 'previous', set);
+            });
+        },
         editChallenge(round: Round, challenge: Challenge & Editable): void {
             if (!challenge.editable || state(this.challengeFeedback(round, challenge))) Vue.set(challenge, 'editable', !challenge.editable);
         },
         addChallenge(round: Round): void {
             if (round.challenges == undefined) round.challenges = [];
-            let add = { order: nextOrder(round.challenges), type: ChallengeType.BASIC, editable: true, attachFile: null, dockerFile: null };
+            let add = { order: nextOrder(round.challenges), type: ChallengeType.BASIC, editable: true, attachFile: null, dockerFile: null, previous: -1 };
             round.challenges.push(Object.assign({}, add, { name: '', description: '', tag: null, points: NaN, flag: '', attachment: '', docker: '', hints: [], questions: undefined }));
+        },
+        previousList(round: Round, challenge: Challenge){
+            return [{ value: -1, text: 'No previous TODO NAME' }].concat(round.challenges?.filter(c => c.order < challenge.order).map(c => ({ value: c.order, text: c.name })) || []);
+        },
+        changedType(challenge: Challenge) {
+            if (challenge.type == ChallengeType.QUIZ && challenge.questions == undefined) this.toggledQuestions(challenge, true);
         },
         toggledHints(challenge: Challenge & HintsVisible): void {
             this.toggledItems(challenge, 'hintsLoading', c => c.hintsVisible, c => c.hints, c => this.loadHints(c));
@@ -323,8 +341,8 @@ export default Vue.extend({
         loadHints(challenge: Challenge): Promise<void> {
             return this.loadItems(challenge, 'hints', 'hintsLoading', 'hintsVisible', '/api/rounds/challenge/hints/', data => validHints(data));
         },
-        toggledQuestions(challenge: Challenge & QuestionsVisible): void {
-            this.toggledItems(challenge, 'questionsLoading', c => c.questionsVisible, c => c.questions, c => this.loadQuestions(c));
+        toggledQuestions(challenge: Challenge & QuestionsVisible, visible?: boolean): void {
+            this.toggledItems(challenge, 'questionsLoading', c => visible || c.questionsVisible, c => c.questions, c => this.loadQuestions(c));
         },
         loadQuestions(challenge: Challenge): Promise<void> {
             return this.loadItems(challenge, 'questions', 'questionsLoading', 'questionsVisible', '/api/rounds/challenge/questions/', data => validQuestions(data));
