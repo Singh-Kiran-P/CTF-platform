@@ -1,5 +1,5 @@
 <template>
-    <div class="teams">
+    <div class="users">
         <div class=top-table>
             <b-form-group>
                 <label for="filter-input">Filter</label>
@@ -47,11 +47,12 @@
         ></b-pagination>
 
         <div class=table>
-            <label for="teams-table">Teams</label>
+            <label for="users-table">Users</label>
             <span class=error :v-if="error != ''">{{error}}</span>
-            <b-table id=teams-table sticky-header striped :busy="isLoading" :items="teams" :fields="teams_fields" :sort-by.sync="sortBy" sort-desc.sync="sortDesc" :per-page="0" :no-local-sorting="true" @sort-changed="sortingChanged">
-                <template v-slot:cell(name)="row">
-                    <a :href="`${home}/team/${row.item.uuid}`">{{ row.item.name }}</a>
+            <b-table id=users-table sticky-header striped :busy="isLoading" :items="users" :fields="users_fields" :sort-by.sync="sortBy" sort-desc.sync="sortDesc" :per-page="0" :no-local-sorting="true" @sort-changed="sortingChanged">
+                <template v-slot:cell(team)="row">
+                    <a v-if="row.item.team != 'None'" :href="`${home}/team/${row.item.teamUuid}`">{{ row.item.team }}</a>
+                    <span v-else>{{ row.item.team }}</span>
                 </template>
                 <template #table-busy>
                     <div class="text-center text-primary my-2">
@@ -70,7 +71,7 @@ import axios from 'axios';
 type Context = {currentPage: number, perPage: number, filter: string, sortBy: string, sortDesc: boolean};
 
 export default Vue.extend({
-    name: 'Teams',
+    name: 'Users',
 
     data: () => ({ 
         error: '',
@@ -84,12 +85,13 @@ export default Vue.extend({
         perPageOptions: [1, 2, 5, 10, 15],
         filterCategoryOptions: [{ value: '', text: 'All categories'}] as any[],
         filterCategory: '',
-        teams_fields: [
+        users_fields: [
             { key: 'name', sortable: true},
+            { key: 'team', sortable: false},
             { key: 'category', sortable: false},
             { key: 'points', sortable: true},
         ] as {key: string, sortable?: boolean, label?: string}[],
-        teams: [] as {uuid: string, name: string, category: string, points: number} [],
+        users: [] as {id: number, name: string, category: string, points: number, team: string, teamUuid: string} [],
         home: ''
     }),
     created() {
@@ -126,10 +128,10 @@ export default Vue.extend({
         },
         getData() {
             this.isLoading = true;
-            axios.get('/api/team/getTeams/', {params: {perPage: this.perPage, currentPage: this.currentPage, filter: this.filter, category: this.filterCategory, sortBy: this.sortBy, sortDirection: this.sortDesc ? 'DESC' : 'ASC'}})
+            axios.get('/api/account/getUsers/', {params: {perPage: this.perPage, currentPage: this.currentPage, filter: this.filter, category: this.filterCategory, sortBy: this.sortBy, sortDirection: this.sortDesc ? 'DESC' : 'ASC'}})
             .then(response => {
                 if (response.data.error) {this.isLoading=false; return this.error = response.data.error;}
-                this.teams = response.data.teams;
+                this.users = response.data.users;
                 this.totalRows = response.data.amount;
                 this.isLoading = false;
             }).catch((err)=>{this.isLoading = false; return this.error = err});
@@ -145,7 +147,7 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-.teams {    
+.users {    
     padding: var(--double-margin);
     width: min(100%, 750px);
     margin: auto;

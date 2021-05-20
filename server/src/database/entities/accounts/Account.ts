@@ -1,5 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
-import { Attempt, Solve, Category, Team } from '../../../database';
+import { Attempt, Solve, Category, Team, UsedHint } from '../../../database';
 import { generatePassword } from '../../../auth';
 
 @Entity()
@@ -22,7 +22,7 @@ export class Account {
     @ManyToOne(_ => Category, category => category.accounts, { nullable: true, onDelete: 'SET NULL', eager: true })
     category: Category;
 
-    @ManyToOne(_ => Team, team => team.accounts, { nullable: true, onDelete: 'SET NULL', eager: true,  })
+    @ManyToOne(_ => Team, team => team.accounts, { nullable: true, onDelete: 'SET NULL', eager: true })
     @JoinColumn()
     team: Team;
 
@@ -44,5 +44,14 @@ export class Account {
         this.salt = pass.salt;
     }
 
-    // TODO: set team functions
+    getPoints(): number {
+        var points: number = 0;
+        this.solves.forEach((solve: Solve)=>{
+            points += solve.challenge.points;
+            solve.usedHints.forEach((usedHint: UsedHint)=>{
+                points -= usedHint.hint.cost
+            });
+        });
+        return points;
+    }
 }

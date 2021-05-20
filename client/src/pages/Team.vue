@@ -8,7 +8,7 @@
 import Vue from 'vue';
 import axios from 'axios';
 import Create from '../components/Teams/Create.vue';
-import Dashboard from '../components/Teams/Dashboard.vue';
+import Dashboard from './TeamDashboard.vue';
 import Loading from '../components/Loading.vue'
 
 export default Vue.extend({
