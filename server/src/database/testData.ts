@@ -1,7 +1,6 @@
-import DB, { Team, Competition, Category, Challenge, ChallengeType, Tag, Account, Page, TeamRepoCustom } from '../database';
+import DB, { Team, Competition, Category, Challenge, ChallengeType, Tag, Account, Round, Page, TeamRepoCustom } from '../database';
 import { DockerManagement } from './entities/docker/DockerManagement';
 import { DockerOpenPort } from './entities/docker/DockerOpenPort';
-import { DockerChallengeImage } from './entities/docker/DockerChallengeImage';
 
 /**
  * loads test entries into the database
@@ -93,9 +92,9 @@ async function loadTestData() {
     ]));
 
 
-    let dockerimages: DockerChallengeImage[] = (await save([
+    /* let dockerimages: DockerChallengeImage[] = (await save([
         new DockerChallengeImage("challenge1", ["8080/tcp"], 521)
-    ]));
+    ])); */ // TODO: in challenge instead
 }
 
 /**

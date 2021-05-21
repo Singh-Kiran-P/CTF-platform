@@ -44,16 +44,8 @@ router.put('/save', isAdmin, (req, res) => {
         sponsor => `_${sponsor.name}`, sponsor => `/sponsors/${sponsor.name}`, sponsor => parentDir(sponsor.icon), (sponsor, dir) => upload(dir, sponsor.img),
         (p, dir, diff) => { if (diff) p.icon = `${dir}/${p.img?.name || fileName(p.icon)}`; });
 
-<<<<<<< HEAD
-    const error = (action: string): any => {
-        res.json({ error: `Error ${action}`})
-        console.log(action);
-    }
-    Promise.all([chain(() => Promise.all(moves), () => Promise.all(secondaryUploads.map(upload => upload()))), ...initialUploads]).then(() => Promise.all([
-=======
     const error = (action: string): any => res.json({ error: `Error ${action}`});
     Promise.all([pageUploads, sponsorUploads]).then(() => Promise.all([
->>>>>>> admin-rounds-and-challenges
         DB.crepo(CompetitionRepo).setName(data.name),
         DB.setRepo(DB.repo(Category), data.categories.map(x => new Category(x))),
         DB.setRepo(DB.repo(Tag), data.tags.map(x => new Tag(x))),

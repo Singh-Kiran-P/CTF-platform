@@ -1,15 +1,15 @@
 /**
- * @auther Kiran Singh
+ * @author Kiran Singh
  */
 import { Request, Response, NextFunction } from 'express';
 import Docker = require('dockerode');
 import pump from 'pump';
 var build = require('dockerode-build')
 var docker = new Docker({ socketPath: '/var/run/docker.sock' });
-import DB, { DockerChallengeContainer, DockerChallengeImage, DockerManagementRepo, DockerOpenPort } from '../database';
+import DB, { DockerManagementRepo, DockerOpenPort } from '../database';
 import { deserialize } from '@shared/objectFormdata';
 import { uploaddir } from '@/routes/uploads';
-import { unzip_, upload } from '@/files';
+import { unzip, upload } from '@/files';
 
 async function dockerConfigPorts_GET(req: Request, res: Response) {
     const dockerManagementRepo = DB.crepo(DockerManagementRepo)
@@ -95,17 +95,17 @@ function makeImage_POST(req: Request, res: Response) {
         let image = await _getImage(data.name);
         if (image == undefined) {
             // save image data to DB
-            const DockerChallengeImageRepo = DB.repo(DockerChallengeImage);
+            /* const DockerChallengeImageRepo = DB.repo(DockerChallengeImage);
             let image = new DockerChallengeImage(data.name, ports, 25);
             await DockerChallengeImageRepo.save(image);
             // upload / unzip
             let dir = `${uploaddir}/challenges/compressed/`;
-            let destination = `${uploaddir}/challenges/${data.name}/`;
+            let destination = `${uploaddir}/challenges/${data.name}/`; */
 
 
-            upload(dir, data.file)
+            /* upload(dir, data.file)
                 .then(() => {
-                    unzip_(`${dir}/${data.file.name}`, destination)
+                    unzip(`${dir}/${data.file.name}`)
                         .then(() => {
                             _createChallengeImage({ 'dir': destination, 'name': data.name }).catch((err) => { reject(err) });
                             resolve();
@@ -119,7 +119,8 @@ function makeImage_POST(req: Request, res: Response) {
                 .catch((err) => {
                     console.log("hello:" + err);
 
-                });
+                }); */
+            resolve(); // TODO: ???
         }
         else {
             reject("Something went wrong!")
@@ -142,7 +143,9 @@ function makeImage_POST(req: Request, res: Response) {
  * @param req: [challengeImage]
  */
 async function createChallengeContainer_POST(req: Request, res: Response) {
-    let name: string = req.fields.challengeImage.toString();
+    res.send('');
+    // TODO: get info from challenge instead of challengeImage
+    /*let name: string = req.fields.challengeImage.toString();
     console.log(name);
 
     let image = await _getImage(name)
@@ -193,7 +196,7 @@ async function createChallengeContainer_POST(req: Request, res: Response) {
     }
     else {
         res.json({ message: "Image not found!", statusCode: 404 });
-    }
+    } */
 
 }
 
@@ -236,9 +239,10 @@ function resetContainer_POST(req: Request, res: Response) {
 }
 
 async function _getImage(name: string) {
-    const challenge = DB.repo(DockerChallengeImage);
+    /* const challenge = DB.repo(DockerChallengeImage);
     let i = await challenge.findOne({ name: name });
-    return i;
+    return i; */
+    return 0; // TODO: challenge instead of challengeimage
 }
 
 function _createChallengeImage(jsonObj: any) {

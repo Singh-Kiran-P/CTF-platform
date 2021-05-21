@@ -7,22 +7,11 @@
             >
                 <b-form-group label="Username" label-for="username">
                     <b-form-input
-<<<<<<< HEAD
-                        id="username"
-                        type="text"
-                        v-model="form.username"
-                        placeholder="Enter username"
-                        v-on:input="
-                            usernameFeedback = '';
-                            passwordFeedback = '';
-                        "
-=======
                         id=username
                         type=text trim
                         v-model="form.username"
                         placeholder="Enter username"
                         @input="usernameFeedback = ''; passwordFeedback = ''"
->>>>>>> admin-rounds-and-challenges
                         :state="state(usernameFeedback)"
                     />
                     <b-form-invalid-feedback>{{
@@ -82,7 +71,6 @@ export default Vue.extend({
         usernameFeedback: "",
         passwordFeedback: "",
     }),
-<<<<<<< HEAD
     computed: {
         username(): string {
             return this.form.username.trim();
@@ -91,8 +79,6 @@ export default Vue.extend({
             return this.form.password;
         },
     },
-=======
->>>>>>> admin-rounds-and-challenges
     watch: {
         form: {
             deep: true,
@@ -104,17 +90,8 @@ export default Vue.extend({
     },
     methods: {
         state,
-<<<<<<< HEAD
-        validForm(): boolean {
-            return (
-                validInput(this.usernameFeedback, this.username) &&
-                validInput(this.passwordFeedback, this.password)
-            );
-        },
-=======
         validForm(): boolean { return validInput(this.usernameFeedback, this.form.username) && validInput(this.passwordFeedback, this.form.password); },
 
->>>>>>> admin-rounds-and-challenges
         onSubmit(e: Event): void {
             e.preventDefault();
             this.loginState = "loading";
@@ -127,7 +104,6 @@ export default Vue.extend({
                     if (is.string(err.password))
                         this.passwordFeedback = err.password;
                 }
-<<<<<<< HEAD
             };
             axios
                 .post("/api/auth/login", {
@@ -141,15 +117,6 @@ export default Vue.extend({
                     location.replace("/");
                 })
                 .catch(() => error());
-=======
-            }
-            axios.post('/api/auth/login', { username: this.form.username, password: this.form.password }).then(response => {
-                if(response.data.error) return error(response.data.error);
-                this.loginState = 'succes';
-                location.reload();
-                location.replace('/');
-            }).catch(() => error());
->>>>>>> admin-rounds-and-challenges
         },
     },
 });

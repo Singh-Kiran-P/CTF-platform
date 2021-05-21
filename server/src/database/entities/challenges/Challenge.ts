@@ -1,12 +1,6 @@
-<<<<<<< HEAD
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany, OneToOne } from 'typeorm';
-import { Environment, Solve, Attachment, Question, Round, Hint, Tag } from '../../../database';
-import { DockerChallengeImage } from '../docker/DockerChallengeImage';
-=======
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany } from 'typeorm';
 import { Environment, Solve, Question, Round, Hint, Tag } from '../../../database';
 import { ChallengeType } from '@shared/validation/roundsForm';
->>>>>>> admin-rounds-and-challenges
 
 export { ChallengeType };
 
