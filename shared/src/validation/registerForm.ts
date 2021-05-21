@@ -36,4 +36,4 @@ const regexPassword = (password: string): string => {
 
 const isForm = (f: any) => is.object(f) && is.string(f.username) && is.string(f.password) && is.string(f.confirmPassword) && is.string(f.category);
 
-export { state, validInput, validateString, validateUsername, validatePassword, validForm, Form };
+export { state, validInput, validateUsername, validatePassword, validForm, Form };

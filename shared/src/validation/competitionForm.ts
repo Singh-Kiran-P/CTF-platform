@@ -1,7 +1,7 @@
 // functions to validate the competition form
 
 import { File as UFile } from 'formidable';
-import { state, validInput, validateString, is } from '../validation';
+import { state, validInput, validateString, validateCharacters, validateList, is } from '../validation';
 
 type Category = { name: string, order: number };
 type Tag = { name: string, description: string, order: number };
@@ -9,8 +9,8 @@ type Page = { name: string, path: string, source: string, order: number, html: F
 type Sponsor = { name: string, link: string, icon: string, order: number, img: File | UFile | null };
 type Form = { name: string, categories: Category[], tags: Tag[], pages: Page[], sponsors: Sponsor[] };
 
-const validForm = (f: Form, checkType: boolean = true): boolean => {
-    let valid = (!checkType || isf.form(f));
+const validForm = (f: Form): boolean => {
+    let valid = isf.form(f);
     valid = valid && state(validate.name(f.name), validate.categories(f.categories), validate.tags(f.tags), validate.pages(f.pages), validate.sponsors(f.sponsors));
     valid = valid && f.categories.every(category => state(validate.category(category, f.categories)));
     valid = valid && f.tags.every(tag => state(validate.tag(tag, f.tags)));
@@ -19,18 +19,11 @@ const validForm = (f: Form, checkType: boolean = true): boolean => {
 }
 
 const validate = {
-    name: (name: string): string => {
-        return validateString(name, 'Competition name', 3, 32);
-    },
-
-    categories: (categories: Category[]): string => {
-        return categories.length == 0 ? 'At least one category is required' : '';
-    },
-    pages: (pages: Page[]): string => {
-        return pages.findIndex(x => x.path == '/') < 0 ? `A page with path '/' is required` : '';
-    },
-    tags: (tags: Tag[]): string => '',
-    sponsors: (sponsors: Sponsor[]): string => '',
+    name: (name: string): string => validateString(name, 'Competition name', 3, 32),
+    categories: (categories: Category[]): string => validateList(categories, 'category', true),
+    pages: (pages: Page[]): string => pages.findIndex(x => x.path == '/') < 0 ? `A page with path '/' is required` : '',
+    tags: (tags: Tag[]): string => validateList(tags, 'tag', false),
+    sponsors: (sponsors: Sponsor[]): string => validateList(sponsors, 'sponsor', false),
 
     category: (category: Category, categories: Category[], add: boolean = false): string => {
         return validateString(category.name, 'Category', 3, 32, !add, categories.map(x => x.name), !add);
@@ -39,28 +32,25 @@ const validate = {
         return validateString(tag.name, 'Tag name', 3, 32, !add, tags.map(x => x.name), !add);
     },
     page: (page: Page, pages: Page[], add: boolean = false): string => {
-        let r = validateString(page.name, 'Page name', 3, 32, !add);
-        if (!r && page.path && !page.path.startsWith('/')) r = `Page path must start with '/'`;
-        if (!r && page.path.startsWith('/api')) r = `Page path cannot start with '/api'`;
-        let invalidChars = page.path.replace(/([a-zA-Z0-9\/\-]+)/g, '');
-        if (!r && invalidChars) r = `Page path cannot contain the following characters: '${invalidChars}'`;
-        if (!r && page.path.includes('//')) r = `Page path cannot have multiple '/'s in a row`;
-        if (!r && page.path.length > 1 && page.path.endsWith('/')) r = `Page path cannot end with '/'`;
-        if (!r) r = validateString(page.path, 'Page path', 1, 32, !add, pages.map(x => x.path), !add);
-        if (!r && !add && !page.source && !page.html) r = 'Page source is required';
-        if (!r && !add && page.zip && !page.html) r = 'New page dependencies require a new page source';
-        if (!r && page.html?.name && !page.html.name.endsWith('.html')) r = 'Page source must be a .html file';
-        if (!r && page.zip?.name && !page.zip.name.endsWith('.zip')) r = 'Page dependencies must be contained in a .zip file';
-        return r;
+        let v = validateString(page.name, 'Page name', 3, 32, !add);
+        if (!v && page.path && !page.path.startsWith('/')) v = `Page path must start with '/'`;
+        if (!v && page.path.startsWith('/api')) v = `Page path cannot start with '/api'`;
+        if (!v) v = validateCharacters(page.path, 'Page path', undefined, /([a-zA-Z0-9\/\-]+)/g);
+        if (!v && page.path.includes('//')) v = `Page path cannot have multiple '/'s in a row`;
+        if (!v && page.path.length > 1 && page.path.endsWith('/')) v = `Page path cannot end with '/'`;
+        if (!v) v = validateString(page.path, 'Page path', 1, 32, !add, pages.map(x => x.path), !add);
+        if (!v && !add && !page.source && !page.html) v = 'Page source is required';
+        if (!v && !add && page.zip && !page.html) v = 'New page dependencies require a new page source';
+        if (!v && page.html && !page.html.name?.endsWith('.html')) v = 'Page source must be a .html file';
+        if (!v && page.zip && !page.zip.name?.endsWith('.zip')) v = 'Page dependencies must be contained in a .zip file';
+        return v;
     },
     sponsor: (sponsor: Sponsor, sponsors: Sponsor[], add: boolean = false): string => {
-        let r = sponsor.name.startsWith('_') ? `Sponsor name cannot start with '_'` : '';
-        let invalidChars = sponsor.name.replace(/([a-zA-Z0-9 \,\!\?\.\'\"\&\_\-]+)/g, '');
-        if (!r && invalidChars) r = `Sponsor name cannot contain the following characters: '${invalidChars}'`;
-        if (!r) r = validateString(sponsor.name, 'Sponsor name', 3, 32, !add, sponsors.map(x => x.name), !add);
-        if (!r) r = validateString(sponsor.link, 'Sponsor link', -1, 128, !add);
-        if (!r && !add && !sponsor.icon && !sponsor.img) r = 'Sponsor icon is required';
-        return r;
+        let v = validateCharacters(sponsor.name, 'Sponsor name', true);
+        if (!v) v = validateString(sponsor.name, 'Sponsor name', 3, 32, !add, sponsors.map(x => x.name), !add);
+        if (!v) v = validateString(sponsor.link, 'Sponsor link', -1, 128, !add);
+        if (!v && !add && !sponsor.icon && !sponsor.img) v = 'Sponsor icon is required';
+        return v;
     }
 }
 
@@ -83,4 +73,4 @@ const isf = { // check if a given variable with type any is a Form
     }
 }
 
-export { state, validInput, validForm, validateString, validate, Category, Tag, Page, Sponsor, Form };
+export { state, validInput, validForm, validate, Category, Tag, Page, Sponsor, Form, isf };

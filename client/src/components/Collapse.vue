@@ -1,8 +1,10 @@
 <template>
-    <div id=Collapse>
-        <label @click="visible = !visible">{{label}}</label>
-        <IconButton icon="chevron-down" :class="visible ? 'danger' : 'primary'" @click="visible = !visible"/>
-        <b-collapse :visible="visible">
+    <div>
+        <div :class="['header', { 'center': center }]" @click="toggle()">
+            <label :class="{ 'large': large }">{{label}}</label>
+            <IconButton icon="chevron-down" :loading="loading" :class="visible ? 'danger' : 'primary'"/>
+        </div>
+        <b-collapse :visible="visible" :class="{ 'no-border': noborder }">
             <slot/>
         </b-collapse>
     </div>
@@ -18,31 +20,74 @@ export default Vue.extend({
         IconButton
     },
     props: {
-        label: String
+        value: Boolean,
+        label: String,
+        large: Boolean,
+        center: Boolean,
+        noborder: Boolean,
+        loading: Boolean
     },
     data: () => ({
-        visible: false
-    })
+        state: false
+    }),
+    created() {
+        this.state = this.value;
+    },
+    computed: {
+        visible(): boolean {
+            return this.state && !this.loading;
+        }
+    },
+    watch: {
+        value(): void {
+            this.state = this.value;
+        }
+    },
+    methods: {
+        toggle(): void {
+            this.state = !this.state;
+            this.$emit('input', this.state);
+            this.$emit('toggle');
+        }
+    }
 });
 </script>
 
 <style scoped lang="scss">
-label {
-    display: inline;
-    margin-bottom: 0;
-    font-weight: bold;
-}
-
 .collapse {
     margin-top: 0 !important;
+}
+
+.collapse:not(.no-border) {
     border-bottom: 2px solid black;
 }
 
-button {
-    float: right;
-}
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-button.danger {
-    transform: rotate(180deg);
+    &:not(.center) label {
+        flex-grow: 1;
+    }
+
+    label {
+        padding-right: var(--margin);
+        display: inline;
+        margin-bottom: 0;
+        font-weight: bold;
+
+        &.large {
+            font-size: var(--font-large);
+        }
+    }
+
+    button {
+        flex-shrink: 0;
+    }
+
+    button.danger {
+        transform: rotate(180deg);
+    }
 }
 </style>

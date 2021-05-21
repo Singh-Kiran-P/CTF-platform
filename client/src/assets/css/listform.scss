@@ -1,0 +1,101 @@
+// general styling for list forms
+
+.list-form {
+    display: flex;
+    justify-content: center;
+    overflow-y: scroll !important;
+    padding: var(--double-margin);
+    padding-bottom: 0;
+
+    form {
+        width: min(100%, var(--breakpoint-md));
+    }
+}
+
+.list-item, .add-list-item {
+    margin-top: var(--margin);
+}
+
+.list-item {
+    display: flex;
+
+    &:not(.nostyle) {
+        padding: var(--margin);
+        border-radius: var(--border-radius);
+        background-color: var(--gray-light);
+    }
+
+    .item-content {
+        width: 0;
+        flex-grow: 1;
+        margin-right: var(--margin);
+    }
+    
+    .item-name {
+        display: block;
+        font-weight: bold;
+    }
+
+    .item-description {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .item-category {
+        min-width: 5rem;
+        color: var(--gray);
+        display: inline-block;
+    }
+
+    .item-category ~ * {
+        width: 0;
+        flex-grow: 1;
+    }
+
+    .item-content.editable {
+        textarea, .item-description {
+            margin-top: var(--margin);
+        }
+    }
+}
+
+.add-list-item {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: var(--double-margin);
+
+    input, textarea, .b-form-file, .date-time-picker {
+        width: 100%;
+        margin-top: var(--margin);
+    }
+    
+    input:first-of-type {
+        width: 0;
+        flex-grow: 1;
+        margin-top: 0;
+        margin-right: var(--margin);
+    }
+}
+
+$breakpoint-sm: 576px;
+@media (max-width: $breakpoint-sm) {
+    .list-item {
+        .item-description {
+            flex-wrap: wrap;
+        }
+
+        .item-category ~ *:not(span) {
+            width: 100%;
+        }
+    }
+}
+
+form > button {
+    width: calc(50% - var(--margin) / 2);
+    margin-bottom: var(--double-margin);
+}
+
+form > .btn-danger {
+    margin-right: var(--margin);
+}

@@ -10,15 +10,27 @@ export class Round {
     name: string;
 
     @Column()
-    start: number;
+    folder: string;
 
     @Column()
-    end: number;
+    start: string;
+
+    @Column()
+    end: string;
+
+    @Column()
+    description: string;
 
     @OneToMany(_ => Challenge, challenge => challenge.round)
     challenges: Challenge[];
 
-    constructor() {
-        // TODO
+    constructor(params?: { name: string, folder: string, start: string, end: string, description: string, id?: number }) {
+        if (!params) return;
+        this.id = params.id;
+        this.name = params.name;
+        this.folder = params.folder;
+        this.start = params.start;
+        this.end = params.end;
+        this.description = params.description;
     }
 }

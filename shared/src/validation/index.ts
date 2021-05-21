@@ -12,17 +12,36 @@ const validateString = (input: string, name: string, min: number, max: number, r
     return '';
 }
 
-const regexName = (input: string, name: string): string => {
-    let invalidChars = input.replace(/([a-zA-Z0-9 \_\-]+)/g, '');
-    if (invalidChars) return `${name} cannot contain the following characters: '${invalidChars}'`;
+const validateNumber = (number: number, name: string, negative: boolean, min?: number, max?: number): string => {
+    if (!Number.isInteger(number)) return `${name} must be a valid integer`;
+    if (!negative && number < 0) return `${name} cannot be negative`;
+    if (min && number < min) return `${name} must be at least ${min}`;
+    if (max && number > max) return `${name} must be at most ${max}`;
     return '';
+}
+
+const validateCharacters = (input: string, name: string, disallowed?: RegExp | boolean, allowed?: RegExp): string => {
+    if (disallowed && input.startsWith('_')) return `${name} cannot start with '_'`;
+    if (typeof disallowed == 'boolean') disallowed = /([\\\/\:\*\?\<\>\"\|]+)/g;
+    let invalidChars = allowed ? input.replace(allowed, '') : '';
+    if (disallowed) invalidChars += input.match(disallowed)?.toString() || '';
+    return invalidChars ? `${name} cannot contain the following characters: '${invalidChars}'` : '';
+}
+
+const validateList = (list: any[], name: string, required: boolean): string => {
+    return required && list.length == 0 ? `At least one ${name} is required` : '';
+};
+
+const regexName = (input: string, name: string): string => {
+    return validateCharacters(input, name, undefined, /([a-zA-Z0-9 \_\-]+)/g);
 }
 
 const is = {
     string: (v: any): boolean => typeof v == 'string',
     number: (v: any): boolean => typeof v == 'number',
     object: (v: any): boolean => v && typeof v == 'object',
-    array: (v: any, t: (x: any) => boolean): boolean => Array.isArray(v) && (v as any[]).every(x => t(x))
+    date: (v: any): boolean => is.string(v) && !isNaN(Date.parse(v)),
+    array: (v: any, t: (x: any) => boolean): boolean => Array.isArray(v) && (v as any[]).every(x => t(x)),
 }
 
-export { state, validInput, validateString, regexName, is };
+export { state, validInput, validateString, validateNumber, validateCharacters, validateList, regexName, is };

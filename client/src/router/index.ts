@@ -74,6 +74,16 @@ const pages: { [page: string]: Route } = {
         name: 'Notifications',
         src: 'Notifications.vue',
         meta: { right: true }
+    },
+    roundsAdmin: {
+        path: '/rounds/config',
+        name: 'Rounds',
+        src: 'RoundsAdmin.vue'
+    },
+    roundsParticipant: {
+        path: '/rounds',
+        name: 'Rounds',
+        src: 'RoundsParticipant.vue'
     }
 };
 
@@ -88,13 +98,14 @@ const routes: { [page: string]: Route[] } = {
         pages.users
     ],
     [Roles.PARTICIPANT]: [
-        pages.leaderboard,
         pages.team,
         pages.teamDashboard,
         pages.joinTeam,
         pages.notifications,
         pages.teams,
         pages.users,
+        pages.roundsParticipant,
+        pages.leaderboard,
         pages.logout
     ],
     [Roles.ORGANIZER]: [
@@ -102,6 +113,7 @@ const routes: { [page: string]: Route[] } = {
         pages.teamDashboard,
         pages.teams,
         pages.users,
+        pages.roundsAdmin,
         pages.config,
         pages.docker,
         pages.notifications,

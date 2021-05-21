@@ -17,10 +17,12 @@ export class Sponsor {
     @Column()
     order: number;
 
-    constructor(name: string, link: string, icon: string, order: number) {
-        this.name = name;
-        this.link = link;
-        this.icon = icon;
-        this.order = order;
+    constructor(params?: { name: string, link: string, icon: string, order: number, id?: number }) {
+        if (!params) return;
+        this.id = params.id;
+        this.name = params.name;
+        this.link = params.link;
+        this.icon = params.icon;
+        this.order = params.order;
     }
 }

@@ -8,7 +8,7 @@
                     v-model="form.teamname"
                     placeholder="Enter a name for your team"
                     :state="state(teamnameFeedback)"
-                    v-on:input="resetCreateFeedback"
+                    @input="resetCreateFeedback"
                 ></b-form-input> 
                 <b-form-invalid-feedback>{{teamnameFeedback}}</b-form-invalid-feedback>
             </b-form-group>        
@@ -43,7 +43,7 @@ export default Vue.extend({
         teamnameFeedback(): string { return this.validateTeamname(); },
     },
     watch: {
-        form: {deep: true, handler() { this.createState = 'normal'; }}
+        form: { deep: true, handler() { this.createState = 'normal'; }}
     },
     methods: {
         validForm(): boolean { return validInput(this.teamnameFeedback, this.form.teamname) && state(this.createFeedback); },
