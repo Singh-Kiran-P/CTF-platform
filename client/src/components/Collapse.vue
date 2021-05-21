@@ -1,7 +1,9 @@
 <template>
     <div>
-        <label @click="toggle()">{{label}}</label>
-        <IconButton icon="chevron-down" :loading="loading" :class="visible ? 'danger' : 'primary'" @click="toggle()"/>
+        <div :class="['header', { 'center': center }]" @click="toggle()">
+            <label :class="{ 'large': large }">{{label}}</label>
+            <IconButton icon="chevron-down" :loading="loading" :class="visible ? 'danger' : 'primary'"/>
+        </div>
         <b-collapse :visible="visible" :class="{ 'no-border': noborder }">
             <slot/>
         </b-collapse>
@@ -20,6 +22,8 @@ export default Vue.extend({
     props: {
         value: Boolean,
         label: String,
+        large: Boolean,
+        center: Boolean,
         noborder: Boolean,
         loading: Boolean
     },
@@ -50,12 +54,6 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-label {
-    display: inline;
-    margin-bottom: 0;
-    font-weight: bold;
-}
-
 .collapse {
     margin-top: 0 !important;
 }
@@ -64,11 +62,32 @@ label {
     border-bottom: 2px solid black;
 }
 
-button {
-    float: right;
-}
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-button.danger {
-    transform: rotate(180deg);
+    &:not(.center) label {
+        flex-grow: 1;
+    }
+
+    label {
+        padding-right: var(--margin);
+        display: inline;
+        margin-bottom: 0;
+        font-weight: bold;
+
+        &.large {
+            font-size: var(--font-large);
+        }
+    }
+
+    button {
+        flex-shrink: 0;
+    }
+
+    button.danger {
+        transform: rotate(180deg);
+    }
 }
 </style>

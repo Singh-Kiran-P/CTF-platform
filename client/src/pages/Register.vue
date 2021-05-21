@@ -83,7 +83,7 @@ export default Vue.extend({
         validForm(): boolean { return validForm(this.form) && state(this.usernameFeedback); }
     },
     watch: {
-        form: {deep: true, handler() {
+        form: { deep: true, handler() {
             this.registerState = 'normal';
             this.registerFeedback = '';
         }}

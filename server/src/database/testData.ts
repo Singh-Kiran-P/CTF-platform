@@ -36,9 +36,9 @@ async function loadTestData() {
     ]);
 
     let rounds: Round[] = await save([
-        new Round({ name: 'First round!!', folder: '/rounds/first round!!', start: new Date(2021, 5, 1, 10).toJSON(), end: new Date(2021, 5, 1, 11).toJSON() }),
-        new Round({ name: 'GIVE IT UP FOR ROUND 22@', folder: '/rounds/give it up for round 22@', start: new Date(2021, 5, 1, 11, 30).toJSON(), end: new Date(2021, 5, 1, 12, 30).toJSON() }),
-        new Round({ name: '~le tour final est arrivé~', folder: '/rounds/~le tour final est arrivé~', start: new Date(2021, 5, 1, 13).toJSON(), end: new Date(2021, 5, 1, 14).toJSON() })
+        new Round({ name: 'First round!!', folder: '/rounds/first round!!', description: 'haha teste te bal bla bla', start: new Date(2021, 5, 1, 10).toJSON(), end: new Date(2021, 5, 1, 11).toJSON() }),
+        new Round({ name: 'GIVE IT UP FOR ROUND 22@', folder: '/rounds/give it up for round 22@', description: '', start: new Date(2021, 5, 1, 11, 30).toJSON(), end: new Date(2021, 5, 1, 12, 30).toJSON() }),
+        new Round({ name: '~le tour final est arrivé~', folder: '/rounds/~le tour final est arrivé~', description: 'bim bom \n jaime la prevenir de ca telegrafeur\n\n\n                  ~~fantastique', start: new Date(2021, 5, 1, 13).toJSON(), end: new Date(2021, 5, 1, 14).toJSON() })
     ]);
 
     let challenges: Challenge[] = await save([

@@ -51,10 +51,15 @@ const pages: { [page: string]: Route } = {
         src: 'Config.vue',
         meta: { right: true }
     },
-    rounds: {
+    roundsAdmin: {
+        path: '/rounds/config',
+        name: 'Rounds',
+        src: 'RoundsAdmin.vue'
+    },
+    roundsParticipant: {
         path: '/rounds',
         name: 'Rounds',
-        src: 'Rounds.vue'
+        src: 'RoundsParticipant.vue'
     }
 };
 
@@ -65,15 +70,16 @@ const routes: { [page: string]: Route[] } = {
         pages.register
     ],
     [Roles.PARTICIPANT]: [
-        pages.leaderboard,
         pages.team,
         pages.joinTeam,
+        pages.roundsParticipant,
+        pages.leaderboard,
         pages.logout
     ],
     [Roles.ORGANIZER]: [
         pages.leaderboard,
         pages.teams,
-        pages.rounds,
+        pages.roundsAdmin,
         pages.config,
         pages.logout
     ]

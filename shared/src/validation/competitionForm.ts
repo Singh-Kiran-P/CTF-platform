@@ -73,4 +73,4 @@ const isf = { // check if a given variable with type any is a Form
     }
 }
 
-export { state, validInput, validateString, validForm, validate, Category, Tag, Page, Sponsor, Form, isf };
+export { state, validInput, validForm, validate, Category, Tag, Page, Sponsor, Form, isf };

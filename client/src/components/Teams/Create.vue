@@ -43,7 +43,7 @@ export default Vue.extend({
         teamnameFeedback(): string { return this.validateTeamname(); },
     },
     watch: {
-        form: {deep: true, handler() { this.createState = 'normal'; }}
+        form: { deep: true, handler() { this.createState = 'normal'; }}
     },
     methods: {
         validForm(): boolean { return validInput(this.teamnameFeedback, this.form.teamname) && state(this.createFeedback); },

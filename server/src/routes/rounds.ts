@@ -2,15 +2,25 @@ import { validForm, Form, sortRounds, ChallengeType, Challenge as VChallenge, Hi
 import { createDir, uploadFiles, uploaddir, upload, fileName, chain, unzip } from '../files';
 import DB, { Challenge, Hint, Question, Round } from '../database';
 import { deserialize } from '@shared/objectFormdata';
-import { isAdmin } from '../auth/index';
+import { isAdmin, isAuth } from '../auth/index';
 import express from 'express';
 const router = express.Router();
 
-router.get('/data', isAdmin, (_, res) => {
+router.get('/data', isAuth, (_, res) => {
     DB.respond(DB.repo(Round).find(), res, rounds => ({ rounds: sortRounds(rounds.map(round => Object.assign({}, round, { challenges: undefined }))) }));
 });
 
-router.get('/challenges/:round', isAdmin, (req, res) => DB.respond(DB.repo(Challenge).find({ where: { round: req.params.round }, order: { order: 'ASC' }, relations: ['tag'] }), res));
+router.get('/challenges/:round', isAuth, (req, res) => {
+    let error = () => res.send({ error: 'Error fetching data' });
+    let respond = () => DB.respond(DB.repo(Challenge).find({ where: { round: req.params.round }, order: { order: 'ASC' }, relations: ['tag'] }), res);
+    DB.repo(Round).findOne(req.params.round).then(round => {
+        if (!round) return error();
+        if (new Date(round.start) < new Date()) respond();
+        else respond(); // TODO: REMOVE THIS DO THE FOLLOWING LINE INSTEAD
+        // TODO: else isAdmin(req, res, (err: any) => err ? error() : respond());
+    });
+});
+
 router.get('/challenge/hints/:challenge', isAdmin, (req, res) => DB.respond(DB.repo(Hint).find({ where: { challenge: req.params.challenge }, order: { order: 'ASC' } }), res));
 router.get('/challenge/questions/:quiz', isAdmin, (req, res) => DB.respond(DB.repo(Question).find({ where: { quiz: req.params.quiz }, order: { order: 'ASC' } }), res));
 
@@ -42,7 +52,8 @@ router.put('/save', isAdmin, (req, res) => {
     const lists = (c: ListsType): ListsType => ({ hints: c?.hints, questions: c?.questions });
     roundUploads.then(() => Promise.all(challengeUploads).then(() => {
         DB.setRepo(DB.repo(Round), data.rounds.map(x => new Round(x)), {}, x => [x.folder], true).then(rounds => {
-            rounds.map(x => Object.assign({}, x, { challenges: data.rounds.find(y => y.name == x.name)?.challenges })).filter(x => x.challenges).forEach(round => {
+            let challengeRounds = rounds.map(x => Object.assign({}, x, { challenges: data.rounds.find(y => y.name == x.name)?.challenges })).filter(x => x.challenges);
+            if (challengeRounds.length == 0) res.send(); else challengeRounds.forEach(round => {
                 let challenges = round.challenges.map(x => new Challenge(Object.assign({}, x, { round: round })));
                 DB.setRepo(DB.repo(Challenge), challenges, { where: { round: round } }, x => cfolder(x) ? [uploaddir + round.folder + cfolder(x)] : [], true).then(challenges => {
                     challenges.map(x => Object.assign({}, x, lists(round.challenges.find(y => y.order == x.order)))).forEach(challenge => {

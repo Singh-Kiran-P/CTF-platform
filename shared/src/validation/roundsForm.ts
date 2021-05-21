@@ -14,8 +14,15 @@ type Question = { question: string, answer: string, order: number };
 type Hint = { name: string, content: string, cost: number, order: number };
 type Challenge = { id?: number, name: string, description: string, tag: Tag | null, points: number, flag: string, order: number, type: ChallengeType, hints: Hint[] | undefined,
     attachment: string, attachFile: File | UFile | null, docker: string, dockerFile: File | UFile | null, questions: Question[] | undefined, previous: number };
-type Round = { id? :number, name: string, folder: string, start: string, end: string, challenges: Challenge[] | undefined };
+type Round = { id? :number, name: string, folder: string, start: string, end: string, description: string, challenges: Challenge[] | undefined };
 type Form = { rounds: Round[] };
+
+const timeDisplay = (round: Round): string => {
+    let [start, end] = [round.start, round.end].map(time => new Date(time));
+    let [startday, endday] = [start, end].map(time => time.toLocaleString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }));
+    let [starttime, endtime] = [start, end].map(time => time.toLocaleString('nl-BE', { hour: 'numeric', minute: 'numeric' }));
+    return `${startday}, ${starttime} - ${startday == endday ? '' : endday + ', '}${endtime}`;
+}
 
 const sortRounds = (rounds: Round[]): Round[] => [...rounds].sort((a, b) => new Date(a.start) < new Date(b.start) ? -1 : 1);
 const times = (round: Round) => [round.start, round.end].map(time => new Date(time).getTime());
@@ -80,7 +87,8 @@ const isf = {
     },
 
     round: (round: any): boolean => {
-        return is.object(round) && is.string(round.name) && is.string(round.folder) && is.date(round.start) && is.date(round.end) && isf.challenges(round.challenges);
+        let v = is.object(round) && is.string(round.name) && is.string(round.folder) && is.string(round.description) && is.date(round.start) && is.date(round.end);
+        return v && isf.challenges(round.challenges);
     },
     challenges: (challenges: any): boolean => challenges == undefined || is.array(challenges, isf.challenge),
 
@@ -102,4 +110,4 @@ const isf = {
     }
 }
 
-export { state, validInput, validateString, sortRounds, validForm, validChallenges, validHints, validQuestions, validate, Question, Hint, Challenge, Round, Form, ChallengeType };
+export { state, validInput, timeDisplay, sortRounds, validForm, validChallenges, validHints, validQuestions, validate, Question, Hint, Challenge, Round, Form, ChallengeType };

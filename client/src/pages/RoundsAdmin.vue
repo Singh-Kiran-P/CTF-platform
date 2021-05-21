@@ -7,11 +7,13 @@
                         <template v-if="!round.editable">
                             <span class=item-name>{{round.name}}</span>
                             <span>{{timeDisplay(round)}}</span>
+                            <span class="item-description nowrap">{{round.description}}</span>
                         </template>
                         <template v-else>
                             <b-form-input type=text trim v-model="round.name" placeholder="Enter round name" :state="state(roundFeedback(round))"/>
                             <DateTimePicker v-model="round.start" :state="state(roundFeedback(round))" label="Starts at"/>
                             <DateTimePicker v-model="round.end" :state="state(roundFeedback(round))"  label="Ends at"/>
+                            <b-form-textarea max-rows="10" v-model="round.description" placeholder="Enter round description" :state="state(roundFeedback(round))"/>
                             <b-form-invalid-feedback>{{roundFeedback(round)}}</b-form-invalid-feedback>
                         </template>
                     </div>
@@ -140,6 +142,7 @@
                         <b-button type=button variant=primary :disabled="!validNewRound" @click="addRound()"><font-awesome-icon icon=plus /></b-button>
                         <DateTimePicker v-model="add.round.start" :state="state(newRoundFeedback)" label="Starts at"/>
                         <DateTimePicker v-model="add.round.end" :state="state(newRoundFeedback)" label="Ends at"/>
+                        <b-form-textarea max-rows="10" v-model="add.round.description" placeholder="Enter new round description" :state="state(newRoundFeedback)"/>
                         <b-form-invalid-feedback>{{newRoundFeedback}}</b-form-invalid-feedback>
                     </div>
                 </Collapse>
@@ -158,12 +161,11 @@ import Collapse from '@/components/Collapse.vue';
 import IconButton from '@/components/IconButton.vue';
 import StatusButton from '@/components/StatusButton.vue';
 import DateTimePicker from '@/components/DateTimePicker.vue';
-import { nextOrder, moveDown } from '@/assets/listFunctions';
-import { Question, Hint, Challenge, Round, Form, ChallengeType } from '@shared/validation/roundsForm';
-import { state, validate, validInput, sortRounds, validForm, validChallenges, validHints, validQuestions } from '@shared/validation/roundsForm';
+import { nextOrder, moveDown, toggledItems, loadItems } from '@/assets/listFunctions';
+import { Form, Round, Challenge, ChallengeType, Hint, Question } from '@shared/validation/roundsForm';
+import { state, validate, validInput, timeDisplay, sortRounds, validForm, validChallenges, validHints, validQuestions } from '@shared/validation/roundsForm';
 import { Tag } from '@shared/validation/competitionForm';
 import { serialize } from '@shared/objectFormdata';
-import { is } from '@shared/validation';
 import path from 'path';
 
 type Editable = { editable?: boolean };
@@ -172,7 +174,7 @@ type HintsVisible = { hintsVisible?: boolean };
 type QuestionsVisible = { questionsVisible?: boolean };
 
 export default Vue.extend({
-    name: 'Rounds',
+    name: 'RoundsAdmin',
     components: {
         Collapse,
         IconButton,
@@ -191,7 +193,7 @@ export default Vue.extend({
             rounds: [] as (Round & ChallengesVisible)[]
         },
         add: {
-            round: { name: '', start: '', end: '' }
+            round: { name: '', start: '', end: '', description: '' }
         },
 
         types: [] as { value: string, text: string }[],
@@ -228,7 +230,7 @@ export default Vue.extend({
 
         loadFormData(close: boolean = true): void {
             this.cancelState = 'loading';
-            if (close) this.add.round = { name: '', start: '', end: '' };
+            if (close) this.add.round = { name: '', start: '', end: '', description: '' };
             const error = () => {
                 this.cancelState = 'error';
                 this.saveState = 'normal';
@@ -255,35 +257,7 @@ export default Vue.extend({
             }).catch(() => error());
         },
 
-        toggledItems<C>(container: C & Object, loading: string, getVisible: (c: C) => boolean | undefined, getItems: (c: C) => any[] | undefined, loadItems: (c: C) => any): void {
-            if (getVisible(container) && getItems(container) == undefined) {
-                Vue.set(container, loading, true);
-                loadItems(container);
-            }
-        },
-        loadItems(container: { id?: number, }, list: string, loading: string, visible: string, request: string, getValid: (data: any) => boolean): Promise<void> {
-            return new Promise<void>(resolve => {
-                const setItems = (items?: any[]) => {
-                    Vue.set(container, list, items);
-                    Vue.set(container, loading, false);
-                    resolve();
-                }
-                if (!container.id) setItems([]);
-                else axios.get(request + container.id).then(res => {
-                    if (res.data.error || (!is.array(res.data, _ => false) && !getValid(res.data))) {
-                        Vue.set(container, visible, false);
-                        setItems(undefined);
-                    } else setItems(res.data);
-                });
-            });
-        },
-
-        timeDisplay(round: Round): string {
-            let [start, end] = [round.start, round.end].map(time => new Date(time));
-            let [startday, endday] = [start, end].map(time => time.toLocaleString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }));
-            let [starttime, endtime] = [start, end].map(time => time.toLocaleString('nl-BE', { hour: 'numeric', minute: 'numeric' }));
-            return `${startday}, ${starttime} - ${startday == endday ? '' : endday + ', '}${endtime}`;
-        },
+        timeDisplay(round: Round): string { return timeDisplay(round); },
         roundFeedback(round: Round, add: boolean = false): string { return validate.round(round, this.form.rounds, add); },
         removeRound(round: Round): void { this.form.rounds = this.form.rounds.filter(x => x != round); },
         editRound(round: Round & Editable): void {
@@ -294,13 +268,13 @@ export default Vue.extend({
         addRound(): void {
             if (!this.validNewRound) return;
             this.form.rounds = sortRounds(this.form.rounds.concat(this.newRound));
-            this.add.round = { name: '', start: '', end: '' };
+            this.add.round = { name: '', start: '', end: '', description: '' };
         },
         toggledChallenges(round: Round & ChallengesVisible): void {
-            this.toggledItems(round, 'challengesLoading', r => r.challengesVisible, r => r.challenges, r => this.loadChallenges(r));
+            toggledItems(round, 'challengesLoading', round.challengesVisible, round.challenges, r => this.loadChallenges(r));
         },
         loadChallenges(round: Round): Promise<void> {
-            return this.loadItems(round, 'challenges', 'challengesLoading', 'challengesVisible', '/api/rounds/challenges/', (data: any) => validChallenges(data));
+            return loadItems(round, 'challenges', 'challengesLoading', 'challengesVisible', '/api/rounds/challenges/', (data: any) => validChallenges(data));
         },
 
         typeText(type: string): string { return type == ChallengeType.INTERACTIVE ? 'Interactive' : (type == ChallengeType.QUIZ ? 'Quiz' : 'Basic'); },
@@ -336,16 +310,16 @@ export default Vue.extend({
             if (challenge.type == ChallengeType.QUIZ && challenge.questions == undefined) this.toggledQuestions(challenge, true);
         },
         toggledHints(challenge: Challenge & HintsVisible): void {
-            this.toggledItems(challenge, 'hintsLoading', c => c.hintsVisible, c => c.hints, c => this.loadHints(c));
+            toggledItems(challenge, 'hintsLoading', challenge.hintsVisible, challenge.hints, c => this.loadHints(c));
         },
         loadHints(challenge: Challenge): Promise<void> {
-            return this.loadItems(challenge, 'hints', 'hintsLoading', 'hintsVisible', '/api/rounds/challenge/hints/', data => validHints(data));
+            return loadItems(challenge, 'hints', 'hintsLoading', 'hintsVisible', '/api/rounds/challenge/hints/', data => validHints(data));
         },
         toggledQuestions(challenge: Challenge & QuestionsVisible, visible?: boolean): void {
-            this.toggledItems(challenge, 'questionsLoading', c => visible || c.questionsVisible, c => c.questions, c => this.loadQuestions(c));
+            toggledItems(challenge, 'questionsLoading', visible || challenge.questionsVisible, challenge.questions, c => this.loadQuestions(c));
         },
         loadQuestions(challenge: Challenge): Promise<void> {
-            return this.loadItems(challenge, 'questions', 'questionsLoading', 'questionsVisible', '/api/rounds/challenge/questions/', data => validQuestions(data));
+            return loadItems(challenge, 'questions', 'questionsLoading', 'questionsVisible', '/api/rounds/challenge/questions/', data => validQuestions(data));
         },
 
         hintsFeedback(challenge: Challenge): string { return validate.hints(challenge.hints); },
@@ -397,18 +371,24 @@ export default Vue.extend({
     }
 }
 
+.round > div, .add-list-item {
+    textarea {
+        margin-top: var(--double-margin);
+    }
+}
+
+.item-description.nowrap {
+    display: block;
+    overflow-x: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
 .challenges {
     width: 100%;
     margin: var(--margin) 0;
 
     .list-item {
-        .item-description.nowrap {
-            display: block;
-            overflow-x: hidden;
-            white-space: nowrap;
-            text-overflow: ellipsis;
-        }
-
         &.nostyle {
             display: block;
         }
