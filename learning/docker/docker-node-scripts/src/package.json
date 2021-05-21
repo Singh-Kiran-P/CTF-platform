@@ -7,7 +7,8 @@
         "create": "node create-container+start.js",
         "createCompose": "node createWithCompose.js",
         "start": "node make-start-challenge-container.js",
-        "info": "node getinfo.js"
+        "info": "node getinfo.js",
+        "delete": "node deleteImage.js"
     },
     "author": "",
     "license": "ISC",

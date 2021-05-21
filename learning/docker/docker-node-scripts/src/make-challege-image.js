@@ -5,7 +5,7 @@ var path = require('path')
 var pump = require('pump')
 
 pump(
-    build(path.join('../node_project', 'Dockerfile'), { t: 'challenge1' }),
+    build(path.join('/docker-projects/node_project', 'Dockerfile'), { t: 'sss' }),
     process.stdout,
     function (err) {
         if (err) {

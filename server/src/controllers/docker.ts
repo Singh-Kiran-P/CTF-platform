@@ -46,6 +46,45 @@ function images_GET(req: Request, res: Response) {
         res.json(images);
     });
 }
+
+/**
+ * Make challenge image
+ * @param dockerFileDes location of the docker file
+ *
+ */
+function makeImage(dockerFileDes: string, dockerChallengeName: string) {
+    return new Promise<string>((resolve, reject) => {
+        _createChallengeImage({ 'dir': dockerFileDes, 'name': dockerChallengeName })
+            .then(() => {
+                docker.getImage(dockerChallengeName)
+                    .inspect()
+                    .then((imageData) => {
+                        resolve(imageData.Id);
+                    })
+            })
+            .catch((err) => {
+                reject(err);
+            })
+    })
+}
+
+/**
+ * Remove image from docker
+ * @param imageId: string
+ */
+function deleteImage(imageId: string) {
+    return new Promise<void>((resolve, reject) => {
+        if (!imageId) return resolve();
+        docker.getImage(imageId)
+            .remove({ force: { true: 'true' } }, (err, res) => {
+                if (err) {
+                    reject(err);
+                }
+                resolve();
+            });
+    })
+}
+
 function makeImage_POST(req: Request, res: Response) {
     let data = deserialize(req);
 
@@ -211,7 +250,6 @@ function _createChallengeImage(jsonObj: any) {
                 reject(err);
             }
         )
-
         resolve();
     });
 }
@@ -278,5 +316,7 @@ export default {
     startContainer_POST,
     stopContainer_POST,
     resetContainer_POST,
+    makeImage,
+    deleteImage
 }
 
