@@ -1,6 +1,7 @@
 /**
  * @author Kiran Singh
  */
+//TODO: createChallengeImage func
 import { Request, Response, NextFunction } from 'express';
 import Docker = require('dockerode');
 import pump from 'pump';
@@ -9,7 +10,7 @@ var docker = new Docker({ socketPath: '/var/run/docker.sock' });
 import DB, { DockerManagementRepo, DockerOpenPort } from '../database';
 import { deserialize } from '@shared/objectFormdata';
 import { uploaddir } from '@/routes/uploads';
-import { unzip, upload } from '@/files';
+import { unzip, upload, Root } from '@/files';
 
 async function dockerConfigPorts_GET(req: Request, res: Response) {
     const dockerManagementRepo = DB.crepo(DockerManagementRepo)
@@ -54,17 +55,17 @@ function images_GET(req: Request, res: Response) {
  */
 function makeImage(dockerFileDes: string, dockerChallengeName: string) {
     return new Promise<string>((resolve, reject) => {
-        _createChallengeImage({ 'dir': dockerFileDes, 'name': dockerChallengeName })
-            .then(() => {
-                docker.getImage(dockerChallengeName)
-                    .inspect()
-                    .then((imageData) => {
-                        resolve(imageData.Id);
-                    })
-            })
-            .catch((err) => {
-                reject(err);
-            })
+        pump(
+            build(`${Root}${dockerFileDes}/Dockerfile`, { t: dockerChallengeName })
+                .on("complete", (id: any) => {
+                    // console.log("klaar:" + id);
+                    resolve(id);
+                }),
+            process.stdout,
+            (err) => {
+                reject(err)
+            }
+        )
     })
 }
 
@@ -243,19 +244,6 @@ async function _getImage(name: string) {
     let i = await challenge.findOne({ name: name });
     return i; */
     return 0; // TODO: challenge instead of challengeimage
-}
-
-function _createChallengeImage(jsonObj: any) {
-    return new Promise<void>((resolve, reject) => {
-        pump(
-            build(`${__dirname}/../../../../..${jsonObj.dir}Dockerfile`, { t: jsonObj.name }),
-            process.stdout,
-            (err) => {
-                reject(err);
-            }
-        )
-        resolve();
-    });
 }
 
 async function _createPortConfig(ports: string[]) {

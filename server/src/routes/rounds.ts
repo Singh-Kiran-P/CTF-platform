@@ -2,6 +2,9 @@ import { validForm, Form, sortRounds, ChallengeType, Challenge as VChallenge, Hi
 import { createDir, uploadFiles, uploaddir, upload, fileName, chain, unzip, parentDir } from '../files';
 import DB, { Challenge, Hint, Question, Round } from '../database';
 import { deserialize } from '@shared/objectFormdata';
+import dockerController from "../controllers/docker";
+
+
 import { isAdmin, isAuth } from '../auth/index';
 import express from 'express';
 const router = express.Router();
@@ -40,23 +43,24 @@ router.put('/save', isAdmin, (req, res) => {
             if (round.challenges) challengeUploads.push(uploadFiles(round.challenges, uploaddir + round.folder, c => clears(c).length > 0, c => clears(c),
                 challenge => `_${challenge.name}`, challenge => `/${challenge.name}`, c => cfolder(c),
                 (c, dir) => Promise.all([upload(dir + attachDir, c.attachFile),
-                    docker(c) ? chain(() => upload(dir + dockerDir, c.dockerFile), () => unzip(`${dir + dockerDir}/${c.dockerFile.name}`)) : null]), (c, dir, diff) => {
-                        if (attach(c) || (diff && c.attachment)) c.attachment = `${dir}${attachDir}/${c.attachFile?.name || fileName(c.attachment)}`;
-                        if (docker(c) || (diff && c.docker)) c.docker = `${dir}${dockerDir}/${c.dockerFile?.name || fileName(c.docker)}`;
-                        if (c.type != ChallengeType.INTERACTIVE) c.docker = '';
+                docker(c) ? chain(() => upload(dir + dockerDir, c.dockerFile), () => unzip(`${dir + dockerDir}/${c.dockerFile.name}`)) : null]), (c, dir, diff) => {
+                    if (attach(c) || (diff && c.attachment)) c.attachment = `${dir}${attachDir}/${c.attachFile?.name || fileName(c.attachment)}`;
+                    if (docker(c) || (diff && c.docker)) c.docker = `${dir}${dockerDir}/${c.dockerFile?.name || fileName(c.docker)}`;
+                    if (c.type != ChallengeType.INTERACTIVE) c.docker = '';
                 }));
         });
-    
+
     type ListsType = { hints: VHint[], questions: VQuestion[] };
-    const error = (action: string): any => res.json({ error: `Error ${action}`});
+    const error = (action: string): any => res.json({ error: `Error ${action}` });
     const lists = (c: ListsType): ListsType => ({ hints: c?.hints, questions: c?.questions });
     roundUploads.then(() => Promise.all(challengeUploads).then(() => {
         DB.setRepo(DB.repo(Round), data.rounds.map(x => new Round(x)), {}, x => [x.folder], true).then(rounds => {
             let challengeRounds = rounds.map(x => Object.assign({}, x, { challenges: data.rounds.find(y => y.name == x.name)?.challenges })).filter(x => x.challenges);
-            if (challengeRounds.length == 0) res.send(); else challengeRounds.forEach(round => {
+            if (challengeRounds.length == 0) res.send(); else challengeRounds.forEach((round, i) => {
                 Promise.all(round.challenges.filter((c: Challenge & VChallenge) => c.type == ChallengeType.INTERACTIVE && c.dockerFile).map(c => chain(
-                    () => REMOVEDOCKERIMAGEID(c.dockerImageId),
-                    () => GETDOCKERIMAGEID(`${round.folder}/${parentDir(c.docker)}`, `${c.round.name}${c.name}${new Date().toJSON()}`).then(id => c.dockerImageId = id))
+                    () => dockerController.deleteImage(c.dockerImageId),
+                    () => dockerController.makeImage(uploaddir + round.folder + parentDir(c.docker), `${i}-${c.order}-${new Date().getTime()}`).then(id => { console.log(id);
+                     c.dockerImageId = id }))
                 )).then(() => {
                     let challenges = round.challenges.map(x => new Challenge(Object.assign({}, x, { round: round })));
                     DB.setRepo(DB.repo(Challenge), challenges, { where: { round: round } }, x => cfolder(x) ? [uploaddir + round.folder + cfolder(x)] : [], true).then(challenges => {
@@ -66,29 +70,13 @@ router.put('/save', isAdmin, (req, res) => {
                             Promise.all([
                                 hints == undefined ? null : DB.setRepo(DB.repo(Hint), hints, { where: { challenge: challenge } }),
                                 questions == undefined ? null : DB.setRepo(DB.repo(Question), questions, { where: { quiz: challenge } })
-                            ]).then(() => res.send()).catch(() => error('saving'));
+                            ]).then(() => res.send()).catch((err) => { console.log(err); error('saving') });
                         });
-                    }).catch(() => error('saving'));
-                }).catch(() => error('uploading'));
+                    }).catch((err) => { console.log(err); error('saving') });
+                }).catch((err) => { console.log(err); error('uploading') });
             });
-        }).catch(() => error('saving'));
-    }).catch(() => error('uploading'))).catch(() => error('uploading'));
+        }).catch((err) => { console.log(err); error('saving') });
+    }).catch((err) => { console.log(err); error('uploading') })).catch((err) => { console.log(err); error('uploading') });
 });
-
-const REMOVEDOCKERIMAGEID = (id: string) => {
-    return new Promise<void>((resolve, reject) => {
-        setTimeout(() => {
-            resolve();
-        }, 80);
-    });
-}
-
-const GETDOCKERIMAGEID = (f: string, p: string) => {
-    return new Promise<string>((resolve, reject) => {
-        setTimeout(() => {
-            resolve('TEST: ' + f + ', ' + p);
-        }, 100);
-    });
-}
 
 export default { path: '/rounds', router };
