@@ -64,7 +64,6 @@ export default Vue.extend({
         StatusButton,
     },
     created() {},
-
     data: () => ({
         form: {
             username: "",
