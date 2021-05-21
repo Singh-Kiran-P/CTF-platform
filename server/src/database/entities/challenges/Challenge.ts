@@ -45,6 +45,12 @@ export class Challenge {
     @Column()
     docker: string;
 
+    @Column()
+    dockerImageId: string;
+
+    @Column()
+    innerPorts: string;
+
     @OneToMany(_ => Question, question => question.quiz)
     questions: Question[];
 
@@ -55,7 +61,7 @@ export class Challenge {
     environments: Environment[]; // TODO: remove this?
 
     constructor(params?: { round: Round, name: string, description: string, tag: Tag | null, points: number, flag: string, order: number, type: ChallengeType, id?: number,
-        attachment: string, docker: string, previous: number }) {
+        attachment: string, docker: string, innerPorts: string, dockerImageId: string, previous: number }) {
         if (!params) return;
         this.id = params.id;
         this.round = params.round;
@@ -66,6 +72,8 @@ export class Challenge {
         this.flag = params.flag;
         this.attachment = params.attachment;
         this.docker = params.docker;
+        this.dockerImageId = params.dockerImageId;
+        this.innerPorts = params.innerPorts;
         this.previous = params.previous;
         this.order = params.order;
         this.type = params.type;

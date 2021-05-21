@@ -1,5 +1,5 @@
 import { validForm, Form, sortRounds, ChallengeType, Challenge as VChallenge, Hint as VHint, Question as VQuestion } from '@shared/validation/roundsForm';
-import { createDir, uploadFiles, uploaddir, upload, fileName, chain, unzip } from '../files';
+import { createDir, uploadFiles, uploaddir, upload, fileName, chain, unzip, parentDir } from '../files';
 import DB, { Challenge, Hint, Question, Round } from '../database';
 import { deserialize } from '@shared/objectFormdata';
 import { isAdmin, isAuth } from '../auth/index';
@@ -54,20 +54,41 @@ router.put('/save', isAdmin, (req, res) => {
         DB.setRepo(DB.repo(Round), data.rounds.map(x => new Round(x)), {}, x => [x.folder], true).then(rounds => {
             let challengeRounds = rounds.map(x => Object.assign({}, x, { challenges: data.rounds.find(y => y.name == x.name)?.challenges })).filter(x => x.challenges);
             if (challengeRounds.length == 0) res.send(); else challengeRounds.forEach(round => {
-                let challenges = round.challenges.map(x => new Challenge(Object.assign({}, x, { round: round })));
-                DB.setRepo(DB.repo(Challenge), challenges, { where: { round: round } }, x => cfolder(x) ? [uploaddir + round.folder + cfolder(x)] : [], true).then(challenges => {
-                    challenges.map(x => Object.assign({}, x, lists(round.challenges.find(y => y.order == x.order)))).forEach(challenge => {
-                        let hints = challenge.hints?.map(x => Object.assign({}, new Hint(x), { challenge: challenge }));
-                        let questions = challenge.type == ChallengeType.QUIZ ? challenge.questions?.map(x => Object.assign({}, new Question(x), { quiz: challenge })) : [];
-                        Promise.all([
-                            hints == undefined ? null : DB.setRepo(DB.repo(Hint), hints, { where: { challenge: challenge } }),
-                            questions == undefined ? null : DB.setRepo(DB.repo(Question), questions, { where: { quiz: challenge } })
-                        ]).then(() => res.send()).catch(() => error('saving'));
-                    });
-                }).catch(() => error('saving'));
+                Promise.all(round.challenges.filter((c: Challenge & VChallenge) => c.type == ChallengeType.INTERACTIVE && c.dockerFile).map(c => chain(
+                    () => REMOVEDOCKERIMAGEID(c.dockerImageId),
+                    () => GETDOCKERIMAGEID(`${round.folder}/${parentDir(c.docker)}`, `${c.round.name}${c.name}${new Date().toJSON()}`).then(id => c.dockerImageId = id))
+                )).then(() => {
+                    let challenges = round.challenges.map(x => new Challenge(Object.assign({}, x, { round: round })));
+                    DB.setRepo(DB.repo(Challenge), challenges, { where: { round: round } }, x => cfolder(x) ? [uploaddir + round.folder + cfolder(x)] : [], true).then(challenges => {
+                        challenges.map(x => Object.assign({}, x, lists(round.challenges.find(y => y.order == x.order)))).forEach(challenge => {
+                            let hints = challenge.hints?.map(x => Object.assign({}, new Hint(x), { challenge: challenge }));
+                            let questions = challenge.type == ChallengeType.QUIZ ? challenge.questions?.map(x => Object.assign({}, new Question(x), { quiz: challenge })) : [];
+                            Promise.all([
+                                hints == undefined ? null : DB.setRepo(DB.repo(Hint), hints, { where: { challenge: challenge } }),
+                                questions == undefined ? null : DB.setRepo(DB.repo(Question), questions, { where: { quiz: challenge } })
+                            ]).then(() => res.send()).catch(() => error('saving'));
+                        });
+                    }).catch(() => error('saving'));
+                }).catch(() => error('uploading'));
             });
         }).catch(() => error('saving'));
     }).catch(() => error('uploading'))).catch(() => error('uploading'));
 });
+
+const REMOVEDOCKERIMAGEID = (id: string) => {
+    return new Promise<void>((resolve, reject) => {
+        setTimeout(() => {
+            resolve();
+        }, 80);
+    });
+}
+
+const GETDOCKERIMAGEID = (f: string, p: string) => {
+    return new Promise<string>((resolve, reject) => {
+        setTimeout(() => {
+            resolve('TEST: ' + f + ', ' + p);
+        }, 100);
+    });
+}
 
 export default { path: '/rounds', router };

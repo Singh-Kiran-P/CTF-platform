@@ -13,7 +13,8 @@ enum ChallengeType {
 type Question = { question: string, answer: string, order: number };
 type Hint = { name: string, content: string, cost: number, order: number };
 type Challenge = { id?: number, name: string, description: string, tag: Tag | null, points: number, flag: string, order: number, type: ChallengeType, hints: Hint[] | undefined,
-    attachment: string, attachFile: File | UFile | null, docker: string, dockerFile: File | UFile | null, questions: Question[] | undefined, previous: number };
+    attachment: string, attachFile: File | UFile | null, questions: Question[] | undefined, previous: number,
+    docker: string, dockerImageId: string, innerPorts: string, dockerFile: File | UFile | null };
 type Round = { id? :number, name: string, folder: string, start: string, end: string, description: string, challenges: Challenge[] | undefined };
 type Form = { rounds: Round[] };
 
@@ -65,9 +66,11 @@ const validate = {
         if (!v) v = validateString(challenge.flag, 'Challenge flag', -1, -1, !add);
         if (!v && challenge.previous >= 0 && !challenges?.find(c => c.order == challenge.previous)) v = 'Previous TODO NAME challenge does not exist';
         if (!v && challenge.previous >= challenge.order) v = 'Previous TODO NAME challenge must be ordered before this one';
-        let docker = challenge.type == ChallengeType.INTERACTIVE;
-        if (!v && docker && !challenge.docker && !challenge.dockerFile) v = 'Interactive challenges require a docker TODO HOW NAME';
-        if (!v && docker && challenge.dockerFile && !challenge.dockerFile.name?.endsWith('.zip')) v = 'Challlenge docker TODO HWO ANME must be contained in a .zip file';
+        if (challenge.type == ChallengeType.INTERACTIVE) {
+            if (!v && !challenge.docker && !challenge.dockerFile) v = 'Interactive challenges require a docker file';
+            if (!v && challenge.dockerFile && !challenge.dockerFile.name?.endsWith('.zip')) v = 'Challenge docker file must be contained in a .zip file';
+            if (!v) v = validateString(challenge.innerPorts, 'Challenge inner ports', -1, -1);
+        }
         return v;
     },
     hint: (hint: Hint, add: boolean = false): string => {

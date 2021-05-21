@@ -70,9 +70,14 @@
                                     <span class=input-tag>Type</span>
                                     <b-form-select v-model="challenge.type" :options="types" :state="state(challengeFeedback(round, challenge))" @input="changedType(challenge)"/>
                                     <template v-if="challenge.type == typeValues.INTERACTIVE">
-                                        <span class=input-tag>Docker TODO HOW TO CALL THIS</span>
+                                        <span class=input-tag>Docker file</span>
                                         <b-form-file accept=".zip" v-model="challenge.dockerFile" :placeholder="dockerPlaceholder(challenge)"
                                             :state="state(challengeFeedback(round, challenge))"/>
+                                        <span class=info>The docker file zip should contain the Dockerfile to be run</span>
+                                        <span class=input-tag>Docker inner ports</span>
+                                        <b-form-input type=text trim v-model="challenge.innerPorts" placeholder="Enter docker inner ports"
+                                            :state="state(challengeFeedback(round, challenge))"/>
+                                        <span class=info>Multiple inner ports should be seperated with a comma, for example: '8080/tcp, 900/udp'</span>
                                     </template>
                                     <b-form-invalid-feedback>{{challengeFeedback(round, challenge)}}</b-form-invalid-feedback>
                                     <b-form-group v-if="challenge.type == typeValues.QUIZ" :state="state(questionsFeedback(challenge))" :invalid-feedback="questionsFeedback(challenge)">
@@ -280,7 +285,7 @@ export default Vue.extend({
         typeText(type: string): string { return type == ChallengeType.INTERACTIVE ? 'Interactive' : (type == ChallengeType.QUIZ ? 'Quiz' : 'Basic'); },
         docker(challenge: Challenge): string { return challenge.dockerFile ? challenge.dockerFile.name || '' : path.basename(challenge.docker); },
         attachment(challenge: Challenge): string { return challenge.attachFile ? challenge.attachFile.name || '' : path.basename(challenge.attachment); },
-        dockerPlaceholder(challenge?: Challenge): string { return (challenge?.dockerFile || challenge?.docker) ? this.docker(challenge) : 'Upload challenge docker TODO HOW CALL THIS'; },
+        dockerPlaceholder(challenge?: Challenge): string { return (challenge?.dockerFile || challenge?.docker) ? this.docker(challenge) : 'Upload challenge docker file'; },
         attachPlaceholder(challenge?: Challenge): string { return (challenge?.attachFile || challenge?.attachment) ? this.attachment(challenge) : 'Upload challenge attachment'; },
         removeAttachment(challenge: Challenge): void { Vue.set(challenge, 'attachment', ''); Vue.set(challenge, 'attachFile', null); },
         challengesFeedback(round: Round): string { return validate.challenges(round.challenges); },
@@ -300,7 +305,7 @@ export default Vue.extend({
         },
         addChallenge(round: Round): void {
             if (round.challenges == undefined) round.challenges = [];
-            let add = { order: nextOrder(round.challenges), type: ChallengeType.BASIC, editable: true, attachFile: null, dockerFile: null, previous: -1 };
+            let add = { order: nextOrder(round.challenges), type: ChallengeType.BASIC, editable: true, attachFile: null, dockerFile: null, dockerImageId: '', innerPorts: '', previous: -1 };
             round.challenges.push(Object.assign({}, add, { name: '', description: '', tag: null, points: NaN, flag: '', attachment: '', docker: '', hints: [], questions: undefined }));
         },
         previousList(round: Round, challenge: Challenge){
@@ -349,6 +354,11 @@ export default Vue.extend({
 
 <style scoped lang="scss">
 @import '@/assets/css/listform.scss';
+
+span.info {
+    font-size: var(--font-small);
+    margin-top: var(--half-margin);
+}
 
 .round {
     flex-wrap: wrap;
