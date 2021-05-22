@@ -63,6 +63,7 @@ export class Challenge {
     constructor(params?: { round: Round, name: string, description: string, tag: Tag | null, points: number, flag: string, order: number, type: ChallengeType, id?: number,
         attachment: string, docker: string, innerPorts: string, dockerImageId: string, previous: number }) {
         if (!params) return;
+        let docker = params.type == ChallengeType.INTERACTIVE;
         this.id = params.id;
         this.round = params.round;
         this.name = params.name;
@@ -71,9 +72,9 @@ export class Challenge {
         this.points = params.points;
         this.flag = params.flag;
         this.attachment = params.attachment;
-        this.docker = params.docker;
-        this.dockerImageId = params.dockerImageId;
-        this.innerPorts = params.innerPorts;
+        this.docker = docker ? params.docker : '';
+        this.dockerImageId = docker ? params.dockerImageId : '';
+        this.innerPorts = docker ? params.innerPorts : '';
         this.previous = params.previous;
         this.order = params.order;
         this.type = params.type;

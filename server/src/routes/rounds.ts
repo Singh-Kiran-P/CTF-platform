@@ -2,10 +2,8 @@ import { validForm, Form, sortRounds, ChallengeType, Challenge as VChallenge, Hi
 import { createDir, uploadFiles, uploaddir, upload, fileName, chain, unzip, parentDir } from '../files';
 import DB, { Challenge, Hint, Question, Round } from '../database';
 import { deserialize } from '@shared/objectFormdata';
-import dockerController from "../controllers/docker";
-
-
 import { isAdmin, isAuth } from '../auth/index';
+import Docker from "../controllers/docker";
 import express from 'express';
 const router = express.Router();
 
@@ -46,7 +44,6 @@ router.put('/save', isAdmin, (req, res) => {
                 docker(c) ? chain(() => upload(dir + dockerDir, c.dockerFile), () => unzip(`${dir + dockerDir}/${c.dockerFile.name}`)) : null]), (c, dir, diff) => {
                     if (attach(c) || (diff && c.attachment)) c.attachment = `${dir}${attachDir}/${c.attachFile?.name || fileName(c.attachment)}`;
                     if (docker(c) || (diff && c.docker)) c.docker = `${dir}${dockerDir}/${c.dockerFile?.name || fileName(c.docker)}`;
-                    if (c.type != ChallengeType.INTERACTIVE) c.docker = '';
                 }));
         });
 
@@ -57,11 +54,10 @@ router.put('/save', isAdmin, (req, res) => {
         DB.setRepo(DB.repo(Round), data.rounds.map(x => new Round(x)), {}, x => [x.folder], true).then(rounds => {
             let challengeRounds = rounds.map(x => Object.assign({}, x, { challenges: data.rounds.find(y => y.name == x.name)?.challenges })).filter(x => x.challenges);
             if (challengeRounds.length == 0) res.send(); else challengeRounds.forEach((round, i) => {
-                Promise.all(round.challenges.filter((c: Challenge & VChallenge) => c.type == ChallengeType.INTERACTIVE && c.dockerFile).map(c => chain(
-                    () => dockerController.deleteImage(c.dockerImageId),
-                    () => dockerController.makeImage(uploaddir + round.folder + parentDir(c.docker), `${i}-${c.order}-${new Date().getTime()}`).then(id => { console.log(id);
-                     c.dockerImageId = id }))
-                )).then(() => {
+                Promise.all(round.challenges.map((c: Challenge & VChallenge) => c.type != ChallengeType.INTERACTIVE ? Docker.deleteImage(c.dockerImageId) : (!c.dockerFile ? null : chain(
+                    () => Docker.deleteImage(c.dockerImageId),
+                    () => Docker.makeImage(uploaddir + round.folder + parentDir(c.docker), `${i}-${c.order}-${new Date().getTime()}`).then(id => c.dockerImageId = id))
+                ))).then(() => {
                     let challenges = round.challenges.map(x => new Challenge(Object.assign({}, x, { round: round })));
                     DB.setRepo(DB.repo(Challenge), challenges, { where: { round: round } }, x => cfolder(x) ? [uploaddir + round.folder + cfolder(x)] : [], true).then(challenges => {
                         challenges.map(x => Object.assign({}, x, lists(round.challenges.find(y => y.order == x.order)))).forEach(challenge => {
@@ -70,13 +66,13 @@ router.put('/save', isAdmin, (req, res) => {
                             Promise.all([
                                 hints == undefined ? null : DB.setRepo(DB.repo(Hint), hints, { where: { challenge: challenge } }),
                                 questions == undefined ? null : DB.setRepo(DB.repo(Question), questions, { where: { quiz: challenge } })
-                            ]).then(() => res.send()).catch((err) => { console.log(err); error('saving') });
+                            ]).then(() => res.send()).catch(() => error('saving'));
                         });
-                    }).catch((err) => { console.log(err); error('saving') });
-                }).catch((err) => { console.log(err); error('uploading') });
+                    }).catch(() => error('saving'));
+                }).catch(() => error('uploading'));
             });
-        }).catch((err) => { console.log(err); error('saving') });
-    }).catch((err) => { console.log(err); error('uploading') })).catch((err) => { console.log(err); error('uploading') });
+        }).catch(() => error('saving'));
+    }).catch(() => error('uploading'))).catch(() => error('uploading'));
 });
 
 export default { path: '/rounds', router };
