@@ -69,7 +69,7 @@ const validate = {
         if (challenge.type == ChallengeType.INTERACTIVE) {
             if (!v && !challenge.docker && !challenge.dockerFile) v = 'Interactive challenges require a docker file';
             if (!v && challenge.dockerFile && !challenge.dockerFile.name?.endsWith('.zip')) v = 'Challenge docker file must be contained in a .zip file';
-            if (!v) v = validateString(challenge.innerPorts, 'Challenge inner ports', -1, -1);
+            if (!v && !challenge.innerPorts) v = 'Interactive challenges require inner ports';
         }
         return v;
     },
