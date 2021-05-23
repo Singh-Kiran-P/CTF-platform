@@ -18,15 +18,17 @@ router.get("/containers", isAdmin, controller.containers_GET);
 
 router.get("/images", isAdmin, controller.images_GET);
 
-router.post("/makeImage", isAdmin, controller.makeImage_POST);
+// router.post("/makeImage", isAdmin, controller.makeImage_POST);
 
-router.post("/createChallengeContainer", isAuth, controller.createChallengeContainer_POST);
+// router.post("/createChallengeContainer", isAuth, controller.createChallengeContainer_POST);
 
-router.post("/startContainer", isAuth, controller.startContainer_POST);
+// router.post("/startContainer", isAuth, controller.startContainer_POST);
 
-router.post("/stopContainer", isAuth, controller.stopContainer_POST);
+// router.post("/stopContainer", isAuth, controller.stopContainer_POST);
 
-router.post("/resetContainer", isAuth, controller.resetContainer_POST);
+// router.post("/resetContainer", isAuth, controller.resetContainer_POST);
+
+router.get("/test", controller.test)
 
 export default { path: "/docker", router };
 
