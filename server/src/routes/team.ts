@@ -60,10 +60,10 @@ router.get('/infoDashboard', isAuth, hasTeam, (req, res) => {
 
 //TODO: get placement
 router.get('/infoDashboard/:uuid', (req, res) => {
-    let isCaptainOrAdmin: boolean = false;
+    let isCaptainOrAdmin = false;
     let isAdmin = false;
     let isCaptain = false;
-    let isMember: boolean = false;
+    let isMember = false;
     let uuid: string = req.params.uuid;
     let data = { name: '', placement: 0, points: 0, uuid: uuid, inviteCode: '' };
 

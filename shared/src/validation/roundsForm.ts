@@ -10,10 +10,11 @@ enum ChallengeType {
     INTERACTIVE = 'interactive'
 }
 
+type Solve = { name: string, points: number };
 type Question = { question: string, answer: string, order: number };
 type Hint = { name: string, content: string, cost: number, order: number };
-type Challenge = { id?: number, name: string, description: string, tag: Tag | null, points: number, flag: string, order: number, type: ChallengeType, hints: Hint[] | undefined,
-    attachment: string, attachFile: File | UFile | null, questions: Question[] | undefined, previous: number,
+type Challenge = { id?: number, round?: Round, name: string, description: string, tag: Tag | null, points: number, flag: string, order: number, type: ChallengeType,
+    attachment: string, attachFile: File | UFile | null, hints: Hint[] | undefined, questions: Question[] | undefined, solves?: Solve[], lock: number,
     docker: string, dockerImageId: string, innerPorts: string, dockerFile: File | UFile | null };
 type Round = { id? :number, name: string, folder: string, start: string, end: string, description: string, challenges: Challenge[] | undefined };
 type Form = { rounds: Round[] };
@@ -27,9 +28,15 @@ const timeDisplay = (round: Round): string => {
 
 const sortRounds = (rounds: Round[]): Round[] => [...rounds].sort((a, b) => new Date(a.start) < new Date(b.start) ? -1 : 1);
 const times = (round: Round) => [round.start, round.end].map(time => new Date(time).getTime());
-const validForm = (f: Form): boolean => isf.form(f) && state(validate.rounds(f.rounds)) && f.rounds.every(r => state(validate.round(r, f.rounds)) && validChallenges(r.challenges));
-const validChallenges = (cs?: Challenge[]): boolean => isf.challenges(cs) && state(validate.challenges(cs)) && (cs || []).every(c => validChallenge(c, cs));
-const validChallenge = (c: Challenge, cs?: Challenge[]) => state(validate.challenge(c, cs)) && validHints(c.hints) && (c.type != ChallengeType.QUIZ || validQuestions(c.questions));
+
+const validForm = (f: Form): boolean => isf.form(f) && state(validate.rounds(f.rounds)) && f.rounds.every(r => state(validate.round(r, f.rounds)) && validChallenges(r.challenges, true));
+const validChallenges = (cs?: Challenge[], create?: boolean): boolean => isf.challenges(cs) && state(validate.challenges(cs)) && (cs || []).every(c => validChallenge(c, cs, create));
+
+const validChallenge = (c: Challenge, cs?: Challenge[], create?: boolean): boolean => {
+    return isf.challenge(c) && state(validate.challenge(c, cs, create)) && validSolves(c.solves) && validHints(c.hints) && (c.type != ChallengeType.QUIZ || validQuestions(c.questions));
+}
+
+const validSolves = (solves?: Solve[]): boolean => isf.solves(solves);
 const validHints = (hints?: Hint[]): boolean => isf.hints(hints) && state(validate.hints(hints)) && (hints || []).every(h => state(validate.hint(h)));
 const validQuestions = (questions?: Question[]): boolean => isf.questions(questions) && state(validate.questions(questions)) && (questions || []).every(q => state(validate.question(q)));
 
@@ -39,7 +46,7 @@ const validate = {
     hints: (hints?: Hint[]): string => hints ? validateList(hints, 'hint', false) : '',
     questions: (questions?: Question[]): string => questions ? validateList(questions, 'question', true) : '',
 
-    round: (round: Round, rounds: Round[], add: boolean = false): string => {
+    round: (round: Round, rounds: Round[], add?: boolean): string => {
         let v = validateCharacters(round.name, 'Round name', true);
         if (!v) v = validateString(round.name, 'Round name', 3, 32, !add, rounds.map(r => r.name), !add);
         if (!v) v = validateString(round.start, 'Round start', -1, -1, !add);
@@ -54,13 +61,13 @@ const validate = {
         });
         return v;
     },
-    challenge: (challenge: Challenge, challenges?: Challenge[], add: boolean = false): string => {
+    challenge: (challenge: Challenge, challenges?: Challenge[], create?: boolean, add?: boolean): string => { // TODO: flag not always required
         let v = validateCharacters(challenge.name, 'Challenge name', !add);
         if (!v) v = validateString(challenge.name, 'Challenge name', 3, 32, !add, (challenges || []).map(c => c.name), !add);
         if (!v) v = validateNumber(challenge.points, 'Challenge points', false);
-        if (!v) v = validateString(challenge.flag, 'Challenge flag', -1, -1, !add);
-        if (!v && challenge.previous >= 0 && challenges && !challenges.find(c => c.order == challenge.previous)) v = 'Previous TODO NAME challenge does not exist';
-        if (!v && challenge.previous >= challenge.order) v = 'Previous TODO NAME challenge must be ordered before this one';
+        if (!v && create) v = validateString(challenge.flag, 'Challenge flag', -1, -1, !add);
+        if (!v && challenge.lock >= 0 && challenges && !challenges.find(c => c.order == challenge.lock)) v = 'Challenge lock does not exist';
+        if (!v && challenge.lock >= challenge.order) v = 'Challenge lock must be ordered before this challenge';
         if (challenge.type == ChallengeType.INTERACTIVE) {
             if (!v && !challenge.docker && !challenge.dockerFile) v = 'Interactive challenges require a docker file';
             if (!v && challenge.dockerFile && !challenge.dockerFile.name?.endsWith('.zip')) v = 'Challenge docker file must be contained in a .zip file';
@@ -68,12 +75,12 @@ const validate = {
         }
         return v;
     },
-    hint: (hint: Hint, add: boolean = false): string => {
+    hint: (hint: Hint, add?: boolean): string => {
         let v = validateString(hint.name, 'Hint name', 3, 32, !add);
         if (!v) v = validateString(hint.content, 'Hint content', -1, -1, !add);
         return v || validateNumber(hint.cost, 'Hint cost', false);
     },
-    question: (question: Question, add: boolean = false): string => {
+    question: (question: Question, add?: boolean): string => {
         let v = validateString(question.question, 'Quiz question', -1, -1, !add);
         return v || validateString(question.answer, 'Question answer', -1, -1, !add);
     }
@@ -92,14 +99,18 @@ const isf = {
 
     challenge: (challenge: any): boolean => {
         let v = is.object(challenge) && is.string(challenge.name) && is.string(challenge.description) && is.number(challenge.points) && is.string(challenge.flag);
-        v = v && is.string(challenge.attachment) && is.string(challenge.docker) && is.number(challenge.order) && is.number(challenge.previous);
+        v = v && is.string(challenge.attachment) && is.string(challenge.docker) && is.number(challenge.order) && is.number(challenge.lock);
         return v && isf.tag(challenge.tag) && isf.type(challenge.type) && isf.hints(challenge.hints) && isf.questions(challenge.questions);
     },
     tag: (tag: any): boolean => tag == null || iscf.tag(tag),
     type: (type: any): boolean => type == ChallengeType.BASIC || type == ChallengeType.QUIZ || type == ChallengeType.INTERACTIVE,
+    solves: (solves: any): boolean => solves == undefined || is.array(solves, isf.solve),
     hints: (hints: any): boolean => hints == undefined || is.array(hints, isf.hint),
     questions: (questions: any): boolean => questions == undefined || is.array(questions, isf.question),
 
+    solve: (solve: any): boolean => {
+        return is.object(solve) && is.string(solve.name) && is.number(solve.points);
+    },
     hint: (hint: any): boolean => {
         return is.object(hint) && is.string(hint.name) && is.string(hint.content) && is.number(hint.cost) && is.number(hint.order);
     },
@@ -110,5 +121,5 @@ const isf = {
 
 export {
     state, validInput, timeDisplay, sortRounds, validForm, validChallenges, validChallenge, validHints, validQuestions,
-    validate, Question, Hint, Challenge, Round, Form, ChallengeType
+    validate, Solve, Question, Hint, Challenge, Round, Form, ChallengeType
 };

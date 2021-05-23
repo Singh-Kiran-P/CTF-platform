@@ -1,7 +1,10 @@
 <template>
     <Loading v-if="!loaded"/>
+    <div v-else-if="!challenge">
+        <span>TODO: error</span>    
+    </div>
     <div v-else>
-        
+        <span>{{JSON.stringify(challenge)}}</span>
     </div>
 </template>
 
@@ -19,10 +22,14 @@ export default Vue.extend({
         Collapse
     },
     created() {
-        axios.get('/api/rounds/challenge/' + this.$route.params.id).then(res => {
+        axios.get('/api/challenges/' + this.$route.params.id).then(res => {
             this.loaded = true;
             if (validChallenge(res.data)) this.challenge = res.data;
 
+            setTimeout(() => { // TODO: show timer
+                if (this.challenge?.round && new Date() > new Date(this.challenge.round.end))
+                    location.reload();
+            }, 1000);
         });
     },
     data: () => ({
@@ -40,5 +47,7 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-
+span {
+    display: block;
+}
 </style>

@@ -74,23 +74,14 @@ class Database extends EventEmitter {
      * returns the repository for the given entity, assumes the database is connected
      */
     repo<E>(entity: EntityTarget<E>): Repository<E> {
-        if (this.conn) {
-            return this.conn.getRepository(entity);
-        }
+        return this.conn.getRepository(entity);
     }
 
     /**
      * returns an instance of the given custom repository, assumes the database is connected
      */
     crepo<E>(entity: ObjectType<E>): E {
-        if (this.conn) {
-            return this.conn.getCustomRepository(entity);
-        }
-    }
-    connection() {
-        if (this.conn) {
-            return this.conn;
-        }
+        return this.conn.getCustomRepository(entity);
     }
 
     /**
@@ -105,7 +96,7 @@ class Database extends EventEmitter {
      */
     setRepo<E>(repo: Repository<E>, set: E[], where: FindManyOptions<E>, files: (x: E) => string[], returnRepo: true): Promise<E[]>;
     setRepo<E>(repo: Repository<E>, set: E[], where?: FindManyOptions<E>, files?: (x: E) => string[], returnRepo?: false): Promise<void>;
-    setRepo<E>(repo: Repository<E>, set: E[], where: FindManyOptions<E> = {}, files: (x: E) => string[] = () => [], returnRepo: boolean = false) {
+    setRepo<E>(repo: Repository<E>, set: E[], where: FindManyOptions<E> = {}, files: (x: E) => string[] = () => [], returnRepo?: boolean) {
         const id = (x: any): number => x.id || -1;
         return new Promise<void | E[]>((resolve, reject) => {
             const done = () => returnRepo ? repo.find(where).then(items => resolve(items)).catch(err => reject(err)) : resolve();

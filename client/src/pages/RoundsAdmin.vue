@@ -24,6 +24,9 @@
                         <Collapse label=Challenges noborder v-model="round.challengesVisible" :loading="round.challengesLoading" @toggle="toggledChallenges(round)">
                             <div :class="['list-item', { nostyle: challenge.editable }]" v-for="challenge in round.challenges" :key="challenge.order">
                                 <div class=item-content v-if="!challenge.editable">
+                                    <span v-if="challenge.lock >= 0">
+                                        <font-awesome-icon icon=lock /> Locked until <b>{{lockedName(challenge, round.challenges)}}</b> is solved
+                                    </span>
                                     <span class=item-name>{{challenge.name}}</span>
                                     <span class="item-description nowrap">{{challenge.description}}</span>
                                     <span class=item-description v-if="challenge.tag">
@@ -65,8 +68,8 @@
                                         <b-form-file v-model="challenge.attachFile" :placeholder="attachPlaceholder(challenge)" :state="state(challengeFeedback(round, challenge))"/>
                                         <b-button type=button variant=danger @click="removeAttachment(challenge)"><font-awesome-icon icon=times /></b-button>
                                     </div>
-                                    <span class=input-tag>Previous TODO OTHER NAME</span>
-                                    <b-form-select v-model="challenge.previous" :options="previousList(round, challenge)" :state="state(challengeFeedback(round, challenge))"/>
+                                    <span class=input-tag>Challenge lock</span>
+                                    <b-form-select v-model="challenge.lock" :options="lockOptions(round, challenge)" :state="state(challengeFeedback(round, challenge))"/>
                                     <span class=input-tag>Type</span>
                                     <b-form-select v-model="challenge.type" :options="types" :state="state(challengeFeedback(round, challenge))" @input="changedType(challenge)"/>
                                     <template v-if="challenge.type == typeValues.INTERACTIVE">
@@ -263,7 +266,7 @@ export default Vue.extend({
         },
 
         timeDisplay(round: Round): string { return timeDisplay(round); },
-        roundFeedback(round: Round, add: boolean = false): string { return validate.round(round, this.form.rounds, add); },
+        roundFeedback(round: Round, add?: boolean): string { return validate.round(round, this.form.rounds, add); },
         removeRound(round: Round): void { this.form.rounds = this.form.rounds.filter(x => x != round); },
         editRound(round: Round & Editable): void {
             if (round.editable && !state(this.roundFeedback(round))) return;
@@ -279,9 +282,10 @@ export default Vue.extend({
             toggledItems(round, 'challengesLoading', round.challengesVisible, round.challenges, r => this.loadChallenges(r));
         },
         loadChallenges(round: Round): Promise<void> {
-            return loadItems(round, 'challenges', 'challengesLoading', 'challengesVisible', '/api/rounds/challenges/', (data: any) => validChallenges(data));
+            return loadItems(round, 'challenges', 'challengesLoading', 'challengesVisible', '/api/rounds/challenges/', (data: any) => validChallenges(data, true));
         },
 
+        lockedName(challenge: Challenge, challenges: Challenge[]): string { return challenges.find(c => c.order == challenge.lock)?.name || ''; },
         typeText(type: string): string { return type == ChallengeType.INTERACTIVE ? 'Interactive' : (type == ChallengeType.QUIZ ? 'Quiz' : 'Basic'); },
         docker(challenge: Challenge): string { return challenge.dockerFile ? challenge.dockerFile.name || '' : path.basename(challenge.docker); },
         attachment(challenge: Challenge): string { return challenge.attachFile ? challenge.attachFile.name || '' : path.basename(challenge.attachment); },
@@ -289,15 +293,15 @@ export default Vue.extend({
         attachPlaceholder(challenge?: Challenge): string { return (challenge?.attachFile || challenge?.attachment) ? this.attachment(challenge) : 'Upload challenge attachment'; },
         removeAttachment(challenge: Challenge): void { Vue.set(challenge, 'attachment', ''); Vue.set(challenge, 'attachFile', null); },
         challengesFeedback(round: Round): string { return validate.challenges(round.challenges); },
-        challengeFeedback(round: Round, challenge: Challenge, add: boolean = false): string { return validate.challenge(challenge, round.challenges, add); },
+        challengeFeedback(round: Round, challenge: Challenge, add?: boolean): string { return validate.challenge(challenge, round.challenges, add); },
         removeChallenge(round: Round, challenge: Challenge): void { round.challenges = round.challenges?.filter(x => x.order != challenge.order) || []; },
         challengeDown(round: Round, challenge: Challenge): void {
             let order = challenge.order;
             moveDown(round.challenges || [], challenge.order);
             let next = round.challenges?.find(c => c.order > order)?.order || -1;
             if (next > -1 && order > -1) round.challenges?.forEach(c => {
-                let set = c.previous == order ? next : (c.previous == next ? order : c.previous);
-                if (set != c.previous) Vue.set(c, 'previous', set);
+                let set = c.lock == order ? next : (c.lock == next ? order : c.lock);
+                if (set != c.lock) Vue.set(c, 'lock', set);
             });
         },
         editChallenge(round: Round, challenge: Challenge & Editable): void {
@@ -305,11 +309,11 @@ export default Vue.extend({
         },
         addChallenge(round: Round): void {
             if (round.challenges == undefined) round.challenges = [];
-            let add = { order: nextOrder(round.challenges), type: ChallengeType.BASIC, editable: true, attachFile: null, dockerFile: null, dockerImageId: '', innerPorts: '', previous: -1 };
+            let add = { order: nextOrder(round.challenges), type: ChallengeType.BASIC, editable: true, attachFile: null, dockerFile: null, dockerImageId: '', innerPorts: '', lock: -1 };
             round.challenges.push(Object.assign({}, add, { name: '', description: '', tag: null, points: NaN, flag: '', attachment: '', docker: '', hints: [], questions: undefined }));
         },
-        previousList(round: Round, challenge: Challenge){
-            return [{ value: -1, text: 'No previous TODO NAME' }].concat(round.challenges?.filter(c => c.order < challenge.order).map(c => ({ value: c.order, text: c.name })) || []);
+        lockOptions(round: Round, challenge: Challenge){
+            return [{ value: -1, text: 'Unlocked' }].concat(round.challenges?.filter(c => c.order < challenge.order).map(c => ({ value: c.order, text: c.name })) || []);
         },
         changedType(challenge: Challenge) {
             if (challenge.type == ChallengeType.QUIZ && challenge.questions == undefined) this.toggledQuestions(challenge, true);
@@ -328,7 +332,7 @@ export default Vue.extend({
         },
 
         hintsFeedback(challenge: Challenge): string { return validate.hints(challenge.hints); },
-        hintFeedback(hint: Hint, add: boolean = false): string { return validate.hint(hint, add); },
+        hintFeedback(hint: Hint, add?: boolean): string { return validate.hint(hint, add); },
         hintDown(challenge: Challenge, hint: Hint): void { moveDown(challenge.hints || [], hint.order); },
         removeHint(challenge: Challenge, hint: Hint): void { challenge.hints = challenge.hints?.filter(x => x.order != hint.order) || []; },
         editHint(hint: Hint & Editable): void { if (!hint.editable || state(this.hintFeedback(hint))) Vue.set(hint, 'editable', !hint.editable); },
@@ -339,7 +343,7 @@ export default Vue.extend({
         },
 
         questionsFeedback(challenge: Challenge): string { return validate.questions(challenge.questions); },
-        questionFeedback(question: Question, add: boolean = false): string { return validate.question(question, add); },
+        questionFeedback(question: Question, add?: boolean): string { return validate.question(question, add); },
         questionDown(challenge: Challenge, question: Question): void { moveDown(challenge.questions || [], question.order); },
         removeQuestion(challenge: Challenge, question: Question): void { challenge.questions = challenge.questions?.filter(x => x.order != question.order) || []; },
         editQuestion(question: Question & Editable): void { if (!question.editable || state(this.questionFeedback(question))) Vue.set(question, 'editable', !question.editable); },
@@ -398,10 +402,8 @@ span.info {
     width: 100%;
     margin: var(--margin) 0;
 
-    .list-item {
-        &.nostyle {
-            display: block;
-        }
+    .list-item.nostyle {
+        display: block;
     }
 
     .edit-challenge-header {

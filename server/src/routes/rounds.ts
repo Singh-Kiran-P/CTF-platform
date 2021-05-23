@@ -1,15 +1,20 @@
 import { validForm, Form, sortRounds, ChallengeType, Challenge as VChallenge, Hint as VHint, Question as VQuestion } from '@shared/validation/roundsForm';
 import { createDir, uploadFiles, uploaddir, upload, fileName, chain, unzip, parentDir } from '../files';
 import DB, { Challenge, Hint, Question, Round } from '../database';
+import { isAdmin, isAuth, getAccount } from '../auth/index';
 import { deserialize } from '@shared/objectFormdata';
-import { isAdmin, isAuth } from '../auth/index';
 import Docker from "../controllers/docker";
 import express from 'express';
 const router = express.Router();
 
-const isAvailable = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    if (req.isAuthenticated()) next();
-    else res.json({ error: 'Unauthorized request' });
+const roundStarted = (roundId: number | string, req: express.Request, res: express.Response, next: (round: Round) => any) => {
+    let error = () => res.send({ error: 'Error fetching data' });
+    DB.repo(Round).findOne(roundId).then(round => {
+        if (!round) return error();
+        return next(round); // TODO: remove this line
+        if (new Date(round.start) < new Date()) next(round);
+        else isAdmin(req, res, (err: any) => err ? error() : next(round));
+    }).catch(() => error());
 }
 
 router.get('/data', isAuth, (_, res) => {
@@ -17,17 +22,14 @@ router.get('/data', isAuth, (_, res) => {
 });
 
 router.get('/challenges/:round', isAuth, (req, res) => {
-    let error = () => res.send({ error: 'Error fetching data' });
-    let respond = () => DB.respond(DB.repo(Challenge).find({ where: { round: req.params.round }, order: { order: 'ASC' }, relations: ['tag'] }), res);
-    respond(); // TODO: delete this, following block instead
-    /* TODO: DB.repo(Round).findOne(req.params.round).then(round => {
-        if (!round) return error();
-        if (new Date(round.start) < new Date()) respond();
-        else isAdmin(req, res, (err: any) => err ? error() : respond());
-    }); */
+    let admin = getAccount(req).admin;
+    roundStarted(req.params.round, req, res, round => {
+        DB.respond(DB.repo(Challenge).find({ where: { round: round.id }, order: { order: 'ASC' }, relations: ['tag'] }), res, cs => cs.map(c =>
+            admin ? c : Object.assign({}, c, { flag: '' })
+        ));
+    });
 });
 
-router.get('/challenge/:id', isAdmin, (req, res) => DB.respond(DB.repo(Challenge).findOne(req.params.id), res)); // TODO proper auth
 router.get('/challenge/hints/:challenge', isAdmin, (req, res) => DB.respond(DB.repo(Hint).find({ where: { challenge: req.params.challenge }, order: { order: 'ASC' } }), res));
 router.get('/challenge/questions/:quiz', isAdmin, (req, res) => DB.respond(DB.repo(Question).find({ where: { quiz: req.params.quiz }, order: { order: 'ASC' } }), res));
 

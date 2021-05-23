@@ -25,13 +25,13 @@ const validate = {
     tags: (tags: Tag[]): string => validateList(tags, 'tag', false),
     sponsors: (sponsors: Sponsor[]): string => validateList(sponsors, 'sponsor', false),
 
-    category: (category: Category, categories: Category[], add: boolean = false): string => {
+    category: (category: Category, categories: Category[], add?: boolean): string => {
         return validateString(category.name, 'Category', 3, 32, !add, categories.map(x => x.name), !add);
     },
-    tag: (tag: Tag, tags: Tag[] = [], add: boolean = false): string => {
+    tag: (tag: Tag, tags: Tag[] = [], add?: boolean): string => {
         return validateString(tag.name, 'Tag name', 3, 32, !add, tags.map(x => x.name), !add);
     },
-    page: (page: Page, pages: Page[], add: boolean = false): string => {
+    page: (page: Page, pages: Page[], add?: boolean): string => {
         let v = validateString(page.name, 'Page name', 3, 32, !add);
         if (!v && page.path && !page.path.startsWith('/')) v = `Page path must start with '/'`;
         if (!v && page.path.startsWith('/api')) v = `Page path cannot start with '/api'`;
@@ -45,7 +45,7 @@ const validate = {
         if (!v && page.zip && !page.zip.name?.endsWith('.zip')) v = 'Page dependencies must be contained in a .zip file';
         return v;
     },
-    sponsor: (sponsor: Sponsor, sponsors: Sponsor[], add: boolean = false): string => {
+    sponsor: (sponsor: Sponsor, sponsors: Sponsor[], add?: boolean): string => {
         let v = validateCharacters(sponsor.name, 'Sponsor name', true);
         if (!v) v = validateString(sponsor.name, 'Sponsor name', 3, 32, !add, sponsors.map(x => x.name), !add);
         if (!v) v = validateString(sponsor.link, 'Sponsor link', -1, 128, !add);

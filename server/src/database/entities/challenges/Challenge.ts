@@ -34,7 +34,7 @@ export class Challenge {
     hints: Hint[];
 
     @Column()
-    previous: number;
+    lock: number;
 
     @Column()
     order: number;
@@ -61,7 +61,7 @@ export class Challenge {
     environments: Environment[]; // TODO: remove this?
 
     constructor(params?: { round: Round, name: string, description: string, tag: Tag | null, points: number, flag: string, order: number, type: ChallengeType, id?: number,
-        attachment: string, docker: string, innerPorts: string, dockerImageId: string, previous: number }) {
+        attachment: string, docker: string, innerPorts: string, dockerImageId: string, lock: number }) {
         if (!params) return;
         let docker = params.type == ChallengeType.INTERACTIVE;
         this.id = params.id;
@@ -75,8 +75,8 @@ export class Challenge {
         this.docker = docker ? params.docker : '';
         this.dockerImageId = docker ? params.dockerImageId : '';
         this.innerPorts = docker ? params.innerPorts : '';
-        this.previous = params.previous;
         this.order = params.order;
+        this.lock = params.lock;
         this.type = params.type;
     }
 }
