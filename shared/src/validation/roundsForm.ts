@@ -27,14 +27,9 @@ const timeDisplay = (round: Round): string => {
 
 const sortRounds = (rounds: Round[]): Round[] => [...rounds].sort((a, b) => new Date(a.start) < new Date(b.start) ? -1 : 1);
 const times = (round: Round) => [round.start, round.end].map(time => new Date(time).getTime());
-
 const validForm = (f: Form): boolean => isf.form(f) && state(validate.rounds(f.rounds)) && f.rounds.every(r => state(validate.round(r, f.rounds)) && validChallenges(r.challenges));
-
-const validChallenges = (cs?: Challenge[]): boolean => {
-    let v = isf.challenges(cs) && state(validate.challenges(cs));
-    return v && (cs || []).every(c => state(validate.challenge(c, cs)) && validHints(c.hints) && (c.type != ChallengeType.QUIZ || validQuestions(c.questions)));
-}
-
+const validChallenges = (cs?: Challenge[]): boolean => isf.challenges(cs) && state(validate.challenges(cs)) && (cs || []).every(c => validChallenge(c, cs));
+const validChallenge = (c: Challenge, cs?: Challenge[]) => state(validate.challenge(c, cs)) && validHints(c.hints) && (c.type != ChallengeType.QUIZ || validQuestions(c.questions));
 const validHints = (hints?: Hint[]): boolean => isf.hints(hints) && state(validate.hints(hints)) && (hints || []).every(h => state(validate.hint(h)));
 const validQuestions = (questions?: Question[]): boolean => isf.questions(questions) && state(validate.questions(questions)) && (questions || []).every(q => state(validate.question(q)));
 
@@ -64,7 +59,7 @@ const validate = {
         if (!v) v = validateString(challenge.name, 'Challenge name', 3, 32, !add, (challenges || []).map(c => c.name), !add);
         if (!v) v = validateNumber(challenge.points, 'Challenge points', false);
         if (!v) v = validateString(challenge.flag, 'Challenge flag', -1, -1, !add);
-        if (!v && challenge.previous >= 0 && !challenges?.find(c => c.order == challenge.previous)) v = 'Previous TODO NAME challenge does not exist';
+        if (!v && challenge.previous >= 0 && challenges && !challenges.find(c => c.order == challenge.previous)) v = 'Previous TODO NAME challenge does not exist';
         if (!v && challenge.previous >= challenge.order) v = 'Previous TODO NAME challenge must be ordered before this one';
         if (challenge.type == ChallengeType.INTERACTIVE) {
             if (!v && !challenge.docker && !challenge.dockerFile) v = 'Interactive challenges require a docker file';
@@ -113,4 +108,7 @@ const isf = {
     }
 }
 
-export { state, validInput, timeDisplay, sortRounds, validForm, validChallenges, validHints, validQuestions, validate, Question, Hint, Challenge, Round, Form, ChallengeType };
+export {
+    state, validInput, timeDisplay, sortRounds, validForm, validChallenges, validChallenge, validHints, validQuestions,
+    validate, Question, Hint, Challenge, Round, Form, ChallengeType
+};

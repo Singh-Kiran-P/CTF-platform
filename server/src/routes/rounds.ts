@@ -7,6 +7,11 @@ import Docker from "../controllers/docker";
 import express from 'express';
 const router = express.Router();
 
+const isAvailable = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    if (req.isAuthenticated()) next();
+    else res.json({ error: 'Unauthorized request' });
+}
+
 router.get('/data', isAuth, (_, res) => {
     DB.respond(DB.repo(Round).find(), res, rounds => ({ rounds: sortRounds(rounds.map(round => Object.assign({}, round, { challenges: undefined }))) }));
 });
@@ -14,14 +19,15 @@ router.get('/data', isAuth, (_, res) => {
 router.get('/challenges/:round', isAuth, (req, res) => {
     let error = () => res.send({ error: 'Error fetching data' });
     let respond = () => DB.respond(DB.repo(Challenge).find({ where: { round: req.params.round }, order: { order: 'ASC' }, relations: ['tag'] }), res);
-    DB.repo(Round).findOne(req.params.round).then(round => {
+    respond(); // TODO: delete this, following block instead
+    /* TODO: DB.repo(Round).findOne(req.params.round).then(round => {
         if (!round) return error();
         if (new Date(round.start) < new Date()) respond();
-        else respond(); // TODO: REMOVE THIS DO THE FOLLOWING LINE INSTEAD
-        // TODO: else isAdmin(req, res, (err: any) => err ? error() : respond());
-    });
+        else isAdmin(req, res, (err: any) => err ? error() : respond());
+    }); */
 });
 
+router.get('/challenge/:id', isAdmin, (req, res) => DB.respond(DB.repo(Challenge).findOne(req.params.id), res)); // TODO proper auth
 router.get('/challenge/hints/:challenge', isAdmin, (req, res) => DB.respond(DB.repo(Hint).find({ where: { challenge: req.params.challenge }, order: { order: 'ASC' } }), res));
 router.get('/challenge/questions/:quiz', isAdmin, (req, res) => DB.respond(DB.repo(Question).find({ where: { quiz: req.params.quiz }, order: { order: 'ASC' } }), res));
 

@@ -1,17 +1,17 @@
 import path from 'path';
 import 'reflect-metadata';
-import dotenv from 'dotenv';
 import EventEmitter = require('events');
 import { Connection, createConnection, EntityTarget, FindManyOptions, ObjectType, Repository } from 'typeorm';
 import { chain, remove } from '../files';
 import loadTestData from './testData';
 import express from 'express';
+import dotenv from 'dotenv';
 dotenv.config();
 
 // TODO: create entity CRUD operations (custom entity repositories)
 
+// defines all events the database can emit
 interface DatabaseEvents {
-    // defines all events the database can emit
     connect: () => void;
     error: (error: any) => void;
 }
@@ -62,8 +62,6 @@ class Database extends EventEmitter {
             this.conn = conn;
             await this.conn.query(`SET search_path TO ${process.env.DB_SCHEMA};`);
             if (this.loadTestData) await loadTestData();
-            console.log('Connected to Database!');
-
             this.emit('connect');
         }).catch(error => this.emit('error', error));
     }
@@ -166,9 +164,7 @@ export { Attempt, AttemptType } from './entities/connections/Attempt';
 export { Environment } from './entities/connections/Environment';
 export { Solve } from './entities/connections/Solve';
 export { UsedHint } from './entities/connections/UsedHint';
-
+export { Notification } from './entities/notification/Notification';
 export { DockerChallengeContainer } from './entities/docker/DockerChallengeContainer';
 export { DockerManagement, DockerManagementRepo } from './entities/docker/DockerManagement';
-export { DockerOpenPort } from './entities/docker/DockerOpenPort'
-
-export { Notification } from './entities/notification/Notification'
+export { DockerOpenPort } from './entities/docker/DockerOpenPort';

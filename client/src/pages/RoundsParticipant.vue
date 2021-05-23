@@ -10,6 +10,7 @@
                     @toggle="toggledChallenges(currentRound)">
                     <div class="challenge list-item" v-for="challenge in currentRound.challenges" :key="challenge.order">
                         <span class=item-name>{{challenge.name}}</span>
+                        <span>TODO DISPLAY GOOD</span>
                     </div>
                 </Collapse>
             </div>
@@ -20,7 +21,7 @@
                 <span>TODO: no current round, competition ended</span>
             </div>
 
-            <Collapse v-if="nextRounds.length > 0" label="Next rounds" :large="true" :value="currentRound == undefined">
+            <Collapse v-if="nextRounds.length > 0" label="Next rounds" :large="true" :noborder="true" :value="currentRound == undefined">
                 <div class="round list-item" v-for="round in nextRounds" :key="round.start">
                     <span class=item-name>{{round.name}}</span>
                     <span>{{timeDisplay(round)}}</span>
@@ -29,10 +30,17 @@
                 </div>
             </Collapse>
 
-            <Collapse label="Past rounds" v-if="pastRounds.length > 0">
-                <div v-for="round in pastRounds" :key="round.start">
-                    <span>{{round.name}}</span>
-                    <span>TODO DISPLAY</span>
+            <Collapse class=past-rounds label="Past rounds" v-if="pastRounds.length > 0" :large="true">
+                <div class=previous v-for="round in pastRounds" :key="round.start">
+                    <span class=round-name>{{round.name}}</span>
+                    <span class=round-time>{{timeDisplay(round)}}</span>
+                    <span class=round-description>{{round.description}}</span>
+                    <Collapse class=challenges label="Challenges" v-model="round.visible" :loading="round.loading" @toggle="toggledChallenges(round)">
+                        <div class="challenge list-item" v-for="challenge in round.challenges" :key="challenge.order">
+                            <span class=item-name>{{challenge.name}}</span>
+                            <span>TODO DISPLAY GOOD</span>
+                        </div>
+                    </Collapse>
                 </div>
             </Collapse>
         </div>
@@ -67,6 +75,8 @@ export default Vue.extend({
                 this.toggledChallenges(this.currentRound);
                 toggledItems(this.currentRound, 'loading', true, undefined, r => this.loadChallenges(r));
             }
+
+            setInterval(() => this.time = new Date(), 1000);
         });
     },
     data: () => ({
@@ -76,9 +86,9 @@ export default Vue.extend({
         loaded: false
     }),
     computed: {
-        pastRounds(): Round[] { return this.rounds.filter(r => new Date(r.end) < this.time); },
+        pastRounds(): Round[] { return this.rounds.filter(r => new Date(r.start) > this.time); }, // TODO: r => new Date(r.end) < this.time);
         nextRounds(): Round[] { return this.rounds.filter(r => new Date(r.start) > this.time); },
-        currentRound(): (Round & Visible) | undefined { return this.rounds[0]; }// TODO: this.rounds.find(r => new Date(r.start) > this.time && new Date(r.end) < this.time); }
+        currentRound(): (Round & Visible) | undefined { return this.rounds[0]; } // TODO: this.rounds.find(r => new Date(r.start) > this.time && new Date(r.end) < this.time); }
     },
     methods: {
         timeDisplay(round: Round) { return timeDisplay(round); },
@@ -113,10 +123,6 @@ span {
 
     .round {
         display: block;
-
-        &:last-child {
-            margin-bottom: var(--margin);
-        }
     }
 }
 
@@ -131,8 +137,8 @@ span {
 }
 
 .round-time {
-    padding-bottom: var(--margin);
     margin-bottom: var(--margin);
+    padding-bottom: var(--margin);
     border-bottom: 2px solid black;
 }
 
@@ -141,10 +147,38 @@ span {
 }
 
 .challenges {
-    margin: var(--double-margin) 0;
+    margin: var(--margin) 0;
 
     .challenge:last-child {
         margin-bottom: var(--double-margin);
+    }
+}
+
+.past-rounds {
+    margin-top: var(--margin);
+    padding-top: var(--margin);
+    border-top: 2px solid black;
+}
+
+.previous {
+    padding: var(--double-margin) 0;
+
+    .round-name, .round-time, .round-description {
+        text-align: initial;
+    }
+
+    .round-time {
+        border: initial;
+        margin: initial;
+        padding: initial;
+    }
+
+    .challenges {
+        margin: initial;
+
+        .challenge:last-child {
+            margin-bottom: var(--margin);
+        }
     }
 }
 </style>

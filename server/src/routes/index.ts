@@ -6,7 +6,6 @@ import uploads from './uploads';
 import competition from './competition';
 import docker from './docker';
 import util from './util';
-import pages from './pages';
 import notification from './notification'
 
 export default [
@@ -16,7 +15,6 @@ export default [
     auth,
     util,
     team,
-    pages,
     rounds,
     uploads,
     account,
