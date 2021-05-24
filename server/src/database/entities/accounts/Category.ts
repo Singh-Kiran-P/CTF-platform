@@ -15,8 +15,10 @@ export class Category {
     @OneToMany(_ => Account, account => account.category)
     accounts: Account[];
 
-    constructor(name: string, order: number) {
-        this.name = name;
-        this.order = order;
+    constructor(params?: { name: string, order: number, id?: number }) {
+        if (!params) return;
+        this.id = params.id;
+        this.name = params.name;
+        this.order = params.order;
     }
 }

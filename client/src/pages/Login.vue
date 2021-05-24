@@ -7,14 +7,11 @@
             >
                 <b-form-group label="Username" label-for="username">
                     <b-form-input
-                        id="username"
-                        type="text"
+                        id=username
+                        type=text trim
                         v-model="form.username"
                         placeholder="Enter username"
-                        v-on:input="
-                            usernameFeedback = '';
-                            passwordFeedback = '';
-                        "
+                        @input="usernameFeedback = ''; passwordFeedback = ''"
                         :state="state(usernameFeedback)"
                     />
                     <b-form-invalid-feedback>{{
@@ -28,7 +25,7 @@
                         type="password"
                         v-model="form.password"
                         placeholder="Enter password"
-                        v-on:input="passwordFeedback = ''"
+                        @input="passwordFeedback = ''"
                         :state="state(passwordFeedback)"
                     />
                     <b-form-invalid-feedback>{{
@@ -93,12 +90,8 @@ export default Vue.extend({
     },
     methods: {
         state,
-        validForm(): boolean {
-            return (
-                validInput(this.usernameFeedback, this.username) &&
-                validInput(this.passwordFeedback, this.password)
-            );
-        },
+        validForm(): boolean { return validInput(this.usernameFeedback, this.form.username) && validInput(this.passwordFeedback, this.form.password); },
+
         onSubmit(e: Event): void {
             e.preventDefault();
             this.loginState = "loading";

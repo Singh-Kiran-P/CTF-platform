@@ -1,5 +1,5 @@
 /**
- * @auther Kiran Singh
+ * @author Kiran Singh
  */
 import { Request, Response, NextFunction } from 'express';
 import DB, { Notification } from '../database';

@@ -17,6 +17,25 @@ services:
     networks:
       - mynet
 
+  pgAdmin:
+    container_name: pgAdmin
+    restart: always
+    image: dpage/pgadmin4
+    environment:
+        PGADMIN_DEFAULT_EMAIL: admin@linuxhint.com
+        PGADMIN_DEFAULT_PASSWORD: secret
+        PGADMIN_LISTEN_PORT: 80
+    ports:
+        - '8080:80'
+    volumes:
+        - pgadmin-data:/var/lib/pgadmin
+    depends_on:
+        - postgres
+    links:
+        - postgres
+    networks:
+        - mynet
+
   portainer-dockerManager:
     container_name: portainer-dockerManager
     image: portainer/portainer-ce
@@ -65,6 +84,8 @@ services:
 volumes:
     ctf-db:
     portainer_data:
+    pgadmin-data:
+
 
 networks:
   mynet:

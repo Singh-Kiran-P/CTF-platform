@@ -34,7 +34,9 @@ export default Vue.extend({
         timeSpanOptions: ["Hourly", "Daily", "Weekly"],
         chartData: [] as {
             date: Date,
-
+            team1: number,
+            team2: number,
+            team3: number
         }[],
     }),
     created() {},

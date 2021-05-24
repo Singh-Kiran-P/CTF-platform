@@ -11,7 +11,7 @@
 		"vetur.format.options.tabSize": 4,
 		"search.exclude": {
 			"**/package-lock.json": true,
-			"public": true
+			"uploads": true
 		}
 	}
 }

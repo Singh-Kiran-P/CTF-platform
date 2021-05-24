@@ -17,18 +17,12 @@ export class Page {
     @Column()
     order: number;
 
-    @Column()
-    authentication: number; // TODO: enum? remove this?
-
-    @Column()
-    visibility: boolean; // TODO: remove this?
-
-    constructor(name: string, path: string, source: string, order: number) {
-        this.name = name;
-        this.path = path;
-        this.source = source;
-        this.order = order;
-        this.authentication = 0;
-        this.visibility = true;
+    constructor(params?: { name: string, path: string, source: string, order: number, id?: number }) {
+        if (!params) return;
+        this.id = params.id;
+        this.name = params.name;
+        this.path = params.path;
+        this.source = params.source;
+        this.order = params.order;
     }
 }

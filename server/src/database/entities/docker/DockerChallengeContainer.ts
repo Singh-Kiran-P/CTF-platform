@@ -1,7 +1,11 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryColumn, Unique, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryColumn, UpdateDateColumn } from "typeorm";
+import { Team } from "../accounts/Team";
 import { Challenge } from "../challenges/Challenge";
-import { DockerChallengeImage } from "./DockerChallengeImage";
 
+/**
+ * One dockerChallenge is made only for one team
+ * TODO:->FK team
+ */
 @Entity()
 export class DockerChallengeContainer {
     @PrimaryColumn()
@@ -10,12 +14,13 @@ export class DockerChallengeContainer {
     @Column("int", { array: true })
     ports: number[];
 
-    @Column({ name: 'imageId' })
-    imageId: string
+    @ManyToOne(() => Challenge, { nullable: false })
+    @JoinColumn({ name: "challenge" })
+    challenge: Challenge;
 
-    @ManyToOne(() => DockerChallengeImage,{ nullable: false })
-    @JoinColumn({ name: "imageId" })
-    image: DockerChallengeImage;
+    @ManyToOne(() => Team, { nullable: false })
+    @JoinColumn({ name: "team" })
+    team: Team;
 
     @CreateDateColumn()
     createdAt: string
@@ -23,11 +28,10 @@ export class DockerChallengeContainer {
     @UpdateDateColumn({ type: "timestamp" })
     updatedAt: number
 
-    constructor(name: string, ports: number[],  imageId: string) {
+    constructor(name: string, ports: number[], team: Team, challenge: Challenge) {
         this.name = name;
         this.ports = ports;
-        this.imageId = imageId;
-
+        this.team = team;
+        this.challenge = challenge
     }
-
 }

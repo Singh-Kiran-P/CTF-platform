@@ -12,6 +12,7 @@ $primary: rgb(63, 181, 129);
     --double-margin: calc(var(--margin) * 2);
     --triple-margin: calc(var(--margin) * 3);
     --half-margin: calc(var(--margin) / 2);
+    --font-large: 1.25rem;
     --font-small: 90%;
     --font-smallest: 80%;
 }
@@ -38,15 +39,15 @@ html, body {
 }
 
 button, span {
-    word-wrap: break-word;
+    word-break: break-all;
 }
 
 textarea {
     overflow-y: hidden !important;
 }
 
-// .custom-file-label styling must be defined here for some ungodly reason, used in Config.vue
-.config .list-item {
+// .custom-file-label styling must be defined here for some ungodly reason, dont ask me why
+.list-item:not(.nostyle) .item-content.editable {
     input, textarea, .custom-file-label, .custom-file-label::after {
         margin: 0;
         padding-top: 0;

@@ -1,6 +1,7 @@
 <template>
     <b-button type=button :class="['icon', { toggled: toggled }, { darker: toggled && !icon2 }]" :disabled="disabled" @click="$emit('click', $event)">
-        <font-awesome-icon :icon="toggled && icon2 ? icon2 : icon" />
+        <b-spinner v-if="loading" small/>
+        <font-awesome-icon v-else :icon="toggled && icon2 ? icon2 : icon" />
     </b-button>
 </template>
 
@@ -14,6 +15,7 @@ export default Vue.extend({
         variant: String,
         disabled: Boolean,
         toggled: Boolean,
+        loading: Boolean,
         icon: String,
         icon2: String
     }
@@ -22,6 +24,7 @@ export default Vue.extend({
 
 <style scoped lang="scss">
 button.icon {
+    padding: 0;
     width: 1.5rem;
     height: 1.5rem;
     display: inline-flex;
