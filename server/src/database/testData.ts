@@ -62,18 +62,10 @@ async function loadTestData() {
     ]);
 
     const teamRepo = new TeamRepoCustom;
-    let teams: Team[] = [teamRepo.saveWithCaptain('Team 1', accounts[1]),
+    let teams: Team[] = await Promise.all([teamRepo.saveWithCaptain('Team 1', accounts[1]),
     teamRepo.saveWithCaptain('Team 2', accounts[2]),
-    teamRepo.saveWithCaptain('Team 3', accounts[3])];
+    teamRepo.saveWithCaptain('Team 3', accounts[3])]);
 
-    /*
-
-    let teams: Team[] = await save([
-        new Team('Team 1', accounts[1]),
-        new Team('Team 2', accounts[2]),
-        new Team('Team 3', accounts[3])
-    ]);
-    */
     /*
     for (let i = 0; i < accounts.length; ++i) { // give every account a team, COMMENT IF TESTING TEAM CONSTRUCTOR
         accounts[i].team = teams[Math.round(i * (teams.length - 1) / (accounts.length - 1))];
