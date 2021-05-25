@@ -1,151 +1,110 @@
 <template>
     <div class="leaderboard">
-        <div class="chart-settings-div">
-            <b-form-group>
-                <label for="time-span-select">Time Span</label>
-                <b-form-select
-                    @change="handleTimeSpanSelect"
-                    size="sm"
-                    id="time-span-select"
-                    v-model="timeSpan"
-                    :options="timeSpanOptions"
-                ></b-form-select>
-            </b-form-group>
-        </div>
-        <div class="chart-div" id="chart"></div>
+        <!--<Carousel :autoplay="true" :perPage="1" :paginationEnabled="false">
+            <Slide v-for="categorie in categories" :key="categorie" class=carousel-cell>
+                <Scoreboard :category="categorie" :id="categorie"></Scoreboard>
+            </Slide>
+        </Carousel>-->
+        <!--<Agile :dots="false" :nav-buttons="false" :autoplay="true" :infinite="true" :autoplay-speed="4000">
+            <div v-for="categorie in categories" :key="categorie" class=carousel-cell>
+            <Scoreboard :category="categorie" :id="categorie"></Scoreboard>
+            </div>
+        </Agile>-->
+        <!--<Scoreboard v-for="categorie in categories" :key="categorie" :category="categorie" :id="categorie"></Scoreboard>-->
+        <!--<flickity>
+            <div v-for="categorie in categories" :key="categorie" class=carousel-cell>
+                <Scoreboard :category="categorie" :id="categorie"></Scoreboard>
+            </div>
+        </flickity>-->
+        <Slider animation="fade" class="slider">
+            <SliderItem
+                v-for="categorie in categories"
+                :key="categorie"
+                class="carousel-cell"
+            >
+                <Scoreboard :category="categorie" :id="categorie"></Scoreboard>
+            </SliderItem>
+        </Slider>
     </div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import * as am4core from "@amcharts/amcharts4/core";
-import * as am4charts from "@amcharts/amcharts4/charts";
-import am4themes_animated from "@amcharts/amcharts4/themes/animated";
-import { any } from "@amcharts/amcharts4/.internal/core/utils/Array";
-
-am4core.useTheme(am4themes_animated);
+import { Carousel, Slide } from "vue-carousel";
+import { VueAgile } from "vue-agile";
+import Flickity from "vue-flickity";
+import { Slider, SliderItem } from "vue-easy-slider";
+import Scoreboard from "../components/Scoreboard.vue";
 
 export default Vue.extend({
     name: "Leaderboard",
-    components: {},
+    components: {
+        Scoreboard,
+        Carousel,
+        Slide,
+        Agile: VueAgile,
+        flickity: Flickity,
+        Slider,
+        SliderItem,
+    },
     data: () => ({
-        chart: (null as unknown) as am4charts.XYChart,
-        timeSpan: "Weekly",
-        timeSpanOptions: ["Hourly", "Daily", "Weekly"],
-        chartData: [] as {
-            date: Date,
-            team1: number,
-            team2: number,
-            team3: number
-        }[],
+        categories: [] as String[],
+        chart:[]
     }),
-    created() {},
-    methods: {
-        createSeries(
-            field: string,
-            name: string,
-            valueAxis: am4charts.ValueAxis<am4charts.AxisRenderer>
-        ) {
-            var series = this.chart.series.push(new am4charts.StepLineSeries());
-            series.dataFields.valueY = field;
-            series.dataFields.dateX = "date";
-            series.strokeWidth = 2;
-            series.yAxis = valueAxis;
-            series.name = name;
-            series.tooltipText = "{name}: [bold]{valueY}[/]";
-            series.tensionX = 0.8;
-            series.showOnInit = true;
-            var interfaceColors = new am4core.InterfaceColorSet();
-            var defaultBullet = series.bullets.push(
-                new am4charts.CircleBullet()
-            );
-            defaultBullet.circle.stroke = interfaceColors.getFor("background");
-            defaultBullet.circle.strokeWidth = 2;
-        },
-        generateChartData() {
-            var firstDate = new Date();
-            firstDate.setDate(firstDate.getDate());
-            firstDate.setHours(0, 0, 0, 0);
+    created() {
+        this.categories.push("BACH1");
+        this.categories.push("BACH2");
+        this.categories.push("BACH3");
+        this.categories.push("MAST1");
+        this.categories.push("MAST2");
 
-            var team1_points = 0;
-            var team2_points = 0;
-            var team3_points = 0;
-
-            for (var i = 0; i < 14; i++) {
-                // we create date objects here. In your data, you can have date strings
-                // and then set format of your dates using chart.dataDateFormat property,
-                // however when possible, use date objects, as this will speed up chart rendering.
-                var newDate = new Date(firstDate);
-                newDate.setDate(newDate.getDate() + i);
-
-                team1_points += (i + 5) * 10;
-                team2_points += (i + 23) * 10;
-                team3_points += i * 10;
-
-                this.chartData.push({
-                    // Save date and points per team on this date
-                    date: newDate,
-                    team1: team1_points,
-                    team2: team2_points,
-                    team3: team3_points,
-                });
-            }
-            return this.chartData;
-        },
-        handleTimeSpanSelect(span: string) {
-            console.log(span);
-        },
+        this.$socket.$subscribe("BACH 1", (data: any) => {
+            console.log(data);
+            this.$socket.$subscribe("BACH 2", (data: any) => {});
+        });
+        this.$socket.$subscribe("BACH 3", (data: any) => {
+            console.log(data);
+        });
+        this.$socket.$subscribe("MASTER 1", (data: any) => {
+            console.log(data);
+        });
+        this.$socket.$subscribe("MASTER 2", (data: any) => {
+            console.log(data);
+        });
     },
-    mounted() {
-        this.chart = am4core.create("chart", am4charts.XYChart);
-        this.chart.colors.step = 2; // Increase contrast by taking every second color
-
-        // Add data
-        this.chart.data = this.generateChartData();
-
-        // Create X axis
-        var dateAxis = this.chart.xAxes.push(new am4charts.DateAxis());
-        dateAxis.renderer.minGridDistance = 50;
-
-        // Create Y axis
-        var pointsAxis = this.chart.yAxes.push(new am4charts.ValueAxis());
-
-        // Create series
-        this.createSeries("team1", "Team 1", pointsAxis);
-        this.createSeries("team2", "Team 2", pointsAxis);
-        this.createSeries("team3", "Team 3", pointsAxis);
-
-        // Add legend
-        this.chart.legend = new am4charts.Legend();
-
-        // Add cursor
-        this.chart.cursor = new am4charts.XYCursor();
-
-        // generate scrollbar
-        let scrollbarX = new am4charts.XYChartScrollbar();
-        this.chart.scrollbarX = scrollbarX;
-    },
-
-    beforeDestroy() {
-        if (this.chart) {
-            this.chart.dispose();
-        }
-    },
+    methods: {},
+    mounted() {},
 });
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-        Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
-        "Segoe UI Symbol";
+.scoreboard {
+    height: 100%;
 }
-.chart-settings {
-    margin-top: var(--margin);
+#carousel {
+    width: 100%;
 }
-.chart-div {
-    width: 50%;
-    height: 500px;
+.carousel-cell {
+    width: 100%;
+    height: 80vh;
+    margin-right: 10px;
+    background: #8c8;
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
 }
+.slider {
+    height: 80vh !important;
+}
+
+/* cell number */
+/*.carousel-cell:before {
+  display: block;
+  text-align: center;
+  content: counter(gallery-cell);
+  line-height: 200px;
+  font-size: 80px;
+  color: white;
+}*/
 </style>
