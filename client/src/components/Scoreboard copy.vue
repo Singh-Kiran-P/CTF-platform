@@ -53,62 +53,71 @@ export default Vue.extend({
             defaultBullet.circle.stroke = interfaceColors.getFor("background");
             defaultBullet.circle.strokeWidth = 2;
         },
-        loadData() {
+        generateChartData() {
+            var chartData = [];
             var firstDate = new Date();
             firstDate.setDate(firstDate.getDate());
             firstDate.setHours(0, 0, 0, 0);
 
             var team1_points = 0;
+            var team2_points = 0;
+            var team3_points = 0;
 
-            this.teams.push({
-                uuid: "sdfds",
-                name: "dsfdsf",
-                scores: [],
-            });
-
-            this.teams.push({
-                uuid: "sdsqdfds",
-                name: "dsfqsddsf",
-                scores: [],
-            });
-
-            for (var i = 0; i < 2; i++) {
+            for (var i = 0; i < 14; i++) {
+                // we create date objects here. In your data, you can have date strings
+                // and then set format of your dates using chart.dataDateFormat property,
+                // however when possible, use date objects, as this will speed up chart rendering.
                 var newDate = new Date(firstDate);
                 newDate.setDate(newDate.getDate() + i);
 
                 team1_points += (i + 5) * 10;
+                team2_points += (i + 23) * 10;
+                team3_points += i * 10;
 
-                this.teams[0].scores.push({
+                chartData.push({
+                    // Save date and points per team on this date
                     date: newDate,
-                    score: team1_points,
+                    team1: team1_points,
+                    team2: team2_points,
+                    team3: team3_points,
                 });
             }
+            return chartData;
+        },
+        loadData() {
             //TODO: write backend route for data and show error
             // axios.get("/api/lksdgs/slkfj").then((response) => {
             //     if (response.data.error)
             //         return console.log(response.data.error); //this.error = response.data.error;
             //     this.teams = this.teams.concat(response.data);
             // });
-            // var firstDate = new Date();
-            // firstDate.setHours(19, 0, 0, 0);
-            // var firstDate2 = new Date();
-            // firstDate2.setTime(firstDate)
-            // firstDate2.setHours(19, 10, 0, 0);
-            // this.teams.push({
-            //     uuid: "sdfds",
-            //     name: "dsfdsf",
-            //     scores: [
-            //         { date: firstDate, score: 0 },
-            //         { date: firstDate2, score: 26 },
-            //     ],
-            // });
-            // firstDate2.setDate(firstDate2.getDate());
-            // firstDate2.setHours(17, 30, 0, 0);
-            // this.teams.push({
-            //     uuid: "sdsqdfds",
-            //     name: "dsfqsddsf",
-            //     scores: [{ date: firstDate, score: 0 }],
-            // });
+
+            var firstDate2 = new Date();
+            firstDate2.setHours(16, 10, 0, 0);
+
+            var firstDate = new Date();
+
+            firstDate.setHours(16, 0, 0, 0);
+            this.teams.push({
+                uuid: "sdfds",
+                name: "dsfdsf",
+                scores: [
+                    { date: firstDate, score: 0 },
+                    { date: firstDate2, score: 26 },
+                ],
+            });
+
+            firstDate2.setDate(firstDate2.getDate());
+            firstDate2.setHours(17, 30, 0, 0);
+            this.teams.push({
+                uuid: "sdsqdfds",
+                name: "dsfqsddsf",
+                scores: [{ date: firstDate, score: 0 }],
+            });
+            firstDate2.setHours(18, 30, 30, 0);
+            this.teams[1].scores.push({ date: firstDate2, score: 36 });
+            firstDate2.setHours(19, 40, 40, 0);
+            this.teams[1].scores.push({ date: firstDate2, score: 50 });
         },
     },
     mounted() {
@@ -126,9 +135,8 @@ export default Vue.extend({
 
         // Create X axis
         var dateAxis = this.chart.xAxes.push(new am4charts.DateAxis());
-        dateAxis.renderer.grid.template.location = 0.5;
         dateAxis.renderer.minGridDistance = 50;
-        dateAxis.gridIntervals.setAll([{ timeUnit: "hour", count: 1 }]);
+        dateAxis.adjustLabelPrecision = false;
         // Create Y axis
         var pointsAxis = this.chart.yAxes.push(new am4charts.ValueAxis());
 
@@ -136,12 +144,11 @@ export default Vue.extend({
         for (const team of this.teams) {
             var firstDate = new Date();
 
-            // this.createSeries(team.uuid, team.name, pointsAxis);
+            this.createSeries(team.uuid, team.name, pointsAxis);
 
             var series1 = this.chart.series.push(
                 new am4charts.StepLineSeries()
             );
-
             series1.dataFields.valueY = "score";
             series1.dataFields.dateX = "date";
             series1.strokeWidth = 3;

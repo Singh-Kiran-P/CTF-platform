@@ -16,7 +16,7 @@
                 <Scoreboard :category="categorie" :id="categorie"></Scoreboard>
             </div>
         </flickity>-->
-        <Slider animation="fade" class="slider">
+        <!-- <Slider animation="none" class="slider">
             <SliderItem
                 v-for="categorie in categories"
                 :key="categorie"
@@ -24,7 +24,14 @@
             >
                 <Scoreboard :category="categorie" :id="categorie"></Scoreboard>
             </SliderItem>
-        </Slider>
+        </Slider> -->
+        <div
+            v-for="categorie in categories"
+            :key="categorie"
+            class="carousel-cell"
+        >
+            <Scoreboard :category="categorie" :id="categorie"></Scoreboard>
+        </div>
     </div>
 </template>
 
@@ -76,11 +83,12 @@ export default Vue.extend({
     },
     methods: {
         loadCategories(): void {
-            axios.get('/api/competition/categories').then(response => {
-                if (response.data.error) return console.log(response.data.error);//this.error = response.data.error;
-                this.categories = this.categories.concat(response.data);
+            axios.get("/api/competition/categories").then((response) => {
+                if (response.data.error)
+                    return console.log(response.data.error); //this.error = response.data.error;
+                this.categories = this.categories.concat(response.data[0]);
             });
-        }
+        },
     },
     mounted() {},
 });
