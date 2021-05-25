@@ -95,6 +95,8 @@ const routes: { [page: string]: Route[] } = {
         pages.joinTeam,
         pages.teamDashboard,
         pages.teams,
+        pages.leaderboard,
+
         pages.users
     ],
     [Roles.PARTICIPANT]: [

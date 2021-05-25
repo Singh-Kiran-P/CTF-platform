@@ -8,6 +8,7 @@ import docker from './docker';
 import util from './util';
 import pages from './pages';
 import notification from './notification'
+import leaderboard from './leaderboard';
 
 export default [
     competition,
@@ -20,5 +21,6 @@ export default [
     rounds,
     uploads,
     account,
-    notification
+    notification,
+    leaderboard
 ];
