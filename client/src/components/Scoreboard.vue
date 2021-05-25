@@ -6,6 +6,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import axios from 'axios';
 import * as am4core from "@amcharts/amcharts4/core";
 import * as am4charts from "@amcharts/amcharts4/charts";
 import am4themes_animated from "@amcharts/amcharts4/themes/animated";
@@ -17,12 +18,16 @@ export default Vue.extend({
     components: {},
     props: {
         category: String,
-        id: String
+        id: String,
     },
     data: () => ({
         chart: null as unknown as am4charts.XYChart,
-        //timeSpan: "Weekly",
-        //timeSpanOptions: ["Hourly", "Daily", "Weekly"]
+        teams: [] as
+            {
+                uuid: String,
+                name: String,
+                scores: {date: Date, score: number}[]
+            }[]
     }),
     created() {},
     methods: {
@@ -70,6 +75,13 @@ export default Vue.extend({
                 });
             }
             return chartData;
+        },
+        loadData() {
+            //TODO: write backend route for data and show error
+            axios.get('/api/lksdgs/slkfj').then(response => {
+                if (response.data.error) return console.log(response.data.error);//this.error = response.data.error;
+                this.teams = this.teams.concat(response.data);
+            });
         }
     },
     mounted() {
@@ -95,6 +107,9 @@ export default Vue.extend({
         this.createSeries("team1", "Team 1", pointsAxis);
         this.createSeries("team2", "Team 2", pointsAxis);
         this.createSeries("team3", "Team 3", pointsAxis);
+        for (let team in this.teams) {
+            
+        }
 
         // Add legend
         this.chart.legend = new am4charts.Legend();

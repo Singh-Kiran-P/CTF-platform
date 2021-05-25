@@ -30,6 +30,7 @@
 
 <script lang="ts">
 import Vue from "vue";
+import axios from "axios";
 import { Carousel, Slide } from "vue-carousel";
 import { VueAgile } from "vue-agile";
 import Flickity from "vue-flickity";
@@ -51,11 +52,13 @@ export default Vue.extend({
         categories: [] as String[],
     }),
     created() {
-        this.categories.push("BACH1");
+        //TODO: GET CATEGORIES FROM SERVER
+        /*this.categories.push("BACH1");
         this.categories.push("BACH2");
         this.categories.push("BACH3");
         this.categories.push("MAST1");
-        this.categories.push("MAST2");
+        this.categories.push("MAST2");*/
+        this.loadCategories();
 
         this.$socket.$subscribe("BACH 1", (data: any) => {
             console.log(data);
@@ -71,7 +74,14 @@ export default Vue.extend({
             console.log(data);
         });
     },
-    methods: {},
+    methods: {
+        loadCategories(): void {
+            axios.get('/api/competition/categories').then(response => {
+                if (response.data.error) return console.log(response.data.error);//this.error = response.data.error;
+                this.categories = this.categories.concat(response.data);
+            });
+        }
+    },
     mounted() {},
 });
 </script>
