@@ -12,7 +12,7 @@
                 ></b-form-input> 
                 <b-form-invalid-feedback>{{teamnameFeedback}}</b-form-invalid-feedback>
             </b-form-group>        
-            <StatusButton type=submit block variant=primary :state="createState" normal=Create loading="Creating" succes="Created" :disabled="!validForm()"/>
+            <StatusButton type=submit block variant=primary :state="createState" normal="Create" loading="Creating" succes="Created" :disabled="!validForm()"/>
             <span>Want to join a team? Ask the captain for an invite-link!</span>
         </b-form>
     </div>
