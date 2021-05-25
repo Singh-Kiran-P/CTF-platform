@@ -13,7 +13,7 @@ import Vue from 'vue';
 import axios from 'axios';
 import Loading from '@/components/Loading.vue';
 import Collapse from '@/components/Collapse.vue';
-import { Challenge, ChallengeType, Hint, Question, timeDisplay, validChallenge } from '@shared/validation/roundsForm';
+import { Challenge, ChallengeType, Hint, Question, durationDisplay, validChallenge } from '@shared/validation/roundsForm';
 
 export default Vue.extend({
     name: 'RoundsAdmin',

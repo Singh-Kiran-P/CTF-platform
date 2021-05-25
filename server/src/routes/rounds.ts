@@ -24,7 +24,7 @@ router.get('/data', isAuth, (_, res) => {
 router.get('/challenges/:round', isAuth, (req, res) => {
     let admin = getAccount(req).admin;
     roundStarted(req.params.round, req, res, round => {
-        DB.respond(DB.repo(Challenge).find({ where: { round: round.id }, order: { order: 'ASC' }, relations: ['tag'] }), res, cs => cs.map(c =>
+        DB.respond(DB.repo(Challenge).find({ where: { round: round.id }, order: { order: 'ASC' } }), res, cs => cs.map(c =>
             admin ? c : Object.assign({}, c, { flag: '' })
         ));
     });

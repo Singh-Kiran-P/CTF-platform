@@ -6,7 +6,7 @@ const router = express.Router();
 const challengeAvailable = (challengeId: number | string, req: express.Request, res: express.Response, next: (challenge: Challenge) => any) => {
     let error = () => res.send({ error: 'Error fetching data' });
     DB.repo(Challenge).findOne({ where: { id: Number(challengeId) }, relations:
-        ['tag', 'round', 'hints', 'questions', 'solves', 'solves.team', 'solves.account', 'solves.usedHints', 'solves.usedHints.hint']
+        ['round', 'hints', 'questions', 'solves', 'solves.team', 'solves.account', 'solves.usedHints', 'solves.usedHints.hint']
     }).then(challenge => {
         if (!challenge) return error();
         return next(challenge); // TODO: remove this line

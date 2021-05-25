@@ -6,7 +6,7 @@
                     <div class=item-content>
                         <template v-if="!round.editable">
                             <span class=item-name>{{round.name}}</span>
-                            <span>{{timeDisplay(round)}}</span>
+                            <span>{{durationDisplay(round)}}</span>
                             <span class="item-description nowrap">{{round.description}}</span>
                         </template>
                         <template v-else>
@@ -29,6 +29,10 @@
                                     </span>
                                     <span class=item-name>{{challenge.name}}</span>
                                     <span class="item-description nowrap">{{challenge.description}}</span>
+                                    <span class=item-description>
+                                        <span class=item-category>Type</span>
+                                        <span class=item-value>{{typeText(challenge.type)}}</span>
+                                    </span>
                                     <span class=item-description v-if="challenge.tag">
                                         <span class=item-category>Tag</span>
                                         <span class=item-value>{{challenge.tag.name}}</span>
@@ -36,10 +40,6 @@
                                     <span class=item-description>
                                         <span class=item-category>Points</span>
                                         <span class=item-value>{{challenge.points}}</span>
-                                    </span>
-                                    <span class=item-description>
-                                        <span class=item-category>Type</span>
-                                        <span class=item-value>{{typeText(challenge.type)}}</span>
                                     </span>
                                     <b-form-invalid-feedback :state="state(challengeFeedback(round, challenge))">{{challengeFeedback(round, challenge)}}</b-form-invalid-feedback>
                                 </div>
@@ -171,7 +171,7 @@ import StatusButton from '@/components/StatusButton.vue';
 import DateTimePicker from '@/components/DateTimePicker.vue';
 import { nextOrder, moveDown, toggledItems, loadItems } from '@/assets/listFunctions';
 import { Form, Round, Challenge, ChallengeType, Hint, Question } from '@shared/validation/roundsForm';
-import { state, validate, validInput, timeDisplay, sortRounds, validForm, validChallenges, validHints, validQuestions } from '@shared/validation/roundsForm';
+import { state, validate, validInput, durationDisplay, sortRounds, validForm, validChallenges, validHints, validQuestions } from '@shared/validation/roundsForm';
 import { Tag } from '@shared/validation/competitionForm';
 import { serialize } from '@shared/objectFormdata';
 import path from 'path';
@@ -265,7 +265,7 @@ export default Vue.extend({
             }).catch(() => error());
         },
 
-        timeDisplay(round: Round): string { return timeDisplay(round); },
+        durationDisplay(round: Round): string { return durationDisplay(round); },
         roundFeedback(round: Round, add?: boolean): string { return validate.round(round, this.form.rounds, add); },
         removeRound(round: Round): void { this.form.rounds = this.form.rounds.filter(x => x != round); },
         editRound(round: Round & Editable): void {

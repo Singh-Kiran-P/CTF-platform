@@ -99,12 +99,12 @@ router.get('/getMembers/:uuid', (req, res) => {
 
 
 router.get('/getSolves/:uuid', (req, res) => {
-    let data: { name: string, category: { name: string, description: string }, value: number, date: number }[] = [];
+    let data: { name: string, category: { name: string, description: string }, value: number, date: string }[] = [];
     let uuid: string = req.params.uuid;
 
     DB.repo(Solve).find({ where: { team: uuid }, relations: ['challenge', 'challenge.tag'] }).then((solves: Solve[]) => {
         solves.forEach((solve: Solve) => {
-            data.push({ name: solve.challenge.name, category: { name: solve.challenge.tag.name, description: solve.challenge.tag.description }, value: solve.challenge.points, date: solve.timestamp });
+            data.push({ name: solve.challenge.name, category: { name: solve.challenge.tag.name, description: solve.challenge.tag.description }, value: solve.challenge.points, date: solve.time });
         });
         res.json(data);
     }).catch((err) => { res.json({ error: 'Error retrieving solves' }) });

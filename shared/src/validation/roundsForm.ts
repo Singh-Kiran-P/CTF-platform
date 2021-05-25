@@ -19,11 +19,25 @@ type Challenge = { id?: number, round?: Round, name: string, description: string
 type Round = { id? :number, name: string, folder: string, start: string, end: string, description: string, challenges: Challenge[] | undefined };
 type Form = { rounds: Round[] };
 
-const timeDisplay = (round: Round): string => {
+const durationDisplay = (round: Round): string => {
     let [start, end] = [round.start, round.end].map(time => new Date(time));
     let [startday, endday] = [start, end].map(time => time.toLocaleString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }));
     let [starttime, endtime] = [start, end].map(time => time.toLocaleString('nl-BE', { hour: 'numeric', minute: 'numeric' }));
     return `${startday}, ${starttime} - ${startday == endday ? '' : endday + ', '}${endtime}`;
+}
+
+const countdownDisplay = (round: Round): string => {
+    let time = [round.start, round.end].map(time => new Date(time)).filter(t => t > new Date()).concat([new Date()])[0];
+    let diff = Math.max(0, time.getTime() - new Date().getTime());
+    const amount = (time: number): number => {
+        let amount = Math.floor(diff / time);
+        diff %= time;
+        return amount;
+    }
+    let [y, d, h, m, s] = [amount(1000 * 60 * 60 * 24 * 365), amount(1000 * 60 * 60 * 24), amount(1000 * 60 * 60), amount(1000 * 60), amount(1000)];
+    const t = (amount: number, time: string) => `${amount} ${time}${amount == 1 ? '' : 's'}`;
+    let large = (y ? `${t(y, 'year')}, ` : '') + (y || d ? `${t(d, 'day')}, ` : '') + (y || d ? t(h, 'hour') : '');
+    return large || ((h ? h + 'h ' : '') + m + 'm ' + (s < 10 ? '0' : '') + s + 's');
 }
 
 const sortRounds = (rounds: Round[]): Round[] => [...rounds].sort((a, b) => new Date(a.start) < new Date(b.start) ? -1 : 1);
@@ -120,6 +134,6 @@ const isf = {
 }
 
 export {
-    state, validInput, timeDisplay, sortRounds, validForm, validChallenges, validChallenge, validHints, validQuestions,
+    state, validInput, durationDisplay, countdownDisplay, sortRounds, validForm, validChallenges, validChallenge, validHints, validQuestions,
     validate, Solve, Question, Hint, Challenge, Round, Form, ChallengeType
 };
