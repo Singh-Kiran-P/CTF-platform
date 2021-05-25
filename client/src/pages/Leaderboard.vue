@@ -16,34 +16,39 @@
                 <Scoreboard :category="categorie" :id="categorie"></Scoreboard>
             </div>
         </flickity>-->
-        <Slider animation="fade" class=slider>
+        <Slider animation="fade" class="slider">
             <SliderItem
-            v-for="categorie in categories" :key="categorie" class=carousel-cell>
+                v-for="categorie in categories"
+                :key="categorie"
+                class="carousel-cell"
+            >
                 <Scoreboard :category="categorie" :id="categorie"></Scoreboard>
             </SliderItem>
         </Slider>
     </div>
-
-    <div class="chart-div" id="chart"></div>
-    <div>
-      <b-table hover :items="items"></b-table>
-    </div>
-  </div>
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
-import { Carousel, Slide } from 'vue-carousel';
-import {VueAgile} from 'vue-agile';
+import Vue from "vue";
+import { Carousel, Slide } from "vue-carousel";
+import { VueAgile } from "vue-agile";
 import Flickity from "vue-flickity";
-import { Slider, SliderItem } from 'vue-easy-slider'
+import { Slider, SliderItem } from "vue-easy-slider";
 import Scoreboard from "../components/Scoreboard.vue";
 
 export default Vue.extend({
     name: "Leaderboard",
-    components: {Scoreboard, Carousel, Slide, Agile: VueAgile, flickity: Flickity, Slider, SliderItem },
-    data: ()=> ({
-        categories: [] as String[]
+    components: {
+        Scoreboard,
+        Carousel,
+        Slide,
+        Agile: VueAgile,
+        flickity: Flickity,
+        Slider,
+        SliderItem,
+    },
+    data: () => ({
+        categories: [] as String[],
     }),
     created() {
         this.categories.push("BACH1");
@@ -53,25 +58,21 @@ export default Vue.extend({
         this.categories.push("MAST2");
 
         this.$socket.$subscribe("BACH 1", (data: any) => {
-      console.log(data);
-    this.$socket.$subscribe("BACH 2", (data: any) => {
-    });
-      console.log(data);
-    });
-    this.$socket.$subscribe("BACH 3", (data: any) => {
-      console.log(data);
-    });
-    this.$socket.$subscribe("MASTER 1", (data: any) => {
-      console.log(data);
-    });
-    this.$socket.$subscribe("MASTER 2", (data: any) => {
-      console.log(data);
-    });
-        
-        },
+            console.log(data);
+            this.$socket.$subscribe("BACH 2", (data: any) => {});
+        });
+        this.$socket.$subscribe("BACH 3", (data: any) => {
+            console.log(data);
+        });
+        this.$socket.$subscribe("MASTER 1", (data: any) => {
+            console.log(data);
+        });
+        this.$socket.$subscribe("MASTER 2", (data: any) => {
+            console.log(data);
+        });
+    },
     methods: {},
-    mounted() {}
-    
+    mounted() {},
 });
 </script>
 
@@ -81,19 +82,19 @@ export default Vue.extend({
     height: 100%;
 }
 #carousel {
-    width:100%;
+    width: 100%;
 }
 .carousel-cell {
-  width: 100%;
-  height: 80vh;
-  margin-right: 10px;
-  background: #8C8;
-  border-radius: 5px;
-  display: flex;
-  justify-content: center;
+    width: 100%;
+    height: 80vh;
+    margin-right: 10px;
+    background: #8c8;
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
 }
 .slider {
-      height: 80vh !important;
+    height: 80vh !important;
 }
 
 /* cell number */
