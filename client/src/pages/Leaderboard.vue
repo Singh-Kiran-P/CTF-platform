@@ -25,11 +25,7 @@
                 <Scoreboard :category="categorie" :id="categorie"></Scoreboard>
             </SliderItem>
         </Slider> -->
-        <div
-            v-for="categorie in categories"
-            :key="categorie"
-            class="carousel-cell"
-        >
+        <div v-for="categorie in categories" :key="categorie" class="carousel-cell">
             <Scoreboard :category="categorie" :id="categorie"></Scoreboard>
         </div>
     </div>
@@ -103,8 +99,8 @@ export default Vue.extend({
     width: 100%;
 }
 .carousel-cell {
-    width: 100%;
-    height: 80vh;
+    width: 60%;
+    height: 85vh;
     margin-right: 10px;
     background: #8c8;
     border-radius: 5px;

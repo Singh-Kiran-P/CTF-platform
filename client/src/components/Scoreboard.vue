@@ -32,33 +32,28 @@ export default Vue.extend({
     }),
     created() {},
     methods: {
-        createSeries(
-            field: string,
-            name: string,
-            valueAxis: am4charts.ValueAxis<am4charts.AxisRenderer>
-        ) {
+        createSeries(team:Team,valueAxis:am4charts.ValueAxis<am4charts.AxisRenderer>) {
             var series = this.chart.series.push(new am4charts.StepLineSeries());
-            series.dataFields.valueY = field;
+            series.dataFields.valueY = "score";
             series.dataFields.dateX = "date";
             series.strokeWidth = 2;
             series.yAxis = valueAxis;
-            series.name = name;
-            series.tooltipText = "{name}: [bold]{valueY}[/]";
+            series.name = team.name;
+            series.tooltipText = "{name}: [bold]{valueY}[/] \n Date: {date} {valueX}";
             series.tensionX = 0.8;
             series.showOnInit = true;
             var interfaceColors = new am4core.InterfaceColorSet();
-            var defaultBullet = series.bullets.push(
-                new am4charts.CircleBullet()
-            );
+            var defaultBullet = series.bullets.push(new am4charts.CircleBullet());
             defaultBullet.circle.stroke = interfaceColors.getFor("background");
             defaultBullet.circle.strokeWidth = 2;
+            series.data = team.scores;
+            //series.dataFields.valueYShow = "totalPercent";
+            //series.groupFields.valueY = "average";
         },
         loadData() {
-            var firstDate = new Date();
-            firstDate.setDate(firstDate.getDate());
-            firstDate.setHours(0, 0, 0, 0);
-
             var team1_points = 0;
+            var team2_points = 0;
+            var team3_points = 0;
 
             this.teams.push({
                 uuid: "sdfds",
@@ -71,43 +66,42 @@ export default Vue.extend({
                 name: "dsfqsddsf",
                 scores: [],
             });
+            this.teams.push({
+                uuid: "sdfddsqdfds",
+                name: "dsfqdfddsddsf",
+                scores: [],
+            });
 
-            for (var i = 0; i < 2; i++) {
-                var newDate = new Date(firstDate);
-                newDate.setDate(newDate.getDate() + i);
+            for (var day = 0; day < 1; day++) {
+                for (var hour = 0; hour < 8; hour++) {
+                    for (var minute=0; minute < 60; minute+=30) {
+                        team1_points += (day + 24*hour + 60*minute + 5)*2;
+                        team2_points += (day + 24*hour + 60*minute + 3)*1.5;
+                        team3_points += (day + 24*hour + 60*minute + 3)*3;
 
-                team1_points += (i + 5) * 10;
-
-                this.teams[0].scores.push({
-                    date: newDate,
-                    score: team1_points,
-                });
+                        var newDate1 = new Date(2020, 0, day, hour, Math.floor(Math.random() * ((minute+4) - minute + 1) + minute), 0);
+                        var newDate2 = new Date(2020, 0, day, hour, Math.floor(Math.random() * ((minute+4) - minute + 1) + minute), 0);
+                        var newDate3 = new Date(2020, 0, day, hour, Math.floor(Math.random() * ((minute+4) - minute + 1) + minute), 0);
+                        this.teams[0].scores.push({
+                            date: newDate1,
+                            score: team1_points,
+                        });
+                        this.teams[1].scores.push({
+                            date: newDate2,
+                            score: team2_points,
+                        });
+                        this.teams[2].scores.push({
+                            date: newDate3,
+                            score: team3_points,
+                        });
+                    }
+                }
             }
             //TODO: write backend route for data and show error
             // axios.get("/api/lksdgs/slkfj").then((response) => {
             //     if (response.data.error)
             //         return console.log(response.data.error); //this.error = response.data.error;
             //     this.teams = this.teams.concat(response.data);
-            // });
-            // var firstDate = new Date();
-            // firstDate.setHours(19, 0, 0, 0);
-            // var firstDate2 = new Date();
-            // firstDate2.setTime(firstDate)
-            // firstDate2.setHours(19, 10, 0, 0);
-            // this.teams.push({
-            //     uuid: "sdfds",
-            //     name: "dsfdsf",
-            //     scores: [
-            //         { date: firstDate, score: 0 },
-            //         { date: firstDate2, score: 26 },
-            //     ],
-            // });
-            // firstDate2.setDate(firstDate2.getDate());
-            // firstDate2.setHours(17, 30, 0, 0);
-            // this.teams.push({
-            //     uuid: "sdsqdfds",
-            //     name: "dsfqsddsf",
-            //     scores: [{ date: firstDate, score: 0 }],
             // });
         },
     },
@@ -119,35 +113,41 @@ export default Vue.extend({
         title.text = this.category;
         //title.fontSize = 25;
         this.chart.colors.step = 2; // Increase contrast by taking every second color
-
-        // Add data
-        this.loadData();
-        this.chart.data;
+        this.chart.dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss";
 
         // Create X axis
         var dateAxis = this.chart.xAxes.push(new am4charts.DateAxis());
         dateAxis.renderer.grid.template.location = 0.5;
         dateAxis.renderer.minGridDistance = 50;
-        dateAxis.gridIntervals.setAll([{ timeUnit: "hour", count: 1 }]);
+        dateAxis.gridIntervals.setAll([ { timeUnit: "second", count: 1 },
+                                        { timeUnit: "second", count: 5 },
+                                        { timeUnit: "second", count: 10 },
+                                        { timeUnit: "second", count: 30 },
+                                        { timeUnit: "minute", count: 1 },
+                                        { timeUnit: "minute", count: 5 },
+                                        { timeUnit: "minute", count: 10 },
+                                        { timeUnit: "hour", count: 1 },
+                                        { timeUnit: "day", count: 1 },
+                                        { timeUnit: "week", count: 1 },]);
+        //dateAxis.groupData = true;
+        /*dateAxis.groupIntervals.setAll([{ timeUnit: "minute", count: 1 },
+                                        { timeUnit: "minute", count: 5 },
+                                        { timeUnit: "minute", count: 10 },
+                                        { timeUnit: "hour", count: 1 },
+                                        { timeUnit: "day", count: 1 },
+                                        { timeUnit: "week", count: 1 },]);
+        dateAxis.groupCount = 31;*/
+        
         // Create Y axis
         var pointsAxis = this.chart.yAxes.push(new am4charts.ValueAxis());
+        //pointsAxis.calculateTotals = true;
+        // Add data
+        this.loadData();
+        this.chart.data;
 
         // Create series
         for (const team of this.teams) {
-            var firstDate = new Date();
-
-            // this.createSeries(team.uuid, team.name, pointsAxis);
-
-            var series1 = this.chart.series.push(
-                new am4charts.StepLineSeries()
-            );
-
-            series1.dataFields.valueY = "score";
-            series1.dataFields.dateX = "date";
-            series1.strokeWidth = 3;
-            series1.tensionX = 0.8;
-            series1.bullets.push(new am4charts.CircleBullet());
-            series1.data = team.scores;
+            this.createSeries(team, pointsAxis);
         }
         // Add legend
         this.chart.legend = new am4charts.Legend();
