@@ -6,7 +6,8 @@
  */
 import { isAdmin, isAuth } from "@/auth";
 import express from "express";
-import controller from "../controllers/docker";
+import {DockerController} from "../controllers/docker";
+let controller = new DockerController();
 
 const router = express.Router();
 

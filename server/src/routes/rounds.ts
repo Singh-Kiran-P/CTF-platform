@@ -3,9 +3,10 @@ import { createDir, uploadFiles, uploaddir, upload, fileName, chain, unzip, pare
 import DB, { Challenge, Hint, Question, Round } from '../database';
 import { deserialize } from '@shared/objectFormdata';
 import { isAdmin, isAuth } from '../auth/index';
-import Docker from "../controllers/docker";
+import {DockerController} from "../controllers/docker";
 import express from 'express';
 const router = express.Router();
+let Docker = new DockerController();
 
 router.get('/data', isAuth, (_, res) => {
     DB.respond(DB.repo(Round).find(), res, rounds => ({ rounds: sortRounds(rounds.map(round => Object.assign({}, round, { challenges: undefined }))) }));
