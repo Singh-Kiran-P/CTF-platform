@@ -34,7 +34,7 @@ router.get('/getUsers', (req, res) => {
     DB.repo(Account).find(
         {
             where: { name: ILike('%' + filter + '%'), admin: false }, order: { name: nameOrder },
-            relations: ['solves', 'solves.challenge', 'solves.usedHints', 'solves.usedHints.hint'],
+            relations: ['solves', 'solves.challenge', 'solves.usedHints'],
         }
     ).then((accountsDB: Account[]) => {
         let accountsData: { id: number, name: string, category: string, points: number, team: string, teamUuid: string }[] = [];

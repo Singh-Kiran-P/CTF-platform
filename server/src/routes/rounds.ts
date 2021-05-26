@@ -7,29 +7,12 @@ import Docker from "../controllers/docker";
 import express from 'express';
 const router = express.Router();
 
-const roundStarted = (roundId: number | string, req: express.Request, res: express.Response, next: (round: Round) => any) => {
-    let error = () => res.send({ error: 'Error fetching data' });
-    DB.repo(Round).findOne(roundId).then(round => {
-        if (!round) return error();
-        return next(round); // TODO: remove this line
-        if (new Date(round.start) < new Date()) next(round);
-        else isAdmin(req, res, (err: any) => err ? error() : next(round));
-    }).catch(() => error());
-}
-
-router.get('/data', isAuth, (_, res) => {
+router.get('/data', isAuth, (req, res) => {
+    if (!getAccount(req).admin && !getAccount(req).team) return res.json({ error: 'Unauthorized request', joinTeam: true });
     DB.respond(DB.repo(Round).find(), res, rounds => ({ rounds: sortRounds(rounds.map(round => Object.assign({}, round, { challenges: undefined }))) }));
 });
 
-router.get('/challenges/:round', isAuth, (req, res) => {
-    let admin = getAccount(req).admin;
-    roundStarted(req.params.round, req, res, round => {
-        DB.respond(DB.repo(Challenge).find({ where: { round: round.id }, order: { order: 'ASC' } }), res, cs => cs.map(c =>
-            admin ? c : Object.assign({}, c, { flag: '' })
-        ));
-    });
-});
-
+router.get('/challenges/:round', isAdmin, (req, res) => DB.respond(DB.repo(Challenge).find({ where: { round: req.params.round }, order: { order: 'ASC' } }), res));
 router.get('/challenge/hints/:challenge', isAdmin, (req, res) => DB.respond(DB.repo(Hint).find({ where: { challenge: req.params.challenge }, order: { order: 'ASC' } }), res));
 router.get('/challenge/questions/:quiz', isAdmin, (req, res) => DB.respond(DB.repo(Question).find({ where: { quiz: req.params.quiz }, order: { order: 'ASC' } }), res));
 

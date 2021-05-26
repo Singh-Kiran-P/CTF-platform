@@ -1,5 +1,5 @@
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faCheck, faTimes, faPlus, faChevronDown, faPen, faSave, faLock, faLockOpen } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faTimes, faPlus, faChevronDown, faPen, faSave, faLock, faLockOpen, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 // view https://fontawesome.com/icons for a list of all available icons
 
-library.add(faCheck, faTimes, faPlus, faChevronDown, faPen, faSave, faLock, faLockOpen);
+library.add(faCheck, faTimes, faPlus, faChevronDown, faPen, faSave, faLock, faLockOpen, faInfoCircle);

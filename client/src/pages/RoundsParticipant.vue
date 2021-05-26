@@ -1,7 +1,11 @@
 <template>
     <Loading v-if="!loaded"/>
     <div v-else class=rounds>
-        <div v-if="rounds.length == 0">
+        <div v-if="joinTeam">
+            <span class=center>You have to be part of a team to join the competition</span>
+            <router-link class=center :to="{ name: 'Team' }">Create or join a team</router-link>
+        </div>
+        <div v-else-if="rounds.length == 0">
             <span class=center>The competition does not yet have any rounds</span>
         </div>
         <div v-else>
@@ -12,9 +16,9 @@
                 <span class="round-description center">{{currentRound.description}}</span>
                 <Collapse class=challenges label="Challenges" :large="true" :center="true" v-model="currentRound.visible" :loading="currentRound.loading"
                     @toggle="toggledChallenges(currentRound)">
-                    <div v-for="challenge in currentRound.challenges" :key="challenge.order"
+                    <div v-for="challenge in currentRound.challenges" :key="challenge.order" :tabindex="unlocked(challenge, currentRound.challenges) ? 0 : -1"
                         :class="['challenge', 'list-item', unlocked(challenge, currentRound.challenges) ? 'unlocked' : 'locked']"
-                        :tabindex="unlocked(challenge, currentRound.challenges) ? 0 : -1" @click="redirectChallenge(challenge.id)" @keydown.enter="redirectChallenge(challenge.id)">
+                        @click="redirectChallenge(challenge.id, $event)" @keydown.enter="redirectChallenge(challenge.id, $event)">
                         <span v-if="solved(challenge)">
                             <font-awesome-icon icon=check class=icon-primary /> Solved by <b>{{solveNames(challenge)}}</b> for <b>{{solvePoints(challenge)}} points</b>
                         </span>
@@ -30,11 +34,17 @@
                             <span class="item-description nowrap">{{challenge.description}}</span>
                             <span class=item-description>
                                 <span class=item-category>Type</span>
-                                <span class=item-value>{{typeText(challenge.type)}}</span>
+                                <span class=item-value>{{typeName(challenge)}}</span>
+                                <Tooltip class=item-value-tooltip :title="typeName(challenge)" :content="typeDescription(challenge)">
+                                    <font-awesome-icon icon=info-circle class=icon-info />
+                                </Tooltip>
                             </span>
                             <span class=item-description v-if="challenge.tag">
                                 <span class=item-category>Tag</span>
                                 <span class=item-value>{{challenge.tag.name}}</span>
+                                <Tooltip class=item-value-tooltip :title="challenge.tag.name" :content="challenge.tag.description" :below="true">
+                                    <font-awesome-icon icon=info-circle class=icon-tooltip />
+                                </Tooltip>
                             </span>
                             <span class=item-description>
                                 <span class=item-category>Points</span>
@@ -67,7 +77,7 @@
                         <span class=round-description>{{round.description}}</span>
                         <Collapse class=challenges label="Challenges" v-model="round.visible" :loading="round.loading" :noborder="true" @toggle="toggledChallenges(round)">
                             <div class="challenge list-item unlocked" v-for="challenge in round.challenges" :key="challenge.order"
-                                :tabindex="0" @click="redirectChallenge(challenge.id)" @keydown.enter="redirectChallenge(challenge.id)">
+                                :tabindex="0" @click="redirectChallenge(challenge.id, $event)" @keydown.enter="redirectChallenge(challenge.id, $event)">
                                 <span v-if="!solved(challenge)"><font-awesome-icon icon=times class=icon-danger /> Not solved</span>
                                 <span v-else>
                                     <font-awesome-icon icon=check class=icon-primary /> Solved by <b>{{solveNames(challenge)}}</b> for <b>{{solvePoints(challenge)}} points</b>
@@ -82,11 +92,17 @@
                                 <span class="item-description nowrap">{{challenge.description}}</span>
                                 <span class=item-description>
                                     <span class=item-category>Type</span>
-                                    <span class=item-value>{{typeText(challenge.type)}}</span>
+                                    <span class=item-value>{{typeName(challenge)}}</span>
+                                    <Tooltip class=item-value-tooltip :title="typeName(challenge)" :content="typeDescription(challenge)">
+                                        <font-awesome-icon icon=info-circle class=icon-info />
+                                    </Tooltip>
                                 </span>
                                 <span class=item-description v-if="challenge.tag">
                                     <span class=item-category>Tag</span>
                                     <span class=item-value>{{challenge.tag.name}}</span>
+                                    <Tooltip class=item-value-tooltip :title="challenge.tag.name" :content="challenge.tag.description" :below="true">
+                                        <font-awesome-icon icon=info-circle class=icon-tooltip />
+                                    </Tooltip>
                                 </span>
                                 <span class=item-description>
                                     <span class=item-category>Points</span>
@@ -105,9 +121,10 @@
 import Vue from 'vue';
 import axios from 'axios';
 import Loading from '@/components/Loading.vue';
+import Tooltip from '@/components/Tooltip.vue';
 import Collapse from '@/components/Collapse.vue';
 import { toggledItems, loadItems } from '@/assets/listFunctions';
-import { Round, Challenge, ChallengeType, Solve, Hint, Question, validForm, durationDisplay, countdownDisplay, validChallenges } from '@shared/validation/roundsForm';
+import { Round, Challenge, validForm, validChallenges, typeName, typeDescription, durationDisplay, countdownDisplay } from '@shared/validation/roundsForm';
 
 type Visible = { visible?: boolean };
 
@@ -115,27 +132,30 @@ export default Vue.extend({
     name: 'RoundsAdmin',
     components: {
         Loading,
+        Tooltip,
         Collapse
     },
     created() {
         axios.get('/api/rounds/data').then(res => {
-            this.loaded = true;
-            if (validForm(res.data)) this.rounds = res.data.rounds;
+            if (res.data.joinTeam) this.joinTeam = true;
+            else if (validForm(res.data)) this.rounds = res.data.rounds;
             if (this.currentRound) {
                 this.currentRound.visible = true;
                 this.toggledChallenges(this.currentRound);
                 toggledItems(this.currentRound, 'loading', true, undefined, r => this.loadChallenges(r));
             }
 
-            setInterval(() => this.time = new Date(), 1000); // TODO: show timer
-
+            setInterval(() => this.time = new Date(), 1000);
             //setTimeout(() => (this.currentRound?.challenges || [])[0].solves = [{ name: 'BurhBR boy', points: 4 }, { name: 'your team', points: 5 }], 3000); // TODO: remove this
+
+            this.loaded = true;
         });
     },
     data: () => ({
         rounds: [] as Round[],
 
         time: new Date(),
+        joinTeam: false,
         loaded: false
     }),
     computed: {
@@ -145,12 +165,16 @@ export default Vue.extend({
     },
     methods: {
         durationDisplay(round: Round) { return durationDisplay(round); },
-        countdownDisplay(round: Round): string { return countdownDisplay(round); },
+        countdownDisplay(round: Round): string { return countdownDisplay(this.time, round); },
 
-        typeText(type: string): string { return type == ChallengeType.INTERACTIVE ? 'Interactive' : (type == ChallengeType.QUIZ ? 'Quiz' : 'Basic'); },
+        typeName(challenge: Challenge): string { return typeName(challenge.type); },
+        typeDescription(challenge: Challenge): string { return typeDescription(challenge.type); },
         toggledChallenges(round: Round & Visible): void { toggledItems(round, 'loading', round.visible, round.challenges, r => this.loadChallenges(r)); },
-        loadChallenges(round: Round) { return loadItems(round, 'challenges', 'loading', 'visible', '/api/rounds/challenges/', (data: any) => validChallenges(data)); },
-        redirectChallenge(id: number | string): void { this.$router.push({ name: 'Challenge', params: { id: id.toString() } }); },
+        loadChallenges(round: Round) { return loadItems(round, 'challenges', 'loading', 'visible', '/api/challenges/round/', (data: any) => validChallenges(data)); },
+        redirectChallenge(id: number | string, e?: MouseEvent | KeyboardEvent): void {
+            let route = { name: 'Challenge', params: { id: id.toString() } };
+            e?.ctrlKey ? window.open(this.$router.resolve(route).href, '_blank') : this.$router.push(route);
+        },
 
         solved(challenge?: Challenge): boolean { return (challenge?.solves?.length || 0) > 0; },
         solvePoints(challenge: Challenge): number { return challenge.solves?.reduce((acc, cur) => Math.max(acc, cur.points), 0) || 0; },
@@ -165,7 +189,7 @@ export default Vue.extend({
 <style scoped lang="scss">
 @import '@/assets/css/listform.scss';
 
-span {
+span, a {
     display: block;
 }
 
@@ -185,12 +209,7 @@ span {
     }
 }
 
-.center {
-    text-align: center;
-}
-
 .round-name {
-    display: block;
     font-weight: bold;
     font-size: var(--font-massive);
 }
@@ -275,7 +294,7 @@ span {
     color: var(--danger);
 }
 
-.icon-info {
+.icon-info, .icon-tooltip {
     color: var(--info);
 }
 

@@ -6,7 +6,7 @@ export class UsedHint {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @ManyToOne(_ => Hint, hint => hint.usedHints, { nullable: false })
+    @ManyToOne(_ => Hint, hint => hint.usedHints, { nullable: false, eager: true })
     hint: Hint;
 
     @ManyToOne(_ => Solve, solve => solve.usedHints, { nullable: false })

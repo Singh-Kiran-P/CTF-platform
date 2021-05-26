@@ -31,11 +31,17 @@
                                     <span class="item-description nowrap">{{challenge.description}}</span>
                                     <span class=item-description>
                                         <span class=item-category>Type</span>
-                                        <span class=item-value>{{typeText(challenge.type)}}</span>
+                                        <span class=item-value>{{typeName(challenge.type)}}</span>
+                                        <Tooltip class=item-value-tooltip :title="typeName(challenge.type)" :content="typeDescription(challenge.type)">
+                                            <font-awesome-icon icon=info-circle />
+                                        </Tooltip>
                                     </span>
                                     <span class=item-description v-if="challenge.tag">
                                         <span class=item-category>Tag</span>
                                         <span class=item-value>{{challenge.tag.name}}</span>
+                                        <Tooltip class=item-value-tooltip :title="challenge.tag.name" :content="challenge.tag.description" :below="true">
+                                            <font-awesome-icon icon=info-circle class=icon-tooltip />
+                                        </Tooltip>
                                     </span>
                                     <span class=item-description>
                                         <span class=item-category>Points</span>
@@ -165,13 +171,14 @@
 <script lang="ts">
 import Vue from 'vue';
 import axios from 'axios';
+import Tooltip from '@/components/Tooltip.vue';
 import Collapse from '@/components/Collapse.vue';
 import IconButton from '@/components/IconButton.vue';
 import StatusButton from '@/components/StatusButton.vue';
 import DateTimePicker from '@/components/DateTimePicker.vue';
 import { nextOrder, moveDown, toggledItems, loadItems } from '@/assets/listFunctions';
-import { Form, Round, Challenge, ChallengeType, Hint, Question } from '@shared/validation/roundsForm';
-import { state, validate, validInput, durationDisplay, sortRounds, validForm, validChallenges, validHints, validQuestions } from '@shared/validation/roundsForm';
+import { Form, Round, Challenge, ChallengeType, Hint, Question, state, validate, validInput } from '@shared/validation/roundsForm';
+import { typeName, typeDescription, durationDisplay, sortRounds, validForm, validChallenges, validHints, validQuestions } from '@shared/validation/roundsForm';
 import { Tag } from '@shared/validation/competitionForm';
 import { serialize } from '@shared/objectFormdata';
 import path from 'path';
@@ -184,13 +191,14 @@ type QuestionsVisible = { questionsVisible?: boolean };
 export default Vue.extend({
     name: 'RoundsAdmin',
     components: {
+        Tooltip,
         Collapse,
         IconButton,
         StatusButton,
         DateTimePicker
     },
     created() {
-        this.types = Object.values(this.typeValues).map(type => ({ value: type, text: this.typeText(type) }))
+        this.types = Object.values(this.typeValues).map(type => ({ value: type, text: this.typeName(type) }))
         axios.get('/api/competition/tags').then(res => {
             this.tags = this.tags.concat(res.data.map((tag: Tag) => ({ value: tag, text: tag.name })));
             this.loadFormData();
@@ -285,15 +293,16 @@ export default Vue.extend({
             return loadItems(round, 'challenges', 'challengesLoading', 'challengesVisible', '/api/rounds/challenges/', (data: any) => validChallenges(data, true));
         },
 
+        typeName(type: string): string { return typeName(type); },
+        typeDescription(type: string): string { return typeDescription(type); },
         lockedName(challenge: Challenge, challenges: Challenge[]): string { return challenges.find(c => c.order == challenge.lock)?.name || ''; },
-        typeText(type: string): string { return type == ChallengeType.INTERACTIVE ? 'Interactive' : (type == ChallengeType.QUIZ ? 'Quiz' : 'Basic'); },
         docker(challenge: Challenge): string { return challenge.dockerFile ? challenge.dockerFile.name || '' : path.basename(challenge.docker); },
         attachment(challenge: Challenge): string { return challenge.attachFile ? challenge.attachFile.name || '' : path.basename(challenge.attachment); },
         dockerPlaceholder(challenge?: Challenge): string { return (challenge?.dockerFile || challenge?.docker) ? this.docker(challenge) : 'Upload challenge docker file'; },
         attachPlaceholder(challenge?: Challenge): string { return (challenge?.attachFile || challenge?.attachment) ? this.attachment(challenge) : 'Upload challenge attachment'; },
         removeAttachment(challenge: Challenge): void { Vue.set(challenge, 'attachment', ''); Vue.set(challenge, 'attachFile', null); },
         challengesFeedback(round: Round): string { return validate.challenges(round.challenges); },
-        challengeFeedback(round: Round, challenge: Challenge, add?: boolean): string { return validate.challenge(challenge, round.challenges, add); },
+        challengeFeedback(round: Round, challenge: Challenge, add?: boolean): string { return validate.challenge(challenge, round.challenges, true, add); },
         removeChallenge(round: Round, challenge: Challenge): void { round.challenges = round.challenges?.filter(x => x.order != challenge.order) || []; },
         challengeDown(round: Round, challenge: Challenge): void {
             let order = challenge.order;
@@ -322,17 +331,17 @@ export default Vue.extend({
             toggledItems(challenge, 'hintsLoading', challenge.hintsVisible, challenge.hints, c => this.loadHints(c));
         },
         loadHints(challenge: Challenge): Promise<void> {
-            return loadItems(challenge, 'hints', 'hintsLoading', 'hintsVisible', '/api/rounds/challenge/hints/', data => validHints(data));
+            return loadItems(challenge, 'hints', 'hintsLoading', 'hintsVisible', '/api/rounds/challenge/hints/', data => validHints(data, true));
         },
         toggledQuestions(challenge: Challenge & QuestionsVisible, visible?: boolean): void {
             toggledItems(challenge, 'questionsLoading', visible || challenge.questionsVisible, challenge.questions, c => this.loadQuestions(c));
         },
         loadQuestions(challenge: Challenge): Promise<void> {
-            return loadItems(challenge, 'questions', 'questionsLoading', 'questionsVisible', '/api/rounds/challenge/questions/', data => validQuestions(data));
+            return loadItems(challenge, 'questions', 'questionsLoading', 'questionsVisible', '/api/rounds/challenge/questions/', data => validQuestions(data, true));
         },
 
         hintsFeedback(challenge: Challenge): string { return validate.hints(challenge.hints); },
-        hintFeedback(hint: Hint, add?: boolean): string { return validate.hint(hint, add); },
+        hintFeedback(hint: Hint, add?: boolean): string { return validate.hint(hint, true, add); },
         hintDown(challenge: Challenge, hint: Hint): void { moveDown(challenge.hints || [], hint.order); },
         removeHint(challenge: Challenge, hint: Hint): void { challenge.hints = challenge.hints?.filter(x => x.order != hint.order) || []; },
         editHint(hint: Hint & Editable): void { if (!hint.editable || state(this.hintFeedback(hint))) Vue.set(hint, 'editable', !hint.editable); },
@@ -343,7 +352,7 @@ export default Vue.extend({
         },
 
         questionsFeedback(challenge: Challenge): string { return validate.questions(challenge.questions); },
-        questionFeedback(question: Question, add?: boolean): string { return validate.question(question, add); },
+        questionFeedback(question: Question, add?: boolean): string { return validate.question(question, true, add); },
         questionDown(challenge: Challenge, question: Question): void { moveDown(challenge.questions || [], question.order); },
         removeQuestion(challenge: Challenge, question: Question): void { challenge.questions = challenge.questions?.filter(x => x.order != question.order) || []; },
         editQuestion(question: Question & Editable): void { if (!question.editable || state(this.questionFeedback(question))) Vue.set(question, 'editable', !question.editable); },
@@ -404,6 +413,10 @@ span.info {
 
     .list-item.nostyle {
         display: block;
+    }
+
+    .item-name {
+        font-size: initial;
     }
 
     .edit-challenge-header {

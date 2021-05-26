@@ -5,7 +5,7 @@
             <PushNotification/>
         </div>
         <div id=page>
-            <router-view/>
+            <router-view :key="$route.fullPath"/>
         </div>
     </div>
 </template>

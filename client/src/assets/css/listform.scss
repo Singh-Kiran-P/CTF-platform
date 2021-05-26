@@ -47,9 +47,13 @@
         display: inline-block;
     }
 
-    .item-category ~ * {
+    .item-category ~ *:not(.item-value):not(.item-value-tooltip) {
         width: 0;
         flex-grow: 1;
+    }
+
+    .item-value-tooltip {
+        margin-left: var(--margin);
     }
 
     .item-content.editable {

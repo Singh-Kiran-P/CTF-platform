@@ -10,12 +10,12 @@ type Sponsor = { name: string, link: string, icon: string, order: number, img: F
 type Form = { name: string, categories: Category[], tags: Tag[], pages: Page[], sponsors: Sponsor[] };
 
 const validForm = (f: Form): boolean => {
-    let valid = isf.form(f);
-    valid = valid && state(validate.name(f.name), validate.categories(f.categories), validate.tags(f.tags), validate.pages(f.pages), validate.sponsors(f.sponsors));
-    valid = valid && f.categories.every(category => state(validate.category(category, f.categories)));
-    valid = valid && f.tags.every(tag => state(validate.tag(tag, f.tags)));
-    valid = valid && f.pages.every(page => state(validate.page(page, f.pages)));
-    return valid && f.sponsors.every(sponsor => state(validate.sponsor(sponsor, f.sponsors)));
+    let v = isf.form(f);
+    v = v && state(validate.name(f.name), validate.categories(f.categories), validate.tags(f.tags), validate.pages(f.pages), validate.sponsors(f.sponsors));
+    v = v && f.categories.every(category => state(validate.category(category, f.categories)));
+    v = v && f.tags.every(tag => state(validate.tag(tag, f.tags)));
+    v = v && f.pages.every(page => state(validate.page(page, f.pages)));
+    return v && f.sponsors.every(sponsor => state(validate.sponsor(sponsor, f.sponsors)));
 }
 
 const validate = {
@@ -56,8 +56,8 @@ const validate = {
 
 const isf = { // check if a given variable with type any is a Form
     form: (form: any): boolean => {
-        let valid = is.object(form) && is.string(form.name);
-        return valid && is.array(form.categories, isf.category) && is.array(form.tags, isf.tag) && is.array(form.pages, isf.page) && is.array(form.sponsors, isf.sponsor);
+        let v = is.object(form) && is.string(form.name);
+        return v && is.array(form.categories, isf.category) && is.array(form.tags, isf.tag) && is.array(form.pages, isf.page) && is.array(form.sponsors, isf.sponsor);
     },
     category: (category: any): boolean => {
         return is.object(category) && is.string(category.name) && is.number(category.order);
