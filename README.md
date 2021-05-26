@@ -1,32 +1,30 @@
 # CTF platform
-## Vue.js (Frontend), Node.js (Backend), PostgreSQL
+...
+## Vue.js(Frontend) + Node.js (REST API) + PostgreSQL
 
-- Frontend
+- Frontend - Vue.js
     - Vue.js, Vue Router, BootstrapVue
 
-- Backend
-    - Node.js, Express, TypeORM, Socket.io
+- API
+    - Node.js, Express, Socket.io
 
 ## Setup for development
-Client
+Client side
 ```
 cd client
+
+# Install all dependencies for Vue
 npm install
 ```
 
-Server
+Server side
 ```
 cd server
+
+# Install all dependencies for the REST API
 npm install
 ```
 
-Shared
-```
-cd shared
-npm install
-```
-
-<<<<<<< HEAD
 Shared folder
 ```
 cd shared
@@ -82,15 +80,10 @@ DB_LOAD_DATA=false
 
 SECRET=random_string
 ```
-=======
-Environment variables can be changed in .env files
->>>>>>> admin-rounds-and-challenges
 
 
 ## How to run services
-Client, Server and shared
 ```
-<<<<<<< HEAD
 cd server || cd shared || cd shared
 
 # Run client
@@ -100,8 +93,6 @@ npm run client
 npm run server
 
 # Run client and server
-=======
->>>>>>> admin-rounds-and-challenges
 npm run dev
 ```
 
