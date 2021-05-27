@@ -39,15 +39,11 @@ passport.use(strategy);
 app.use(passport.initialize());
 app.use(passport.session());
 
-// serve docs
-app.use('/docs', express.static(path.join(__dirname, "../../../", 'docs')))
-
 // listener called before every single route, calls any following routes once the database is connected
 // this ensures that the database is already connected in every single route listener
 app.all(/./, (_, __, next) => {
     if (DB.connected()) next();
     else DB.once('connect', () => next());
-    app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 });
 
 // serve docs
