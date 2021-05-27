@@ -9,7 +9,7 @@
         "server": "npm run build && concurrently --kill-others  \"tsc --watch\" \"nodemon --legacy-watch dist/server/src\"",
         "dev": "concurrently --kill-others  \"npm run client\" \"npm run server\"",
         "makeDocs": "npx typedoc --out docs src",
-        "makeDocs-dark": "npx typedoc --out docs src && npx typedoc --out docs ./src/ --theme ./node_modules/typedoc-dark-theme/bin/default/"
+        "makeDocs-dark": "npx typedoc --out docs src"
     },
     "nodemonConfig": {
         "exec": "ts-node -r tsconfig-paths/register",

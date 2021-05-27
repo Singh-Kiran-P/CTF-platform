@@ -94,9 +94,14 @@
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
-							<h3>Methods</h3>
+							<h3>Routes Methods</h3>
 							<ul class="tsd-index-list">
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="controllers_leaderboard.leaderboardcontroller.html#getalldata" class="tsd-kind-icon">get<wbr>All<wbr>Data</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="controllers_leaderboard.leaderboardcontroller.html#update" class="tsd-kind-icon">update</a></li>
+							</ul>
+							<h3>Other Methods</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="controllers_leaderboard.leaderboardcontroller.html#generateddata" class="tsd-kind-icon">generated<wbr>Data</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="controllers_leaderboard.leaderboardcontroller.html#updateleaderboard" class="tsd-kind-icon">update<wbr>Leaderboard</a></li>
 							</ul>
 						</section>
@@ -114,6 +119,9 @@
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/INF-Vakken-PSOPV-20-21/inf-psopv-20-21-team-groep-2/blob/ffabf81/server/src/controllers/leaderboard.ts#L23">server/src/controllers/leaderboard.ts:23</a></li>
+								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <a href="controllers_leaderboard.leaderboardcontroller.html" class="tsd-signature-type" data-tsd-kind="Class">LeaderBoardController</a></h4>
 						</li>
@@ -121,7 +129,45 @@
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
-				<h2>Methods</h2>
+				<h2>Routes Methods</h2>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="getalldata" class="tsd-anchor"></a>
+					<h3>get<wbr>All<wbr>Data</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">get<wbr>All<wbr>Data<span class="tsd-signature-symbol">(</span>req<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Request</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">ParamsDictionary</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">ParsedQs</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span>, res<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Response</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/INF-Vakken-PSOPV-20-21/inf-psopv-20-21-team-groep-2/blob/ffabf81/server/src/controllers/leaderboard.ts#L77">server/src/controllers/leaderboard.ts:77</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Route to get data for the leaderboard</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>req: <span class="tsd-signature-type">Request</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">ParamsDictionary</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">ParsedQs</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>route request object</p>
+									</div>
+								</li>
+								<li>
+									<h5>res: <span class="tsd-signature-type">Response</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>route response object</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+							<p>This is the response</p>
+						</li>
+					</ul>
+				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
 					<a name="update" class="tsd-anchor"></a>
 					<h3>update</h3>
@@ -132,7 +178,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/INF-Vakken-PSOPV-20-21/inf-psopv-20-21-team-groep-2/blob/b728f72/server/src/controllers/leaderboard.ts#L40">server/src/controllers/leaderboard.ts:40</a></li>
+									<li>Defined in <a href="https://github.com/INF-Vakken-PSOPV-20-21/inf-psopv-20-21-team-groep-2/blob/ffabf81/server/src/controllers/leaderboard.ts#L60">server/src/controllers/leaderboard.ts:60</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -159,6 +205,31 @@
 						</li>
 					</ul>
 				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Other Methods</h2>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="generateddata" class="tsd-anchor"></a>
+					<h3>generated<wbr>Data</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">generated<wbr>Data<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">data_send</span><span class="tsd-signature-symbol">[]</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/INF-Vakken-PSOPV-20-21/inf-psopv-20-21-team-groep-2/blob/ffabf81/server/src/controllers/leaderboard.ts#L88">server/src/controllers/leaderboard.ts:88</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Create fake data for the leaderboard</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">data_send</span><span class="tsd-signature-symbol">[]</span></h4>
+						</li>
+					</ul>
+				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
 					<a name="updateleaderboard" class="tsd-anchor"></a>
 					<h3>update<wbr>Leaderboard</h3>
@@ -169,7 +240,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/INF-Vakken-PSOPV-20-21/inf-psopv-20-21-team-groep-2/blob/b728f72/server/src/controllers/leaderboard.ts#L19">server/src/controllers/leaderboard.ts:19</a></li>
+									<li>Defined in <a href="https://github.com/INF-Vakken-PSOPV-20-21/inf-psopv-20-21-team-groep-2/blob/ffabf81/server/src/controllers/leaderboard.ts#L38">server/src/controllers/leaderboard.ts:38</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -222,6 +293,12 @@
 						<ul>
 							<li class=" tsd-kind-constructor tsd-parent-kind-class">
 								<a href="controllers_leaderboard.leaderboardcontroller.html#constructor" class="tsd-kind-icon">constructor</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="controllers_leaderboard.leaderboardcontroller.html#generateddata" class="tsd-kind-icon">generated<wbr>Data</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="controllers_leaderboard.leaderboardcontroller.html#getalldata" class="tsd-kind-icon">get<wbr>All<wbr>Data</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="controllers_leaderboard.leaderboardcontroller.html#update" class="tsd-kind-icon">update</a>

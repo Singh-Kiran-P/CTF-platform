@@ -13,6 +13,25 @@ let docker = new Docker({ socketPath: '/var/run/docker.sock' });
  * This class handles the logic/contection with docker
  */
 export class DockerController {
+    constructor() {
+        this.containers_GET = this.containers_GET.bind(this);
+        this.dockerConfigPorts_GET = this.dockerConfigPorts_GET.bind(this);
+        this.dockerConfigPorts_POST = this.dockerConfigPorts_POST.bind(this);
+        this.images_GET = this.images_GET.bind(this);
+        this.test = this.test.bind(this);
+        this._createPortConfig = this._createPortConfig.bind(this);
+        this._giveRandomPort = this._giveRandomPort.bind(this);
+        this._randomIntFromInterval = this._randomIntFromInterval.bind(this);
+        this.createChallengeContainer = this.createChallengeContainer.bind(this);
+        this.deleteImage = this.deleteImage.bind(this);
+        this.makeImage = this.makeImage.bind(this);
+        this.removeContainerById = this.removeContainerById.bind(this);
+        this.resetContainer = this.resetContainer.bind(this);
+        this.startContainer = this.startContainer.bind(this);
+        this.startContainerById = this.startContainerById.bind(this);
+        this.stopContainer = this.stopContainer.bind(this);
+        this.stopContainerById = this.stopContainerById.bind(this);
+    }
 
     /**
      * For testing functions
