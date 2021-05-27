@@ -22,6 +22,13 @@
             ]
         }
     },
+    "typedocOptions":{
+        "entryPoints": ["src/controllers/docker.ts"],
+        "out": "docs",
+        "defaultCategory": "",
+        "categoryOrder": ["Routes", "*"],
+        "categorizeByGroup": true,
+    },
     "include": [
         "src/**/*.ts"
     ],

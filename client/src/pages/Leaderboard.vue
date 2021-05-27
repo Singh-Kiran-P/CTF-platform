@@ -63,19 +63,19 @@ export default Vue.extend({
         this.categories.push("MAST2");*/
         this.loadCategories();
 
-        this.$socket.$subscribe("BACH 1", (data: any) => {
-            console.log(data);
-            this.$socket.$subscribe("BACH 2", (data: any) => {});
-        });
-        this.$socket.$subscribe("BACH 3", (data: any) => {
-            console.log(data);
-        });
-        this.$socket.$subscribe("MASTER 1", (data: any) => {
-            console.log(data);
-        });
-        this.$socket.$subscribe("MASTER 2", (data: any) => {
-            console.log(data);
-        });
+        // this.$socket.$subscribe("BACH 1", (data: any) => {
+        //     console.log(data);
+        //     this.$socket.$subscribe("BACH 2", (data: any) => {});
+        // });
+        // this.$socket.$subscribe("BACH 3", (data: any) => {
+        //     console.log(data);
+        // });
+        // this.$socket.$subscribe("MASTER 1", (data: any) => {
+        //     console.log(data);
+        // });
+        // this.$socket.$subscribe("MASTER 2", (data: any) => {
+        //     console.log(data);
+        // });
     },
     methods: {
         loadCategories(): void {
@@ -102,7 +102,7 @@ export default Vue.extend({
     width: 60%;
     height: 85vh;
     margin-right: 10px;
-    background: #8c8;
+    /* background: #8c8; */
     border-radius: 5px;
     display: flex;
     justify-content: center;

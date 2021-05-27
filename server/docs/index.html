@@ -1,0 +1,368 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>server</title>
+	<meta name="description" content="Documentation for server">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="assets/css/main.css">
+	<script async src="assets/js/search.js" id="search-script"></script>
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="assets/js/search.json" data-base=".">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="index.html" class="title">server</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-externals" checked />
+							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<h1>server</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<div class="tsd-panel tsd-typography">
+				<a href="#ctf-platform" id="ctf-platform" style="color: inherit; text-decoration: none;">
+					<h1>CTF platform</h1>
+				</a>
+				<p>...</p>
+				<a href="#vuejsfrontend--nodejs-rest-api--postgresql" id="vuejsfrontend--nodejs-rest-api--postgresql" style="color: inherit; text-decoration: none;">
+					<h2>Vue.js(Frontend) + Node.js (REST API) + PostgreSQL</h2>
+				</a>
+				<ul>
+					<li><p>Frontend - Vue.js</p>
+						<ul>
+							<li>Vue.js, Vue Router, BootstrapVue</li>
+						</ul>
+					</li>
+					<li><p>API</p>
+						<ul>
+							<li>Node.js, Express, Socket.io</li>
+						</ul>
+					</li>
+				</ul>
+				<a href="#setup-for-development" id="setup-for-development" style="color: inherit; text-decoration: none;">
+					<h2>Setup for development</h2>
+				</a>
+				<p>Client side</p>
+				<pre><code><span style="color: #001080">cd</span><span style="color: #000000"> </span><span style="color: #001080">client</span>
+
+<span style="color: #000000"># </span><span style="color: #001080">Install</span><span style="color: #000000"> </span><span style="color: #001080">all</span><span style="color: #000000"> </span><span style="color: #001080">dependencies</span><span style="color: #000000"> </span><span style="color: #001080">for</span><span style="color: #000000"> </span><span style="color: #001080">Vue</span>
+<span style="color: #001080">npm</span><span style="color: #000000"> </span><span style="color: #001080">install</span>
+</code></pre>
+				<p>Server side</p>
+				<pre><code><span style="color: #001080">cd</span><span style="color: #000000"> </span><span style="color: #001080">server</span>
+
+<span style="color: #000000"># </span><span style="color: #001080">Install</span><span style="color: #000000"> </span><span style="color: #001080">all</span><span style="color: #000000"> </span><span style="color: #001080">dependencies</span><span style="color: #000000"> </span><span style="color: #001080">for</span><span style="color: #000000"> </span><span style="color: #001080">the</span><span style="color: #000000"> </span><span style="color: #0070C1">REST</span><span style="color: #000000"> </span><span style="color: #0070C1">API</span>
+<span style="color: #001080">npm</span><span style="color: #000000"> </span><span style="color: #001080">install</span>
+</code></pre>
+				<p>Shared folder</p>
+				<pre><code><span style="color: #001080">cd</span><span style="color: #000000"> </span><span style="color: #001080">shared</span>
+
+<span style="color: #000000"># </span><span style="color: #001080">Install</span><span style="color: #000000"> </span><span style="color: #001080">all</span><span style="color: #000000"> </span><span style="color: #001080">dependencies</span><span style="color: #000000"> </span><span style="color: #001080">for</span><span style="color: #000000"> </span><span style="color: #001080">utility</span>
+<span style="color: #001080">npm</span><span style="color: #000000"> </span><span style="color: #001080">install</span>
+</code></pre>
+				<a href="#generate-docs-rest-api" id="generate-docs-rest-api" style="color: inherit; text-decoration: none;">
+					<h2>Generate docs REST API</h2>
+				</a>
+				<pre><code><span style="color: #001080">cd</span><span style="color: #000000"> </span><span style="color: #001080">server</span>
+
+<span style="color: #008000">// Light theme</span>
+<span style="color: #001080">npx</span><span style="color: #000000"> </span><span style="color: #001080">typedoc</span><span style="color: #000000"> --</span><span style="color: #001080">out</span><span style="color: #000000"> </span><span style="color: #001080">docs</span><span style="color: #000000"> </span><span style="color: #001080">src</span>
+
+<span style="color: #008000">// Dark theme</span>
+<span style="color: #001080">npm</span><span style="color: #000000"> </span><span style="color: #001080">install</span><span style="color: #000000"> </span><span style="color: #001080">typedoc</span><span style="color: #000000">-</span><span style="color: #001080">dark</span><span style="color: #000000">-</span><span style="color: #001080">theme</span><span style="color: #000000"> --</span><span style="color: #001080">save</span><span style="color: #000000">-</span><span style="color: #001080">dev</span>
+<span style="color: #001080">npx</span><span style="color: #000000"> </span><span style="color: #001080">typedoc</span><span style="color: #000000"> --</span><span style="color: #001080">out</span><span style="color: #000000"> </span><span style="color: #001080">docs</span><span style="color: #000000"> .</span><span style="color: #811F3F">/src/</span><span style="color: #000000"> --</span><span style="color: #001080">theme</span><span style="color: #000000"> ./</span><span style="color: #001080">node_modules</span><span style="color: #000000">/</span><span style="color: #001080">typedoc</span><span style="color: #000000">-</span><span style="color: #001080">dark</span><span style="color: #000000">-</span><span style="color: #001080">theme</span><span style="color: #000000">/</span><span style="color: #001080">bin</span><span style="color: #000000">/</span>
+</code></pre>
+				<a href="#environment-variables" id="environment-variables" style="color: inherit; text-decoration: none;">
+					<h2>Environment variables</h2>
+				</a>
+				<p>Env variables can be changed in .env files located in de root folders on client and server</p>
+				<a href="#information-on-client-env-file" id="information-on-client-env-file" style="color: inherit; text-decoration: none;">
+					<h3>Information on client .env file</h3>
+				</a>
+				<ol>
+					<li><p>Hosting</p>
+						<ul>
+							<li>This can be set to LOCALHOST if you are running de appliction on your local machine. If you want to run de applicition inside Docker containers set it to DOCKER</li>
+						</ul>
+					</li>
+					<li><p>...
+						```</p>
+						<a href="#set-it-to-localhost-if-you-are-not-using-docker" id="set-it-to-localhost-if-you-are-not-using-docker" style="color: inherit; text-decoration: none;">
+							<h1>Set it to LOCALHOST if you are not using docker!</h1>
+						</a>
+						<p>HOSTING=DOCKER</p>
+					</li>
+				</ol>
+				<p>NODE_ENV=development</p>
+				<p>VUE_APP_SERVER_PORT=80
+				VUE_APP_API_SERVER=4000</p>
+				<p>VUE_APP_API_HOST=localhost
+				VUE_APP_API_HOST_DOCKER=nodejs-server</p>
+				<pre><code>
+<span style="color: #000000">### </span><span style="color: #001080">Information</span><span style="color: #000000"> </span><span style="color: #001080">on</span><span style="color: #000000"> </span><span style="color: #001080">server</span><span style="color: #000000"> .</span><span style="color: #001080">env</span><span style="color: #000000"> </span><span style="color: #001080">file</span>
+</code></pre>
+				<a href="#set-it-to-localhost-if-you-are-not-using-docker-1" id="set-it-to-localhost-if-you-are-not-using-docker-1" style="color: inherit; text-decoration: none;">
+					<h1>Set it to LOCALHOST if you are not using docker!</h1>
+				</a>
+				<p>HOSTING=DOCKER</p>
+				<p>NODE_ENV=development
+				SERVER_PORT=4000</p>
+				<p>DB_HOST=localhost
+					DB_USER=root
+					DB_PASSWORD=postgres
+				DB_NAME=ctf-platform</p>
+				<p>DB_HOST_DOCKER=postgres
+					DB_USER_DOCKER=postgres
+					DB_PASSWORD_DOCKER=postgres
+				DB_NAME_DOCKER=ctf-platform</p>
+				<p>DB_PORT=5432
+					DB_SCHEMA=public
+					DB_LOGGING=true
+				DB_LOAD_DATA=false</p>
+				<p>SECRET=random_string</p>
+				<pre><code>
+
+<span style="color: #000000">## </span><span style="color: #001080">How</span><span style="color: #000000"> </span><span style="color: #001080">to</span><span style="color: #000000"> </span><span style="color: #001080">run</span><span style="color: #000000"> </span><span style="color: #001080">services</span>
+</code></pre>
+				<p>cd server || cd shared || cd shared</p>
+				<a href="#run-client" id="run-client" style="color: inherit; text-decoration: none;">
+					<h1>Run client</h1>
+				</a>
+				<p>npm run client</p>
+				<a href="#run-server" id="run-server" style="color: inherit; text-decoration: none;">
+					<h1>Run server</h1>
+				</a>
+				<p>npm run server</p>
+				<a href="#run-client-and-server" id="run-client-and-server" style="color: inherit; text-decoration: none;">
+					<h1>Run client and server</h1>
+				</a>
+				<p>npm run dev</p>
+				<pre><code>
+<span style="color: #000000">## </span><span style="color: #001080">Docker</span>
+</code></pre>
+				<a href="#build-docker-compose-file" id="build-docker-compose-file" style="color: inherit; text-decoration: none;">
+					<h1>Build Docker compose file</h1>
+				</a>
+				<p>docker-compose build</p>
+				<a href="#run-docker-compose-to-start-all-containers" id="run-docker-compose-to-start-all-containers" style="color: inherit; text-decoration: none;">
+					<h1>Run docker compose to start all containers</h1>
+				</a>
+				<p>docker-compose up</p>
+				<a href="#show-running-containers" id="show-running-containers" style="color: inherit; text-decoration: none;">
+					<h1>Show running containers</h1>
+				</a>
+				<p>docker ps</p>
+				<a href="#delete-all-images--containers" id="delete-all-images--containers" style="color: inherit; text-decoration: none;">
+					<h1>Delete all images / containers</h1>
+				</a>
+				<p>docker stop $(docker ps -a -q)
+					docker rm $(docker ps -a -q)
+				docker rmi -f $(docker images -a -q)</p>
+				<pre><code>
+</code></pre>
+			</div>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class=" ">
+						<a href="modules.html">Exports</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/auth.html">auth</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/config_session.html">config/session</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/controllers_docker.html">controllers/docker</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/controllers_leaderboard.html">controllers/leaderboard</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/controllers_notification.html">controllers/notification</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/controllers_socket.html">controllers/socket</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/database.html">database</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/database_entities_accounts_account.html">database/entities/accounts/<wbr>Account</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/database_entities_accounts_category.html">database/entities/accounts/<wbr>Category</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/database_entities_accounts_team.html">database/entities/accounts/<wbr>Team</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/database_entities_challenges_challenge.html">database/entities/challenges/<wbr>Challenge</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/database_entities_challenges_hint.html">database/entities/challenges/<wbr>Hint</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/database_entities_challenges_question.html">database/entities/challenges/<wbr>Question</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/database_entities_challenges_round.html">database/entities/challenges/<wbr>Round</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/database_entities_challenges_tag.html">database/entities/challenges/<wbr>Tag</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/database_entities_competition_competition.html">database/entities/competition/<wbr>Competition</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/database_entities_competition_page.html">database/entities/competition/<wbr>Page</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/database_entities_competition_sponsor.html">database/entities/competition/<wbr>Sponsor</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/database_entities_connections_attempt.html">database/entities/connections/<wbr>Attempt</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/database_entities_connections_environment.html">database/entities/connections/<wbr>Environment</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/database_entities_connections_solve.html">database/entities/connections/<wbr>Solve</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/database_entities_connections_usedhint.html">database/entities/connections/<wbr>Used<wbr>Hint</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/database_entities_docker_dockerchallengecontainer.html">database/entities/docker/<wbr>Docker<wbr>Challenge<wbr>Container</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/database_entities_docker_dockermanagement.html">database/entities/docker/<wbr>Docker<wbr>Management</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/database_entities_docker_dockeropenport.html">database/entities/docker/<wbr>Docker<wbr>Open<wbr>Port</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/database_entities_notification_notification.html">database/entities/notification/<wbr>Notification</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/database_testdata.html">database/test<wbr>Data</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/files.html">files</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/index.html">index</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/routes.html">routes</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/routes_account.html">routes/account</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/routes_auth.html">routes/auth</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/routes_competition.html">routes/competition</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/routes_docker.html">routes/docker</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/routes_docs.html">routes/docs</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/routes_leaderboard.html">routes/leaderboard</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/routes_notification.html">routes/notification</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/routes_pages.html">routes/pages</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/routes_rounds.html">routes/rounds</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/routes_team.html">routes/team</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/routes_uploads.html">routes/uploads</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/routes_util.html">routes/util</a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer class="with-border-bottom">
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
+				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
+				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="container tsd-generator">
+	<p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p>
+</div>
+<div class="overlay"></div>
+<script src="assets/js/main.js"></script>
+</body>
+</html>

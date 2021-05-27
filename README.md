@@ -33,6 +33,18 @@ cd shared
 npm install
 ```
 
+## Generate docs REST API
+```
+cd server
+
+// Light theme
+npx typedoc --out docs src
+
+// Dark theme
+npm install typedoc-dark-theme --save-dev
+npx typedoc --out docs ./src/ --theme ./node_modules/typedoc-dark-theme/bin/
+```
+
 ## Environment variables
 Env variables can be changed in .env files located in de root folders on client and server
 
