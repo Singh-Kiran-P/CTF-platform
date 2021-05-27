@@ -14,10 +14,6 @@ export class Team {
     @Column({nullable: true})
     inviteCode: string;
 
-    /*@OneToOne(_ => Category)
-    @JoinColumn()
-    category: Category;*/
-
     @OneToOne(_ => Account)
     @JoinColumn()
     captain: Account;
@@ -41,18 +37,10 @@ export class Team {
         DB.repo(Team).update(this.id, {inviteCode: inviteData.hash});
     }
 
-    /*@AfterUpdate()
-    updateCategory() {
-        let cat: Category = this.getCategory();
-        if (cat != this.category)
-            DB.repo(Team).update(this.id, {category: cat});
-    }*/
-
     constructor(name: string, creator: Account) {
         this.name = name;
         if (!creator) return;
         this.captain = creator;
-        //this.category = creator.category;
     }
     memberCount(): number {
         return this.accounts.length;
@@ -83,27 +71,14 @@ export class Team {
     }
 }
 
-//Ik moet hier volgens mij async functies met promises
 export class TeamRepoCustom extends Repository<Team> {
     //used for testdata
-    saveWithCaptain(name: string, creator: Account): Team {
-        let newTeam: Team = new Team(name, creator);
-        DB.repo(Team).save(newTeam).then((teamDB: Team) => {
-            DB.repo(Account).update(creator.id, {team: teamDB}).then(() => {return teamDB;}).catch(()=> {return null;})
-        }).catch(()=>{return null;})
-        return null;
-    }
-    //werkt niet
-    public addUserToTeam(team:Team, account: Account): boolean {
-        console.log('ENTERED');
-        console.log(team);
-        console.log(account);
-        if(!team || !account) return false;
-        console.log('passed');
-        ///DB.repo(Team).findOne({where: {id: team.id}, relations:['accounts']}).then((t: Team)=>{console.log(t.memberCount); if(t.memberCount>4) return false;}).catch(()=>{return false;})
-        //DB.repo(Team).findOne({where: {id: team.id}, relations:['accounts']}).then((t: Team)=>{console.log(t.memberCount); if(t.memberCount>4) return false;}).catch(()=>{return false;})
-        account.team = team;
-        DB.repo(Account).save(account).then(()=> {return true;}).catch(()=>{return false;});
-        return true;
+    saveWithCaptain(name: string, creator: Account) {
+        return new Promise<Team>(async (resolve, reject)=> {
+            let newTeam: Team = new Team(name, creator);
+            DB.repo(Team).save(newTeam).then((teamDB: Team) => {
+                DB.repo(Account).update(creator.id, {team: teamDB}).then(() => {resolve(teamDB);}).catch(()=> {reject("DB ERROR MEMBER");})
+            }).catch(()=>{reject("DB ERROR TEAM");})
+        });
     }
 }

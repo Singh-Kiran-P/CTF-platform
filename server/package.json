@@ -7,7 +7,9 @@
         "server_watch_TS": "tsc --watch",
         "client": "npm run client --prefix ../client",
         "server": "npm run build && concurrently --kill-others  \"tsc --watch\" \"nodemon --legacy-watch dist/server/src\"",
-        "dev": "concurrently --kill-others  \"npm run client\" \"npm run server\""
+        "dev": "concurrently --kill-others  \"npm run client\" \"npm run server\"",
+        "makeDocs": "npx typedoc --out docs src",
+        "makeDocs-dark": "npx typedoc --out docs src"
     },
     "nodemonConfig": {
         "exec": "ts-node -r tsconfig-paths/register",
@@ -47,6 +49,7 @@
         "pump": "^3.0.0",
         "reflect-metadata": "^0.1.13",
         "socket.io": "^4.0.1",
+        "swagger-express-ts": "^1.1.0",
         "tslib": "^2.2.0",
         "typeorm": "^0.2.32",
         "typeorm-store": "^1.2.0",
@@ -72,6 +75,8 @@
         "shelljs": "^0.8.4",
         "ts-node": "^9.1.1",
         "tsconfig-paths": "^3.9.0",
+        "typedoc": "^0.20.36",
+        "typedoc-dark-theme": "0.0.11",
         "typescript": "^4.2.3"
     }
 }

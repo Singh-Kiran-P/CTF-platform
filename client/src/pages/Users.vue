@@ -1,65 +1,67 @@
 <template>
-    <div class="users">
-        <div class=top-table>
-            <b-form-group>
-                <label for="filter-input">Filter</label>
-                <b-form-input
-                    @input="handleFilterChange"
-                    size=sm
-                    id="filter-input"
-                    v-model="filter"
-                    type="search"
-                    placeholder="Search by name"
-                    debounce="150"
-                    trim
-                ></b-form-input>
-            </b-form-group>
-            <b-form-group>
-                <label for="per-page-select">Per page</label>
-                <b-form-select 
-                    @change="handlePerPageChange"
-                    size=sm
-                    id="per-page-select"
-                    v-model="perPage"
-                    :options="perPageOptions"
-                ></b-form-select>
-            </b-form-group>
-            <b-form-group>
-                <label for="category-select">Category</label>
-                <b-form-select 
-                    @change="handleCategoryChange"
-                    size=sm
-                    id="category-select"
-                    v-model="filterCategory"
-                    :options="filterCategoryOptions"
-                ></b-form-select>
-            </b-form-group>
-        </div>
+    <div class=wrapper>
+        <div class="users">
+            <div class=top-table>
+                <b-form-group>
+                    <label for="filter-input">Filter</label>
+                    <b-form-input
+                        @input="handleFilterChange"
+                        size=sm
+                        id="filter-input"
+                        v-model="filter"
+                        type="search"
+                        placeholder="Search by name"
+                        debounce="150"
+                        trim
+                    ></b-form-input>
+                </b-form-group>
+                <b-form-group>
+                    <label for="per-page-select">Per page</label>
+                    <b-form-select 
+                        @change="handlePerPageChange"
+                        size=sm
+                        id="per-page-select"
+                        v-model="perPage"
+                        :options="perPageOptions"
+                    ></b-form-select>
+                </b-form-group>
+                <b-form-group>
+                    <label for="category-select">Category</label>
+                    <b-form-select 
+                        @change="handleCategoryChange"
+                        size=sm
+                        id="category-select"
+                        v-model="filterCategory"
+                        :options="filterCategoryOptions"
+                    ></b-form-select>
+                </b-form-group>
+            </div>
 
-        <b-pagination
-            v-model="currentPage"
-            :total-rows="totalRows"
-            :per-page="perPage"
-            align="fill"
-            size="sm"
-            class="my-0"
-            @change="handleCurrentPageChange"
-        ></b-pagination>
+            <b-pagination
+                v-model="currentPage"
+                :total-rows="totalRows"
+                :per-page="perPage"
+                align="fill"
+                size="sm"
+                class="my-0"
+                @change="handleCurrentPageChange"
+            ></b-pagination>
 
-        <div class=table>
-            <label for="users-table">Users</label>
-            <span class=error :v-if="error != ''">{{error}}</span>
-            <b-table id=users-table sticky-header striped :busy="isLoading" :items="users" :fields="users_fields" :sort-by.sync="sortBy" sort-desc.sync="sortDesc" :per-page="0" :no-local-sorting="true" @sort-changed="sortingChanged">
-                <template v-slot:cell(team)="row">
-                    <a v-if="row.item.team != 'None'" :href="`${home}/team/${row.item.teamUuid}`">{{ row.item.team }}</a>
-                    <span v-else>{{ row.item.team }}</span>
-                </template>
-                <template #table-busy>
-                    <div class="text-center text-primary my-2">
-                        <b-spinner variant="primary" label="Spinning"></b-spinner>
-                    </div>
-                </template>
-            </b-table>
+            <div class=table>
+                <label for="users-table">Users</label>
+                <span class=error :v-if="error != ''">{{error}}</span>
+                <b-table id=users-table sticky-header striped :busy="isLoading" :items="users" :fields="users_fields" :sort-by.sync="sortBy" sort-desc.sync="sortDesc" :per-page="0" :no-local-sorting="true" @sort-changed="sortingChanged">
+                    <template v-slot:cell(team)="row">
+                        <a v-if="row.item.team != 'None'" :href="`${home}/team/${row.item.teamUuid}`">{{ row.item.team }}</a>
+                        <span v-else>{{ row.item.team }}</span>
+                    </template>
+                    <template #table-busy>
+                        <div class="text-center text-primary my-2">
+                            <b-spinner variant="primary" label="Spinning"></b-spinner>
+                        </div>
+                    </template>
+                </b-table>
+            </div>
         </div>
     </div>
 </template>
@@ -149,10 +151,8 @@ export default Vue.extend({
 <style scoped lang="scss">
 .users {    
     padding: var(--double-margin);
-    width: min(100%, 750px);
+    width: min(100%, 900px);
     margin: auto;
-    /*display: flex;
-    flex-direction: column;*/
 }
 .table {
     margin-top: 1rem;

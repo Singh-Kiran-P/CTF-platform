@@ -93,8 +93,11 @@ const routes: { [page: string]: Route[] } = {
         pages.login,
         pages.register,
         pages.joinTeam,
+        pages.leaderboard,
         pages.teamDashboard,
         pages.teams,
+        pages.leaderboard,
+
         pages.users
     ],
     [Roles.PARTICIPANT]: [

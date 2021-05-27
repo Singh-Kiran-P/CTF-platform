@@ -6,7 +6,7 @@ import session from 'express-session';
 import formidable from 'express-formidable';
 import { createServer } from 'http';
 import { Server, Socket } from 'socket.io';
-
+import path from 'path';
 import { strategy } from './auth';
 import routes from './routes';
 import DB from './database';
@@ -46,6 +46,9 @@ app.all(/./, (_, __, next) => {
     else DB.once('connect', () => next());
 });
 
+// serve docs
+app.use('/docs', express.static(path.join("../../../", 'docs')))
+
 // register all routes
 routes.forEach(route => app.use(route.path, route.router));
 
@@ -68,3 +71,5 @@ let socket = io.init(server);
 socket.on('connection', (_socket: any) => {
     console.log('Client connected to socket!');
 })
+
+

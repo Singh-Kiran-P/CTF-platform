@@ -16,7 +16,7 @@
                 <Scoreboard :category="categorie" :id="categorie"></Scoreboard>
             </div>
         </flickity>-->
-        <Slider animation="fade" class="slider">
+        <!-- <Slider animation="none" class="slider">
             <SliderItem
                 v-for="categorie in categories"
                 :key="categorie"
@@ -24,12 +24,16 @@
             >
                 <Scoreboard :category="categorie" :id="categorie"></Scoreboard>
             </SliderItem>
-        </Slider>
+        </Slider> -->
+        <div v-for="categorie in categories" :key="categorie" class="carousel-cell">
+            <Scoreboard :category="categorie" :id="categorie"></Scoreboard>
+        </div>
     </div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
+import axios from "axios";
 import { Carousel, Slide } from "vue-carousel";
 import { VueAgile } from "vue-agile";
 import Flickity from "vue-flickity";
@@ -49,30 +53,39 @@ export default Vue.extend({
     },
     data: () => ({
         categories: [] as String[],
-        chart:[]
     }),
     created() {
-        this.categories.push("BACH1");
+        //TODO: GET CATEGORIES FROM SERVER
+        /*this.categories.push("BACH1");
         this.categories.push("BACH2");
         this.categories.push("BACH3");
         this.categories.push("MAST1");
-        this.categories.push("MAST2");
+        this.categories.push("MAST2");*/
+        this.loadCategories();
 
-        this.$socket.$subscribe("BACH 1", (data: any) => {
-            console.log(data);
-            this.$socket.$subscribe("BACH 2", (data: any) => {});
-        });
-        this.$socket.$subscribe("BACH 3", (data: any) => {
-            console.log(data);
-        });
-        this.$socket.$subscribe("MASTER 1", (data: any) => {
-            console.log(data);
-        });
-        this.$socket.$subscribe("MASTER 2", (data: any) => {
-            console.log(data);
-        });
+        // this.$socket.$subscribe("BACH 1", (data: any) => {
+        //     console.log(data);
+        //     this.$socket.$subscribe("BACH 2", (data: any) => {});
+        // });
+        // this.$socket.$subscribe("BACH 3", (data: any) => {
+        //     console.log(data);
+        // });
+        // this.$socket.$subscribe("MASTER 1", (data: any) => {
+        //     console.log(data);
+        // });
+        // this.$socket.$subscribe("MASTER 2", (data: any) => {
+        //     console.log(data);
+        // });
     },
-    methods: {},
+    methods: {
+        loadCategories(): void {
+            axios.get("/api/competition/categories").then((response) => {
+                if (response.data.error)
+                    return console.log(response.data.error); //this.error = response.data.error;
+                this.categories = this.categories.concat(response.data[0]);
+            });
+        },
+    },
     mounted() {},
 });
 </script>
@@ -86,10 +99,10 @@ export default Vue.extend({
     width: 100%;
 }
 .carousel-cell {
-    width: 100%;
-    height: 80vh;
+    width: 60%;
+    height: 85vh;
     margin-right: 10px;
-    background: #8c8;
+    /* background: #8c8; */
     border-radius: 5px;
     display: flex;
     justify-content: center;
