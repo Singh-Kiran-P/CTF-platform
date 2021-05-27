@@ -14,10 +14,10 @@
         </div>
         <div class=sponsors>
             <Carousel :autoplay="true" :autoplayHoverPause="true" :loop="true" :paginationEnabled="false" :perPageCustom="[[1024, 4],[750,3],[550, 2], [350,1]]" easing="linear" :autoplayTimeout="5000" :speed="1000" :centerMode="true" class=sponsor-slider>
-                    <Slide v-for="i in 2" :key="i" class=sponsor-cell>
+                    <Slide v-for="sponsor in sponsors" :key="sponsor.id" class=sponsor-cell>
                         <div class=sponsor-cell-content>
-                            <a href="https://www.w3schools.com" target="_blank" rel="noopener noreferrer">
-                            <img alt="W3Schools" src="/api/sponsor-image/../rounds/logo_cegeka_w.png">
+                            <a :href="sponsor.link" target="_blank" rel="noopener noreferrer">
+                                <b-img :alt="sponsor.name" :src="'/api'+sponsor.icon"></b-img>
                             </a>
                         </div>
                     </Slide>
@@ -80,6 +80,7 @@ export default Vue.extend({
                 if (response.data.error)
                     return console.log(response.data.error); //this.error = response.data.error;
                 this.sponsors = response.data.sponsors;
+                console.log(this.sponsors);
             });
         }
     },
@@ -119,21 +120,24 @@ export default Vue.extend({
     justify-content: center;
 }
 .sponsor-cell-content{
-    margin: var(--margin);
-    background: chocolate;
-    border-radius: 15px;
+    margin: 0px var(--margin);
+    background: white;
+        border-radius: 20px;
     width: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
 }
 .sponsor-cell-content a {
-    max-width:100%;
-    max-height:100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 img {
-    width: 100%;
-    max-height: 100%;
+    flex-shrink:0;
+    -webkit-flex-shrink: 0;
+    max-width:70%;
+    max-height:90%;
 }
 .lists {
     width: 35%;
