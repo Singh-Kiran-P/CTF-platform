@@ -28,6 +28,8 @@ export class LeaderBoardController {
         this.updateLeaderboard = this.updateLeaderboard.bind(this);
         this.update = this.update.bind(this);
         this.getAllData = this.getAllData.bind(this);
+        this.generatedData();
+
     }
 
     /**
@@ -66,7 +68,7 @@ export class LeaderBoardController {
                 let date = new Date();
 
                 //save data
-                this.teams[0].scores.push({ date, score });
+                // this.teams[0].scores.push({ date, score });
                 this.updateLeaderboard(acc, score, date);
                 res.send("oke")
             })
@@ -82,8 +84,8 @@ export class LeaderBoardController {
     public getAllData(req: Request, res: Response) {
         //TODO: get real data from @lander
         // let rawData:raw_data = getRawData();
-        let teams = this.generatedData();
-        res.json(teams);
+        console.log(this.teams);
+        res.json(this.teams);
     }
 
     /**
@@ -113,19 +115,21 @@ export class LeaderBoardController {
         });
 
         for (var day = 0; day < 1; day++) {
-            for (var hour = 0; hour < 8; hour++) {
+            for (var hour = 0; hour < 5; hour++) {
                 for (var minute = 0; minute < 60; minute += 30) {
-                    team1_points = (day + 24 * hour + 60 * minute + 5) * 2;
-                    team2_points = (day + 24 * hour + 60 * minute + 3) * 1.5;
-                    team3_points = (day + 24 * hour + 60 * minute + 3) * 3;
+                    team1_points += (minute + 5) * 2;
+                    team2_points += (minute + 3) * 1.5;
+                    team3_points += (minute + 3) * 3;
 
                     var newDate1 = new Date(2020, 0, day, hour, Math.floor(Math.random() * ((minute + 4) - minute + 1) + minute), 0);
                     var newDate2 = new Date(2020, 0, day, hour, Math.floor(Math.random() * ((minute + 4) - minute + 1) + minute), 0);
                     var newDate3 = new Date(2020, 0, day, hour, Math.floor(Math.random() * ((minute + 4) - minute + 1) + minute), 0);
-                    // this.teams[0].scores.push({
-                    //     date: newDate1,
-                    //     score: team1_points,
-                    // });
+                    console.log(newDate1);
+
+                    this.teams[0].scores.push({
+                        date: newDate1,
+                        score: team1_points,
+                    });
                     this.teams[1].scores.push({
                         date: newDate2,
                         score: team2_points,
