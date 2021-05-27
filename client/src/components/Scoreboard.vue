@@ -1,6 +1,6 @@
 <template>
     <div class="scoreboard">
-        <div class="chart-div" :id="this.id"></div>
+        <div class="chart-div" :id="this.category"></div>
     </div>
 </template>
 
@@ -25,7 +25,6 @@ export default Vue.extend({
     components: {},
     props: {
         category: String,
-        id: String,
     },
     data: () => ({
         chart: (null as unknown) as am4charts.XYChart,
@@ -238,6 +237,9 @@ export default Vue.extend({
         // generate scrollbar
         let scrollbarX = new am4charts.XYChartScrollbar();
         this.chart.scrollbarX = scrollbarX;
+        this.$root.$on('lol', (data: any) => {
+                console.log(data);
+            });        
     },
 
     beforeDestroy() {
