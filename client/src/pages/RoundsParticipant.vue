@@ -13,14 +13,14 @@
                 <span class="round-name center">{{currentRound.name}}</span>
                 <span class="round-duration center">{{durationDisplay(currentRound)}}</span>
                 <span class="round-time center">{{countdownDisplay(currentRound)}}</span>
-                <span class="round-description center">{{currentRound.description}}</span>
-                <Collapse class=challenges label="Challenges" :large="true" :center="true" v-model="currentRound.visible" :loading="currentRound.loading"
+                <span class="round-description center"><span>{{currentRound.description}}</span></span>
+                <Collapse class=challenges label="Challenges" large center v-model="currentRound.visible" :loading="currentRound.loading"
                     @toggle="toggledChallenges(currentRound)">
                     <div v-for="challenge in currentRound.challenges" :key="challenge.order" :tabindex="unlocked(challenge, currentRound.challenges) ? 0 : -1"
                         :class="['challenge', 'list-item', unlocked(challenge, currentRound.challenges) ? 'unlocked' : 'locked']"
                         @click="redirectChallenge(challenge.id, $event)" @keydown.enter="redirectChallenge(challenge.id, $event)">
                         <span v-if="solved(challenge)">
-                            <font-awesome-icon icon=check class=icon-primary /> Solved by <b>{{solveNames(challenge)}}</b> for <b>{{solvePoints(challenge)}} points</b>
+                            <font-awesome-icon icon=check class=icon-primary /> Solved by <b>{{solveNames(challenge)}}</b> for <b>{{solvePoints(challenge)}}</b>
                         </span>
                         <template v-if="!unlocked(challenge, currentRound.challenges)">
                             <span><font-awesome-icon icon=lock class=icon-info /> Locked until <b>{{lockedName(challenge, currentRound.challenges)}}</b> is solved</span>
@@ -42,7 +42,7 @@
                             <span class=item-description v-if="challenge.tag">
                                 <span class=item-category>Tag</span>
                                 <span class=item-value>{{challenge.tag.name}}</span>
-                                <Tooltip class=item-value-tooltip :title="challenge.tag.name" :content="challenge.tag.description" :below="true">
+                                <Tooltip class=item-value-tooltip :title="challenge.tag.name" :content="challenge.tag.description" below>
                                     <font-awesome-icon icon=info-circle class=icon-tooltip />
                                 </Tooltip>
                             </span>
@@ -62,25 +62,25 @@
                 <span class=center>All rounds have ended, you can view them below</span>
             </div>
 
-            <Collapse v-if="nextRounds.length > 0" label="Next rounds" :large="true" :noborder="true" :value="!currentRound">
+            <Collapse v-if="nextRounds.length > 0" label="Next rounds" large noborder :value="!currentRound">
                 <div class="round list-item" v-for="round in nextRounds" :key="round.start">
                     <span class=item-name>{{round.name}}</span>
                     <span>{{durationDisplay(round)}}</span>
                 </div>
             </Collapse>
 
-            <Collapse class=past-rounds label="Past rounds" v-if="pastRounds.length > 0" :large="true" :noborder="true" :value="!currentRound && nextRounds.length == 0">
+            <Collapse class=past-rounds label="Past rounds" v-if="pastRounds.length > 0" large noborder :value="!currentRound && nextRounds.length == 0">
                 <div class=past-round v-for="round in pastRounds" :key="round.start">
                     <span class=round-name>{{round.name}}</span>
                     <div class=past-round-content>
                         <span class=round-duration>{{durationDisplay(round)}}</span>
                         <span class=round-description>{{round.description}}</span>
-                        <Collapse class=challenges label="Challenges" v-model="round.visible" :loading="round.loading" :noborder="true" @toggle="toggledChallenges(round)">
+                        <Collapse class=challenges label="Challenges" v-model="round.visible" :loading="round.loading" noborder @toggle="toggledChallenges(round)">
                             <div class="challenge list-item unlocked" v-for="challenge in round.challenges" :key="challenge.order"
                                 :tabindex="0" @click="redirectChallenge(challenge.id, $event)" @keydown.enter="redirectChallenge(challenge.id, $event)">
                                 <span v-if="!solved(challenge)"><font-awesome-icon icon=times class=icon-danger /> Not solved</span>
                                 <span v-else>
-                                    <font-awesome-icon icon=check class=icon-primary /> Solved by <b>{{solveNames(challenge)}}</b> for <b>{{solvePoints(challenge)}} points</b>
+                                    <font-awesome-icon icon=check class=icon-primary /> Solved by <b>{{solveNames(challenge)}}</b> for <b>{{solvePoints(challenge)}}</b>
                                 </span>
                                 <span v-if="!unlocked(challenge, round.challenges)">
                                     <font-awesome-icon icon=lock class=icon-info /> Locked because <b>{{lockedName(challenge, currentRound.challenges)}}</b> was not solved
@@ -100,7 +100,7 @@
                                 <span class=item-description v-if="challenge.tag">
                                     <span class=item-category>Tag</span>
                                     <span class=item-value>{{challenge.tag.name}}</span>
-                                    <Tooltip class=item-value-tooltip :title="challenge.tag.name" :content="challenge.tag.description" :below="true">
+                                    <Tooltip class=item-value-tooltip :title="challenge.tag.name" :content="challenge.tag.description" below>
                                         <font-awesome-icon icon=info-circle class=icon-tooltip />
                                     </Tooltip>
                                 </span>
@@ -124,7 +124,7 @@ import Loading from '@/components/Loading.vue';
 import Tooltip from '@/components/Tooltip.vue';
 import Collapse from '@/components/Collapse.vue';
 import { toggledItems, loadItems } from '@/assets/listFunctions';
-import { Round, Challenge, validForm, validChallenges, typeName, typeDescription, durationDisplay, countdownDisplay } from '@shared/validation/roundsForm';
+import { Round, Challenge, validForm, validChallenges, typeName, typeDescription, solvePoints, solveNames, durationDisplay, countdownDisplay } from '@shared/validation/roundsForm';
 
 type Visible = { visible?: boolean };
 
@@ -146,10 +146,8 @@ export default Vue.extend({
             }
 
             setInterval(() => this.time = new Date(), 1000);
-            //setTimeout(() => (this.currentRound?.challenges || [])[0].solves = [{ name: 'BurhBR boy', points: 4 }, { name: 'your team', points: 5 }], 3000); // TODO: remove this
-
             this.loaded = true;
-        });
+        }).catch(() => this.loaded = true);
     },
     data: () => ({
         rounds: [] as Round[],
@@ -177,8 +175,8 @@ export default Vue.extend({
         },
 
         solved(challenge?: Challenge): boolean { return (challenge?.solves?.length || 0) > 0; },
-        solvePoints(challenge: Challenge): number { return challenge.solves?.reduce((acc, cur) => Math.max(acc, cur.points), 0) || 0; },
-        solveNames(challenge: Challenge): string { return challenge.solves?.reduce((acc, cur, i) => cur.name + (i == 1 ? ' and ' : (i == 0 ? '' : ', ')) + acc, '') || ''; },
+        solvePoints(challenge: Challenge): string { return solvePoints(challenge.solves || []); },
+        solveNames(challenge: Challenge): string { return solveNames(challenge.solves || []); },
         lockedChallenge(challenge: Challenge, challenges: Challenge[]): Challenge | undefined { return challenges.find(c => c.order == challenge.lock); },
         unlocked(challenge: Challenge, challenges: Challenge[]): boolean { return challenge.lock < 0 || this.solved(this.lockedChallenge(challenge, challenges)); },
         lockedName(challenge: Challenge, challenges: Challenge[]): string { return this.lockedChallenge(challenge, challenges)?.name || ''; }
@@ -222,6 +220,11 @@ span, a {
 
 .round-description {
     white-space: pre-wrap;
+
+    span {
+        text-align: initial;
+        display: inline-block;
+    }
 }
 
 .challenges {

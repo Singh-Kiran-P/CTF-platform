@@ -116,12 +116,12 @@ const routes: { [page: string]: Route[] } = {
         pages.logout
     ],
     [Roles.ORGANIZER]: [
-        pages.leaderboard,
         pages.teamDashboard,
         pages.teams,
         pages.users,
         pages.roundsAdmin,
         pages.challenge,
+        pages.leaderboard,
         pages.config,
         pages.docker,
         pages.notifications,

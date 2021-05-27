@@ -1,8 +1,8 @@
 import express from 'express';
 const router = express.Router();
-import DB, { Team, Account, Solve, UsedHint } from '../database';
-import { isAuth, hasTeam, getAccount, generatePassword, isAdmin } from '../auth/index';
-import { ILike, Like } from 'typeorm';
+import DB, { Team, Account, Solve } from '../database';
+import { isAuth, hasTeam, getAccount, generatePassword } from '../auth/index';
+import { ILike } from 'typeorm';
 
 router.post('/register', isAuth, (req, res) => {
     req.body = req.fields;
@@ -67,7 +67,7 @@ router.get('/infoDashboard/:uuid', (req, res) => {
     let uuid: string = req.params.uuid;
     let data = { name: '', placement: 0, points: 0, uuid: uuid, inviteCode: '' };
 
-    DB.repo(Team).findOne({ where: { id: uuid }, relations: ['captain', 'accounts', 'solves', 'solves.challenge', 'solves.usedHints'] }).then((team: Team) => {
+    DB.repo(Team).findOne({ where: { id: uuid }, relations: ['captain', 'accounts', 'solves', 'solves.challenge', 'usedHints'] }).then((team: Team) => {
         if (!team) return res.json({ error: 'Team not found' });
         if (req.user) {
             let acc: Account = getAccount(req);
@@ -135,7 +135,7 @@ router.post('/removeMember/:uuid/:memberName', isAuth, (req, res) => {
     DB.repo(Team).findAndCount(
         {
             where: { name: ILike('%' + filter + '%') }, order: { name: "ASC" },
-            relations: ['accounts', 'solves', 'solves.challenge', 'solves.usedHints'],
+            relations: ['accounts', 'solves', 'solves.challenge', 'solves.usedHints'], TODO: SOLVES DONT HAVE USED HINTS, USE TEAM.USEDHINTS
             take: perPage,
             skip: skip
         }
@@ -172,7 +172,7 @@ router.get('/getTeams', (req, res) => {
     DB.repo(Team).find(
         {
             where: { name: ILike('%' + filter + '%') }, order: { name: nameOrder },
-            relations: ['accounts', 'solves', 'solves.challenge', 'solves.usedHints'],
+            relations: ['accounts', 'solves', 'solves.challenge', 'usedHints'],
         }
     ).then((teamsDB: Team[]) => {
 
@@ -195,4 +195,4 @@ router.get('/getTeams', (req, res) => {
     }).catch((err) => { return res.json({ error: err }) });
 });
 
-    export default { path: '/team', router };
+export default { path: '/team', router };

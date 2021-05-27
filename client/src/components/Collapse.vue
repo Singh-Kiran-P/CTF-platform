@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div :class="['header', { 'center': center }]" @click="toggle()">
+        <div :class="['header', { 'center': center, 'left': left }]" @click="toggle()">
             <label :class="{ 'large': large }">{{label}}</label>
             <IconButton icon="chevron-down" :loading="loading" :class="visible ? 'danger' : 'primary'"/>
         </div>
@@ -24,6 +24,7 @@ export default Vue.extend({
         label: String,
         large: Boolean,
         center: Boolean,
+        left: Boolean,
         noborder: Boolean,
         loading: Boolean
     },
@@ -65,9 +66,12 @@ export default Vue.extend({
 .header {
     display: flex;
     align-items: center;
-    justify-content: center;
 
-    &:not(.center) label {
+    &:not(.left) {
+        justify-content: center;
+    }
+
+    &:not(.center):not(.left) label {
         flex-grow: 1;
     }
 

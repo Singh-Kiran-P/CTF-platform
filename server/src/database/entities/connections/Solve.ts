@@ -1,5 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
-import { Account, Challenge, Team, UsedHint } from '../../../database';
+import { Account, Challenge, Team } from '../../../database';
 
 @Entity()
 export class Solve {
@@ -17,9 +17,6 @@ export class Solve {
 
     @Column()
     time: string;
-
-    @OneToMany(_ => UsedHint, usedHint => usedHint.solve)
-    usedHints: UsedHint[];
 
     constructor(challenge: Challenge, team: Team, time: string, account?: Account) {
         this.challenge = challenge;

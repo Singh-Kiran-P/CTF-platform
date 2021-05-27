@@ -39,7 +39,7 @@
                                     <span class=item-description v-if="challenge.tag">
                                         <span class=item-category>Tag</span>
                                         <span class=item-value>{{challenge.tag.name}}</span>
-                                        <Tooltip class=item-value-tooltip :title="challenge.tag.name" :content="challenge.tag.description" :below="true">
+                                        <Tooltip class=item-value-tooltip :title="challenge.tag.name" :content="challenge.tag.description" below>
                                             <font-awesome-icon icon=info-circle class=icon-tooltip />
                                         </Tooltip>
                                     </span>
@@ -65,10 +65,12 @@
                                     <span class=input-tag>Tag</span>
                                     <b-form-select v-model="challenge.tag" :options="tags" :state="state(challengeFeedback(round, challenge))"/>
                                     <span class=input-tag>Points</span>
-                                    <b-form-input type=number :number="true" v-model="challenge.points" placeholder="Enter challenge points"
+                                    <b-form-input type=number number v-model="challenge.points" placeholder="Enter challenge points"
                                         :state="state(challengeFeedback(round, challenge))"/>
-                                    <span class=input-tag>Flag</span>
-                                    <b-form-input type=text trim v-model="challenge.flag" placeholder="Enter challenge flag" :state="state(challengeFeedback(round, challenge))"/>
+                                    <template v-if="challenge.type != typeValues.QUIZ">
+                                        <span class=input-tag>Flag</span>
+                                        <b-form-input type=text trim v-model="challenge.flag" placeholder="Enter challenge flag" :state="state(challengeFeedback(round, challenge))"/>
+                                    </template>
                                     <span class=input-tag>Attachment</span>
                                     <div class=challenge-attachment-input>
                                         <b-form-file v-model="challenge.attachFile" :placeholder="attachPlaceholder(challenge)" :state="state(challengeFeedback(round, challenge))"/>
@@ -92,6 +94,7 @@
                                     <b-form-group v-if="challenge.type == typeValues.QUIZ" :state="state(questionsFeedback(challenge))" :invalid-feedback="questionsFeedback(challenge)">
                                         <Collapse class=questions label=Questions noborder v-model="challenge.questionsVisible" :loading="challenge.questionsLoading"
                                             @toggle="toggledQuestions(challenge)">
+                                            <span>Questions are asked top to bottom</span>
                                             <div class=list-item v-for="question in challenge.questions" :key="question.order">
                                                 <div :class="['item-content', { editable: question.editable }]">
                                                     <template v-if="!question.editable">
@@ -131,7 +134,7 @@
                                                     <span class=item-description>
                                                         <span class=item-category>Cost</span>
                                                         <span v-if="!hint.editable" class=item-value>{{hint.cost}}</span>
-                                                        <b-form-input v-else type=number :number="true" v-model="hint.cost" placeholder="Enter hint cost"
+                                                        <b-form-input v-else type=number number v-model="hint.cost" placeholder="Enter hint cost"
                                                             :state="state(hintFeedback(hint))"/>
                                                     </span>
                                                     <b-form-invalid-feedback>{{hintFeedback(hint)}}</b-form-invalid-feedback>
@@ -202,6 +205,9 @@ export default Vue.extend({
         axios.get('/api/competition/tags').then(res => {
             this.tags = this.tags.concat(res.data.map((tag: Tag) => ({ value: tag, text: tag.name })));
             this.loadFormData();
+        }).catch(() => {
+            this.cancelState = 'error';
+            this.saveState = 'normal';
         });
     },
     data: () => ({

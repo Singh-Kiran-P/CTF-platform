@@ -1,5 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany } from 'typeorm';
-import { Environment, Solve, Question, Round, Hint, Tag } from '../../../database';
+import { Environment, Solve, Question, Round, Hint, Tag, UsedHint } from '../../../database';
 import { ChallengeType } from '@shared/validation/roundsForm';
 
 export { ChallengeType };
@@ -53,6 +53,9 @@ export class Challenge {
 
     @OneToMany(_ => Question, question => question.quiz)
     questions: Question[];
+
+    @OneToMany(_ => UsedHint, usedHint => usedHint.challenge)
+    usedHints: UsedHint[];
 
     @OneToMany(_ => Solve, solve => solve.challenge)
     solves: Solve[];

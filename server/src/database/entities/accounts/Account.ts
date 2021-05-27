@@ -1,5 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
-import { Attempt, Solve, Category, Team, UsedHint } from '../../../database';
+import { Attempt, Solve, Category, Team } from '../../../database';
 import { generatePassword } from '../../../auth';
 
 @Entity()
@@ -45,13 +45,7 @@ export class Account {
     }
 
     getPoints(): number {
-        var points: number = 0;
-        this.solves.forEach((solve: Solve)=>{
-            points += solve.challenge.points;
-            solve.usedHints.forEach((usedHint: UsedHint)=>{
-                points -= usedHint.hint.cost
-            });
-        });
-        return points;
+        return this.solves.reduce((acc, cur) =>
+            acc + Math.max(0, (cur.challenge.points - this.team.usedHints.filter(h => h.challenge.id == cur.challenge.id).reduce((acc, cur) => acc + cur.hint.cost, 0))), 0);
     }
 }

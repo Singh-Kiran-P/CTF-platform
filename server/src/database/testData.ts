@@ -1,5 +1,4 @@
-import DB, { Team, Competition, Category, Challenge, ChallengeType, Tag, Account, Round, Page, TeamRepoCustom } from '../database';
-import { Solve } from './entities/connections/Solve';
+import DB, { Team, Competition, Category, Challenge, ChallengeType, Hint, Tag, Account, Round, Page, TeamRepoCustom } from '../database';
 import { DockerManagement } from './entities/docker/DockerManagement';
 import { DockerOpenPort } from './entities/docker/DockerOpenPort';
 
@@ -49,6 +48,11 @@ async function loadTestData() {
         new Challenge({ round: rounds[1], docker: '', dockerImageId: '', innerPorts: '', lock: -1, tag: null, type: ChallengeType.BASIC, name: 'warm up cuz abotu to get stemey', description: 'i was just joking this one dont even got points LMAO\n\n\n\n\n\nepic owned', points: 0, flag: 'usesless flag LOL', attachment: '', order: 1 }),
         new Challenge({ round: rounds[1], docker: '', dockerImageId: '', innerPorts: '', lock: -1, tag: tags[1], type: ChallengeType.BASIC, name: 'haha finif', description: 'BOO! yeah now it s hard cunt watch out ccd', points: 20, flag: 'haha you wont even find this i bet', attachment: '', order: 7 }),
         new Challenge({ round: rounds[2], docker: '', dockerImageId: '', innerPorts: '', lock: -1, tag: tags[2], type: ChallengeType.BASIC, name: 'huhgg FIN#', description: 'Quest-ce que Lorem Ipsum? Lorem Ipsum est simplement un faux texte de lindustrie de limpression et de la composition. Lorem Ipsum a été le texte factice standard de lindustrie depuis les années 1500, quand un imprimeur inconnu a pris une galère de caractères et la brouillée pour en faire un livre de spécimens. Il a survécu non seulement cinq siècles, mais aussi le saut dans la composition électronique, demeurant essentiellement inchangé. Il a été popularisé dans les années 1960 avec la sortie de feuilles Letraset contenant des passages du Lorem Ipsum, et plus récemment avec un logiciel de publication assistée par ordinateur comme Aldus PageMaker comprenant des versions de Lorem Ipsum.', points: 999, flag: 'tres bon', attachment: '', order: 2 })
+    ]);
+
+    let hints: Hint[] = await save([
+        new Hint({ challenge: challenges[0], name: 'hint number 1', content: 'bl bla useless', cost: 1, order: 1 }),
+        new Hint({ challenge: challenges[0], name: 'SECOND HINT!!', content: 'wooo great', cost: 3, order: 2 })
     ]);
 
     let admin = new Account('admin', 'password');

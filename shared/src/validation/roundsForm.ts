@@ -12,12 +12,15 @@ enum ChallengeType {
 
 type Solve = { name: string, points: number };
 type Question = { question: string, answer: string, order: number };
-type Hint = { name: string, content: string, cost: number, order: number };
+type Hint = { id?: number, name: string, content: string, cost: number, order: number };
 type Challenge = { id?: number, round?: Round, name: string, description: string, tag: Tag | null, points: number, flag: string, order: number, type: ChallengeType,
     attachment: string, attachFile: File | UFile | null, hints: Hint[] | undefined, questions: Question[] | undefined, solves?: Solve[], lock: number,
     docker: string, dockerImageId: string, innerPorts: string, dockerFile: File | UFile | null };
 type Round = { id? :number, name: string, folder: string, start: string, end: string, description: string, challenges: Challenge[] | undefined };
 type Form = { rounds: Round[] };
+
+const solvePoints = (solves: Solve[]): string => { let p = solves.reduce((acc, cur) => Math.max(acc, cur.points), 0); return `${p} point${p == 1 ? '' : 's'}`; };
+const solveNames = (solves: Solve[]): string => { return solves.reduce((acc, cur, i) => cur.name + (i == 1 ? ' and ' : (i == 0 ? '' : ', ')) + acc, ''); };
 
 const typeName = (type: string): string => type == ChallengeType.INTERACTIVE ? 'Interactive' : (type == ChallengeType.QUIZ ? 'Quiz' : 'Basic');
 const typeDescription = (type: string): string => {
@@ -87,7 +90,7 @@ const validate = {
         });
         return v;
     },
-    challenge: (challenge: Challenge, challenges?: Challenge[], create?: boolean, add?: boolean): string => { // TODO: flag not always required
+    challenge: (challenge: Challenge, challenges?: Challenge[], create?: boolean, add?: boolean): string => {
         let v = validateCharacters(challenge.name, 'Challenge name', !add);
         if (!v) v = validateString(challenge.name, 'Challenge name', 3, 32, !add, (challenges || []).map(c => c.name), !add);
         if (!v) v = validateNumber(challenge.points, 'Challenge points', false);
@@ -149,6 +152,6 @@ const isf = {
 }
 
 export {
-    state, validInput, typeName, typeDescription, durationDisplay, countdownDisplay, sortRounds, validForm, validChallenges, validChallenge, validHints, validQuestions,
-    validate, Solve, Question, Hint, Challenge, Round, Form, ChallengeType
+    state, validInput, validate, Solve, Question, Hint, Challenge, Round, Form, ChallengeType,
+    solvePoints, solveNames, typeName, typeDescription, durationDisplay, countdownDisplay, sortRounds, validForm, validChallenges, validChallenge, validHints, validQuestions
 };

@@ -26,6 +26,9 @@ export class Team {
     @JoinColumn()
     accounts: Account[];
 
+    @OneToMany(_ => UsedHint, usedHint => usedHint.team)
+    usedHints: UsedHint[];
+
     @OneToMany(_ => Solve, solve => solve.team)
     solves: Solve[];
 
@@ -58,14 +61,8 @@ export class Team {
         return this.accounts.length;
     }
     getPoints(): number {
-        var points: number = 0;
-        this.solves.forEach((solve: Solve)=>{
-            points += solve.challenge.points;
-            solve.usedHints.forEach((usedHint: UsedHint)=>{
-                points -= usedHint.hint.cost
-            });
-        });
-        return points;
+        return this.solves.reduce((acc, cur) =>
+            acc + Math.max(0, (cur.challenge.points - this.usedHints.filter(h => h.challenge.id == cur.challenge.id).reduce((acc, cur) => acc + cur.hint.cost, 0))), 0);
     }
     getCategory(): Category {
         let catOrder: number = this.accounts[0].category.order;

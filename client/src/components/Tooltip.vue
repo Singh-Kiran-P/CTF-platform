@@ -3,7 +3,7 @@
         <div ref=hover>
             <slot/>
         </div>
-        <b-tooltip :target="() => $refs['hover']" triggers=hover :placement="(below ? 'bottom' : 'top') + (center ? '' : 'right')" :no-fade="true" :class="{ 'left' : !center }">
+        <b-tooltip :target="() => $refs['hover']" triggers=hover :placement="(below ? 'bottom' : 'top') + (center ? '' : 'right')" no-fade :class="{ 'left' : !center }">
             <span class=title>{{title}}</span>
             <span class=content>{{content}}</span>
         </b-tooltip>

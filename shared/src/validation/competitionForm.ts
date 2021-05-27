@@ -21,7 +21,7 @@ const validForm = (f: Form): boolean => {
 const validate = {
     name: (name: string): string => validateString(name, 'Competition name', 3, 32),
     categories: (categories: Category[]): string => validateList(categories, 'category', true),
-    pages: (pages: Page[]): string => pages.findIndex(x => x.path == '/') < 0 ? `A page with path '/' is required` : '',
+    pages: (pages: Page[]): string => !pages.find(x => x.path == '/') ? `A page with path '/' is required` : '',
     tags: (tags: Tag[]): string => validateList(tags, 'tag', false),
     sponsors: (sponsors: Sponsor[]): string => validateList(sponsors, 'sponsor', false),
 

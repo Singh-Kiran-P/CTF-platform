@@ -21,6 +21,7 @@ export default Vue.extend({
         normal: String,
         loading: String,
         succes: String,
+        error: String,
         size: String
     },
     computed: {
@@ -30,7 +31,7 @@ export default Vue.extend({
         content(): string {
             if (this.isLoading) return this.loading + '...';
             if (this.isSucces) return this.succes;
-            if (this.isError) return 'Retry ' + this.loading;
+            if (this.isError) return this.error || 'Retry ' + this.loading;
             return this.normal;
         }
     }

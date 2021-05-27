@@ -6,6 +6,6 @@ WORKDIR /ctf/server
 
 # COPY  . .
 
-EXPOSE 4001
+EXPOSE 4000
 
 CMD ["npm", "run", "server"]
