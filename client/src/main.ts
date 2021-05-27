@@ -22,8 +22,9 @@ Vue.use(VueMeta, { refreshOnceOnNavigation: true });
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 
 
+console.log(process.env);
 
-let hostURL = `http://${process.env.VUE_APP_API_HOST}:${process.env.VUE_APP_API_SERVER}`;
+let hostURL = `http://${process.env.VUE_APP_API_HOST}:${process.env.VUE_APP_API_PORT}`;
 const socket = io(hostURL)
 Vue.use(VueSocketIOExt, socket);
 

@@ -1,6 +1,8 @@
 HOSTING=DOCKER
 
 NODE_ENV=development
+
+// DON't FORGET TO UPDATE docker-compose file [ port-binding ]
 SERVER_PORT=4000
 
 DB_HOST=localhost

@@ -9,7 +9,7 @@ export default {
     init: (httpServer: any) => {
         io = new Server(httpServer, {
             cors: {
-                origin: "http://localhost",
+                origin: "*",
                 methods: ["GET", "POST"],
                 allowedHeaders: ["custom-header"],
                 credentials: true
