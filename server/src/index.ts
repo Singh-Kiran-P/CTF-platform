@@ -50,7 +50,7 @@ app.all(/./, (_, __, next) => {
 app.use('/docs', express.static(path.join(__dirname, "../../../", 'docs')));
 
 //to fetch images
-app.use('/sponsor-image', express.static(path.join(__dirname, "../../../" , 'uploads', 'sponsors')));
+app.use('/sponsors', express.static(path.join(__dirname, "../../../" , 'uploads', 'sponsors')));
 
 // register all routes
 routes.forEach(route => app.use(route.path, route.router));
