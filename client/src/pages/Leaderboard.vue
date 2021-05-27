@@ -14,10 +14,10 @@
         </div>
         <div class=sponsors>
             <Carousel :autoplay="true" :autoplayHoverPause="true" :loop="true" :paginationEnabled="false" :perPageCustom="[[1024, 4],[750,3],[550, 2], [350,1]]" easing="linear" :autoplayTimeout="5000" :speed="1000" :centerMode="true" class=sponsor-slider>
-                    <Slide v-for="i in 12" :key="i" class=sponsor-cell>
+                    <Slide v-for="i in 2" :key="i" class=sponsor-cell>
                         <div class=sponsor-cell-content>
                             <a href="https://www.w3schools.com" target="_blank" rel="noopener noreferrer">
-                            <img alt="W3Schools" src="https://d3vn5rg72hh8yg.cloudfront.net/cdn/imagesource/previews/7817/d757175fbcc4570653933e2d98b3dfe7/3/a14d09b53f06427e41c208aca8db07df/2345086.jpg">
+                            <img alt="W3Schools" src="/api/sponsor-image/../rounds/logo_cegeka_w.png">
                             </a>
                         </div>
                     </Slide>

@@ -173,7 +173,7 @@ export default Vue.extend({
         },
     },
     async mounted() {
-        this.chart = am4core.create(this.id, am4charts.XYChart);
+        this.chart = am4core.create(this.category, am4charts.XYChart);
         this.chart.width = am4core.percent(100);
         this.chart.height = am4core.percent(100);
         let title = this.chart.titles.create();

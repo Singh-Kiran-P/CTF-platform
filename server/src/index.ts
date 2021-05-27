@@ -50,7 +50,11 @@ app.all(/./, (_, __, next) => {
     app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 });
 
+// serve docs
+app.use('/docs', express.static(path.join(__dirname, "../../../", 'docs')));
 
+//to fetch images
+app.use('/sponsor-image', express.static(path.join(__dirname, "../../../" , 'uploads', 'sponsors')));
 
 // register all routes
 routes.forEach(route => app.use(route.path, route.router));

@@ -71,7 +71,7 @@ router.get('/infoDashboard/:uuid', (req, res) => {
         if (!team) return res.json({ error: 'Team not found' });
         if (req.user) {
             let acc: Account = getAccount(req);
-            if (team.captain.id == acc.id || acc.admin) { isCaptainOrAdmin = true; data.inviteCode = team.inviteCode; } //mag weg
+            if (team.captain.id == acc.id || acc.admin) { isCaptainOrAdmin = true; data.inviteCode = team.inviteCode; }
             if (team.captain.id == acc.id) {isCaptain = true; data.inviteCode = team.inviteCode; }
             else if (acc.admin) {isAdmin = true; data.inviteCode = team.inviteCode; }
             else if (team.accounts.some(member => member.id == acc.id)) { isMember = true; }
