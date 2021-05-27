@@ -102,7 +102,7 @@ export default Vue.extend({
     width: 60%;
     height: 85vh;
     margin-right: 10px;
-    background: #8c8;
+    /* background: #8c8; */
     border-radius: 5px;
     display: flex;
     justify-content: center;

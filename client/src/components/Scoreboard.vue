@@ -33,21 +33,30 @@ export default Vue.extend({
     }),
     created() {
         this.$socket.$subscribe("BACH 1", (data: any) => {
-            var newDate1 = new Date("2019-12-13T08:08:0.838Z");
+            var newDate1 = new Date("2019-12-31T05:36");
+            console.log(newDate1);
 
             let len = this.teams[0].scores.length - 1;
-            console.log(this.teams[0].scores[len].date);
-            console.log(this.teams[0].scores[len].score);
+            // console.log(this.teams[0].scores[len].date);
+            // console.log(this.teams[0].scores[len].score);
 
-            this.teams[0].scores.push({
-                date: this.teams[0].scores[len].date,
-                score: this.teams[0].scores[len].score + 10,
+            // this.teams[0].scores.push({
+            //     date: this.teams[0].scores[len].date,
+            //     score: this.teams[0].scores[len].score + 10,
+            // });
+            // console.log("oke");
+
+            // get the serie (team serie) and add a point
+            this.chart.series.getIndex(0)?.addData({
+                date: newDate1,
+                score: this.teams[0].scores[len].score + 100,
             });
-            console.log("oke");
-            console.log(this.chart.map.getKey("1").clear());
+
+            // console.log(this.chart.series.getIndex(0)?.dataChangeUpdate());
+            // console.log(this.chart.series.getIndex(0)?.data);
         });
         this.$socket.$subscribe("BACH 3", (data: any) => {
-            var newDate1 = new Date("2019-12-13T08:08:0.838Z");
+            var newDate1 = new Date("2019-12-31T05:30:00.000Z");
 
             let len = this.teams[0].scores.length - 1;
 
@@ -202,9 +211,6 @@ export default Vue.extend({
         // Create Y axis
         var pointsAxis = this.chart.yAxes.push(new am4charts.ValueAxis());
         //pointsAxis.calculateTotals = true;
-        // Add data
-        this.loadData();
-        this.chart.data;
 
         // load data
         await axios.get("/api/leaderboard/getAllData").then((response) => {
@@ -216,6 +222,7 @@ export default Vue.extend({
             let score = 0;
             team.scores.forEach((data) => {
                 data.score += score;
+                // console.log(data.date);
                 data.date = new Date(data.date);
             });
 
