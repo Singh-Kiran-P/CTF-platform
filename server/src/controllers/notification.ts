@@ -23,18 +23,15 @@ function send_POST(req: Request, res: Response) {
     let title: string = data.title.toString();
     let msg: string = data.msg.toString();
 
-    new Promise<void>(async (resolve, reject) => {
-        //save to db
-        let notificationRepo = DB.repo(Notification);
-        let notification = new Notification(title, msg);
-        await notificationRepo.save(notification);
-
-        // emit socket
-        let socket = socketIO.getIO();
-        socket.emit('notification', data);
-        console.log(data);
-    })
+    //save to db
+    let notificationRepo = DB.repo(Notification);
+    let notification = new Notification(title, msg);
+    notificationRepo.save(notification)
         .then((data) => {
+            // emit socket
+            let socket = socketIO.getIO();
+            socket.emit('notification', data);
+            console.log(data);
             res.json({ message: 'Notification send successfully!', statusCode: 205 });
         })
         .catch(() => {
@@ -51,17 +48,14 @@ function deleteById_DELETE(req: Request, res: Response) {
     notificationRepo
         .delete({ id: _id })
         .then(() => {
+            // emit socket
+            let socket = socketIO.getIO();
+            socket.emit('notificationUpdate', {});
             res.json({ message: 'Notification deleted successfully!', statusCode: 200 });
         })
         .catch((err) => {
             res.json({ message: err, statusCode: 404 });
         })
-
-    // emit socket
-    let socket = socketIO.getIO();
-    socket.emit('notificationUpdate', {});
-
-
 }
 
 function deleteAll_DELETE(req: Request, res: Response) {

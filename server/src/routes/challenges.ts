@@ -4,6 +4,8 @@ import { Root, uploaddir } from '../files';
 import levenshtein from 'fast-levenshtein';
 import express from 'express';
 const router = express.Router();
+import { LeaderBoardController } from "../controllers/leaderboard";
+let leaderboardController = new LeaderBoardController();
 
 const challengeRelations = ['solves', 'solves.team', 'solves.account', 'usedHints', 'usedHints.team'];
 
@@ -40,7 +42,7 @@ const challengeAvailable = (challengeId: number | string, relations: string[], a
     }).catch(() => res.json(error()));
 }
 
-const responseSolve = (challenge: Challenge, solve: Solve): any => ({
+const responseSolve = (challenge: Challenge, solve: Solve): { name: string, points: number, time: string } => ({
     name: solve.account?.name || solve.team.name,
     points: challenge.usedHints.filter(h => h.team.id == solve.team?.id).reduce((acc, cur) => Math.max(acc - cur.hint.cost, 0), challenge.points),
     time: solve.time
@@ -114,8 +116,9 @@ const attempt = (res: express.Response, account: Account, team: Team, challenge:
             if (next) return res.send({ solved: true, next: next });
             DB.repo(Solve).save(new Solve(challenge, team, new Date().toJSON(), account)).then(solve => {
                 if (!solve) return res.json(error(true));
-                // TODO leaderboard update
-                res.send({ solved: responseSolve(challenge, solve) });
+                let response = responseSolve(challenge, solve);
+                leaderboardController.updateLeaderboard(account, response.points, response.time);
+                res.send({ solved: response });
             }).catch(() => res.json(error(true)));
         }).catch(() => res.json(error(true)));
     }).catch(() => res.json(error(true)));

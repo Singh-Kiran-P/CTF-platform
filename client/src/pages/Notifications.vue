@@ -12,7 +12,7 @@
                     <b-form-input
                         id="input-1"
                         v-model="form.title"
-                        placeholder=""
+                        placeholder="Enter notification title"
                         required
                     ></b-form-input>
                 </b-form-group>
@@ -25,8 +25,8 @@
                     <b-form-textarea
                         id="textarea-formatter"
                         v-model="form.msg"
-                        placeholder="Type here your message"
-                        rows="4"
+                        placeholder="Enter notification message"
+                        max-rows="10"
                     ></b-form-textarea>
                 </b-form-group>
                 <b-button type="submit" variant="primary">Send</b-button>
@@ -142,12 +142,8 @@ export default Vue.extend({
                     } else if (data.statusCode === 404)
                         Toast.send(this, "Message", data.message, "danger");
                 })
-                .then(() => {
-                    this.loadNotifications();
-                })
                 .catch();
 
-            this.notifications = this.notifications.filter((x) => x.id != id);
         },
     },
 });
