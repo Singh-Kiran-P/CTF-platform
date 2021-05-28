@@ -25,7 +25,7 @@
                             <div :class="['list-item', { nostyle: challenge.editable }]" v-for="challenge in round.challenges" :key="challenge.order">
                                 <div class=item-content v-if="!challenge.editable">
                                     <span v-if="challenge.lock >= 0">
-                                        <font-awesome-icon icon=lock /> Locked until <b>{{lockedName(challenge, round.challenges)}}</b> is solved
+                                        <font-awesome-icon icon=lock class=icon-info /> Locked until <b>{{lockedName(challenge, round.challenges)}}</b> is solved
                                     </span>
                                     <span class=item-name>{{challenge.name}}</span>
                                     <span class="item-description nowrap">{{challenge.description}}</span>
@@ -33,14 +33,14 @@
                                         <span class=item-category>Type</span>
                                         <span class=item-value>{{typeName(challenge.type)}}</span>
                                         <Tooltip class=item-value-tooltip :title="typeName(challenge.type)" :content="typeDescription(challenge.type)">
-                                            <font-awesome-icon icon=info-circle />
+                                            <font-awesome-icon icon=info-circle class=icon-info />
                                         </Tooltip>
                                     </span>
                                     <span class=item-description v-if="challenge.tag">
                                         <span class=item-category>Tag</span>
                                         <span class=item-value>{{challenge.tag.name}}</span>
                                         <Tooltip class=item-value-tooltip :title="challenge.tag.name" :content="challenge.tag.description" below>
-                                            <font-awesome-icon icon=info-circle class=icon-tooltip />
+                                            <font-awesome-icon icon=info-circle class=icon-info />
                                         </Tooltip>
                                     </span>
                                     <span class=item-description>
@@ -67,8 +67,8 @@
                                     <span class=input-tag>Points</span>
                                     <b-form-input type=number number v-model="challenge.points" placeholder="Enter challenge points"
                                         :state="state(challengeFeedback(round, challenge))"/>
-                                    <template v-if="challenge.type != typeValues.QUIZ">
-                                        <span class=input-tag>Flag</span>
+                                    <template v-if="true">
+                                        <span class=input-tag>Flag <span v-if="challenge.type == typeValues.QUIZ">(Not used for quizzes)</span></span>
                                         <b-form-input type=text trim v-model="challenge.flag" placeholder="Enter challenge flag" :state="state(challengeFeedback(round, challenge))"/>
                                     </template>
                                     <span class=input-tag>Attachment</span>
@@ -102,11 +102,22 @@
                                                         <span class=item-description>{{question.answer}}</span>
                                                     </template>
                                                     <template v-else>
-                                                        <b-form-textarea max-rows="10" v-model="question.question" placeholder="Enter quiz question"
+                                                        <b-form-textarea max-rows="10" v-model="question.question" placeholder="Enter question"
                                                             :state="state(questionFeedback(question))"/>
-                                                        <b-form-textarea max-rows="10" v-model="question.answer" placeholder="Enter question answer"
-                                                            :state="state(questionFeedback(question))"/>
+                                                        <b-form-textarea max-rows="10" trim v-model="question.answer" :state="state(questionFeedback(question))"
+                                                            placeholder="Enter answers, each line is a different correct answer"/>
                                                     </template>
+                                                    <span class=item-description>
+                                                        <span class=item-category>Accuracy</span>
+                                                        <Tooltip title="Answer accuracy" class=category-tooltip
+                                                            content="The percentage of characters which have to be right for an answer to be counted as correct,
+                                                            calculated using the Levenshtein distance">
+                                                            <font-awesome-icon icon=info-circle class=icon-info />
+                                                        </Tooltip>
+                                                        <span v-if="!question.editable" class=item-value>{{question.accuracy}}</span>
+                                                        <b-form-input v-else type=number number v-model="question.accuracy" placeholder="Enter answer accuracy"
+                                                            :state="state(questionFeedback(question))"/>
+                                                    </span>
                                                     <b-form-invalid-feedback>{{questionFeedback(question)}}</b-form-invalid-feedback>
                                                 </div>
                                                 <IconButton class=info icon=pen icon2=save :toggled="question.editable" @click="editQuestion(question)"
@@ -330,8 +341,11 @@ export default Vue.extend({
         lockOptions(round: Round, challenge: Challenge){
             return [{ value: -1, text: 'Unlocked' }].concat(round.challenges?.filter(c => c.order < challenge.order).map(c => ({ value: c.order, text: c.name })) || []);
         },
-        changedType(challenge: Challenge) {
-            if (challenge.type == ChallengeType.QUIZ && challenge.questions == undefined) this.toggledQuestions(challenge, true);
+        changedType(challenge: Challenge & QuestionsVisible) {
+            if (challenge.type == ChallengeType.QUIZ && challenge.questions == undefined) {
+                challenge.questionsVisible = true;
+                this.toggledQuestions(challenge, true);
+            }
         },
         toggledHints(challenge: Challenge & HintsVisible): void {
             toggledItems(challenge, 'hintsLoading', challenge.hintsVisible, challenge.hints, c => this.loadHints(c));
@@ -365,7 +379,7 @@ export default Vue.extend({
         addQuestion(challenge: Challenge): void {
             if (challenge.questions == undefined) challenge.questions = [];
             let add = { order: nextOrder(challenge.questions), editable: true };
-            challenge.questions.push(Object.assign({}, add, { question: '', answer: '' }));
+            challenge.questions.push(Object.assign({}, add, { question: '', answer: '', accuracy: 80 }));
         }
     }
 });
@@ -452,6 +466,10 @@ span.info {
             &:not(:first-child) {
                 margin-top: var(--margin);
             }
+
+            span {
+                font-weight: initial;
+            }
         }
 
         .challenge-attachment-input {
@@ -475,6 +493,16 @@ span.info {
                 white-space: pre-wrap;
             }
 
+            .item-category {
+                min-width: unset;
+            }
+
+            .category-tooltip {
+                flex-grow: 0;
+                width: initial;
+                margin: 0 var(--margin);
+            }
+
             textarea:first-of-type {
                 margin-top: 0;
             }
@@ -485,5 +513,9 @@ span.info {
         display: block;
         margin-bottom: 0;
     }
+}
+
+.icon-info {
+    color: var(--info);
 }
 </style>

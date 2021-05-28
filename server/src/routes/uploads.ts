@@ -4,8 +4,8 @@ const router = express.Router();
 
 const uploaddir = '/server/uploads';
 
-router.get('/pages/:page*', (req, res) => {
-    let page = '/pages/' + req.params.page + req.params[0];
+router.get('/pages/:page(*)', (req, res) => {
+    let page = '/pages/' + req.params.page;
     res.sendFile(Root + uploaddir + page);
 });
 

@@ -19,7 +19,7 @@ export class Account {
     @Column()
     admin: boolean;
 
-    @ManyToOne(_ => Category, category => category.accounts, { nullable: true, onDelete: 'SET NULL', eager: true })
+    @ManyToOne(_ => Category, category => category.accounts, { nullable: true, onDelete: 'CASCADE', eager: true })
     category: Category;
 
     @ManyToOne(_ => Team, team => team.accounts, { nullable: true, onDelete: 'SET NULL', eager: true })

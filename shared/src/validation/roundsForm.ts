@@ -11,7 +11,7 @@ enum ChallengeType {
 }
 
 type Solve = { name: string, points: number };
-type Question = { question: string, answer: string, order: number };
+type Question = { id?: number, question: string, answer: string, accuracy: number, order: number };
 type Hint = { id?: number, name: string, content: string, cost: number, order: number };
 type Challenge = { id?: number, round?: Round, name: string, description: string, tag: Tag | null, points: number, flag: string, order: number, type: ChallengeType,
     attachment: string, attachFile: File | UFile | null, hints: Hint[] | undefined, questions: Question[] | undefined, solves?: Solve[], lock: number,
@@ -40,16 +40,19 @@ const durationDisplay = (round: Round): string => {
 
 const countdownDisplay = (now: Date, round: Round): string => {
     let time = [round.start, round.end].map(time => new Date(time)).filter(t => t > new Date()).concat([new Date()])[0];
-    let diff = Math.max(0, time.getTime() - now.getTime());
-    const amount = (time: number): number => {
-        let amount = Math.floor(diff / time);
-        diff %= time;
-        return amount;
+    return timeDisplay(Math.max(0, time.getTime() - now.getTime()));
+}
+
+const timeDisplay = (time: number, short?: boolean): string => {
+    const amount = (t: number): number => {
+        let a = Math.floor(time / t);
+        time %= t;
+        return a;
     }
     let [y, d, h, m, s] = [amount(1000 * 60 * 60 * 24 * 365), amount(1000 * 60 * 60 * 24), amount(1000 * 60 * 60), amount(1000 * 60), amount(1000)];
     const t = (amount: number, time: string) => `${amount} ${time}${amount == 1 ? '' : 's'}`;
     let large = (y ? `${t(y, 'year')}, ` : '') + (y || d ? `${t(d, 'day')}, ` : '') + (y || d ? t(h, 'hour') : '');
-    return large || ((h ? h + 'h ' : '') + m + 'm ' + (s < 10 ? '0' : '') + s + 's');
+    return large || ((h ? h + 'h ' : '') + (m || !short ? m + 'm ' : '') + (s < 10 && !short ? '0' : '') + s + 's');
 }
 
 const sortRounds = (rounds: Round[]): Round[] => [...rounds].sort((a, b) => new Date(a.start) < new Date(b.start) ? -1 : 1);
@@ -111,9 +114,10 @@ const validate = {
         return v || validateNumber(hint.cost, 'Hint cost', false);
     },
     question: (question: Question, create?: boolean, add?: boolean): string => {
-        let v = validateString(question.question, 'Quiz question', -1, -1, !add);
+        let v = validateString(question.question, 'Quiz question', -1, -1, !add && !!create);
         if (!v && create) v = validateString(question.answer, 'Question answer', -1, -1, !add);
         if (!v && !create && question.answer) v = 'Question answer must be excluded';
+        if (!v) v = validateNumber(question.accuracy, 'Question accuracy', false, 0, 100);
         return v;
     }
 }
@@ -147,11 +151,11 @@ const isf = {
         return is.object(hint) && is.string(hint.name) && is.string(hint.content) && is.number(hint.cost) && is.number(hint.order);
     },
     question: (question: any): boolean => {
-        return is.object(question) && is.string(question.question) && is.string(question.answer) && is.number(question.order);
+        return is.object(question) && is.string(question.question) && is.string(question.answer) && is.number(question.accuracy) && is.number(question.order);
     }
 }
 
 export {
     state, validInput, validate, Solve, Question, Hint, Challenge, Round, Form, ChallengeType,
-    solvePoints, solveNames, typeName, typeDescription, durationDisplay, countdownDisplay, sortRounds, validForm, validChallenges, validChallenge, validHints, validQuestions
+    solvePoints, solveNames, typeName, typeDescription, durationDisplay, countdownDisplay, timeDisplay, sortRounds, validForm, validChallenges, validChallenge, validHints, validQuestions
 };

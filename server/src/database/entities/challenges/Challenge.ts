@@ -18,7 +18,7 @@ export class Challenge {
     @Column()
     description: string;
 
-    @ManyToOne(_ => Tag, tag => tag.challenges, { nullable: true, eager: true })
+    @ManyToOne(_ => Tag, tag => tag.challenges, { nullable: true, onDelete: 'SET NULL', eager: true })
     tag: Tag;
 
     @Column()

@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
 import { Account, Challenge, Team } from '../../../database';
 
 @Entity()
@@ -6,13 +6,13 @@ export class Solve {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @ManyToOne(_ => Challenge, challenge => challenge.solves, { nullable: false })
+    @ManyToOne(_ => Challenge, challenge => challenge.solves, { nullable: false, onDelete: 'CASCADE' })
     challenge: Challenge;
 
-    @ManyToOne(_ => Team, team => team.solves, { nullable: false })
+    @ManyToOne(_ => Team, team => team.solves, { nullable: false, onDelete: 'CASCADE' })
     team: Team;
 
-    @ManyToOne(_ => Account, account => account.solves, { nullable: true })
+    @ManyToOne(_ => Account, account => account.solves, { nullable: true, onDelete: 'SET NULL' })
     account: Account;
 
     @Column()

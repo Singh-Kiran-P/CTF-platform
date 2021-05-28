@@ -6,7 +6,7 @@ export class Hint {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @ManyToOne(_ => Challenge, challenge => challenge.hints, { nullable: false })
+    @ManyToOne(_ => Challenge, challenge => challenge.hints, { nullable: false,  onDelete: 'CASCADE' })
     challenge: Challenge;
 
     @OneToMany(_ => UsedHint, usedHint => usedHint.hint)

@@ -13,7 +13,7 @@
                 <span class="round-name center">{{currentRound.name}}</span>
                 <span class="round-duration center">{{durationDisplay(currentRound)}}</span>
                 <span class="round-time center">{{countdownDisplay(currentRound)}}</span>
-                <span class="round-description center"><span>{{currentRound.description}}</span></span>
+                <span class="round-description center"><span v-if="currentRound.description">{{currentRound.description}}</span></span>
                 <Collapse class=challenges label="Challenges" large center v-model="currentRound.visible" :loading="currentRound.loading"
                     @toggle="toggledChallenges(currentRound)">
                     <div v-for="challenge in currentRound.challenges" :key="challenge.order" :tabindex="unlocked(challenge, currentRound.challenges) ? 0 : -1"
@@ -43,7 +43,7 @@
                                 <span class=item-category>Tag</span>
                                 <span class=item-value>{{challenge.tag.name}}</span>
                                 <Tooltip class=item-value-tooltip :title="challenge.tag.name" :content="challenge.tag.description" below>
-                                    <font-awesome-icon icon=info-circle class=icon-tooltip />
+                                    <font-awesome-icon icon=info-circle class=icon-info />
                                 </Tooltip>
                             </span>
                             <span class=item-description>
@@ -101,7 +101,7 @@
                                     <span class=item-category>Tag</span>
                                     <span class=item-value>{{challenge.tag.name}}</span>
                                     <Tooltip class=item-value-tooltip :title="challenge.tag.name" :content="challenge.tag.description" below>
-                                        <font-awesome-icon icon=info-circle class=icon-tooltip />
+                                        <font-awesome-icon icon=info-circle class=icon-info />
                                     </Tooltip>
                                 </span>
                                 <span class=item-description>
@@ -297,8 +297,7 @@ span, a {
     color: var(--danger);
 }
 
-.icon-info, .icon-tooltip {
+.icon-info {
     color: var(--info);
 }
-
 </style>

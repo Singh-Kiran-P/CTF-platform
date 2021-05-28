@@ -20,7 +20,7 @@ interface DatabaseEvents {
  * Database class to connect to the database and provide help functions to access it
  */
 class Database extends EventEmitter {
-    loadTestData: boolean = (process.env.DB_LOAD_DATA == 'true') ? true : false; // empties and loads test data into the database before connecting if true
+    loadTestData: boolean = /* TODO (process.env.DB_LOAD_DATA == 'true') ? true : */ false; // empties and loads test data into the database before connecting if true
     conn: Connection = null;
 
     constructor() {
@@ -151,7 +151,7 @@ export { Tag } from './entities/challenges/Tag';
 export { Competition, CompetitionRepo } from './entities/competition/Competition';
 export { Page } from './entities/competition/Page';
 export { Sponsor } from './entities/competition/Sponsor';
-export { Attempt, AttemptType } from './entities/connections/Attempt';
+export { Attempt, AttemptType, loginAvailable, solveAvailable } from './entities/connections/Attempt';
 export { Environment } from './entities/connections/Environment';
 export { Solve } from './entities/connections/Solve';
 export { UsedHint } from './entities/connections/UsedHint';

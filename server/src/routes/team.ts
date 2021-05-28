@@ -87,7 +87,7 @@ router.get('/getMembers/:uuid', (req, res) => {
     let uuid: string = req.params.uuid;
 
     Promise.all([
-        DB.repo(Account).find({ where: { team: uuid }, relations: ['solves', 'solves.challenge'] }),
+        DB.repo(Account).find({ where: { team: { id: uuid } }, relations: ['solves', 'solves.challenge'] }),
         DB.repo(Team).findOne({ where: { id: uuid }, relations: ['captain'] })
     ]).then(([members, team]: [Account[], Team]) => {
         members.forEach((member: Account) => {
@@ -192,7 +192,7 @@ router.get('/getTeams', (req, res) => {
             else teamsData.sort((t1, t2)=>t1.points-t2.points);
         }
         return res.json({ teams: teamsData.slice(skip, skip+perPage), amount: amount });
-    }).catch((err) => { return res.json({ error: err }) });
+    }).catch((err) => { return res.json({ error: 'Error retrieving teams' }) });
 });
 
 export default { path: '/team', router };

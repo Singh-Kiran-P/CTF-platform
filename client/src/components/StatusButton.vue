@@ -1,5 +1,5 @@
 <template>
-    <b-button :size="size" :type="type" :block="block" :variant="variant" :disabled="disabled || isLoading || isSucces" @click="$emit('click', $event)">
+    <b-button :size="size" :type="type || 'button'" :block="block" :variant="variant" :disabled="disabled || isLoading || isSucces" @click="$emit('click', $event)">
         <b-spinner v-if="isLoading" small label=loading... />
         <font-awesome-icon v-if="isSucces" icon=check />
         <font-awesome-icon v-if="isError" icon=times />
