@@ -98,15 +98,16 @@
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="database_entities_challenges_challenge.challenge.html#hints" class="tsd-kind-icon">hints</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="database_entities_challenges_challenge.challenge.html#id" class="tsd-kind-icon">id</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="database_entities_challenges_challenge.challenge.html#innerports" class="tsd-kind-icon">inner<wbr>Ports</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="database_entities_challenges_challenge.challenge.html#lock" class="tsd-kind-icon">lock</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="database_entities_challenges_challenge.challenge.html#name" class="tsd-kind-icon">name</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="database_entities_challenges_challenge.challenge.html#order" class="tsd-kind-icon">order</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="database_entities_challenges_challenge.challenge.html#points" class="tsd-kind-icon">points</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class"><a href="database_entities_challenges_challenge.challenge.html#previous" class="tsd-kind-icon">previous</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="database_entities_challenges_challenge.challenge.html#questions" class="tsd-kind-icon">questions</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="database_entities_challenges_challenge.challenge.html#round" class="tsd-kind-icon">round</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="database_entities_challenges_challenge.challenge.html#solves" class="tsd-kind-icon">solves</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="database_entities_challenges_challenge.challenge.html#tag" class="tsd-kind-icon">tag</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="database_entities_challenges_challenge.challenge.html#type" class="tsd-kind-icon">type</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="database_entities_challenges_challenge.challenge.html#usedhints" class="tsd-kind-icon">used<wbr>Hints</a></li>
 							</ul>
 						</section>
 					</div>
@@ -118,19 +119,19 @@
 					<a name="constructor" class="tsd-anchor"></a>
 					<h3>constructor</h3>
 					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">new <wbr>Challenge<span class="tsd-signature-symbol">(</span>params<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-symbol">{ </span>attachment<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>description<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>docker<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>dockerImageId<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>flag<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>id<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>innerPorts<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>order<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>points<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>previous<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>round<span class="tsd-signature-symbol">: </span><a href="database_entities_challenges_round.round.html" class="tsd-signature-type" data-tsd-kind="Class">Round</a><span class="tsd-signature-symbol">; </span>tag<span class="tsd-signature-symbol">: </span><a href="database_entities_challenges_tag.tag.html" class="tsd-signature-type" data-tsd-kind="Class">Tag</a><span class="tsd-signature-symbol">; </span>type<span class="tsd-signature-symbol">: </span><a href="../enums/database_entities_challenges_challenge.challengetype.html" class="tsd-signature-type" data-tsd-kind="Enumeration">ChallengeType</a><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="database_entities_challenges_challenge.challenge.html" class="tsd-signature-type" data-tsd-kind="Class">Challenge</a></li>
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Challenge<span class="tsd-signature-symbol">(</span>params<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-symbol">{ </span>attachment<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>description<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>docker<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>dockerImageId<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>flag<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>id<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>innerPorts<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>lock<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>order<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>points<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>round<span class="tsd-signature-symbol">: </span><a href="database_entities_challenges_round.round.html" class="tsd-signature-type" data-tsd-kind="Class">Round</a><span class="tsd-signature-symbol">; </span>tag<span class="tsd-signature-symbol">: </span><a href="database_entities_challenges_tag.tag.html" class="tsd-signature-type" data-tsd-kind="Class">Tag</a><span class="tsd-signature-symbol">; </span>type<span class="tsd-signature-symbol">: </span><a href="../enums/database_entities_challenges_challenge.challengetype.html" class="tsd-signature-type" data-tsd-kind="Enumeration">ChallengeType</a><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="database_entities_challenges_challenge.challenge.html" class="tsd-signature-type" data-tsd-kind="Class">Challenge</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/INF-Vakken-PSOPV-20-21/inf-psopv-20-21-team-groep-2/blob/ffabf81/server/src/database/entities/challenges/Challenge.ts#L61">server/src/database/entities/challenges/Challenge.ts:61</a></li>
+									<li>Defined in <a href="https://github.com/INF-Vakken-PSOPV-20-21/inf-psopv-20-21-team-groep-2/blob/aae40ef/server/src/database/entities/challenges/Challenge.ts#L64">server/src/database/entities/challenges/Challenge.ts:64</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5><span class="tsd-flag ts-flagOptional">Optional</span> params: <span class="tsd-signature-symbol">{ </span>attachment<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>description<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>docker<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>dockerImageId<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>flag<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>id<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>innerPorts<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>order<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>points<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>previous<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>round<span class="tsd-signature-symbol">: </span><a href="database_entities_challenges_round.round.html" class="tsd-signature-type" data-tsd-kind="Class">Round</a><span class="tsd-signature-symbol">; </span>tag<span class="tsd-signature-symbol">: </span><a href="database_entities_challenges_tag.tag.html" class="tsd-signature-type" data-tsd-kind="Class">Tag</a><span class="tsd-signature-symbol">; </span>type<span class="tsd-signature-symbol">: </span><a href="../enums/database_entities_challenges_challenge.challengetype.html" class="tsd-signature-type" data-tsd-kind="Enumeration">ChallengeType</a><span class="tsd-signature-symbol"> }</span></h5>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> params: <span class="tsd-signature-symbol">{ </span>attachment<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>description<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>docker<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>dockerImageId<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>flag<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>id<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>innerPorts<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>lock<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>order<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>points<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>round<span class="tsd-signature-symbol">: </span><a href="database_entities_challenges_round.round.html" class="tsd-signature-type" data-tsd-kind="Class">Round</a><span class="tsd-signature-symbol">; </span>tag<span class="tsd-signature-symbol">: </span><a href="database_entities_challenges_tag.tag.html" class="tsd-signature-type" data-tsd-kind="Class">Tag</a><span class="tsd-signature-symbol">; </span>type<span class="tsd-signature-symbol">: </span><a href="../enums/database_entities_challenges_challenge.challengetype.html" class="tsd-signature-type" data-tsd-kind="Enumeration">ChallengeType</a><span class="tsd-signature-symbol"> }</span></h5>
 									<ul class="tsd-parameters">
 										<li class="tsd-parameter">
 											<h5>attachment<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></h5>
@@ -154,6 +155,9 @@
 											<h5>inner<wbr>Ports<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></h5>
 										</li>
 										<li class="tsd-parameter">
+											<h5>lock<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></h5>
+										</li>
+										<li class="tsd-parameter">
 											<h5>name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></h5>
 										</li>
 										<li class="tsd-parameter">
@@ -161,9 +165,6 @@
 										</li>
 										<li class="tsd-parameter">
 											<h5>points<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></h5>
-										</li>
-										<li class="tsd-parameter">
-											<h5>previous<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></h5>
 										</li>
 										<li class="tsd-parameter">
 											<h5>round<span class="tsd-signature-symbol">: </span><a href="database_entities_challenges_round.round.html" class="tsd-signature-type" data-tsd-kind="Class">Round</a></h5>
@@ -190,7 +191,7 @@
 					<div class="tsd-signature tsd-kind-icon">attachment<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/INF-Vakken-PSOPV-20-21/inf-psopv-20-21-team-groep-2/blob/ffabf81/server/src/database/entities/challenges/Challenge.ts#L31">server/src/database/entities/challenges/Challenge.ts:31</a></li>
+							<li>Defined in <a href="https://github.com/INF-Vakken-PSOPV-20-21/inf-psopv-20-21-team-groep-2/blob/aae40ef/server/src/database/entities/challenges/Challenge.ts#L31">server/src/database/entities/challenges/Challenge.ts:31</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -200,7 +201,7 @@
 					<div class="tsd-signature tsd-kind-icon">description<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/INF-Vakken-PSOPV-20-21/inf-psopv-20-21-team-groep-2/blob/ffabf81/server/src/database/entities/challenges/Challenge.ts#L19">server/src/database/entities/challenges/Challenge.ts:19</a></li>
+							<li>Defined in <a href="https://github.com/INF-Vakken-PSOPV-20-21/inf-psopv-20-21-team-groep-2/blob/aae40ef/server/src/database/entities/challenges/Challenge.ts#L19">server/src/database/entities/challenges/Challenge.ts:19</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -210,7 +211,7 @@
 					<div class="tsd-signature tsd-kind-icon">docker<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/INF-Vakken-PSOPV-20-21/inf-psopv-20-21-team-groep-2/blob/ffabf81/server/src/database/entities/challenges/Challenge.ts#L46">server/src/database/entities/challenges/Challenge.ts:46</a></li>
+							<li>Defined in <a href="https://github.com/INF-Vakken-PSOPV-20-21/inf-psopv-20-21-team-groep-2/blob/aae40ef/server/src/database/entities/challenges/Challenge.ts#L46">server/src/database/entities/challenges/Challenge.ts:46</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -220,7 +221,7 @@
 					<div class="tsd-signature tsd-kind-icon">docker<wbr>Image<wbr>Id<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/INF-Vakken-PSOPV-20-21/inf-psopv-20-21-team-groep-2/blob/ffabf81/server/src/database/entities/challenges/Challenge.ts#L49">server/src/database/entities/challenges/Challenge.ts:49</a></li>
+							<li>Defined in <a href="https://github.com/INF-Vakken-PSOPV-20-21/inf-psopv-20-21-team-groep-2/blob/aae40ef/server/src/database/entities/challenges/Challenge.ts#L49">server/src/database/entities/challenges/Challenge.ts:49</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -230,7 +231,7 @@
 					<div class="tsd-signature tsd-kind-icon">environments<span class="tsd-signature-symbol">:</span> <a href="database_entities_connections_environment.environment.html" class="tsd-signature-type" data-tsd-kind="Class">Environment</a><span class="tsd-signature-symbol">[]</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/INF-Vakken-PSOPV-20-21/inf-psopv-20-21-team-groep-2/blob/ffabf81/server/src/database/entities/challenges/Challenge.ts#L61">server/src/database/entities/challenges/Challenge.ts:61</a></li>
+							<li>Defined in <a href="https://github.com/INF-Vakken-PSOPV-20-21/inf-psopv-20-21-team-groep-2/blob/aae40ef/server/src/database/entities/challenges/Challenge.ts#L64">server/src/database/entities/challenges/Challenge.ts:64</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -240,7 +241,7 @@
 					<div class="tsd-signature tsd-kind-icon">flag<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/INF-Vakken-PSOPV-20-21/inf-psopv-20-21-team-groep-2/blob/ffabf81/server/src/database/entities/challenges/Challenge.ts#L28">server/src/database/entities/challenges/Challenge.ts:28</a></li>
+							<li>Defined in <a href="https://github.com/INF-Vakken-PSOPV-20-21/inf-psopv-20-21-team-groep-2/blob/aae40ef/server/src/database/entities/challenges/Challenge.ts#L28">server/src/database/entities/challenges/Challenge.ts:28</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -250,7 +251,7 @@
 					<div class="tsd-signature tsd-kind-icon">hints<span class="tsd-signature-symbol">:</span> <a href="database_entities_challenges_hint.hint.html" class="tsd-signature-type" data-tsd-kind="Class">Hint</a><span class="tsd-signature-symbol">[]</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/INF-Vakken-PSOPV-20-21/inf-psopv-20-21-team-groep-2/blob/ffabf81/server/src/database/entities/challenges/Challenge.ts#L34">server/src/database/entities/challenges/Challenge.ts:34</a></li>
+							<li>Defined in <a href="https://github.com/INF-Vakken-PSOPV-20-21/inf-psopv-20-21-team-groep-2/blob/aae40ef/server/src/database/entities/challenges/Challenge.ts#L34">server/src/database/entities/challenges/Challenge.ts:34</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -260,7 +261,7 @@
 					<div class="tsd-signature tsd-kind-icon">id<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/INF-Vakken-PSOPV-20-21/inf-psopv-20-21-team-groep-2/blob/ffabf81/server/src/database/entities/challenges/Challenge.ts#L10">server/src/database/entities/challenges/Challenge.ts:10</a></li>
+							<li>Defined in <a href="https://github.com/INF-Vakken-PSOPV-20-21/inf-psopv-20-21-team-groep-2/blob/aae40ef/server/src/database/entities/challenges/Challenge.ts#L10">server/src/database/entities/challenges/Challenge.ts:10</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -270,7 +271,17 @@
 					<div class="tsd-signature tsd-kind-icon">inner<wbr>Ports<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/INF-Vakken-PSOPV-20-21/inf-psopv-20-21-team-groep-2/blob/ffabf81/server/src/database/entities/challenges/Challenge.ts#L52">server/src/database/entities/challenges/Challenge.ts:52</a></li>
+							<li>Defined in <a href="https://github.com/INF-Vakken-PSOPV-20-21/inf-psopv-20-21-team-groep-2/blob/aae40ef/server/src/database/entities/challenges/Challenge.ts#L52">server/src/database/entities/challenges/Challenge.ts:52</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="lock" class="tsd-anchor"></a>
+					<h3>lock</h3>
+					<div class="tsd-signature tsd-kind-icon">lock<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/INF-Vakken-PSOPV-20-21/inf-psopv-20-21-team-groep-2/blob/aae40ef/server/src/database/entities/challenges/Challenge.ts#L37">server/src/database/entities/challenges/Challenge.ts:37</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -280,7 +291,7 @@
 					<div class="tsd-signature tsd-kind-icon">name<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/INF-Vakken-PSOPV-20-21/inf-psopv-20-21-team-groep-2/blob/ffabf81/server/src/database/entities/challenges/Challenge.ts#L16">server/src/database/entities/challenges/Challenge.ts:16</a></li>
+							<li>Defined in <a href="https://github.com/INF-Vakken-PSOPV-20-21/inf-psopv-20-21-team-groep-2/blob/aae40ef/server/src/database/entities/challenges/Challenge.ts#L16">server/src/database/entities/challenges/Challenge.ts:16</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -290,7 +301,7 @@
 					<div class="tsd-signature tsd-kind-icon">order<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/INF-Vakken-PSOPV-20-21/inf-psopv-20-21-team-groep-2/blob/ffabf81/server/src/database/entities/challenges/Challenge.ts#L40">server/src/database/entities/challenges/Challenge.ts:40</a></li>
+							<li>Defined in <a href="https://github.com/INF-Vakken-PSOPV-20-21/inf-psopv-20-21-team-groep-2/blob/aae40ef/server/src/database/entities/challenges/Challenge.ts#L40">server/src/database/entities/challenges/Challenge.ts:40</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -300,17 +311,7 @@
 					<div class="tsd-signature tsd-kind-icon">points<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/INF-Vakken-PSOPV-20-21/inf-psopv-20-21-team-groep-2/blob/ffabf81/server/src/database/entities/challenges/Challenge.ts#L25">server/src/database/entities/challenges/Challenge.ts:25</a></li>
-						</ul>
-					</aside>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
-					<a name="previous" class="tsd-anchor"></a>
-					<h3>previous</h3>
-					<div class="tsd-signature tsd-kind-icon">previous<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/INF-Vakken-PSOPV-20-21/inf-psopv-20-21-team-groep-2/blob/ffabf81/server/src/database/entities/challenges/Challenge.ts#L37">server/src/database/entities/challenges/Challenge.ts:37</a></li>
+							<li>Defined in <a href="https://github.com/INF-Vakken-PSOPV-20-21/inf-psopv-20-21-team-groep-2/blob/aae40ef/server/src/database/entities/challenges/Challenge.ts#L25">server/src/database/entities/challenges/Challenge.ts:25</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -320,7 +321,7 @@
 					<div class="tsd-signature tsd-kind-icon">questions<span class="tsd-signature-symbol">:</span> <a href="database_entities_challenges_question.question.html" class="tsd-signature-type" data-tsd-kind="Class">Question</a><span class="tsd-signature-symbol">[]</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/INF-Vakken-PSOPV-20-21/inf-psopv-20-21-team-groep-2/blob/ffabf81/server/src/database/entities/challenges/Challenge.ts#L55">server/src/database/entities/challenges/Challenge.ts:55</a></li>
+							<li>Defined in <a href="https://github.com/INF-Vakken-PSOPV-20-21/inf-psopv-20-21-team-groep-2/blob/aae40ef/server/src/database/entities/challenges/Challenge.ts#L55">server/src/database/entities/challenges/Challenge.ts:55</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -330,7 +331,7 @@
 					<div class="tsd-signature tsd-kind-icon">round<span class="tsd-signature-symbol">:</span> <a href="database_entities_challenges_round.round.html" class="tsd-signature-type" data-tsd-kind="Class">Round</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/INF-Vakken-PSOPV-20-21/inf-psopv-20-21-team-groep-2/blob/ffabf81/server/src/database/entities/challenges/Challenge.ts#L13">server/src/database/entities/challenges/Challenge.ts:13</a></li>
+							<li>Defined in <a href="https://github.com/INF-Vakken-PSOPV-20-21/inf-psopv-20-21-team-groep-2/blob/aae40ef/server/src/database/entities/challenges/Challenge.ts#L13">server/src/database/entities/challenges/Challenge.ts:13</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -340,7 +341,7 @@
 					<div class="tsd-signature tsd-kind-icon">solves<span class="tsd-signature-symbol">:</span> <a href="database_entities_connections_solve.solve.html" class="tsd-signature-type" data-tsd-kind="Class">Solve</a><span class="tsd-signature-symbol">[]</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/INF-Vakken-PSOPV-20-21/inf-psopv-20-21-team-groep-2/blob/ffabf81/server/src/database/entities/challenges/Challenge.ts#L58">server/src/database/entities/challenges/Challenge.ts:58</a></li>
+							<li>Defined in <a href="https://github.com/INF-Vakken-PSOPV-20-21/inf-psopv-20-21-team-groep-2/blob/aae40ef/server/src/database/entities/challenges/Challenge.ts#L61">server/src/database/entities/challenges/Challenge.ts:61</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -350,7 +351,7 @@
 					<div class="tsd-signature tsd-kind-icon">tag<span class="tsd-signature-symbol">:</span> <a href="database_entities_challenges_tag.tag.html" class="tsd-signature-type" data-tsd-kind="Class">Tag</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/INF-Vakken-PSOPV-20-21/inf-psopv-20-21-team-groep-2/blob/ffabf81/server/src/database/entities/challenges/Challenge.ts#L22">server/src/database/entities/challenges/Challenge.ts:22</a></li>
+							<li>Defined in <a href="https://github.com/INF-Vakken-PSOPV-20-21/inf-psopv-20-21-team-groep-2/blob/aae40ef/server/src/database/entities/challenges/Challenge.ts#L22">server/src/database/entities/challenges/Challenge.ts:22</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -360,7 +361,17 @@
 					<div class="tsd-signature tsd-kind-icon">type<span class="tsd-signature-symbol">:</span> <a href="../enums/database_entities_challenges_challenge.challengetype.html" class="tsd-signature-type" data-tsd-kind="Enumeration">ChallengeType</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/INF-Vakken-PSOPV-20-21/inf-psopv-20-21-team-groep-2/blob/ffabf81/server/src/database/entities/challenges/Challenge.ts#L43">server/src/database/entities/challenges/Challenge.ts:43</a></li>
+							<li>Defined in <a href="https://github.com/INF-Vakken-PSOPV-20-21/inf-psopv-20-21-team-groep-2/blob/aae40ef/server/src/database/entities/challenges/Challenge.ts#L43">server/src/database/entities/challenges/Challenge.ts:43</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="usedhints" class="tsd-anchor"></a>
+					<h3>used<wbr>Hints</h3>
+					<div class="tsd-signature tsd-kind-icon">used<wbr>Hints<span class="tsd-signature-symbol">:</span> <a href="database_entities_connections_usedhint.usedhint.html" class="tsd-signature-type" data-tsd-kind="Class">UsedHint</a><span class="tsd-signature-symbol">[]</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/INF-Vakken-PSOPV-20-21/inf-psopv-20-21-team-groep-2/blob/aae40ef/server/src/database/entities/challenges/Challenge.ts#L58">server/src/database/entities/challenges/Challenge.ts:58</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -418,6 +429,9 @@
 								<a href="database_entities_challenges_challenge.challenge.html#innerports" class="tsd-kind-icon">inner<wbr>Ports</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="database_entities_challenges_challenge.challenge.html#lock" class="tsd-kind-icon">lock</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
 								<a href="database_entities_challenges_challenge.challenge.html#name" class="tsd-kind-icon">name</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class">
@@ -425,9 +439,6 @@
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class">
 								<a href="database_entities_challenges_challenge.challenge.html#points" class="tsd-kind-icon">points</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-class">
-								<a href="database_entities_challenges_challenge.challenge.html#previous" class="tsd-kind-icon">previous</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class">
 								<a href="database_entities_challenges_challenge.challenge.html#questions" class="tsd-kind-icon">questions</a>
@@ -443,6 +454,9 @@
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class">
 								<a href="database_entities_challenges_challenge.challenge.html#type" class="tsd-kind-icon">type</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="database_entities_challenges_challenge.challenge.html#usedhints" class="tsd-kind-icon">used<wbr>Hints</a>
 							</li>
 						</ul>
 					</li>
