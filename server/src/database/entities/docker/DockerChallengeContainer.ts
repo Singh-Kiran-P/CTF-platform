@@ -14,7 +14,7 @@ export class DockerChallengeContainer {
     @Column("int", { array: true })
     ports: number[];
 
-    @ManyToOne(() => Challenge, { nullable: false })
+    @ManyToOne(() => Challenge, { nullable: false, onDelete: 'CASCADE'})
     @JoinColumn({ name: "challenge" })
     challenge: Challenge;
 

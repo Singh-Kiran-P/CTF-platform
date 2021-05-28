@@ -6,7 +6,7 @@
                     <div class=item-content>
                         <template v-if="!round.editable">
                             <span class=item-name>{{round.name}}</span>
-                            <span>{{timeDisplay(round)}}</span>
+                            <span>{{durationDisplay(round)}}</span>
                             <span class="item-description nowrap">{{round.description}}</span>
                         </template>
                         <template v-else>
@@ -24,19 +24,28 @@
                         <Collapse label=Challenges noborder v-model="round.challengesVisible" :loading="round.challengesLoading" @toggle="toggledChallenges(round)">
                             <div :class="['list-item', { nostyle: challenge.editable }]" v-for="challenge in round.challenges" :key="challenge.order">
                                 <div class=item-content v-if="!challenge.editable">
+                                    <span v-if="challenge.lock >= 0">
+                                        <font-awesome-icon icon=lock class=icon-info /> Locked until <b>{{lockedName(challenge, round.challenges)}}</b> is solved
+                                    </span>
                                     <span class=item-name>{{challenge.name}}</span>
                                     <span class="item-description nowrap">{{challenge.description}}</span>
+                                    <span class=item-description>
+                                        <span class=item-category>Type</span>
+                                        <span class=item-value>{{typeName(challenge.type)}}</span>
+                                        <Tooltip class=item-value-tooltip :title="typeName(challenge.type)" :content="typeDescription(challenge.type)">
+                                            <font-awesome-icon icon=info-circle class=icon-info />
+                                        </Tooltip>
+                                    </span>
                                     <span class=item-description v-if="challenge.tag">
                                         <span class=item-category>Tag</span>
                                         <span class=item-value>{{challenge.tag.name}}</span>
+                                        <Tooltip class=item-value-tooltip :title="challenge.tag.name" :content="challenge.tag.description" below>
+                                            <font-awesome-icon icon=info-circle class=icon-info />
+                                        </Tooltip>
                                     </span>
                                     <span class=item-description>
                                         <span class=item-category>Points</span>
                                         <span class=item-value>{{challenge.points}}</span>
-                                    </span>
-                                    <span class=item-description>
-                                        <span class=item-category>Type</span>
-                                        <span class=item-value>{{typeText(challenge.type)}}</span>
                                     </span>
                                     <b-form-invalid-feedback :state="state(challengeFeedback(round, challenge))">{{challengeFeedback(round, challenge)}}</b-form-invalid-feedback>
                                 </div>
@@ -56,17 +65,19 @@
                                     <span class=input-tag>Tag</span>
                                     <b-form-select v-model="challenge.tag" :options="tags" :state="state(challengeFeedback(round, challenge))"/>
                                     <span class=input-tag>Points</span>
-                                    <b-form-input type=number :number="true" v-model="challenge.points" placeholder="Enter challenge points"
+                                    <b-form-input type=number number v-model="challenge.points" placeholder="Enter challenge points"
                                         :state="state(challengeFeedback(round, challenge))"/>
-                                    <span class=input-tag>Flag</span>
-                                    <b-form-input type=text trim v-model="challenge.flag" placeholder="Enter challenge flag" :state="state(challengeFeedback(round, challenge))"/>
+                                    <template v-if="true">
+                                        <span class=input-tag>Flag <span v-if="challenge.type == typeValues.QUIZ">(Not used for quizzes)</span></span>
+                                        <b-form-input type=text trim v-model="challenge.flag" placeholder="Enter challenge flag" :state="state(challengeFeedback(round, challenge))"/>
+                                    </template>
                                     <span class=input-tag>Attachment</span>
                                     <div class=challenge-attachment-input>
                                         <b-form-file v-model="challenge.attachFile" :placeholder="attachPlaceholder(challenge)" :state="state(challengeFeedback(round, challenge))"/>
                                         <b-button type=button variant=danger @click="removeAttachment(challenge)"><font-awesome-icon icon=times /></b-button>
                                     </div>
-                                    <span class=input-tag>Previous TODO OTHER NAME</span>
-                                    <b-form-select v-model="challenge.previous" :options="previousList(round, challenge)" :state="state(challengeFeedback(round, challenge))"/>
+                                    <span class=input-tag>Challenge lock</span>
+                                    <b-form-select v-model="challenge.lock" :options="lockOptions(round, challenge)" :state="state(challengeFeedback(round, challenge))"/>
                                     <span class=input-tag>Type</span>
                                     <b-form-select v-model="challenge.type" :options="types" :state="state(challengeFeedback(round, challenge))" @input="changedType(challenge)"/>
                                     <template v-if="challenge.type == typeValues.INTERACTIVE">
@@ -83,6 +94,7 @@
                                     <b-form-group v-if="challenge.type == typeValues.QUIZ" :state="state(questionsFeedback(challenge))" :invalid-feedback="questionsFeedback(challenge)">
                                         <Collapse class=questions label=Questions noborder v-model="challenge.questionsVisible" :loading="challenge.questionsLoading"
                                             @toggle="toggledQuestions(challenge)">
+                                            <span>Questions are asked top to bottom</span>
                                             <div class=list-item v-for="question in challenge.questions" :key="question.order">
                                                 <div :class="['item-content', { editable: question.editable }]">
                                                     <template v-if="!question.editable">
@@ -90,11 +102,22 @@
                                                         <span class=item-description>{{question.answer}}</span>
                                                     </template>
                                                     <template v-else>
-                                                        <b-form-textarea max-rows="10" v-model="question.question" placeholder="Enter quiz question"
+                                                        <b-form-textarea max-rows="10" v-model="question.question" placeholder="Enter question"
                                                             :state="state(questionFeedback(question))"/>
-                                                        <b-form-textarea max-rows="10" v-model="question.answer" placeholder="Enter question answer"
-                                                            :state="state(questionFeedback(question))"/>
+                                                        <b-form-textarea max-rows="10" trim v-model="question.answer" :state="state(questionFeedback(question))"
+                                                            placeholder="Enter answers, each line is a different correct answer"/>
                                                     </template>
+                                                    <span class=item-description>
+                                                        <span class=item-category>Accuracy</span>
+                                                        <Tooltip title="Answer accuracy" class=category-tooltip
+                                                            content="The percentage of characters which have to be right for an answer to be counted as correct,
+                                                            calculated using the Levenshtein distance">
+                                                            <font-awesome-icon icon=info-circle class=icon-info />
+                                                        </Tooltip>
+                                                        <span v-if="!question.editable" class=item-value>{{question.accuracy}}</span>
+                                                        <b-form-input v-else type=number number v-model="question.accuracy" placeholder="Enter answer accuracy"
+                                                            :state="state(questionFeedback(question))"/>
+                                                    </span>
                                                     <b-form-invalid-feedback>{{questionFeedback(question)}}</b-form-invalid-feedback>
                                                 </div>
                                                 <IconButton class=info icon=pen icon2=save :toggled="question.editable" @click="editQuestion(question)"
@@ -122,7 +145,7 @@
                                                     <span class=item-description>
                                                         <span class=item-category>Cost</span>
                                                         <span v-if="!hint.editable" class=item-value>{{hint.cost}}</span>
-                                                        <b-form-input v-else type=number :number="true" v-model="hint.cost" placeholder="Enter hint cost"
+                                                        <b-form-input v-else type=number number v-model="hint.cost" placeholder="Enter hint cost"
                                                             :state="state(hintFeedback(hint))"/>
                                                     </span>
                                                     <b-form-invalid-feedback>{{hintFeedback(hint)}}</b-form-invalid-feedback>
@@ -162,13 +185,14 @@
 <script lang="ts">
 import Vue from 'vue';
 import axios from 'axios';
+import Tooltip from '@/components/Tooltip.vue';
 import Collapse from '@/components/Collapse.vue';
 import IconButton from '@/components/IconButton.vue';
 import StatusButton from '@/components/StatusButton.vue';
 import DateTimePicker from '@/components/DateTimePicker.vue';
 import { nextOrder, moveDown, toggledItems, loadItems } from '@/assets/listFunctions';
-import { Form, Round, Challenge, ChallengeType, Hint, Question } from '@shared/validation/roundsForm';
-import { state, validate, validInput, timeDisplay, sortRounds, validForm, validChallenges, validHints, validQuestions } from '@shared/validation/roundsForm';
+import { Form, Round, Challenge, ChallengeType, Hint, Question, state, validate, validInput } from '@shared/validation/roundsForm';
+import { typeName, typeDescription, durationDisplay, sortRounds, validForm, validChallenges, validHints, validQuestions } from '@shared/validation/roundsForm';
 import { Tag } from '@shared/validation/competitionForm';
 import { serialize } from '@shared/objectFormdata';
 import path from 'path';
@@ -181,16 +205,20 @@ type QuestionsVisible = { questionsVisible?: boolean };
 export default Vue.extend({
     name: 'RoundsAdmin',
     components: {
+        Tooltip,
         Collapse,
         IconButton,
         StatusButton,
         DateTimePicker
     },
     created() {
-        this.types = Object.values(this.typeValues).map(type => ({ value: type, text: this.typeText(type) }))
+        this.types = Object.values(this.typeValues).map(type => ({ value: type, text: this.typeName(type) }))
         axios.get('/api/competition/tags').then(res => {
             this.tags = this.tags.concat(res.data.map((tag: Tag) => ({ value: tag, text: tag.name })));
             this.loadFormData();
+        }).catch(() => {
+            this.cancelState = 'error';
+            this.saveState = 'normal';
         });
     },
     data: () => ({
@@ -262,8 +290,8 @@ export default Vue.extend({
             }).catch(() => error());
         },
 
-        timeDisplay(round: Round): string { return timeDisplay(round); },
-        roundFeedback(round: Round, add: boolean = false): string { return validate.round(round, this.form.rounds, add); },
+        durationDisplay(round: Round): string { return durationDisplay(round); },
+        roundFeedback(round: Round, add?: boolean): string { return validate.round(round, this.form.rounds, add); },
         removeRound(round: Round): void { this.form.rounds = this.form.rounds.filter(x => x != round); },
         editRound(round: Round & Editable): void {
             if (round.editable && !state(this.roundFeedback(round))) return;
@@ -279,25 +307,27 @@ export default Vue.extend({
             toggledItems(round, 'challengesLoading', round.challengesVisible, round.challenges, r => this.loadChallenges(r));
         },
         loadChallenges(round: Round): Promise<void> {
-            return loadItems(round, 'challenges', 'challengesLoading', 'challengesVisible', '/api/rounds/challenges/', (data: any) => validChallenges(data));
+            return loadItems(round, 'challenges', 'challengesLoading', 'challengesVisible', '/api/rounds/challenges/', (data: any) => validChallenges(data, true));
         },
 
-        typeText(type: string): string { return type == ChallengeType.INTERACTIVE ? 'Interactive' : (type == ChallengeType.QUIZ ? 'Quiz' : 'Basic'); },
+        typeName(type: string): string { return typeName(type); },
+        typeDescription(type: string): string { return typeDescription(type); },
+        lockedName(challenge: Challenge, challenges: Challenge[]): string { return challenges.find(c => c.order == challenge.lock)?.name || ''; },
         docker(challenge: Challenge): string { return challenge.dockerFile ? challenge.dockerFile.name || '' : path.basename(challenge.docker); },
         attachment(challenge: Challenge): string { return challenge.attachFile ? challenge.attachFile.name || '' : path.basename(challenge.attachment); },
         dockerPlaceholder(challenge?: Challenge): string { return (challenge?.dockerFile || challenge?.docker) ? this.docker(challenge) : 'Upload challenge docker file'; },
         attachPlaceholder(challenge?: Challenge): string { return (challenge?.attachFile || challenge?.attachment) ? this.attachment(challenge) : 'Upload challenge attachment'; },
         removeAttachment(challenge: Challenge): void { Vue.set(challenge, 'attachment', ''); Vue.set(challenge, 'attachFile', null); },
         challengesFeedback(round: Round): string { return validate.challenges(round.challenges); },
-        challengeFeedback(round: Round, challenge: Challenge, add: boolean = false): string { return validate.challenge(challenge, round.challenges, add); },
+        challengeFeedback(round: Round, challenge: Challenge, add?: boolean): string { return validate.challenge(challenge, round.challenges, true, add); },
         removeChallenge(round: Round, challenge: Challenge): void { round.challenges = round.challenges?.filter(x => x.order != challenge.order) || []; },
         challengeDown(round: Round, challenge: Challenge): void {
             let order = challenge.order;
             moveDown(round.challenges || [], challenge.order);
             let next = round.challenges?.find(c => c.order > order)?.order || -1;
             if (next > -1 && order > -1) round.challenges?.forEach(c => {
-                let set = c.previous == order ? next : (c.previous == next ? order : c.previous);
-                if (set != c.previous) Vue.set(c, 'previous', set);
+                let set = c.lock == order ? next : (c.lock == next ? order : c.lock);
+                if (set != c.lock) Vue.set(c, 'lock', set);
             });
         },
         editChallenge(round: Round, challenge: Challenge & Editable): void {
@@ -305,30 +335,33 @@ export default Vue.extend({
         },
         addChallenge(round: Round): void {
             if (round.challenges == undefined) round.challenges = [];
-            let add = { order: nextOrder(round.challenges), type: ChallengeType.BASIC, editable: true, attachFile: null, dockerFile: null, dockerImageId: '', innerPorts: '', previous: -1 };
+            let add = { order: nextOrder(round.challenges), type: ChallengeType.BASIC, editable: true, attachFile: null, dockerFile: null, dockerImageId: '', innerPorts: '', lock: -1 };
             round.challenges.push(Object.assign({}, add, { name: '', description: '', tag: null, points: NaN, flag: '', attachment: '', docker: '', hints: [], questions: undefined }));
         },
-        previousList(round: Round, challenge: Challenge){
-            return [{ value: -1, text: 'No previous TODO NAME' }].concat(round.challenges?.filter(c => c.order < challenge.order).map(c => ({ value: c.order, text: c.name })) || []);
+        lockOptions(round: Round, challenge: Challenge){
+            return [{ value: -1, text: 'Unlocked' }].concat(round.challenges?.filter(c => c.order < challenge.order).map(c => ({ value: c.order, text: c.name })) || []);
         },
-        changedType(challenge: Challenge) {
-            if (challenge.type == ChallengeType.QUIZ && challenge.questions == undefined) this.toggledQuestions(challenge, true);
+        changedType(challenge: Challenge & QuestionsVisible) {
+            if (challenge.type == ChallengeType.QUIZ && challenge.questions == undefined) {
+                challenge.questionsVisible = true;
+                this.toggledQuestions(challenge, true);
+            }
         },
         toggledHints(challenge: Challenge & HintsVisible): void {
             toggledItems(challenge, 'hintsLoading', challenge.hintsVisible, challenge.hints, c => this.loadHints(c));
         },
         loadHints(challenge: Challenge): Promise<void> {
-            return loadItems(challenge, 'hints', 'hintsLoading', 'hintsVisible', '/api/rounds/challenge/hints/', data => validHints(data));
+            return loadItems(challenge, 'hints', 'hintsLoading', 'hintsVisible', '/api/rounds/challenge/hints/', data => validHints(data, true));
         },
         toggledQuestions(challenge: Challenge & QuestionsVisible, visible?: boolean): void {
             toggledItems(challenge, 'questionsLoading', visible || challenge.questionsVisible, challenge.questions, c => this.loadQuestions(c));
         },
         loadQuestions(challenge: Challenge): Promise<void> {
-            return loadItems(challenge, 'questions', 'questionsLoading', 'questionsVisible', '/api/rounds/challenge/questions/', data => validQuestions(data));
+            return loadItems(challenge, 'questions', 'questionsLoading', 'questionsVisible', '/api/rounds/challenge/questions/', data => validQuestions(data, true));
         },
 
         hintsFeedback(challenge: Challenge): string { return validate.hints(challenge.hints); },
-        hintFeedback(hint: Hint, add: boolean = false): string { return validate.hint(hint, add); },
+        hintFeedback(hint: Hint, add?: boolean): string { return validate.hint(hint, true, add); },
         hintDown(challenge: Challenge, hint: Hint): void { moveDown(challenge.hints || [], hint.order); },
         removeHint(challenge: Challenge, hint: Hint): void { challenge.hints = challenge.hints?.filter(x => x.order != hint.order) || []; },
         editHint(hint: Hint & Editable): void { if (!hint.editable || state(this.hintFeedback(hint))) Vue.set(hint, 'editable', !hint.editable); },
@@ -339,14 +372,14 @@ export default Vue.extend({
         },
 
         questionsFeedback(challenge: Challenge): string { return validate.questions(challenge.questions); },
-        questionFeedback(question: Question, add: boolean = false): string { return validate.question(question, add); },
+        questionFeedback(question: Question, add?: boolean): string { return validate.question(question, true, add); },
         questionDown(challenge: Challenge, question: Question): void { moveDown(challenge.questions || [], question.order); },
         removeQuestion(challenge: Challenge, question: Question): void { challenge.questions = challenge.questions?.filter(x => x.order != question.order) || []; },
         editQuestion(question: Question & Editable): void { if (!question.editable || state(this.questionFeedback(question))) Vue.set(question, 'editable', !question.editable); },
         addQuestion(challenge: Challenge): void {
             if (challenge.questions == undefined) challenge.questions = [];
             let add = { order: nextOrder(challenge.questions), editable: true };
-            challenge.questions.push(Object.assign({}, add, { question: '', answer: '' }));
+            challenge.questions.push(Object.assign({}, add, { question: '', answer: '', accuracy: 80 }));
         }
     }
 });
@@ -398,10 +431,12 @@ span.info {
     width: 100%;
     margin: var(--margin) 0;
 
-    .list-item {
-        &.nostyle {
-            display: block;
-        }
+    .list-item.nostyle {
+        display: block;
+    }
+
+    .item-name {
+        font-size: initial;
     }
 
     .edit-challenge-header {
@@ -431,6 +466,10 @@ span.info {
             &:not(:first-child) {
                 margin-top: var(--margin);
             }
+
+            span {
+                font-weight: initial;
+            }
         }
 
         .challenge-attachment-input {
@@ -454,6 +493,16 @@ span.info {
                 white-space: pre-wrap;
             }
 
+            .item-category {
+                min-width: unset;
+            }
+
+            .category-tooltip {
+                flex-grow: 0;
+                width: initial;
+                margin: 0 var(--margin);
+            }
+
             textarea:first-of-type {
                 margin-top: 0;
             }
@@ -464,5 +513,9 @@ span.info {
         display: block;
         margin-bottom: 0;
     }
+}
+
+.icon-info {
+    color: var(--info);
 }
 </style>

@@ -1,8 +1,7 @@
 import express from 'express';
 const router = express.Router();
-import DB, { Team, Account, Category, Solve } from '../database';
-import { isAuth, isAdmin, getAccount } from '../auth/index';
-import { send } from 'node:process';
+import DB, { Account } from '../database';
+import { isAuth, getAccount } from '../auth/index';
 import { ILike } from 'typeorm';
 
 router.get('/hasTeam', isAuth, (req, res) => {
@@ -31,12 +30,10 @@ router.get('/getUsers', (req, res) => {
         nameOrder = params.sortDirection;
     }
 
-    DB.repo(Account).find(
-        {
+    DB.repo(Account).find({
             where: { name: ILike('%' + filter + '%'), admin: false }, order: { name: nameOrder },
-            relations: ['solves', 'solves.challenge', 'solves.usedHints', 'solves.usedHints.hint'],
-        }
-    ).then((accountsDB: Account[]) => {
+            relations: ['solves', 'solves.challenge', 'team', 'team.usedHints'],
+    }).then((accountsDB: Account[]) => {
         let accountsData: { id: number, name: string, category: string, points: number, team: string, teamUuid: string }[] = [];
         accountsDB.forEach((account: Account) => {
             var accountData: { id: number, name: string, category: string, points: number, team: string, teamUuid: string } = { id: 0, name: '', category: '', points: 0, team: '', teamUuid: '' };
@@ -44,21 +41,21 @@ router.get('/getUsers', (req, res) => {
             accountData.name = account.name;
             accountData.category = account.category.name;
             accountData.points = account.getPoints();
-            if(account.team) {
+            if (account.team) {
                 accountData.team = account.team.name;
                 accountData.teamUuid = account.team.id;
             } else {
                 accountData.team = 'None';
-            }            
-            if(filterCategory == '') accountsData.push(accountData);
+            }
+            if (filterCategory == '') accountsData.push(accountData);
             else if (filterCategory == account.category.name) accountsData.push(accountData);
         });
         let amount = accountsData.length;
-        if(params.sortBy == 'points') {
-            if(params.sortDirection == 'ASC') accountsData.sort((t1, t2)=>t2.points-t1.points);
+        if (params.sortBy == 'points') {
+            if (params.sortDirection == 'ASC') accountsData.sort((t1, t2)=>t2.points-t1.points);
             else accountsData.sort((t1, t2)=>t1.points-t2.points);
         }
-        return res.json({ users: accountsData.slice(skip, skip+perPage), amount: amount });
+        return res.json({ users: accountsData.slice(skip, skip + perPage), amount: amount });
     }).catch((err) => { return res.json({ error: err }) });
 });
 

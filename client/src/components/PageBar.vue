@@ -2,27 +2,15 @@
     <div id=pageBar>
         <b-navbar toggleable=sm type=dark variant=dark>
             <b-navbar-toggle target=nav-collapse />
-            <b-navbar-brand v-if="name.length > 0">{{name}}</b-navbar-brand>
+            <b-navbar-brand v-if="name.length > 0" id=name @click="home($event)">{{name}}</b-navbar-brand>
             
             <b-collapse id=nav-collapse is-nav>
                 <b-navbar-nav>
-                    <b-nav-item
-                        v-for="page in pages.left"
-                        :key="page.path"
-                        :to="page.path"
-                    >
-                        {{ page.name }}
-                    </b-nav-item>
+                    <b-nav-item v-for="page in pages.left" :key="page.path" :to="page.path">{{page.name}}</b-nav-item>
                 </b-navbar-nav>
 
                 <b-navbar-nav class="ml-auto">
-                    <b-nav-item
-                        v-for="page in pages.right"
-                        :key="page.path"
-                        :to="page.path"
-                    >
-                        {{ page.name }}
-                    </b-nav-item>
+                    <b-nav-item v-for="page in pages.right" :key="page.path" :to="page.path">{{page.name}}</b-nav-item>
                 </b-navbar-nav>
             </b-collapse>
         </b-navbar>
@@ -42,9 +30,7 @@ export default Vue.extend({
                 name: route.name?.toString() || route.path.toString(),
                 path: route.path.toString(),
             };
-            route.meta?.right
-                ? this.pages.right.push(page)
-                : this.pages.left.push(page);
+            route.meta?.right ? this.pages.right.push(page) : this.pages.left.push(page);
         });
 
         axios.get('/api/competition/name').then(res => {
@@ -55,11 +41,20 @@ export default Vue.extend({
     data: () => ({
         pages: { left: [] as { path: string, name: string }[], right: [] as { path: string, name: string }[] },
         name: ''
-    })
+    }),
+    methods: {
+        home(e: MouseEvent) {
+            e?.ctrlKey ? window.open('/', '_blank') : this.$router.push('/');
+        }
+    }
 });
 </script>
 
 <style scoped lang="scss">
+#name {
+    cursor: pointer;
+}
+
 @media (hover: hover) {
     a.router-link-exact-active, a:hover, a:focus-visible {
         color: var(--primary) !important;

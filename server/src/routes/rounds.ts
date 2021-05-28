@@ -1,28 +1,19 @@
 import { validForm, Form, sortRounds, ChallengeType, Challenge as VChallenge, Hint as VHint, Question as VQuestion } from '@shared/validation/roundsForm';
 import { createDir, uploadFiles, uploaddir, upload, fileName, chain, unzip, parentDir } from '../files';
 import DB, { Challenge, Hint, Question, Round } from '../database';
+import { isAdmin, isAuth, getAccount } from '../auth/index';
 import { deserialize } from '@shared/objectFormdata';
-import { isAdmin, isAuth } from '../auth/index';
-import {DockerController} from "../controllers/docker";
+import { DockerController } from './controllers/docker';
 import express from 'express';
 const router = express.Router();
 let Docker = new DockerController();
 
-router.get('/data', isAuth, (_, res) => {
+router.get('/data', isAuth, (req, res) => {
+    if (!getAccount(req).admin && !getAccount(req).team) return res.json({ error: 'Unauthorized request', joinTeam: true });
     DB.respond(DB.repo(Round).find(), res, rounds => ({ rounds: sortRounds(rounds.map(round => Object.assign({}, round, { challenges: undefined }))) }));
 });
 
-router.get('/challenges/:round', isAuth, (req, res) => {
-    let error = () => res.send({ error: 'Error fetching data' });
-    let respond = () => DB.respond(DB.repo(Challenge).find({ where: { round: req.params.round }, order: { order: 'ASC' }, relations: ['tag'] }), res);
-    DB.repo(Round).findOne(req.params.round).then(round => {
-        if (!round) return error();
-        if (new Date(round.start) < new Date()) respond();
-        else respond(); // TODO: REMOVE THIS DO THE FOLLOWING LINE INSTEAD
-        // TODO: else isAdmin(req, res, (err: any) => err ? error() : respond());
-    });
-});
-
+router.get('/challenges/:round', isAdmin, (req, res) => DB.respond(DB.repo(Challenge).find({ where: { round: req.params.round }, order: { order: 'ASC' } }), res));
 router.get('/challenge/hints/:challenge', isAdmin, (req, res) => DB.respond(DB.repo(Hint).find({ where: { challenge: req.params.challenge }, order: { order: 'ASC' } }), res));
 router.get('/challenge/questions/:quiz', isAdmin, (req, res) => DB.respond(DB.repo(Question).find({ where: { quiz: req.params.quiz }, order: { order: 'ASC' } }), res));
 

@@ -1,17 +1,17 @@
 import path from 'path';
 import 'reflect-metadata';
-import dotenv from 'dotenv';
 import EventEmitter = require('events');
 import { Connection, createConnection, EntityTarget, FindManyOptions, ObjectType, Repository } from 'typeorm';
 import { chain, remove } from '../files';
 import loadTestData from './testData';
 import express from 'express';
+import dotenv from 'dotenv';
 dotenv.config();
 
 // TODO: create entity CRUD operations (custom entity repositories)
 
+// defines all events the database can emit
 interface DatabaseEvents {
-    // defines all events the database can emit
     connect: () => void;
     error: (error: any) => void;
 }
@@ -29,17 +29,17 @@ class Database extends EventEmitter {
     }
 
     connect(): void {
-        var DB_HOST: string = "";
-        var DB_USER: string = "";
-        var DB_PASSWORD: string = "";
-        var DB_NAME: string = "";
-        if (process.env.HOSTING == "DOCKER") {
+        var DB_HOST: string = '';
+        var DB_USER: string = '';
+        var DB_PASSWORD: string = '';
+        var DB_NAME: string = '';
+        if (process.env.HOSTING == 'DOCKER') {
             DB_HOST = process.env.DB_HOST_DOCKER;
             DB_USER = process.env.DB_USER_DOCKER;
             DB_PASSWORD = process.env.DB_PASSWORD_DOCKER;
             DB_NAME = process.env.DB_NAME_DOCKER;
         }
-        if (process.env.HOSTING == "LOCALHOST") {
+        if (process.env.HOSTING == 'LOCALHOST') {
             DB_HOST = process.env.DB_HOST;
             DB_USER = process.env.DB_USER;
             DB_PASSWORD = process.env.DB_PASSWORD;
@@ -47,7 +47,7 @@ class Database extends EventEmitter {
 
         }
         createConnection({
-            type: "postgres",
+            type: 'postgres',
             host: DB_HOST,
             port: parseInt(process.env.DB_PORT),
             database: DB_NAME,
@@ -62,8 +62,6 @@ class Database extends EventEmitter {
             this.conn = conn;
             await this.conn.query(`SET search_path TO ${process.env.DB_SCHEMA};`);
             if (this.loadTestData) await loadTestData();
-            console.log('Connected to Database!');
-
             this.emit('connect');
         }).catch(error => this.emit('error', error));
     }
@@ -76,23 +74,14 @@ class Database extends EventEmitter {
      * returns the repository for the given entity, assumes the database is connected
      */
     repo<E>(entity: EntityTarget<E>): Repository<E> {
-        if (this.conn) {
-            return this.conn.getRepository(entity);
-        }
+        return this.conn.getRepository(entity);
     }
 
     /**
      * returns an instance of the given custom repository, assumes the database is connected
      */
     crepo<E>(entity: ObjectType<E>): E {
-        if (this.conn) {
-            return this.conn.getCustomRepository(entity);
-        }
-    }
-    connection() {
-        if (this.conn) {
-            return this.conn;
-        }
+        return this.conn.getCustomRepository(entity);
     }
 
     /**
@@ -107,7 +96,7 @@ class Database extends EventEmitter {
      */
     setRepo<E>(repo: Repository<E>, set: E[], where: FindManyOptions<E>, files: (x: E) => string[], returnRepo: true): Promise<E[]>;
     setRepo<E>(repo: Repository<E>, set: E[], where?: FindManyOptions<E>, files?: (x: E) => string[], returnRepo?: false): Promise<void>;
-    setRepo<E>(repo: Repository<E>, set: E[], where: FindManyOptions<E> = {}, files: (x: E) => string[] = () => [], returnRepo: boolean = false) {
+    setRepo<E>(repo: Repository<E>, set: E[], where: FindManyOptions<E> = {}, files: (x: E) => string[] = () => [], returnRepo?: boolean) {
         const id = (x: any): number => x.id || -1;
         return new Promise<void | E[]>((resolve, reject) => {
             const done = () => returnRepo ? repo.find(where).then(items => resolve(items)).catch(err => reject(err)) : resolve();
@@ -162,13 +151,11 @@ export { Tag } from './entities/challenges/Tag';
 export { Competition, CompetitionRepo } from './entities/competition/Competition';
 export { Page } from './entities/competition/Page';
 export { Sponsor } from './entities/competition/Sponsor';
-export { Attempt, AttemptType } from './entities/connections/Attempt';
+export { Attempt, AttemptType, loginAvailable, solveAvailable } from './entities/connections/Attempt';
 export { Environment } from './entities/connections/Environment';
 export { Solve } from './entities/connections/Solve';
 export { UsedHint } from './entities/connections/UsedHint';
-
+export { Notification } from './entities/notification/Notification';
 export { DockerChallengeContainer } from './entities/docker/DockerChallengeContainer';
 export { DockerManagement, DockerManagementRepo } from './entities/docker/DockerManagement';
-export { DockerOpenPort } from './entities/docker/DockerOpenPort'
-
-export { Notification } from './entities/notification/Notification'
+export { DockerOpenPort } from './entities/docker/DockerOpenPort';

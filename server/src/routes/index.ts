@@ -1,8 +1,11 @@
 import auth from './auth';
 import team from './team';
+import util from './util';
 import rounds from './rounds';
+import docker from './docker';
 import account from './account';
 import uploads from './uploads';
+import challenges from './challenges';
 import competition from './competition';
 import docker from './docker';
 import util from './util';
@@ -17,10 +20,10 @@ export default [
     auth,
     util,
     team,
-    pages,
     rounds,
     uploads,
     account,
+    challenges,
     notification,
     leaderboard
 ];

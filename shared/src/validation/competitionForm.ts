@@ -10,28 +10,28 @@ type Sponsor = { name: string, link: string, icon: string, order: number, img: F
 type Form = { name: string, categories: Category[], tags: Tag[], pages: Page[], sponsors: Sponsor[] };
 
 const validForm = (f: Form): boolean => {
-    let valid = isf.form(f);
-    valid = valid && state(validate.name(f.name), validate.categories(f.categories), validate.tags(f.tags), validate.pages(f.pages), validate.sponsors(f.sponsors));
-    valid = valid && f.categories.every(category => state(validate.category(category, f.categories)));
-    valid = valid && f.tags.every(tag => state(validate.tag(tag, f.tags)));
-    valid = valid && f.pages.every(page => state(validate.page(page, f.pages)));
-    return valid && f.sponsors.every(sponsor => state(validate.sponsor(sponsor, f.sponsors)));
+    let v = isf.form(f);
+    v = v && state(validate.name(f.name), validate.categories(f.categories), validate.tags(f.tags), validate.pages(f.pages), validate.sponsors(f.sponsors));
+    v = v && f.categories.every(category => state(validate.category(category, f.categories)));
+    v = v && f.tags.every(tag => state(validate.tag(tag, f.tags)));
+    v = v && f.pages.every(page => state(validate.page(page, f.pages)));
+    return v && f.sponsors.every(sponsor => state(validate.sponsor(sponsor, f.sponsors)));
 }
 
 const validate = {
     name: (name: string): string => validateString(name, 'Competition name', 3, 32),
     categories: (categories: Category[]): string => validateList(categories, 'category', true),
-    pages: (pages: Page[]): string => pages.findIndex(x => x.path == '/') < 0 ? `A page with path '/' is required` : '',
+    pages: (pages: Page[]): string => !pages.find(x => x.path == '/') ? `A page with path '/' is required` : '',
     tags: (tags: Tag[]): string => validateList(tags, 'tag', false),
     sponsors: (sponsors: Sponsor[]): string => validateList(sponsors, 'sponsor', false),
 
-    category: (category: Category, categories: Category[], add: boolean = false): string => {
+    category: (category: Category, categories: Category[], add?: boolean): string => {
         return validateString(category.name, 'Category', 3, 32, !add, categories.map(x => x.name), !add);
     },
-    tag: (tag: Tag, tags: Tag[] = [], add: boolean = false): string => {
+    tag: (tag: Tag, tags: Tag[] = [], add?: boolean): string => {
         return validateString(tag.name, 'Tag name', 3, 32, !add, tags.map(x => x.name), !add);
     },
-    page: (page: Page, pages: Page[], add: boolean = false): string => {
+    page: (page: Page, pages: Page[], add?: boolean): string => {
         let v = validateString(page.name, 'Page name', 3, 32, !add);
         if (!v && page.path && !page.path.startsWith('/')) v = `Page path must start with '/'`;
         if (!v && page.path.startsWith('/api')) v = `Page path cannot start with '/api'`;
@@ -45,7 +45,7 @@ const validate = {
         if (!v && page.zip && !page.zip.name?.endsWith('.zip')) v = 'Page dependencies must be contained in a .zip file';
         return v;
     },
-    sponsor: (sponsor: Sponsor, sponsors: Sponsor[], add: boolean = false): string => {
+    sponsor: (sponsor: Sponsor, sponsors: Sponsor[], add?: boolean): string => {
         let v = validateCharacters(sponsor.name, 'Sponsor name', true);
         if (!v) v = validateString(sponsor.name, 'Sponsor name', 3, 32, !add, sponsors.map(x => x.name), !add);
         if (!v) v = validateString(sponsor.link, 'Sponsor link', -1, 128, !add);
@@ -56,8 +56,8 @@ const validate = {
 
 const isf = { // check if a given variable with type any is a Form
     form: (form: any): boolean => {
-        let valid = is.object(form) && is.string(form.name);
-        return valid && is.array(form.categories, isf.category) && is.array(form.tags, isf.tag) && is.array(form.pages, isf.page) && is.array(form.sponsors, isf.sponsor);
+        let v = is.object(form) && is.string(form.name);
+        return v && is.array(form.categories, isf.category) && is.array(form.tags, isf.tag) && is.array(form.pages, isf.page) && is.array(form.sponsors, isf.sponsor);
     },
     category: (category: any): boolean => {
         return is.object(category) && is.string(category.name) && is.number(category.order);

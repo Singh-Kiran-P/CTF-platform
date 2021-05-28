@@ -1,43 +1,118 @@
 <template>
     <Loading v-if="!loaded"/>
     <div v-else class=rounds>
-        <div v-if="rounds.length > 0">
+        <div v-if="joinTeam">
+            <span class=center>You have to be part of a team to join the competition</span>
+            <router-link class=center :to="{ name: 'Team' }">Create or join a team</router-link>
+        </div>
+        <div v-else-if="rounds.length == 0">
+            <span class=center>The competition does not yet have any rounds</span>
+        </div>
+        <div v-else>
             <div v-if="currentRound">
-                <span class=round-name>{{currentRound.name}}</span>
-                <span class=round-time>{{timeDisplay(currentRound)}}</span>
-                <span class=round-description>{{currentRound.description}}</span>
-                <Collapse class=challenges label="Challenges" :large="true" :center="true" v-model="currentRound.visible" :loading="currentRound.loading"
+                <span class="round-name center">{{currentRound.name}}</span>
+                <span class="round-duration center">{{durationDisplay(currentRound)}}</span>
+                <span class="round-time center">{{countdownDisplay(currentRound)}}</span>
+                <span class="round-description center"><span v-if="currentRound.description">{{currentRound.description}}</span></span>
+                <Collapse class=challenges label="Challenges" large center v-model="currentRound.visible" :loading="currentRound.loading"
                     @toggle="toggledChallenges(currentRound)">
-                    <div class="challenge list-item" v-for="challenge in currentRound.challenges" :key="challenge.order">
-                        <span class=item-name>{{challenge.name}}</span>
+                    <div v-for="challenge in currentRound.challenges" :key="challenge.order" :tabindex="unlocked(challenge, currentRound.challenges) ? 0 : -1"
+                        :class="['challenge', 'list-item', unlocked(challenge, currentRound.challenges) ? 'unlocked' : 'locked']"
+                        @click="redirectChallenge(challenge.id, $event)" @keydown.enter="redirectChallenge(challenge.id, $event)">
+                        <span v-if="solved(challenge)">
+                            <font-awesome-icon icon=check class=icon-primary /> Solved by <b>{{solveNames(challenge)}}</b> for <b>{{solvePoints(challenge)}}</b>
+                        </span>
+                        <template v-if="!unlocked(challenge, currentRound.challenges)">
+                            <span><font-awesome-icon icon=lock class=icon-info /> Locked until <b>{{lockedName(challenge, currentRound.challenges)}}</b> is solved</span>
+                            <span class=item-name>{{challenge.name}}</span>
+                        </template>
+                        <template v-else>
+                            <span v-if="challenge.lock >= 0">
+                                <font-awesome-icon icon=lock-open class=icon-info /> Unlocked by solving <b>{{lockedName(challenge, currentRound.challenges)}}</b>
+                            </span>
+                            <span class=item-name>{{challenge.name}}</span>
+                            <span class="item-description nowrap">{{challenge.description}}</span>
+                            <span class=item-description>
+                                <span class=item-category>Type</span>
+                                <span class=item-value>{{typeName(challenge)}}</span>
+                                <Tooltip class=item-value-tooltip :title="typeName(challenge)" :content="typeDescription(challenge)">
+                                    <font-awesome-icon icon=info-circle class=icon-info />
+                                </Tooltip>
+                            </span>
+                            <span class=item-description v-if="challenge.tag">
+                                <span class=item-category>Tag</span>
+                                <span class=item-value>{{challenge.tag.name}}</span>
+                                <Tooltip class=item-value-tooltip :title="challenge.tag.name" :content="challenge.tag.description" below>
+                                    <font-awesome-icon icon=info-circle class=icon-info />
+                                </Tooltip>
+                            </span>
+                            <span class=item-description>
+                                <span class=item-category>Points</span>
+                                <span class=item-value>{{challenge.points}}</span>
+                            </span>
+                        </template>
                     </div>
                 </Collapse>
             </div>
             <div v-else-if="nextRounds.length > 0">
-                <span>TODO: no current round, view next rounds</span>
+                <span class=center>There is currently no round ongoing</span>
+                <span class=center>The next round starts in <b>{{countdownDisplay(nextRounds[0])}}</b></span>
             </div>
             <div v-else>
-                <span>TODO: no current round, competition ended</span>
+                <span class=center>All rounds have ended, you can view them below</span>
             </div>
 
-            <Collapse v-if="nextRounds.length > 0" label="Next rounds" :large="true" :value="currentRound == undefined">
+            <Collapse v-if="nextRounds.length > 0" label="Next rounds" large noborder :value="!currentRound">
                 <div class="round list-item" v-for="round in nextRounds" :key="round.start">
                     <span class=item-name>{{round.name}}</span>
-                    <span>{{timeDisplay(round)}}</span>
-                    <span>{{round.description}}</span>
-                    <span>TODO DISPLAY GOOD</span>
+                    <span>{{durationDisplay(round)}}</span>
                 </div>
             </Collapse>
 
-            <Collapse label="Past rounds" v-if="pastRounds.length > 0">
-                <div v-for="round in pastRounds" :key="round.start">
-                    <span>{{round.name}}</span>
-                    <span>TODO DISPLAY</span>
+            <Collapse class=past-rounds label="Past rounds" v-if="pastRounds.length > 0" large noborder :value="!currentRound && nextRounds.length == 0">
+                <div class=past-round v-for="round in pastRounds" :key="round.start">
+                    <span class=round-name>{{round.name}}</span>
+                    <div class=past-round-content>
+                        <span class=round-duration>{{durationDisplay(round)}}</span>
+                        <span class=round-description>{{round.description}}</span>
+                        <Collapse class=challenges label="Challenges" v-model="round.visible" :loading="round.loading" noborder @toggle="toggledChallenges(round)">
+                            <div class="challenge list-item unlocked" v-for="challenge in round.challenges" :key="challenge.order"
+                                :tabindex="0" @click="redirectChallenge(challenge.id, $event)" @keydown.enter="redirectChallenge(challenge.id, $event)">
+                                <span v-if="!solved(challenge)"><font-awesome-icon icon=times class=icon-danger /> Not solved</span>
+                                <span v-else>
+                                    <font-awesome-icon icon=check class=icon-primary /> Solved by <b>{{solveNames(challenge)}}</b> for <b>{{solvePoints(challenge)}}</b>
+                                </span>
+                                <span v-if="!unlocked(challenge, round.challenges)">
+                                    <font-awesome-icon icon=lock class=icon-info /> Locked because <b>{{lockedName(challenge, currentRound.challenges)}}</b> was not solved
+                                </span>
+                                <span v-else-if="challenge.lock >= 0">
+                                    <font-awesome-icon icon=lock-open class=icon-info /> Unlocked by solving <b>{{lockedName(challenge, currentRound.challenges)}}</b>
+                                </span>
+                                <span class=item-name>{{challenge.name}}</span>
+                                <span class="item-description nowrap">{{challenge.description}}</span>
+                                <span class=item-description>
+                                    <span class=item-category>Type</span>
+                                    <span class=item-value>{{typeName(challenge)}}</span>
+                                    <Tooltip class=item-value-tooltip :title="typeName(challenge)" :content="typeDescription(challenge)">
+                                        <font-awesome-icon icon=info-circle class=icon-info />
+                                    </Tooltip>
+                                </span>
+                                <span class=item-description v-if="challenge.tag">
+                                    <span class=item-category>Tag</span>
+                                    <span class=item-value>{{challenge.tag.name}}</span>
+                                    <Tooltip class=item-value-tooltip :title="challenge.tag.name" :content="challenge.tag.description" below>
+                                        <font-awesome-icon icon=info-circle class=icon-info />
+                                    </Tooltip>
+                                </span>
+                                <span class=item-description>
+                                    <span class=item-category>Points</span>
+                                    <span class=item-value>{{challenge.points}}</span>
+                                </span>
+                            </div>
+                        </Collapse>
+                    </div>
                 </div>
             </Collapse>
-        </div>
-        <div v-else>
-            <span>TODO: no rounds yet</span>
         </div>
     </div>
 </template>
@@ -46,9 +121,10 @@
 import Vue from 'vue';
 import axios from 'axios';
 import Loading from '@/components/Loading.vue';
+import Tooltip from '@/components/Tooltip.vue';
 import Collapse from '@/components/Collapse.vue';
 import { toggledItems, loadItems } from '@/assets/listFunctions';
-import { Round, Challenge, ChallengeType, Hint, Question, validForm, timeDisplay, validChallenges } from '@shared/validation/roundsForm';
+import { Round, Challenge, validForm, validChallenges, typeName, typeDescription, solvePoints, solveNames, durationDisplay, countdownDisplay } from '@shared/validation/roundsForm';
 
 type Visible = { visible?: boolean };
 
@@ -56,39 +132,54 @@ export default Vue.extend({
     name: 'RoundsAdmin',
     components: {
         Loading,
+        Tooltip,
         Collapse
     },
     created() {
         axios.get('/api/rounds/data').then(res => {
-            this.loaded = true;
-            if (validForm(res.data)) this.rounds = res.data.rounds;
+            if (res.data.joinTeam) this.joinTeam = true;
+            else if (validForm(res.data)) this.rounds = res.data.rounds;
             if (this.currentRound) {
                 this.currentRound.visible = true;
                 this.toggledChallenges(this.currentRound);
                 toggledItems(this.currentRound, 'loading', true, undefined, r => this.loadChallenges(r));
             }
-        });
+
+            setInterval(() => this.time = new Date(), 1000);
+            this.loaded = true;
+        }).catch(() => this.loaded = true);
     },
     data: () => ({
         rounds: [] as Round[],
 
         time: new Date(),
+        joinTeam: false,
         loaded: false
     }),
     computed: {
-        pastRounds(): Round[] { return this.rounds.filter(r => new Date(r.end) < this.time); },
+        pastRounds(): Round[] { return this.rounds.filter(r => new Date(r.start) > this.time).reverse(); }, // TODO: r => new Date(r.end) < this.time).reverse();
         nextRounds(): Round[] { return this.rounds.filter(r => new Date(r.start) > this.time); },
-        currentRound(): (Round & Visible) | undefined { return this.rounds[0]; }// TODO: this.rounds.find(r => new Date(r.start) > this.time && new Date(r.end) < this.time); }
+        currentRound(): (Round & Visible) | undefined { return this.rounds[0]; } // TODO: this.rounds.find(r => new Date(r.start) > this.time && new Date(r.end) < this.time); }
     },
     methods: {
-        timeDisplay(round: Round) { return timeDisplay(round); },
+        durationDisplay(round: Round) { return durationDisplay(round); },
+        countdownDisplay(round: Round): string { return countdownDisplay(this.time, round); },
 
-        toggledChallenges(round: Round & Visible) {
-            toggledItems(round, 'loading', round.visible, round.challenges, r => this.loadChallenges(r));
+        typeName(challenge: Challenge): string { return typeName(challenge.type); },
+        typeDescription(challenge: Challenge): string { return typeDescription(challenge.type); },
+        toggledChallenges(round: Round & Visible): void { toggledItems(round, 'loading', round.visible, round.challenges, r => this.loadChallenges(r)); },
+        loadChallenges(round: Round) { return loadItems(round, 'challenges', 'loading', 'visible', '/api/challenges/round/', (data: any) => validChallenges(data)); },
+        redirectChallenge(id: number | string, e?: MouseEvent | KeyboardEvent): void {
+            let route = { name: 'Challenge', params: { id: id.toString() } };
+            e?.ctrlKey ? window.open(this.$router.resolve(route).href, '_blank') : this.$router.push(route);
         },
-        loadChallenges(round: Round) {
-            return loadItems(round, 'challenges', 'loading', 'visible', '/api/rounds/challenges/', (data: any) => validChallenges(data));
-        }
+
+        solved(challenge?: Challenge): boolean { return (challenge?.solves?.length || 0) > 0; },
+        solvePoints(challenge: Challenge): string { return solvePoints(challenge.solves || []); },
+        solveNames(challenge: Challenge): string { return solveNames(challenge.solves || []); },
+        lockedChallenge(challenge: Challenge, challenges: Challenge[]): Challenge | undefined { return challenges.find(c => c.order == challenge.lock); },
+        unlocked(challenge: Challenge, challenges: Challenge[]): boolean { return challenge.lock < 0 || this.solved(this.lockedChallenge(challenge, challenges)); },
+        lockedName(challenge: Challenge, challenges: Challenge[]): string { return this.lockedChallenge(challenge, challenges)?.name || ''; }
     }
 });
 </script>
@@ -96,7 +187,7 @@ export default Vue.extend({
 <style scoped lang="scss">
 @import '@/assets/css/listform.scss';
 
-span {
+span, a {
     display: block;
 }
 
@@ -113,38 +204,100 @@ span {
 
     .round {
         display: block;
-
-        &:last-child {
-            margin-bottom: var(--margin);
-        }
     }
 }
 
-.round-name, .round-time, .round-description {
-    text-align: center;
-}
-
 .round-name {
-    display: block;
-    font-size: var(--font-large);
     font-weight: bold;
+    font-size: var(--font-massive);
 }
 
 .round-time {
-    padding-bottom: var(--margin);
     margin-bottom: var(--margin);
+    padding-bottom: var(--margin);
     border-bottom: 2px solid black;
 }
 
 .round-description {
     white-space: pre-wrap;
+
+    span {
+        text-align: initial;
+        display: inline-block;
+    }
 }
 
 .challenges {
-    margin: var(--double-margin) 0;
+    margin: var(--margin) 0;
+
+    .challenge {
+        display: block;
+        border-left: var(--margin) solid transparent;
+
+        &.unlocked:hover, &.unlocked:focus-visible {
+            outline: none;
+            cursor: pointer;
+            border-left: var(--margin) solid var(--primary);
+
+            .item-name {
+                color: var(--primary);
+                text-decoration: underline;
+            }
+        }
+
+        &.locked  {
+            pointer-events: none;
+
+            .item-name {
+                color: var(--gray);
+            }
+        }
+    }
 
     .challenge:last-child {
         margin-bottom: var(--double-margin);
     }
+}
+
+.past-rounds {
+    margin-top: var(--margin);
+    padding-top: var(--margin);
+    border-top: 2px solid black;
+    padding-bottom: var(--double-margin);
+
+    .past-round {
+        padding: var(--margin) 0;
+
+        .past-round-content {
+            padding: var(--margin);
+            border: 2px solid black;
+            border-radius: var(--border-radius);
+        }
+
+        .round-name {
+            padding-left: var(--margin);
+            font-size: initial;
+        }
+
+        .challenges {
+            margin: initial;
+
+            .challenge:last-child {
+                margin-bottom: 0;
+            }
+        }
+    }
+}
+
+.icon-primary {
+    color: var(--primary);
+}
+
+.icon-danger {
+    color: var(--danger);
+}
+
+.icon-info {
+    color: var(--info);
 }
 </style>

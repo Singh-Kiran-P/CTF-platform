@@ -1,18 +1,23 @@
 import { Entity, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
-import { Hint, Solve } from '../../../database';
+import { Hint, Challenge, Team } from '../../../database';
 
 @Entity()
 export class UsedHint {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @ManyToOne(_ => Hint, hint => hint.usedHints, { nullable: false })
+    @ManyToOne(_ => Hint, hint => hint.usedHints, { nullable: false, eager: true, onDelete: 'CASCADE' })
     hint: Hint;
 
-    @ManyToOne(_ => Solve, solve => solve.usedHints, { nullable: false })
-    solve: Solve;
+    @ManyToOne(_ => Challenge, challenge => challenge.usedHints, { nullable: false, eager: true, onDelete: 'CASCADE' })
+    challenge: Challenge;
 
-    constructor() {
-        // TODO
+    @ManyToOne(_ => Team, team => team.usedHints, { nullable: false, onDelete: 'CASCADE' })
+    team: Team;
+
+    constructor(hint: Hint, challenge: Challenge, team: Team) {
+        this.hint = hint;
+        this.challenge = challenge;
+        this.team = team;
     }
 }

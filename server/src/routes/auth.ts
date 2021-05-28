@@ -1,22 +1,24 @@
 import express from 'express';
 import passport from 'passport';
 import Roles from '@shared/roles';
-import DB, { Account, Category } from '../database';
+import DB, { Account, Category, loginAvailable } from '../database';
 import { validForm, Form } from '@shared/validation/registerForm'; 
 import { getAccount } from '../auth';
 const router = express.Router();
 
 router.post('/login', (req, res, next) => {
-    const error = (err?: string) => res.json({ error: err || 'Could not login user' });
-    req.body = req.fields;
-    passport.authenticate('local', (err, user) => {
-        if (err) return error(err);
-        if (!user) return error();
-        req.login(user, err => {
-            if (err) return error();
-            res.json({});
-        });
-    })(req, res, next);
+    loginAvailable(res, null, () => { // TODO: get user ip?
+        const error = (err?: string) => res.json({ error: err || 'Could not login user' });
+        req.body = req.fields;
+        passport.authenticate('local', (err, user) => {
+            if (err) return error(err);
+            if (!user) return error();
+            req.login(user, err => {
+                if (err) return error();
+                res.json({});
+            });
+        })(req, res, next);
+    });
 });
 
 router.post('/register', (req, res) => {

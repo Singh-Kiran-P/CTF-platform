@@ -84,6 +84,12 @@ const pages: { [page: string]: Route } = {
         path: '/rounds',
         name: 'Rounds',
         src: 'RoundsParticipant.vue'
+    },
+    challenge: {
+        path: '/challenge/:id',
+        name: 'Challenge',
+        src: 'Challenge.vue',
+        meta: { hidden: true }
     }
 };
 
@@ -108,19 +114,21 @@ const routes: { [page: string]: Route[] } = {
         pages.teams,
         pages.users,
         pages.roundsParticipant,
+        pages.challenge,
         pages.leaderboard,
         pages.logout
     ],
     [Roles.ORGANIZER]: [
-        pages.leaderboard,
         pages.teamDashboard,
         pages.teams,
         pages.users,
         pages.roundsAdmin,
+        pages.challenge,
+        pages.leaderboard,
         pages.config,
         pages.docker,
         pages.notifications,
-        pages.logout,
+        pages.logout
     ]
 };
 

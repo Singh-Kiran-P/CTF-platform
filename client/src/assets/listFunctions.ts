@@ -32,12 +32,17 @@ const loadItems = (container: { id?: number, }, list: string, loading: string, v
             resolve();
         }
         if (!container.id) setItems([]);
-        else axios.get(request + container.id).then(res => {
-            if (res.data.error || (!is.array(res.data, _ => false) && !getValid(res.data))) {
+        else {
+            const error = () => {
                 Vue.set(container, visible, false);
                 setItems(undefined);
-            } else setItems(res.data);
-        });
+            };
+
+            axios.get(request + container.id).then(res => {
+                if (res.data.error || (!is.array(res.data, _ => false) && !getValid(res.data))) error();
+                else setItems(res.data);
+            }).catch(() => error());
+        }
     });
 }
 
