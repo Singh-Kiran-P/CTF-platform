@@ -42,7 +42,7 @@ const isAuth = (req: express.Request, res: express.Response, next: express.NextF
 }
 
 const isAdmin = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    if(req.isAuthenticated() && getAccount(req).admin) next();
+    if (req.isAuthenticated() && getAccount(req).admin) next();
     else res.json({ error: 'Unauthorized request' });
 }
 
@@ -50,6 +50,13 @@ const hasTeam = (req: express.Request, res: express.Response, next: express.Next
     let acc: Account = getAccount(req);
     if (acc.team != null) next();
     else res.json({ error: 'You are not part of a team' });
+}
+
+const checkUserTeam = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    let acc: Account = getAccount(req);
+    let teamId = req.params.teamId;
+    if (acc && acc.team.id == teamId) next();
+    else res.json({ message: "Unauthorized request. You team is not allowed to access these routes!", statusCode: 404 });
 }
 
 
@@ -69,4 +76,4 @@ const validatePassword = (password: string, hashed: string, salt: string) => {
     return hashed == hash(password, salt);
 }
 
-export { strategy, isAuth, isAdmin, hasTeam, getAccount, generatePassword };
+export { strategy, isAuth, isAdmin, hasTeam, getAccount, generatePassword, checkUserTeam };
