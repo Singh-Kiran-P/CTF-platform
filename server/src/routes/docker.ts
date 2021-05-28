@@ -3,9 +3,9 @@
  * All routes in this file are protected!
  * Only admins can access them
  */
-import { isAdmin, isAuth } from "@/auth";
+import { checkUserTeam, isAdmin, isAuth } from "@/auth";
 import express from "express";
-import {DockerController} from "../controllers/docker";
+import { DockerController } from "../controllers/docker";
 let controller = new DockerController();
 
 const router = express.Router();
@@ -18,8 +18,15 @@ router.get("/containers", isAdmin, controller.containers_GET);
 
 router.get("/images", isAdmin, controller.images_GET);
 
-// router.get("/running/:challengeId/:teamId",controller.checkIfContainerIsRunning)
+router.get("/createChallengeContainer/:challengeId/:teamId", checkUserTeam, isAuth, controller.createChallengeContainer_GET);
 
+router.get("/challengeContainerRunning/:challengeId/:teamId", checkUserTeam, controller.challengeContainerRunning_GET);
+
+router.get("/startChallengeContainer/:challengeId/:teamId", checkUserTeam, isAuth, controller.startChallengeContainer_GET);
+
+router.get("/stopChallengeContainer/:challengeId/:teamId", checkUserTeam, isAuth, controller.stopChallengeContainer_GET);
+
+router.get("/resetChallengeContainer/:challengeId/:teamId", checkUserTeam, isAuth, controller.resetChallengeContainer_GET);
 
 // router.post("/makeImage", isAdmin, controller.makeImage_POST);
 
@@ -34,7 +41,6 @@ router.get("/images", isAdmin, controller.images_GET);
 router.get("/test", controller.test)
 
 export default { path: "/docker", router };
-
 
 // /********************** TESTING ROUTES ********************/
 
