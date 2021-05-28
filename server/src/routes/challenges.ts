@@ -94,6 +94,7 @@ router.put('/solve/:id/:flag(*)', isAuth, (req, res) => {
                 DB.repo(Attempt).delete({ team: team }).then(() => {
                     DB.repo(Solve).save(new Solve(challenge, team, new Date().toJSON(), account)).then(solve => {
                         if (!solve) return res.json(error(true));
+                        //TODO: call update leaderboard
                         res.send({ solved: responseSolve(challenge, solve) });
                     }).catch(() => res.json(error(true)));
                 }).catch(() => res.json(error(true)));
