@@ -1,14 +1,19 @@
+# @author Kiran Singh
+
 FROM node:10-alpine
 
-RUN mkdir -p /home/node/app/node_modules && chown -R node:node /home/node/app
+WORKDIR  /node/client
 
-WORKDIR /home/node/app
+COPY package*.json /node/client/
+RUN npm install
 
-# COPY package*.json ./
+WORKDIR  /node/shared
 
-# USER node
+COPY package*.json /node/shared/
+RUN npm install
 
-# COPY --chown=node:node . .
+WORKDIR /ctf/client
+# COPY . .
 
 EXPOSE 80
 
