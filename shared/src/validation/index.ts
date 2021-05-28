@@ -22,7 +22,7 @@ const validateNumber = (number: number, name: string, negative: boolean, min?: n
 
 const validateCharacters = (input: string, name: string, disallowed?: RegExp | boolean, allowed?: RegExp): string => {
     if (disallowed && input.startsWith('_')) return `${name} cannot start with '_'`;
-    if (typeof disallowed == 'boolean') disallowed = /([\\\/\:\*\?\<\>\"\|]+)/g;
+    if (typeof disallowed == 'boolean') disallowed = /([\\\/\:\*\?\<\>\"\|\#]+)/g;
     let invalidChars = allowed ? input.replace(allowed, '') : '';
     if (disallowed) invalidChars += input.match(disallowed)?.toString() || '';
     return invalidChars ? `${name} cannot contain the following characters: '${invalidChars}'` : '';
