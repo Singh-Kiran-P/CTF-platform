@@ -2,7 +2,6 @@
  * @auther Kiran Singh
  * All routes in this file are protected!
  * Only admins can access them
- * //TODO: stop/start challenge protected for teams
  */
 import { isAdmin, isAuth } from "@/auth";
 import express from "express";

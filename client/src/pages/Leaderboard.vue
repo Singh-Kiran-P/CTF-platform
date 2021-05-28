@@ -1,32 +1,27 @@
 <template>
     <div class="leaderboard">
-        <!--<Carousel :autoplay="true" :perPage="1" :paginationEnabled="false">
-            <Slide v-for="categorie in categories" :key="categorie" class=carousel-cell>
-                <Scoreboard :category="categorie" :id="categorie"></Scoreboard>
-            </Slide>
-        </Carousel>-->
-        <!--<Agile :dots="false" :nav-buttons="false" :autoplay="true" :infinite="true" :autoplay-speed="4000">
-            <div v-for="categorie in categories" :key="categorie" class=carousel-cell>
-            <Scoreboard :category="categorie" :id="categorie"></Scoreboard>
+        <div class=scoreboards>
+            <div class=charts>
+                <Slider animation="fade" :interval="10000" :speed="2000" :stopOnHover="true" :indicators="false" class="chart-slider">
+                    <SliderItem v-for="categorie in categories" :key="categorie" class="chart-cell">
+                        <Scoreboard :category="categorie"></Scoreboard>
+                        <!--list-->
+                    </SliderItem>
+                </Slider>
             </div>
-        </Agile>-->
-        <!--<Scoreboard v-for="categorie in categories" :key="categorie" :category="categorie" :id="categorie"></Scoreboard>-->
-        <!--<flickity>
-            <div v-for="categorie in categories" :key="categorie" class=carousel-cell>
-                <Scoreboard :category="categorie" :id="categorie"></Scoreboard>
-            </div>
-        </flickity>-->
-        <!-- <Slider animation="none" class="slider">
-            <SliderItem
-                v-for="categorie in categories"
-                :key="categorie"
-                class="carousel-cell"
-            >
-                <Scoreboard :category="categorie" :id="categorie"></Scoreboard>
-            </SliderItem>
-        </Slider> -->
-        <div v-for="categorie in categories" :key="categorie" class="carousel-cell">
-            <Scoreboard :category="categorie" :id="categorie"></Scoreboard>
+            <div class=lists>
+            </div>   
+        </div>
+        <div class=sponsors>
+            <Carousel :autoplay="true" :autoplayHoverPause="true" :loop="true" :paginationEnabled="false" :perPageCustom="[[1024, 4],[750,3],[550, 2], [350,1]]" easing="linear" :autoplayTimeout="5000" :speed="1000" :centerMode="true" class=sponsor-slider>
+                    <Slide v-for="sponsor in sponsors" :key="sponsor.id" class=sponsor-cell>
+                        <div class=sponsor-cell-content>
+                            <a :href="sponsor.link" target="_blank" rel="noopener noreferrer">
+                                <b-img :alt="sponsor.name" :src="'/api'+sponsor.icon"></b-img>
+                            </a>
+                        </div>
+                    </Slide>
+            </Carousel>
         </div>
     </div>
 </template>
@@ -35,33 +30,27 @@
 import Vue from "vue";
 import axios from "axios";
 import { Carousel, Slide } from "vue-carousel";
-import { VueAgile } from "vue-agile";
-import Flickity from "vue-flickity";
 import { Slider, SliderItem } from "vue-easy-slider";
 import Scoreboard from "../components/Scoreboard.vue";
+
+declare interface sponsor {icon: string, id:number, name: string, link: string, order:number};
 
 export default Vue.extend({
     name: "Leaderboard",
     components: {
         Scoreboard,
-        Carousel,
-        Slide,
-        Agile: VueAgile,
-        flickity: Flickity,
         Slider,
         SliderItem,
+        Carousel,
+        Slide
     },
     data: () => ({
         categories: [] as String[],
+        sponsors: [] as sponsor[], 
     }),
     created() {
-        //TODO: GET CATEGORIES FROM SERVER
-        /*this.categories.push("BACH1");
-        this.categories.push("BACH2");
-        this.categories.push("BACH3");
-        this.categories.push("MAST1");
-        this.categories.push("MAST2");*/
         this.loadCategories();
+        this.loadSponsors();
 
         // this.$socket.$subscribe("BACH 1", (data: any) => {
         //     console.log(data);
@@ -78,13 +67,22 @@ export default Vue.extend({
         // });
     },
     methods: {
+        //TODO: show errors using kirans dialog
         loadCategories(): void {
             axios.get("/api/competition/categories").then((response) => {
                 if (response.data.error)
                     return console.log(response.data.error); //this.error = response.data.error;
-                this.categories = this.categories.concat(response.data[0]);
+                this.categories = this.categories.concat(response.data);
             });
         },
+        loadSponsors() {
+            axios.get("/api/leaderboard/sponsors").then((response)=> {
+                if (response.data.error)
+                    return console.log(response.data.error); //this.error = response.data.error;
+                this.sponsors = response.data.sponsors;
+                console.log(this.sponsors);
+            });
+        }
     },
     mounted() {},
 });
@@ -92,32 +90,63 @@ export default Vue.extend({
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.scoreboard {
-    height: 100%;
-}
-#carousel {
-    width: 100%;
-}
-.carousel-cell {
-    width: 60%;
-    height: 85vh;
-    margin-right: 10px;
-    /* background: #8c8; */
-    border-radius: 5px;
+/*TODO: Align items vertically when smaller then 750px;*/
+.scoreboards {
+    height: 85%;
     display: flex;
     justify-content: center;
 }
-.slider {
-    height: 80vh !important;
+.charts {
+    width: 65%;
 }
-
-/* cell number */
-/*.carousel-cell:before {
-  display: block;
-  text-align: center;
-  content: counter(gallery-cell);
-  line-height: 200px;
-  font-size: 80px;
-  color: white;
-}*/
+.chart-slider {
+    width: 95% !important;
+    height: 100% !important;
+}
+.chart-cell {
+    background: var(--primary);
+    display: flex;
+    justify-content: center;
+}
+.sponsor-slider{
+    width:100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+}
+.sponsor-cell {
+    height: 12vh;
+    display: flex;
+    justify-content: center;
+}
+.sponsor-cell-content{
+    margin: 0px var(--margin);
+    background: white;
+        border-radius: 20px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.sponsor-cell-content a {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+img {
+    flex-shrink:0;
+    -webkit-flex-shrink: 0;
+    max-width:70%;
+    max-height:90%;
+}
+.lists {
+    width: 35%;
+}
+.sponsors{
+    background: var(--primary);
+    width: 100%;
+    height: 15%;
+    display: flex;
+    justify-content: center;
+}
 </style>

@@ -47,6 +47,7 @@
         "path": "^0.12.7",
         "pg": "^8.5.1",
         "pump": "^3.0.0",
+        "rate-limiter-flexible": "^2.2.2",
         "reflect-metadata": "^0.1.13",
         "socket.io": "^4.0.1",
         "swagger-express-ts": "^1.1.0",

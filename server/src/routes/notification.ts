@@ -1,5 +1,5 @@
 /**
- * @auther Kiran Singh
+ * @author Kiran Singh
  */
 import { isAdmin, isAuth } from "@/auth";
 import express from "express";

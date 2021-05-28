@@ -86,7 +86,6 @@ volumes:
     portainer_data:
     pgadmin-data:
 
-
 networks:
   mynet:
     driver: bridge

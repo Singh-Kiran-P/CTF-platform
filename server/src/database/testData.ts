@@ -1,4 +1,4 @@
-import DB, { Team, Competition, Category, Challenge, ChallengeType, Tag, Account, Round, Page, TeamRepoCustom } from '../database';
+import DB, { Team, Competition, Category, Challenge, ChallengeType, Tag, Account, Round, Page, TeamRepoCustom, Sponsor } from '../database';
 import { DockerManagement } from './entities/docker/DockerManagement';
 import { DockerOpenPort } from './entities/docker/DockerOpenPort';
 
@@ -60,6 +60,13 @@ async function loadTestData() {
         new Account('John 2', 'password', categories[3]),
         new Account('BOB!', 'password', categories[4])
     ]);
+
+    let sponsors: Sponsor[] = (await save([
+        new Sponsor({name: "Cegeka", link: "https://www.cegeka.com/nl-be/", icon: "/sponsors/cegeka/logo_cegeka_w.png", order: 1}),
+        new Sponsor({name: "IBM", link: "https://www.ibm.com/be-en", icon: "/sponsors/ibm/ibm-banner.jpg", order: 2}),
+        new Sponsor({name: "EDM UHasselt", link: "https://www.uhasselt.be/edm", icon: "/sponsors/edm uhasselt/EDM-logo.png", order: 3}),
+        new Sponsor({name: "Intigriti", link: "https://www.intigriti.com/", icon: "/sponsors/intigriti/intigriti.png", order: 4}),
+    ]));
 
     const teamRepo = new TeamRepoCustom;
     let teams: Team[] = await Promise.all([teamRepo.saveWithCaptain('Team 1', accounts[1]),
