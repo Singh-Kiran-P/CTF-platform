@@ -1,9 +1,8 @@
-import DB, { Challenge, Round, Solve, Question, Hint, UsedHint, Attempt, AttemptType, solveAvailable } from '../database';
+import DB, { Challenge, Round, Solve, Question, Hint, UsedHint, Attempt, AttemptType, solveAvailable, Account, Team } from '../database';
 import { getAccount, isAuth } from '../auth/index';
 import { Root, uploaddir } from '../files';
 import levenshtein from 'fast-levenshtein';
 import express from 'express';
-import param from './param';
 const router = express.Router();
 
 const challengeRelations = ['solves', 'solves.team', 'solves.account', 'usedHints', 'usedHints.team'];
@@ -81,27 +80,46 @@ router.get('/attachment/:id', isAuth, (req, res) => {
     });
 });
 
-router.put('/solve/:id/:flag(*)', isAuth, (req, res) => {
+router.post('/solve/:id', isAuth, (req, res) => {
     let [account, team] = [getAccount(req), getAccount(req).team];
     solveAvailable(res, team, () => {
         challengeAvailable(req.params.id, [], true, req, res, challenge => {
-            let correct = challenge.flag === param(req, 3);
+            let correct = challenge.flag === req.fields.flag;
             if (account.admin) return res.send({ solved: correct ? new Solve(challenge, null, new Date().toJSON(), account) : false });
             if (challenge.solves.find(s => s.team.id == team.id)) return res.send({ solved: true });
-            DB.repo(Attempt).save(new Attempt(AttemptType.SOLVE, account, team)).then(attempt => {
-                if (!attempt) res.json(error(true));
-                if (!correct) return res.send({ solved: false });
-                DB.repo(Attempt).delete({ team: team }).then(() => {
-                    DB.repo(Solve).save(new Solve(challenge, team, new Date().toJSON(), account)).then(solve => {
-                        if (!solve) return res.json(error(true));
-                        //TODO: call update leaderboard
-                        res.send({ solved: responseSolve(challenge, solve) });
-                    }).catch(() => res.json(error(true)));
-                }).catch(() => res.json(error(true)));
-            }).catch(() => res.json(error(true)));
+            attempt(res, account, team, challenge, correct);
         });
     });
 });
+
+router.post('/answer/:id/:order', isAuth, (req, res) => {
+    let [account, team] = [getAccount(req), getAccount(req).team];
+    solveAvailable(res, team, () => {
+        challengeAvailable(req.params.id, ['questions'], true, req, res, challenge => {
+            let order = Number(req.params.order);
+            let next = responseQuestion(challenge.questions.find(q => q.order > order), true);
+            let correct = correctAnswer(challenge.questions.find(q => q.order == order), req.fields.answer as string);
+            if (account.admin) return res.send(correct ? { solved: next ? true : new Solve(challenge, null, new Date().toJSON(), account), next: next } : { solve: false });
+            if (challenge.solves.find(s => s.team.id == team.id)) return res.send({ solved: true });
+            attempt(res, account, team, challenge, correct, next);
+        });
+    });
+});
+
+const attempt = (res: express.Response, account: Account, team: Team, challenge: Challenge, correct: boolean, next?: any): void => {
+    DB.repo(Attempt).save(new Attempt(AttemptType.SOLVE, account, team)).then(attempt => {
+        if (!attempt) res.json(error(true));
+        if (!correct) return res.send({ solved: false });
+        DB.repo(Attempt).delete({ team: team }).then(() => {
+            if (next) return res.send({ solved: true, next: next });
+            DB.repo(Solve).save(new Solve(challenge, team, new Date().toJSON(), account)).then(solve => {
+                if (!solve) return res.json(error(true));
+                // TODO leaderboard update
+                res.send({ solved: responseSolve(challenge, solve) });
+            }).catch(() => res.json(error(true)));
+        }).catch(() => res.json(error(true)));
+    }).catch(() => res.json(error(true)));
+}
 
 router.put('/hint/:id', isAuth, (req, res) => {
     let [account, team] = [getAccount(req), getAccount(req).team];
@@ -117,30 +135,6 @@ router.put('/hint/:id', isAuth, (req, res) => {
             }).catch(() => res.json(error(true)));
         });
     }).catch(() => res.json(error()));
-});
-
-router.put('/answer/:id/:order/:answer(*)', isAuth, (req, res) => {
-    let [account, team] = [getAccount(req), getAccount(req).team];
-    solveAvailable(res, team, () => {
-        challengeAvailable(req.params.id, ['questions'], true, req, res, challenge => {
-            let order = Number(req.params.order);
-            let next = responseQuestion(challenge.questions.find(q => q.order > order), true);
-            let correct = correctAnswer(challenge.questions.find(q => q.order == order), param(req, 4));
-            if (account.admin) return res.send(correct ? { solved: next ? true : new Solve(challenge, null, new Date().toJSON(), account), next: next } : { solve: false });
-            if (challenge.solves.find(s => s.team.id == team.id)) return res.send({ solved: true });
-            DB.repo(Attempt).save(new Attempt(AttemptType.SOLVE, account, team)).then(attempt => {
-                if (!attempt) res.json(error(true));
-                if (!correct) return res.send({ solved: false });
-                DB.repo(Attempt).delete({ team: team }).then(() => {
-                    if (next) return res.send({ solved: true, next: next });
-                    DB.repo(Solve).save(new Solve(challenge, team, new Date().toJSON(), account)).then(solve => {
-                        if (!solve) return res.json(error(true));
-                        res.send({ solved: responseSolve(challenge, solve) });
-                    }).catch(() => res.json(error(true)));
-                }).catch(() => res.json(error(true)));
-            }).catch(() => res.json(error(true)));
-        });
-    });
 });
 
 const correctAnswer = (question: Question | undefined, answer: string): boolean => {

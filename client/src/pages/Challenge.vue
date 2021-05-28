@@ -183,7 +183,8 @@ export default Vue.extend({
             if (!this.input) return;
             this.state = 'loading';
             const error = () => this.state = 'error';
-            axios.put(`/api/challenges/${this.quiz ? 'answer' : 'solve'}/${this.challenge?.id || -1}/${this.quiz ? `${this.question?.order || -1}/` : ''}${this.input}`).then(res => {
+            let params = this.quiz ? { answer: this.input } : { flag: this.input };
+            axios.post(`/api/challenges/${this.quiz ? 'answer' : 'solve'}/${this.challenge?.id || -1}${this.quiz ? `/${this.question?.order || -1}` : ''}`, params).then(res => {
                 this.state = 'normal';
                 if (res.data.rateLimit) this.rateLimitTime = res.data.rateLimit;
                 else if (res.data.error) error();

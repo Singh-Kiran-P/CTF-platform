@@ -4,8 +4,6 @@ import cors from 'cors';
 import passport from 'passport';
 import session from 'express-session';
 import formidable from 'express-formidable';
-import { createServer } from 'http';
-import { Server, Socket } from 'socket.io';
 import path from 'path';
 import { strategy } from './auth';
 import routes from './routes';
@@ -73,6 +71,4 @@ import io from './controllers/socket';
 let socket = io.init(server);
 socket.on('connection', (_socket: any) => {
     console.log('Client connected to socket!');
-})
-
-
+});

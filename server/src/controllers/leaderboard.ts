@@ -85,7 +85,7 @@ export class LeaderBoardController {
     public getAllData(req: Request, res: Response) {
         //TODO: get real data from @lander
         // let rawData:raw_data = getRawData();
-        console.log(this.teams);
+        //console.log(this.teams);
         res.json(this.teams);
     }
 
