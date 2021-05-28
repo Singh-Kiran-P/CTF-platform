@@ -2,7 +2,7 @@
  * @author Kiran Singh
  */
 import { Request, Response, NextFunction } from 'express';
-import DB, { Account, Solve } from '../database';
+import DB, { Account, Solve, Sponsor } from '../database';
 import socketIO from './socket';
 
 declare interface raw_data {
@@ -21,6 +21,7 @@ declare interface data_send {
  * This class handles the logic for leaderboard
  */
 export class LeaderBoardController {
+
     teams: data_send[] = [];
 
     constructor() {
@@ -93,7 +94,6 @@ export class LeaderBoardController {
      * @returns {Team[]}
      */
     public generatedData() {
-
         var team1_points = 0;
         var team2_points = 0;
         var team3_points = 0;
@@ -142,5 +142,20 @@ export class LeaderBoardController {
             }
         }
         return this.teams;
+    }
+
+    /**
+    * Route to get data sponsors dat such as link, img path, etc.
+    * @param req route request object
+    * @param res route response object
+    * @category Routes
+    * @returns {Sponsor[]} This is the response
+    */
+    public getSponsorsData(req: Request, res: Response) {
+        DB.repo(Sponsor).find().then((sponsors: Sponsor[]) => {
+            res.json({ sponsors: sponsors });
+        }).catch(() => {
+            res.json({ message: "Cannot retrieve sponsors", statusCode: 404 })
+        });
     }
 }
