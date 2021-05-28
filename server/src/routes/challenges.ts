@@ -3,6 +3,7 @@ import { getAccount, isAuth } from '../auth/index';
 import { Root, uploaddir } from '../files';
 import levenshtein from 'fast-levenshtein';
 import express from 'express';
+import param from './param';
 const router = express.Router();
 
 const challengeRelations = ['solves', 'solves.team', 'solves.account', 'usedHints', 'usedHints.team'];
@@ -84,7 +85,7 @@ router.put('/solve/:id/:flag(*)', isAuth, (req, res) => {
     let [account, team] = [getAccount(req), getAccount(req).team];
     solveAvailable(res, team, () => {
         challengeAvailable(req.params.id, [], true, req, res, challenge => {
-            let correct = challenge.flag === req.params.flag;
+            let correct = challenge.flag === param(req, 3);
             if (account.admin) return res.send({ solved: correct ? new Solve(challenge, null, new Date().toJSON(), account) : false });
             if (challenge.solves.find(s => s.team.id == team.id)) return res.send({ solved: true });
             DB.repo(Attempt).save(new Attempt(AttemptType.SOLVE, account, team)).then(attempt => {
@@ -123,7 +124,7 @@ router.put('/answer/:id/:order/:answer(*)', isAuth, (req, res) => {
         challengeAvailable(req.params.id, ['questions'], true, req, res, challenge => {
             let order = Number(req.params.order);
             let next = responseQuestion(challenge.questions.find(q => q.order > order), true);
-            let correct = correctAnswer(challenge.questions.find(q => q.order == order), req.params.answer);
+            let correct = correctAnswer(challenge.questions.find(q => q.order == order), param(req, 4));
             if (account.admin) return res.send(correct ? { solved: next ? true : new Solve(challenge, null, new Date().toJSON(), account), next: next } : { solve: false });
             if (challenge.solves.find(s => s.team.id == team.id)) return res.send({ solved: true });
             DB.repo(Attempt).save(new Attempt(AttemptType.SOLVE, account, team)).then(attempt => {

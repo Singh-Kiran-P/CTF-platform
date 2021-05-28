@@ -117,6 +117,7 @@ const validate = {
         let v = validateString(question.question, 'Quiz question', -1, -1, !add && !!create);
         if (!v && create) v = validateString(question.answer, 'Question answer', -1, -1, !add);
         if (!v && !create && question.answer) v = 'Question answer must be excluded';
+        if (!v) v = validateCharacters(question.answer, 'Question answer', /([#]+)/g);
         if (!v) v = validateNumber(question.accuracy, 'Question accuracy', false, 0, 100);
         return v;
     }
