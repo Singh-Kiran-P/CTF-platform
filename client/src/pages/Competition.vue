@@ -190,9 +190,9 @@ import Collapse from '@/components/Collapse.vue';
 import IconButton from '@/components/IconButton.vue';
 import StatusButton from '@/components/StatusButton.vue';
 import DateTimePicker from '@/components/DateTimePicker.vue';
-import { nextOrder, moveDown, toggledItems, loadItems } from '@/assets/listFunctions';
-import { Form, Round, Challenge, ChallengeType, Hint, Question, state, validate, validInput, isf } from '@shared/validation/roundsForm';
-import { typeName, typeDescription, durationDisplay, sortRounds, validForm } from '@shared/validation/roundsForm';
+import { nextOrder, moveDown, toggledItems, loadItems } from '@/assets/functions/list';
+import { Form, Round, Challenge, ChallengeType, Hint, Question, state, validate, validInput, sortRounds, validForm, isf } from '@shared/validation/roundsForm';
+import { typeName, typeDescription, durationDisplay } from '@/assets/functions/strings';
 import { Tag } from '@shared/validation/configForm';
 import { serialize } from '@shared/objectFormdata';
 import path from 'path';
@@ -230,7 +230,6 @@ export default Vue.extend({
         },
 
         types: [] as { value: string, text: string }[],
-        typeValues: { BASIC: ChallengeType.BASIC, QUIZ: ChallengeType.QUIZ, INTERACTIVE: ChallengeType.INTERACTIVE }, // make enum available in the html
         tags: [{ value: null, text: 'No tag' }] as { value: Tag | null, text: string }[],
 
         loaded: false,
@@ -238,6 +237,7 @@ export default Vue.extend({
         cancelState: 'normal'
     }),
     computed: {
+        typeValues() { return { BASIC: ChallengeType.BASIC, QUIZ: ChallengeType.QUIZ, INTERACTIVE: ChallengeType.INTERACTIVE } },
         newRound(): Round { return Object.assign({}, this.add.round, { folder: '', challenges: [] }); },
 
         newRoundFeedback(): string { return this.roundFeedback(this.newRound, true); },
@@ -395,7 +395,7 @@ span.info {
 
 .round {
     flex-wrap: wrap;
-    border-bottom: 2px solid black;
+    border-bottom: 2px solid var(--black);
     
     & > button {
         background-color: var(--white);
@@ -455,7 +455,7 @@ span.info {
     }
 
     .edit-item {
-        border: 2px solid black;
+        border: 2px solid var(--black);
         border-radius: var(--border-radius);
         padding: var(--margin);
 

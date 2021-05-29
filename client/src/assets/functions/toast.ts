@@ -7,7 +7,8 @@ const toast = {
             toaster: "b-toaster-bottom-right",
             variant: type,
             solid: true,
-            appendToast: append,
+            noFade: true,
+            appendToast: append
         });
     },
 }

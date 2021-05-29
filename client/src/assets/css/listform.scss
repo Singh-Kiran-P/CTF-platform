@@ -25,6 +25,42 @@
         background-color: var(--gray-light);
     }
 
+    &.card {
+        padding: 0;
+        border: none;
+        margin-bottom: var(--double-margin);
+        background-color: var(--gray-lightest);
+
+        .content {
+            padding: var(--double-margin);
+
+            span {
+                display: block;
+            }
+        }
+
+        .footer {
+            display: flex;
+            align-items: center;
+            background-color: var(--gray-light);
+            border-top: 1px solid var(--gray-half);
+            border-bottom-left-radius: var(--border-radius);
+            border-bottom-right-radius: var(--border-radius);
+
+            span {
+                flex-grow: 1;
+                padding: var(--margin);
+                color: var(--gray);
+                font-size: small;
+            }
+
+            button {
+                border-radius: 0;
+                border-bottom-right-radius: var(--border-radius);
+            }
+        }
+    }
+
     .item-content {
         width: 0;
         flex-grow: 1;

@@ -366,6 +366,6 @@ h2 {
 .create {
     margin: 50px auto 20px auto;
     width: 50%;
-    border-top: 1px solid black;
+    border-top: 1px solid var(--black);
 }
 </style>
