@@ -44,7 +44,7 @@ export default Vue.extend({
             id: number;
             title: string;
             msg: string;
-            createdAt: Date;
+            createdAt: String;
         }[],
         form: {
             title: '',
