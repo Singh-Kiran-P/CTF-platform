@@ -138,6 +138,7 @@ export default Vue.extend({
         });
     },
     data: () => ({
+        teamId: '',
         challenge: undefined as Challenge | undefined,
         input: '',
 
@@ -154,7 +155,9 @@ export default Vue.extend({
         containerInit: false,
         startState: 'normal',
         resetState: 'normal',
-        stopState: 'succes'
+        stopState: 'succes',
+
+        environment: ''
     }),
     computed: {
         admin(): boolean { return this.$route.meta?.admin; },
@@ -175,8 +178,6 @@ export default Vue.extend({
         usedHints(): Hint[] { return (this.challenge?.hints || []).filter(h => h.content); },
         rateLimit(): string { return this.rateLimitTime <= this.time.getTime() ? '' : timerDisplay(this.rateLimitTime - this.time.getTime(), true); },
         rateLimited(): boolean { return this.rateLimit.length > 0; },
-
-        environment(): string { return '/TODO'; },
 
         quiz(): boolean { return this.challenge?.type == ChallengeType.QUIZ; },
         questionNumber(): number { return this.challenge?.questions?.filter(q => q.question).length || 0; },
@@ -217,43 +218,49 @@ export default Vue.extend({
 
         initContainer(): void {
             this.startState = 'normal';
-            setTimeout(() => {
-                let error = false;
-                let started = false;
-                if (error) return this.startState = 'error';
-                if (started) this.startState = 'succes';
+            const error = () => this.startState = 'error';
+            axios.get('/api/challengeContainerRunning/' + this.challenge?.id).then(res => {
+                let err = res.data.statusCode == 404;
+                let started = res.data.state;
+                if (err) return error();
+                if (started) { // TODO: NOT LOCALHOST, FIX PORTS
+                    let ports = Object.values(res.data.ports).map((p: any) => p.map((ip: any) => ip.HostPort));
+                    this.environment = 'localhost:' + ports[0][0];
+                    console.log(ports);
+                    this.startState = 'succes';
+                }
                 this.containerInit = true;
-            }, 1000);
+            }).catch(() => error());
         },
 
         startContainer(): void {
             this.startState = 'loading';
-
-            setTimeout(() => {
-                let error = false;
-                if (error) return this.startState = 'error';
+            const error = () => this.startState = 'error';
+            axios.get('/api/createChallengeContainer/' + this.challenge?.id).then(res => {
+                let err = res.data.statusCode == 404;
+                if (err) error();
                 this.startState = 'succes';
                 this.stopState = 'normal';
-            }, 1000);
+            }).catch(() => error());            
         },
         resetContainer(): void {
             this.resetState = 'loading';
-
-            setTimeout(() => {
-                let error = false;
-                if (error) return this.resetState = 'error';
+            const error = () => this.resetState = 'error';
+            axios.get('/api/resetChallengeContainer/' + this.challenge?.id).then(res => {
+                let err = res.data.statusCode == 404;
+                if (err) return error();
                 this.resetState = 'normal';
-            }, 1000);
+            }).catch(() => error());            
         },
         stopContainer(): void {
             this.stopState = 'loading';
-
-            setTimeout(() => {
-                let error = false;
-                if (error) return this.stopState = 'error';
+            const error = () => this.stopState = 'error';
+            axios.get('/api/stopChallengeContainer/' + this.challenge?.id).then(res => {
+                let err = res.data.statusCode == 404;
+                if (err) return error();
                 this.stopState = 'succes';
                 this.startState = 'normal';
-            }, 1000);
+            }).catch(() => error());  
         }
     }
 });

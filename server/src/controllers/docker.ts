@@ -115,8 +115,8 @@ export class DockerController {
      */
     public createChallengeContainer_GET(req: Request, res: Response) {
         let challengeId = req.params.challengeId;
-        let teamId = req.params.teamId;
         let isAdmin = getAccount(req).admin;
+        let teamId = isAdmin ? '' : getAccount(req).team.id;
 
         this.createChallengeContainer(challengeId, teamId, isAdmin)
             .then(mess => res.json(mess))
@@ -133,8 +133,8 @@ export class DockerController {
      */
     public challengeContainerRunning_GET(req: Request, res: Response) {
         let challengeId = req.params.challengeId;
-        let teamId = req.params.teamId;
         let isAdmin = getAccount(req).admin;
+        let teamId = isAdmin ? '' : getAccount(req).team.id;
 
         this.challengeContainerRunning(challengeId, teamId, isAdmin)
             .then(mess => res.json(mess))
@@ -151,8 +151,8 @@ export class DockerController {
      */
     public startChallengeContainer_GET(req: Request, res: Response) {
         let challengeId = req.params.challengeId;
-        let teamId = req.params.teamId;
         let isAdmin = getAccount(req).admin;
+        let teamId = isAdmin ? '' : getAccount(req).team.id;
 
         this.startContainer(challengeId, teamId, isAdmin)
             .then(mess => res.json(mess))
@@ -169,8 +169,8 @@ export class DockerController {
      */
     public stopChallengeContainer_GET(req: Request, res: Response) {
         let challengeId = req.params.challengeId;
-        let teamId = req.params.teamId;
         let isAdmin = getAccount(req).admin;
+        let teamId = isAdmin ? '' : getAccount(req).team.id;
 
         this.stopContainer(challengeId, teamId, isAdmin)
             .then(mess => res.json(mess))
@@ -187,8 +187,8 @@ export class DockerController {
      */
     public resetChallengeContainer_GET(req: Request, res: Response) {
         let challengeId = req.params.challengeId;
-        let teamId = req.params.teamId;
         let isAdmin = getAccount(req).admin;
+        let teamId = isAdmin ? '' : getAccount(req).team.id;
 
         this.resetContainer(challengeId, teamId, isAdmin)
             .then(mess => res.json(mess))
@@ -250,7 +250,8 @@ export class DockerController {
         return new Promise<object>(async (resolve, reject) => {
 
             let challenge = await DB.repo(Challenge).findOne(challengeId);
-            let ports = challenge.innerPorts.split(",");
+            // TODO if !challenge return reject(error)
+            let ports = challenge.innerPorts.split(",").map(p => p.trim());
 
             const create = (team: Team) => {
                 let containerName = challenge.id + "-" + (team ? team.id : this.adminTeamId);
@@ -298,7 +299,7 @@ export class DockerController {
     private challengeContainerRunning(challengeId: string, teamId: string, isAdmin: boolean) {
         return new Promise<object>(async (resolve, reject) => {
             let challenge = await DB.repo(Challenge).findOne(challengeId);
-
+            // TODO if !challenge return reject(error)
             let running = (team: Team) => {
 
                 let containerName = challenge.id + "-" + (team ? team.id : this.adminTeamId);

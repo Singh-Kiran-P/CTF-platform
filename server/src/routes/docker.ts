@@ -3,7 +3,7 @@
  * All routes in this file are protected!
  * Only admins can access them
  */
-import { checkUserTeam, isAdmin, isAuth } from "@/auth";
+import { isAdmin, isAuth } from "@/auth";
 import express from "express";
 import { DockerController } from "../controllers/docker";
 let controller = new DockerController();
@@ -18,15 +18,15 @@ router.get("/containers", isAdmin, controller.containers_GET);
 
 router.get("/images", isAdmin, controller.images_GET);
 
-router.get("/createChallengeContainer/:challengeId/:teamId", checkUserTeam, isAuth, controller.createChallengeContainer_GET);
+router.get("/createChallengeContainer/:challengeId", isAuth, controller.createChallengeContainer_GET);
 
-router.get("/challengeContainerRunning/:challengeId/:teamId", checkUserTeam, controller.challengeContainerRunning_GET);
+router.get("/challengeContainerRunning/:challengeId", isAuth, controller.challengeContainerRunning_GET);
 
-router.get("/startChallengeContainer/:challengeId/:teamId", checkUserTeam, isAuth, controller.startChallengeContainer_GET);
+router.get("/startChallengeContainer/:challengeId", isAuth, controller.startChallengeContainer_GET);
 
-router.get("/stopChallengeContainer/:challengeId/:teamId", checkUserTeam, isAuth, controller.stopChallengeContainer_GET);
+router.get("/stopChallengeContainer/:challengeId", isAuth, controller.stopChallengeContainer_GET);
 
-router.get("/resetChallengeContainer/:challengeId/:teamId", checkUserTeam, isAuth, controller.resetChallengeContainer_GET);
+router.get("/resetChallengeContainer/:challengeId", isAuth, controller.resetChallengeContainer_GET);
 
 // router.post("/makeImage", isAdmin, controller.makeImage_POST);
 

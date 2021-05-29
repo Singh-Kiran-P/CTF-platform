@@ -52,13 +52,6 @@ const hasTeam = (req: express.Request, res: express.Response, next: express.Next
     else res.json({ error: 'You are not part of a team' });
 }
 
-const checkUserTeam = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    let acc: Account = getAccount(req);
-    let teamId = req.params.teamId;
-    if (acc && (acc.admin || acc.team.id == teamId)) next();
-    else res.json({ message: "Unauthorized request. You team is not allowed to access these routes!", statusCode: 404 });
-}
-
 // hash functions
 
 // see https://tools.ietf.org/html/rfc8018
@@ -74,4 +67,4 @@ const validatePassword = (password: string, hashed: string, salt: string) => {
     return hashed == hash(password, salt);
 }
 
-export { strategy, isAuth, isAdmin, hasTeam, getAccount, generatePassword, checkUserTeam };
+export { strategy, isAuth, isAdmin, hasTeam, getAccount, generatePassword };
