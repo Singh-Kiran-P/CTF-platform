@@ -1,9 +1,11 @@
 import DB, { Challenge, Round, Solve, Question, Hint, UsedHint, Attempt, AttemptType, solveAvailable, Account, Team } from '../database';
+import { LeaderBoardController } from "../controllers/leaderboard";
 import { getAccount, isAuth } from '../auth/index';
 import { Root, uploaddir } from '../files';
 import levenshtein from 'fast-levenshtein';
 import express from 'express';
 const router = express.Router();
+let leaderboardController = new LeaderBoardController();
 
 const challengeRelations = ['solves', 'solves.team', 'solves.account', 'usedHints', 'usedHints.team'];
 
@@ -118,7 +120,7 @@ const attempt = (res: express.Response, account: Account, team: Team, challenge:
             if (next) return res.send({ solved: true, next: next });
             DB.repo(Solve).save(new Solve(challenge, team, new Date().toJSON(), account)).then(solve => {
                 if (!solve) return res.json(error(true));
-                solved(responseSolve(challenge, solve), res);
+                solved(team, account, responseSolve(challenge, solve), res);
             }).catch(() => res.json(error(true)));
         }).catch(() => res.json(error(true)));
     }).catch(() => res.json(error(true)));
@@ -157,7 +159,8 @@ const attempted = (attempt: Attempt, challenge: Challenge) => {
 
 }
 
-const solved = (solve: any, res: express.Response) => {
+const solved = (team: Team, account: Account, solve: { name: string, points: number, time: string }, res: express.Response) => {
+    leaderboardController.updateLeaderboard(account, solve.points, solve.time);
     res.send({ solved: solve });
 }
 

@@ -9,6 +9,7 @@ const router = express.Router();
 import { LeaderBoardController } from "../controllers/leaderboard";
 let controller = new LeaderBoardController();
 
+
 router.post("/update", controller.update);
 
 router.get("/getAllData", controller.getAllData);

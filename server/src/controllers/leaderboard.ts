@@ -41,7 +41,7 @@ export class LeaderBoardController {
      * @param timestamp
      */
     // TODO: @lander call this func after saving solve
-    public updateLeaderboard(account: Account, score: number, timestamp: Date) {
+    public updateLeaderboard(account: Account, score: number, timestamp: string) {
         let cat = account.category.name;
         // emit socket
         let socket = socketIO.getIO();
@@ -70,7 +70,7 @@ export class LeaderBoardController {
 
                 //save data
                 // this.teams[0].scores.push({ date, score });
-                this.updateLeaderboard(acc, score, date);
+                this.updateLeaderboard(acc, score, date.toJSON());
                 res.send("oke")
             })
             .catch(err => res.json(err));
