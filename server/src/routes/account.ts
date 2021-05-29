@@ -1,8 +1,8 @@
-import express from 'express';
-const router = express.Router();
 import DB, { Account } from '../database';
 import { isAuth, getAccount } from '../auth/index';
 import { ILike } from 'typeorm';
+import express from 'express';
+const router = express.Router();
 
 router.get('/hasTeam', isAuth, (req, res) => {
     let acc: Account = getAccount(req);
@@ -26,13 +26,12 @@ router.get('/getUsers', (req, res) => {
     const skip: number = (currentPage - 1) * perPage;
 
     let nameOrder: 'ASC' | 'DESC' = 'ASC';
-    if(params.sortBy == 'name') {
+    if(params.sortBy == 'name')
         nameOrder = params.sortDirection;
-    }
 
     DB.repo(Account).find({
-            where: { name: ILike('%' + filter + '%'), admin: false }, order: { name: nameOrder },
-            relations: ['solves', 'solves.challenge', 'team', 'team.usedHints'],
+        where: { name: ILike('%' + filter + '%'), admin: false }, order: { name: nameOrder },
+        relations: ['solves', 'solves.challenge', 'team', 'team.usedHints'],
     }).then((accountsDB: Account[]) => {
         let accountsData: { id: number, name: string, category: string, points: number, team: string, teamUuid: string }[] = [];
         accountsDB.forEach((account: Account) => {

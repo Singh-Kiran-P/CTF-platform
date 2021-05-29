@@ -1,5 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany, OneToOne, JoinColumn, Repository, AfterInsert, BeforeUpdate, AfterUpdate } from 'typeorm';
-import DB,{ Environment, Attempt, Solve, Account, UsedHint } from '../../../database';
+import DB,{ Attempt, Solve, Account, UsedHint } from '../../../database';
 import { generatePassword } from '../../../auth/index';
 import { Category } from './Category';
 
@@ -31,13 +31,10 @@ export class Team {
     @OneToMany(_ => Attempt, attempt => attempt.team)
     attempts: Attempt[];
 
-    @OneToMany(_ => Environment, environment => environment.team)
-    environments: Environment[];
-
     @AfterInsert() 
     generateInvite() {
         let inviteData = generatePassword(this.id);
-        DB.repo(Team).update(this.id, {inviteCode: inviteData.hash});
+        DB.repo(Team).update(this.id, { inviteCode: inviteData.hash });
     }
 
     constructor(name: string, creator: Account) {
@@ -55,8 +52,8 @@ export class Team {
     getCategory(): Category {
         let catOrder: number = this.accounts[0].category.order;
         let cat: Category = this.accounts[0].category;
-        this.accounts.forEach((member: Account)=>{
-            if(member.category.order > catOrder) {
+        this.accounts.forEach(member => {
+            if (member.category.order > catOrder) {
                 catOrder = member.category.order;
                 cat = member.category;
             }

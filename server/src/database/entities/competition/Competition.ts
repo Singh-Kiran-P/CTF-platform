@@ -15,7 +15,7 @@ export class Competition {
         this.name = name;
         this.paused = false;
         this.flagFormat = '';
-        // TODO: flagFormat
+        // TODO: flagFormat?
     }
 }
 

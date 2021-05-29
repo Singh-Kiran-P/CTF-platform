@@ -14,24 +14,26 @@ const ended = () => ({ error: 'Unauthorized request', ended: true });
 const locked = (id: number, name: string) => ({ error: 'Unauthorized request', locked: { id: id, name: name } });
 
 const roundStarted = (roundId: number | string, req: express.Request, res: express.Response, next: (round: Round) => any) => {
-    if (!getAccount(req).admin && !getAccount(req).team) return res.json(joinTeam());
+    let admin = getAccount(req).admin;
+    if (!admin && !getAccount(req).team) return res.json(joinTeam());
     DB.repo(Round).findOne(roundId).then(round => {
         if (!round) return res.json(error());
-        //if (new Date(round.start) > new Date()) return res.json(notStarted()); // TODO: uncomment
+        if (!admin && new Date(round.start) > new Date()) return res.json(notStarted());
         return next(round);
     }).catch(() => res.json(error()));
 }
 
-const challengeAvailable = (challengeId: number | string, relations: string[], active: boolean, req: express.Request, res: express.Response, next: (challenge: Challenge) => any) => {
-    if (!getAccount(req).admin && !getAccount(req).team) return res.json(joinTeam());
+const challengeAvailable = (challengeId: number | string, relations: string[], active: boolean, req: express.Request, res: express.Response, next: (c: Challenge) => any) => {
+    let admin = getAccount(req).admin;
+    if (!admin && !getAccount(req).team) return res.json(joinTeam());
     DB.repo(Challenge).findOne({ where: { id: Number(challengeId) }, relations: challengeRelations.concat('round', ...relations) }).then(challenge => {
         if (!challenge) return res.json(error());
-        //if (new Date(challenge.round.start) > new Date()) return res.json(notStarted()); // TODO: uncomment
-        //if (active && new Date(challenge.round.end) < new Date()) return res.json(ended()); // TODO: uncomment
+        if (!admin && new Date(challenge.round.start) > new Date()) return res.json(notStarted());
+        if (!admin && active && new Date(challenge.round.end) < new Date()) return res.json(ended());
         if (challenge.questions) challenge.questions.sort((a, b) => a.order - b.order);
         if (challenge.hints) challenge.hints.sort((a, b) => a.order - b.order);
         const available = () => next(challenge);
-        if (challenge.lock < 0 || getAccount(req).admin) return available();
+        if (challenge.lock < 0 || admin) return available();
         DB.repo(Challenge).findOne({ where: { round: challenge.round, order: challenge.lock }, relations: ['solves', 'solves.team'] }).then(c => {
             if (!c) return res.json(error());
             if (!c.solves.find(s => s.team.id == getAccount(req).team.id)) return res.json(locked(c.id, c.name));
@@ -40,31 +42,38 @@ const challengeAvailable = (challengeId: number | string, relations: string[], a
     }).catch(() => res.json(error()));
 }
 
-const responseSolve = (challenge: Challenge, solve: Solve): any => ({
-    name: solve.account?.name || solve.team.name,
-    points: challenge.usedHints.filter(h => h.team.id == solve.team?.id).reduce((acc, cur) => Math.max(acc - cur.hint.cost, 0), challenge.points),
-    time: solve.time
-});
+const solveChallenge = (team: Team, challengeId: number | string, relations: string[], active: boolean, req: express.Request, res: express.Response, next: (c: Challenge) => any) => {
+    solveAvailable(team, res, () => challengeAvailable(challengeId, relations, active, req, res, c => next(c)));
+}
+
+const responseSolve = (challenge: Challenge, solve: Solve) => getSolve(
+    solve.account?.name || solve.team.name,
+    challenge.usedHints.filter(h => h.team.id == solve.team?.id).reduce((acc, cur) => Math.max(acc - cur.hint.cost, 0), challenge.points),
+    solve.time
+);
+
+const getSolve = (name: string, points: number, time: string) => ({ name: name, points: points, time: time });
 
 const responseQuestion = (question: Question | undefined, unlocked: boolean) => {
     if (!question) return question;
     return Object.assign({}, question, { answer: '' }, unlocked ? {} : { id: -1, question: '' });
 }
 
-const responseChallenge = (req: express.Request, challenge: Challenge): any => Object.assign({}, challenge, {
+const responseChallenge = (challenge: Challenge, req: express.Request): any => Object.assign({}, challenge, {
     flag: '',
     solves: challenge.solves.filter(s => s.team.id == getAccount(req).team?.id).map(s => responseSolve(challenge, s))
 });
 
 router.get('/round/:id', isAuth, (req, res) => {
     roundStarted(req.params.id, req, res, round => {
-        DB.respond(DB.repo(Challenge).find({ where: { round: round.id }, order: { order: 'ASC' }, relations: challengeRelations }), res, cs => cs.map(c => responseChallenge(req, c)));
+        DB.respond(DB.repo(Challenge).find({ where: { round: round.id }, order: { order: 'ASC' }, relations: challengeRelations }), res, cs => cs.map(c => responseChallenge(c, req)));
     });
 });
 
 router.get('/:id', isAuth, (req, res) => {
     challengeAvailable(req.params.id, ['questions', 'hints'], false, req, res, challenge => {
-        res.send(Object.assign({}, responseChallenge(req, challenge), {
+        // TODO if (!opened) DB.save(open); opened()?
+        res.send(Object.assign({}, responseChallenge(challenge, req), {
             questions: challenge.questions.map((q, i) => responseQuestion(q, i == 0)),
             hints: challenge.hints.map(hint => Object.assign({}, hint, {
                 content: challenge.usedHints.find(h => h.team.id == getAccount(req).team?.id && h.hint.id == hint.id) ? hint.content : ''
@@ -82,40 +91,34 @@ router.get('/attachment/:id', isAuth, (req, res) => {
 
 router.post('/solve/:id', isAuth, (req, res) => {
     let [account, team] = [getAccount(req), getAccount(req).team];
-    solveAvailable(res, team, () => {
-        challengeAvailable(req.params.id, [], true, req, res, challenge => {
-            let correct = challenge.flag === req.fields.flag;
-            if (account.admin) return res.send({ solved: correct ? new Solve(challenge, null, new Date().toJSON(), account) : false });
-            if (challenge.solves.find(s => s.team.id == team.id)) return res.send({ solved: true });
-            attempt(res, account, team, challenge, correct);
-        });
+    solveChallenge(team, req.params.id, ['questions'], true, req, res, challenge => {
+        let correct = challenge.flag === req.fields.flag;
+        attempt(res, account, team, challenge, correct);
     });
 });
 
 router.post('/answer/:id/:order', isAuth, (req, res) => {
     let [account, team] = [getAccount(req), getAccount(req).team];
-    solveAvailable(res, team, () => {
-        challengeAvailable(req.params.id, ['questions'], true, req, res, challenge => {
-            let order = Number(req.params.order);
-            let next = responseQuestion(challenge.questions.find(q => q.order > order), true);
-            let correct = correctAnswer(challenge.questions.find(q => q.order == order), req.fields.answer as string);
-            if (account.admin) return res.send(correct ? { solved: next ? true : new Solve(challenge, null, new Date().toJSON(), account), next: next } : { solve: false });
-            if (challenge.solves.find(s => s.team.id == team.id)) return res.send({ solved: true });
-            attempt(res, account, team, challenge, correct, next);
-        });
+    solveChallenge(team, req.params.id, ['questions'], true, req, res, challenge => {
+        let order = Number(req.params.order);
+        let next = responseQuestion(challenge.questions.find(q => q.order > order), true);
+        let correct = correctAnswer(challenge.questions.find(q => q.order == order), req.fields.answer as string);
+        attempt(res, account, team, challenge, correct, next);
     });
 });
 
-const attempt = (res: express.Response, account: Account, team: Team, challenge: Challenge, correct: boolean, next?: any): void => {
+const attempt = (res: express.Response, account: Account, team: Team, challenge: Challenge, correct: boolean, next?: any) => {
+    if (account.admin) return res.send(correct ? { solved: next ? true : getSolve(account.name, challenge.points, new Date().toJSON()), next: next } : { solve: false });
+    if (challenge.solves.find(s => s.team.id == team.id)) return res.send({ solved: true });
     DB.repo(Attempt).save(new Attempt(AttemptType.SOLVE, account, team)).then(attempt => {
         if (!attempt) res.json(error(true));
+        attempted(attempt, challenge);
         if (!correct) return res.send({ solved: false });
         DB.repo(Attempt).delete({ team: team }).then(() => {
             if (next) return res.send({ solved: true, next: next });
             DB.repo(Solve).save(new Solve(challenge, team, new Date().toJSON(), account)).then(solve => {
                 if (!solve) return res.json(error(true));
-                // TODO leaderboard update
-                res.send({ solved: responseSolve(challenge, solve) });
+                solved(responseSolve(challenge, solve), res);
             }).catch(() => res.json(error(true)));
         }).catch(() => res.json(error(true)));
     }).catch(() => res.json(error(true)));
@@ -146,4 +149,17 @@ const correctAnswer = (question: Question | undefined, answer: string): boolean 
     });
 }
 
+const opened = () => {
+
+}
+
+const attempted = (attempt: Attempt, challenge: Challenge) => {
+
+}
+
+const solved = (solve: any, res: express.Response) => {
+    res.send({ solved: solve });
+}
+
+export { responseSolve };
 export default { path: '/challenges', router };

@@ -1,5 +1,5 @@
 <template>
-    <div class="loading">
+    <div class=loading>
         <b-spinner variant=primary type=grow label="Loading..."/>
     </div>
 </template>

@@ -9,12 +9,13 @@
             <span class=center>The competition does not yet have any rounds</span>
         </div>
         <div v-else>
+            <AdminHeader v-if="admin" v-model="offset" :names="this.rounds.map(r => r.name)" :times="this.rounds.map(r => r.start)"/>
             <div v-if="currentRound">
                 <span class="round-name center">{{currentRound.name}}</span>
                 <span class="round-duration center">{{durationDisplay(currentRound)}}</span>
                 <span class="round-time center">{{countdownDisplay(currentRound)}}</span>
                 <span class="round-description center"><span v-if="currentRound.description">{{currentRound.description}}</span></span>
-                <Collapse class=challenges label="Challenges" large center v-model="currentRound.visible" :loading="currentRound.loading"
+                <Collapse class=challenges label="Challenges" large center noborder v-model="currentRound.visible" :loading="currentRound.loading"
                     @toggle="toggledChallenges(currentRound)">
                     <div v-for="challenge in currentRound.challenges" :key="challenge.order" :tabindex="unlocked(challenge, currentRound.challenges) ? 0 : -1"
                         :class="['challenge', 'list-item', unlocked(challenge, currentRound.challenges) ? 'unlocked' : 'locked']"
@@ -62,14 +63,14 @@
                 <span class=center>All rounds have ended, you can view them below</span>
             </div>
 
-            <Collapse v-if="nextRounds.length > 0" label="Next rounds" large noborder :value="!currentRound">
+            <Collapse v-if="nextRounds.length > 0" class=next-rounds label="Next rounds" large noborder :value="!currentRound">
                 <div class="round list-item" v-for="round in nextRounds" :key="round.start">
                     <span class=item-name>{{round.name}}</span>
                     <span>{{durationDisplay(round)}}</span>
                 </div>
             </Collapse>
 
-            <Collapse class=past-rounds label="Past rounds" v-if="pastRounds.length > 0" large noborder :value="!currentRound && nextRounds.length == 0">
+            <Collapse v-if="pastRounds.length > 0" class=past-rounds label="Past rounds" large noborder :value="!currentRound && nextRounds.length == 0">
                 <div class=past-round v-for="round in pastRounds" :key="round.start">
                     <span class=round-name>{{round.name}}</span>
                     <div class=past-round-content>
@@ -83,10 +84,10 @@
                                     <font-awesome-icon icon=check class=icon-primary /> Solved by <b>{{solveNames(challenge)}}</b> for <b>{{solvePoints(challenge)}}</b>
                                 </span>
                                 <span v-if="!unlocked(challenge, round.challenges)">
-                                    <font-awesome-icon icon=lock class=icon-info /> Locked because <b>{{lockedName(challenge, currentRound.challenges)}}</b> was not solved
+                                    <font-awesome-icon icon=lock class=icon-info /> Locked because <b>{{lockedName(challenge, round.challenges)}}</b> was not solved
                                 </span>
                                 <span v-else-if="challenge.lock >= 0">
-                                    <font-awesome-icon icon=lock-open class=icon-info /> Unlocked by solving <b>{{lockedName(challenge, currentRound.challenges)}}</b>
+                                    <font-awesome-icon icon=lock-open class=icon-info /> Unlocked by solving <b>{{lockedName(challenge, round.challenges)}}</b>
                                 </span>
                                 <span class=item-name>{{challenge.name}}</span>
                                 <span class="item-description nowrap">{{challenge.description}}</span>
@@ -123,17 +124,19 @@ import axios from 'axios';
 import Loading from '@/components/Loading.vue';
 import Tooltip from '@/components/Tooltip.vue';
 import Collapse from '@/components/Collapse.vue';
+import AdminHeader from '@/components/AdminHeader.vue';
 import { toggledItems, loadItems } from '@/assets/listFunctions';
 import { Round, Challenge, validForm, validChallenges, typeName, typeDescription, solvePoints, solveNames, durationDisplay, countdownDisplay } from '@shared/validation/roundsForm';
 
 type Visible = { visible?: boolean };
 
 export default Vue.extend({
-    name: 'RoundsAdmin',
+    name: 'Rounds',
     components: {
         Loading,
         Tooltip,
-        Collapse
+        Collapse,
+        AdminHeader
     },
     created() {
         axios.get('/api/rounds/data').then(res => {
@@ -145,21 +148,32 @@ export default Vue.extend({
                 toggledItems(this.currentRound, 'loading', true, undefined, r => this.loadChallenges(r));
             }
 
-            setInterval(() => this.time = new Date(), 1000);
+            setInterval(() => this.realTime = new Date(), 100);
             this.loaded = true;
         }).catch(() => this.loaded = true);
     },
     data: () => ({
         rounds: [] as Round[],
 
-        time: new Date(),
+        offset: 0,
+        realTime: new Date(),
         joinTeam: false,
         loaded: false
     }),
+    watch: {
+        offset() {
+            if (!this.currentRound) return;
+            this.currentRound.challenges = undefined;
+            this.rounds.forEach((r: Round & Visible) => r.visible = r == this.currentRound);
+            this.toggledChallenges(this.currentRound);
+        }
+    },
     computed: {
-        pastRounds(): Round[] { return this.rounds.filter(r => new Date(r.start) > this.time).reverse(); }, // TODO: r => new Date(r.end) < this.time).reverse();
+        admin(): boolean { return this.$route.meta?.admin; },
+        time(): Date { return new Date(this.realTime.getTime() + this.offset); },
+        pastRounds(): Round[] { return this.rounds.filter(r => new Date(r.end) < this.time).reverse(); },
         nextRounds(): Round[] { return this.rounds.filter(r => new Date(r.start) > this.time); },
-        currentRound(): (Round & Visible) | undefined { return this.rounds[0]; } // TODO: this.rounds.find(r => new Date(r.start) > this.time && new Date(r.end) < this.time); }
+        currentRound(): (Round & Visible) | undefined { return this.rounds.find(r => new Date(r.start) < this.time && new Date(r.end) > this.time); }
     },
     methods: {
         durationDisplay(round: Round) { return durationDisplay(round); },
@@ -178,7 +192,7 @@ export default Vue.extend({
         solvePoints(challenge: Challenge): string { return solvePoints(challenge.solves || []); },
         solveNames(challenge: Challenge): string { return solveNames(challenge.solves || []); },
         lockedChallenge(challenge: Challenge, challenges: Challenge[]): Challenge | undefined { return challenges.find(c => c.order == challenge.lock); },
-        unlocked(challenge: Challenge, challenges: Challenge[]): boolean { return challenge.lock < 0 || this.solved(this.lockedChallenge(challenge, challenges)); },
+        unlocked(challenge: Challenge, challenges: Challenge[]): boolean { return this.admin || challenge.lock < 0 || this.solved(this.lockedChallenge(challenge, challenges)); },
         lockedName(challenge: Challenge, challenges: Challenge[]): string { return this.lockedChallenge(challenge, challenges)?.name || ''; }
     }
 });
@@ -259,10 +273,13 @@ span, a {
     }
 }
 
-.past-rounds {
+.next-rounds, .past-rounds {
     margin-top: var(--margin);
     padding-top: var(--margin);
     border-top: 2px solid black;
+}
+
+.past-rounds {
     padding-bottom: var(--double-margin);
 
     .past-round {

@@ -40,7 +40,7 @@ router.put('/save', isAdmin, (req, res) => {
         });
 
     type ListsType = { hints: VHint[], questions: VQuestion[] };
-    const error = (action: string): any => res.json({ error: `Error ${action}` });
+    const error = (err: any, action: string): any => { console.log(err); res.json({ error: `Error ${action}` }); };
     const lists = (c: ListsType): ListsType => ({ hints: c?.hints, questions: c?.questions });
     roundUploads.then(() => Promise.all(challengeUploads).then(() => {
         DB.setRepo(DB.repo(Round), data.rounds.map(x => new Round(x)), {}, x => [x.folder], true).then(rounds => {
@@ -58,13 +58,13 @@ router.put('/save', isAdmin, (req, res) => {
                             Promise.all([
                                 hints == undefined ? null : DB.setRepo(DB.repo(Hint), hints, { where: { challenge: challenge } }),
                                 questions == undefined ? null : DB.setRepo(DB.repo(Question), questions, { where: { quiz: challenge } })
-                            ]).then(() => res.send()).catch(() => error('saving'));
+                            ]).then(() => res.send()).catch(err => error(err, 'saving'));
                         });
-                    }).catch(() => error('saving'));
-                }).catch(() => error('uploading'));
+                    }).catch(err => error(err, 'saving'));
+                }).catch(err => error(err, 'uploading'));
             });
-        }).catch(() => error('saving'));
-    }).catch(() => error('uploading'))).catch(() => error('uploading'));
+        }).catch(err => error(err, 'saving'));
+    }).catch(err => error(err, 'uploading'))).catch(err => error(err, 'uploading'));
 });
 
 export default { path: '/rounds', router };

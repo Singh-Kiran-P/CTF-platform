@@ -1,7 +1,7 @@
 // functions to validate the rounds form
 
 import { File as UFile } from 'formidable';
-import { Tag, isf as iscf } from './competitionForm';
+import { Tag, isf as iscf } from './configForm';
 import { state, validInput, validateString, validateNumber, validateCharacters, validateList, is } from '../validation';
 
 enum ChallengeType {
@@ -39,7 +39,7 @@ const durationDisplay = (round: Round): string => {
 }
 
 const countdownDisplay = (now: Date, round: Round): string => {
-    let time = [round.start, round.end].map(time => new Date(time)).filter(t => t > new Date()).concat([new Date()])[0];
+    let time = [round.start, round.end].map(time => new Date(time)).filter(t => t > now).concat([now])[0];
     return timeDisplay(Math.max(0, time.getTime() - now.getTime()));
 }
 
@@ -156,6 +156,6 @@ const isf = {
 }
 
 export {
-    state, validInput, validate, Solve, Question, Hint, Challenge, Round, Form, ChallengeType,
+    state, validInput, validate, Solve, Question, Hint, Challenge, Round, Form, ChallengeType, isf,
     solvePoints, solveNames, typeName, typeDescription, durationDisplay, countdownDisplay, timeDisplay, sortRounds, validForm, validChallenges, validChallenge, validHints, validQuestions
 };

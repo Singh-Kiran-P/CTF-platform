@@ -2,15 +2,15 @@ import Vue from 'vue';
 import VueMeta from 'vue-meta';
 import Vuelidate from 'vuelidate';
 import { BootstrapVue, BootstrapVueIcons } from 'bootstrap-vue';
-import VueSweetalert2 from 'vue-sweetalert2';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import VueSocketIOExt from "vue-socket.io-extended";
+import VueSweetalert2 from 'vue-sweetalert2';
 import '@sweetalert2/theme-dark/dark.css';
 import '@/assets/icons/fontAwesomeIcons';
-import App from '@/App.vue';
-import router from '@/router';
 import { io } from "socket.io-client";
-import VueSocketIOExt from "vue-socket.io-extended";
 import * as dotenv from 'dotenv';
+import router from '@/router';
+import App from '@/App.vue';
 dotenv.config();
 
 Vue.config.productionTip = false;
@@ -21,12 +21,8 @@ Vue.use(VueSweetalert2, {});
 Vue.use(VueMeta, { refreshOnceOnNavigation: true });
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 
-
-console.log(process.env);
-
 let hostURL = `http://${process.env.VUE_APP_API_HOST}:${process.env.VUE_APP_API_PORT}`;
-const socket = io(hostURL)
-Vue.use(VueSocketIOExt, socket);
+Vue.use(VueSocketIOExt, io(hostURL));
 
 router.onReady = router => {
     new Vue({

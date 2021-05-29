@@ -1,25 +1,35 @@
 <template>
-  <div class="pageNotFound">
-    <span>404 page not found</span>
-  </div>
+    <div class=page-not-found>
+        <span class=error>404 page not found</span>
+        <span v-if="auth">Return to the <router-link to="/">Home page</router-link></span>
+        <span v-else>You might have to <router-link :to="{ name: 'Login' }">Log in</router-link> or <router-link :to="{ name: 'Register' }">Register</router-link> first</span>
+    </div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 
 export default Vue.extend({
-  name: "PageNotFound",
+    name: 'PageNotFound',
+    computed: {
+        auth(): boolean { return this.$route.meta.auth; }
+    }
 });
 </script>
 
 <style scoped lang="scss">
-.pageNotFound {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.page-not-found {
+    padding: var(--double-margin);
 }
 
-span {
-  font-size: 2rem;
+.error {
+    margin-bottom: var(--double-margin);
+    font-size: var(--font-massive);
+    font-weight: bold;
+}
+
+span, :not(span) > a {
+    display: block;
+    text-align: center;
 }
 </style>

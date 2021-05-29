@@ -21,7 +21,6 @@ export default Vue.extend({
     }),
     created() {
         axios.post('/api/team/join/'+this.$route.params.invite).then((response) => {
-            if(response.data.error == 'Unauthorized request') {this.error = 'please login or register before entering the invite link'; this.isLoading = false; return;}
             if(response.data.error) {this.error = response.data.error; this.isLoading = false; return;}
             this.$router.replace('/team');
         }).catch((err)=>console.log(err))

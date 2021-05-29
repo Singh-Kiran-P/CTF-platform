@@ -152,7 +152,6 @@ export { Competition, CompetitionRepo } from './entities/competition/Competition
 export { Page } from './entities/competition/Page';
 export { Sponsor } from './entities/competition/Sponsor';
 export { Attempt, AttemptType, loginAvailable, solveAvailable } from './entities/connections/Attempt';
-export { Environment } from './entities/connections/Environment';
 export { Solve } from './entities/connections/Solve';
 export { UsedHint } from './entities/connections/UsedHint';
 export { Notification } from './entities/notification/Notification';

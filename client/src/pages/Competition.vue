@@ -2,7 +2,7 @@
     <div class=list-form>
         <b-form @submit="onSubmit($event)">
             <b-form-group :state="state(roundsFeedback)" :invalid-feedback="roundsFeedback">
-            <div class="list-item nostyle round" v-for="(round, i) in form.rounds" :key="i">
+                <div class="list-item nostyle round" v-for="(round, i) in form.rounds" :key="i">
                     <div class=item-content>
                         <template v-if="!round.editable">
                             <span class=item-name>{{round.name}}</span>
@@ -191,9 +191,9 @@ import IconButton from '@/components/IconButton.vue';
 import StatusButton from '@/components/StatusButton.vue';
 import DateTimePicker from '@/components/DateTimePicker.vue';
 import { nextOrder, moveDown, toggledItems, loadItems } from '@/assets/listFunctions';
-import { Form, Round, Challenge, ChallengeType, Hint, Question, state, validate, validInput } from '@shared/validation/roundsForm';
-import { typeName, typeDescription, durationDisplay, sortRounds, validForm, validChallenges, validHints, validQuestions } from '@shared/validation/roundsForm';
-import { Tag } from '@shared/validation/competitionForm';
+import { Form, Round, Challenge, ChallengeType, Hint, Question, state, validate, validInput, isf } from '@shared/validation/roundsForm';
+import { typeName, typeDescription, durationDisplay, sortRounds, validForm } from '@shared/validation/roundsForm';
+import { Tag } from '@shared/validation/configForm';
 import { serialize } from '@shared/objectFormdata';
 import path from 'path';
 
@@ -203,7 +203,7 @@ type HintsVisible = { hintsVisible?: boolean };
 type QuestionsVisible = { questionsVisible?: boolean };
 
 export default Vue.extend({
-    name: 'RoundsAdmin',
+    name: 'Competition',
     components: {
         Tooltip,
         Collapse,
@@ -270,7 +270,7 @@ export default Vue.extend({
             }
             axios.get('/api/rounds/data').then(res => {
                 let data: Form = res.data;
-                if (!validForm(data)) return error();
+                if (!isf.form(data)) return error();
                 let rounds = data.rounds.map((round, i) => Object.assign({}, round, { challengesVisible: close ? false : this.form.rounds[i]?.challengesVisible }));
                 Promise.all(rounds.filter(round => round.challengesVisible).map(round => this.loadChallenges(round))).then(() => {
                     this.loaded = true;
@@ -307,7 +307,7 @@ export default Vue.extend({
             toggledItems(round, 'challengesLoading', round.challengesVisible, round.challenges, r => this.loadChallenges(r));
         },
         loadChallenges(round: Round): Promise<void> {
-            return loadItems(round, 'challenges', 'challengesLoading', 'challengesVisible', '/api/rounds/challenges/', (data: any) => validChallenges(data, true));
+            return loadItems(round, 'challenges', 'challengesLoading', 'challengesVisible', '/api/rounds/challenges/', (data: any) => isf.challenges(data));
         },
 
         typeName(type: string): string { return typeName(type); },
@@ -351,13 +351,13 @@ export default Vue.extend({
             toggledItems(challenge, 'hintsLoading', challenge.hintsVisible, challenge.hints, c => this.loadHints(c));
         },
         loadHints(challenge: Challenge): Promise<void> {
-            return loadItems(challenge, 'hints', 'hintsLoading', 'hintsVisible', '/api/rounds/challenge/hints/', data => validHints(data, true));
+            return loadItems(challenge, 'hints', 'hintsLoading', 'hintsVisible', '/api/rounds/challenge/hints/', data => isf.hints(data));
         },
         toggledQuestions(challenge: Challenge & QuestionsVisible, visible?: boolean): void {
             toggledItems(challenge, 'questionsLoading', visible || challenge.questionsVisible, challenge.questions, c => this.loadQuestions(c));
         },
         loadQuestions(challenge: Challenge): Promise<void> {
-            return loadItems(challenge, 'questions', 'questionsLoading', 'questionsVisible', '/api/rounds/challenge/questions/', data => validQuestions(data, true));
+            return loadItems(challenge, 'questions', 'questionsLoading', 'questionsVisible', '/api/rounds/challenge/questions/', data => isf.questions(data));
         },
 
         hintsFeedback(challenge: Challenge): string { return validate.hints(challenge.hints); },

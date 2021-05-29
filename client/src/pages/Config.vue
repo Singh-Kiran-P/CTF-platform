@@ -142,7 +142,7 @@ import Collapse from '@/components/Collapse.vue';
 import IconButton from '@/components/IconButton.vue';
 import StatusButton from '@/components/StatusButton.vue';
 import { nextOrder, moveDown } from '@/assets/listFunctions';
-import { state, validInput, validForm, validate, Category, Tag, Page, Sponsor, Form } from '@shared/validation/competitionForm';
+import { state, validInput, validForm, validate, Category, Tag, Page, Sponsor, Form, isf } from '@shared/validation/configForm';
 import { serialize } from '@shared/objectFormdata';
 import path from 'path';
 
@@ -230,7 +230,7 @@ export default Vue.extend({
             }
             axios.get('/api/competition/data').then(res => {
                 let data: Form = res.data;
-                if (!validForm(data)) return error();
+                if (!isf.form(data)) return error();
                 this.loaded = true;
                 this.form = data;
             }).catch(() => error());

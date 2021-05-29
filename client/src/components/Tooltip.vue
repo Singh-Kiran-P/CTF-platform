@@ -4,9 +4,11 @@
             <slot/>
         </div>
         <b-tooltip v-if="title || content" :target="() => $refs['hover']" triggers=hover :show="show"
-            :placement="(below ? 'bottom' : 'top') + (center ? '' : 'right')" no-fade :class="{ 'left' : !center }">
-            <span class=title>{{title}}</span>
-            <span class=content>{{content}}</span>
+            :placement="(below ? 'bottom' : 'top') + (center ? '' : (left ? 'left' : 'right'))" no-fade>
+            <div :class="{ 'left': !center }">
+                <span class=title v-html="title"/>
+                <span class=content v-html="content"/>
+            </div>
         </b-tooltip>
     </div>
 </template>
@@ -21,6 +23,7 @@ export default Vue.extend({
         content: String,
         below: Boolean,
         center: Boolean,
+        left: Boolean,
         show: Boolean
     }
 });
@@ -28,20 +31,14 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-.hover > svg {
-    vertical-align: middle;
-}
-
 .tooltip {
+    .left {
+        text-align: left;
+    }
+
     .title, .content {
         display: block;
         word-break: initial;
-    }
-
-    .left {
-        span {
-            text-align: left;
-        }
     }
 
     .title {

@@ -6,7 +6,7 @@
             <router-link class=center :to="{ name: 'Team' }">Create or join a team</router-link>
         </div>
         <div v-else-if="notStarted">
-            <span>This challenge is not yet available</span>
+            <span class=center>This challenge is not yet available</span>
             <router-link class=center :to="{ name: 'Rounds' }">View available challenges</router-link>
         </div>
         <div v-else-if="locked">
@@ -19,6 +19,7 @@
             <span class=center>Could not load challenge</span>
         </div>
         <div v-else>
+            <AdminHeader v-if="admin"/>
             <span class=name>{{challenge.name}}</span>
             <div class=round>
                 <Tooltip :content="challenge.round.description" below center>
@@ -28,18 +29,20 @@
             <span class=duration>{{durationDisplay}}</span>
             <span class=time>{{countdownDisplay}}</span>
             <div class=info>
-                <Tooltip :content="typeDescription" below center>
-                    <span class=type>{{typeName}}</span>
-                </Tooltip>
-                <Tooltip content="TODO: points explanation" below center>
-                    <span class=points>{{challenge.points}} Point{{challenge.points == 1 ? '' : 's'}}</span>
-                </Tooltip>
-                <Tooltip v-if="challenge.tag" :content="challenge.tag.description" below center>
-                    <span class=tag>{{challenge.tag.name}}</span>
-                </Tooltip>
-                <Tooltip v-else content="This challenge has not been given a tag" below center>
-                    <span class=tag>No tag</span>
-                </Tooltip>
+                <div class=tooltips>
+                    <Tooltip :content="typeDescription" below center>
+                        <span class=type>{{typeName}}</span>
+                    </Tooltip>
+                    <Tooltip content="TODO: points explanation" below center>
+                        <span class=points>{{challenge.points}} Point{{challenge.points == 1 ? '' : 's'}}</span>
+                    </Tooltip>
+                    <Tooltip v-if="challenge.tag" :content="challenge.tag.description" below center>
+                        <span class=tag>{{challenge.tag.name}}</span>
+                    </Tooltip>
+                    <Tooltip v-else content="This challenge has not been given a tag" below center>
+                        <span class=tag>No tag</span>
+                    </Tooltip>
+                </div>
                 <div v-if="solved || ended" class=solve>
                     <span v-if="!solved"><font-awesome-icon icon=times class=icon-danger /> Not solved</span>
                     <span v-else><font-awesome-icon icon=check class=icon-primary /> Solved by <b>{{solveNames}}</b> for <b>{{solvePoints}}</b></span>
@@ -52,10 +55,10 @@
             </span></span>
             <template v-if="!solved && !ended">
                 <div v-if="challenge.type == typeValues.INTERACTIVE" class=interactive>
-                    <span v-if="startState != 'succes'">You can start your interactive environment below</span>
-                    <span v-else><a :href="environment" target=_blank>Open your interactive environment</a></span>
+                    <span>You can {{startState == 'succes' ? 'open' : 'start'}} your interactive environment below</span>
                     <div class=controls>
-                        <StatusButton variant=primary @click="!containerInit ? initContainer() : startContainer()" :disabled="resetState == 'loading'"
+                        <b-button v-if="startState == 'succes'" variant=primary :href="environment" target=_blank><font-awesome-icon icon=external-link-alt /> Open</b-button>
+                        <StatusButton v-else variant=primary @click="!containerInit ? initContainer() : startContainer()" :disabled="resetState == 'loading'"
                             :state="!containerInit && startState != 'error' ? 'loading' : startState" normal=Start :loading="containerInit ? 'Starting' : 'Loading'" succes=Started />
                         <StatusButton variant=info @click="resetContainer()" :disabled="stopState != 'normal'" :state="resetState" normal=Reset loading=Resetting succes=Reset />
                         <StatusButton variant=danger @click="stopContainer()" :disabled="resetState == 'loading'" :state="stopState" normal=Stop loading=Stopping succes=Stopped />
@@ -105,17 +108,19 @@ import axios from 'axios';
 import Loading from '@/components/Loading.vue';
 import Tooltip from '@/components/Tooltip.vue';
 import Collapse from '@/components/Collapse.vue';
+import AdminHeader from '@/components/AdminHeader.vue';
 import StatusButton from '@/components/StatusButton.vue';
 import { Challenge, ChallengeType, Hint, Question } from '@shared/validation/roundsForm';
 import { validChallenge, typeName, typeDescription, solvePoints, solveNames, durationDisplay, countdownDisplay, timeDisplay } from '@shared/validation/roundsForm';
 import path from 'path';
 
 export default Vue.extend({
-    name: 'RoundsAdmin',
+    name: 'Challenge',
     components: {
         Loading,
         Tooltip,
         Collapse,
+        AdminHeader,
         StatusButton
     },
     created() {
@@ -128,7 +133,7 @@ export default Vue.extend({
                 this.initContainer();
             }
 
-            setInterval(() => this.time = new Date(), 1000);
+            setInterval(() => this.time = new Date(), 100);
             this.loaded = true;
         });
     },
@@ -150,11 +155,10 @@ export default Vue.extend({
         containerInit: false,
         startState: 'normal',
         resetState: 'normal',
-        stopState: 'succes',
-
-        answer: ''
+        stopState: 'succes'
     }),
     computed: {
+        admin(): boolean { return this.$route.meta?.admin; },
         solved(): boolean { return (this.challenge?.solves || []).length > 0; },
         ended(): boolean { return this.challenge?.round ? new Date(this.challenge.round.end) < this.time : false; },
 
@@ -293,25 +297,32 @@ export default Vue.extend({
     }
 
     .info {
-        display: flex;
-        justify-content: space-around;
         margin: var(--margin) 0;
         padding-bottom: var(--margin);
         border-bottom: 2px solid black;
         flex-wrap: wrap;
 
-        .type, .points, .tag {
-            font-weight: bold;
-            user-select: none;
-        }
+        .tooltips {
+            display: flex;
+            justify-content: space-around;
 
-        .type, .tag {
-            color: var(--info);
+            & > * {
+                width: 100%;
+                flex-shrink: 1;
+                text-align: center;
+            }
+
+            .type, .points, .tag {
+                font-weight: bold;
+                user-select: none;
+            }
+
+            .type, .tag {
+                color: var(--info);
+            }
         }
 
         .solve {
-            width: 100%;
-            flex-shrink: 0;
             margin-top: var(--margin);
         }
     }
@@ -345,13 +356,17 @@ export default Vue.extend({
         .controls {
             display: flex;
 
-            button {
+            button, a {
                 width: 0;
                 flex-grow: 1;
 
-                &:not(:last-of-type) {
+                &:not(:last-child) {
                     margin-right: var(--double-margin);
                 }
+            }
+
+            a:hover {
+                text-decoration: none !important;
             }
         }
     }

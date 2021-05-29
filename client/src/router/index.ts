@@ -41,11 +41,6 @@ const pages: { [page: string]: Route } = {
         src: 'joinTeam.vue',
         meta: { hidden: true }
     },
-    leaderboard: {
-        path: '/leaderboard',
-        name: 'Leaderboard',
-        src: 'Leaderboard.vue'
-    },
     teams: {
         path: '/teams',
         name: 'Teams',
@@ -55,6 +50,33 @@ const pages: { [page: string]: Route } = {
         path: '/users',
         name: 'Users',
         src: 'Users.vue'
+    },
+    rounds: {
+        path: '/rounds',
+        name: 'Rounds',
+        src: 'Rounds.vue'
+    },
+    challenge: {
+        path: '/challenge/:id',
+        name: 'Challenge',
+        src: 'Challenge.vue',
+        meta: { hidden: true }
+    },
+    leaderboard: {
+        path: '/leaderboard',
+        name: 'Leaderboard',
+        src: 'Leaderboard.vue'
+    },
+    liveFeed: {
+        path: '/live-feed',
+        name: 'Live Feed',
+        src: 'LiveFeed.vue'
+    },
+    competition: {
+        path: '/competition',
+        name: 'Competition',
+        src: 'Competition.vue',
+        meta: { right: true }
     },
     config: {
         path: '/config',
@@ -73,22 +95,6 @@ const pages: { [page: string]: Route } = {
         name: 'Notifications',
         src: 'Notifications.vue',
         meta: { right: true }
-    },
-    roundsAdmin: {
-        path: '/rounds/config',
-        name: 'Rounds',
-        src: 'RoundsAdmin.vue'
-    },
-    roundsParticipant: {
-        path: '/rounds',
-        name: 'Rounds',
-        src: 'RoundsParticipant.vue'
-    },
-    challenge: {
-        path: '/challenge/:id',
-        name: 'Challenge',
-        src: 'Challenge.vue',
-        meta: { hidden: true }
     }
 };
 
@@ -97,12 +103,9 @@ const routes: { [page: string]: Route[] } = {
     [Roles.VISITOR]: [
         pages.login,
         pages.register,
-        pages.joinTeam,
         pages.leaderboard,
         pages.teamDashboard,
         pages.teams,
-        pages.leaderboard,
-
         pages.users
     ],
     [Roles.PARTICIPANT]: [
@@ -112,7 +115,7 @@ const routes: { [page: string]: Route[] } = {
         pages.notifications,
         pages.teams,
         pages.users,
-        pages.roundsParticipant,
+        pages.rounds,
         pages.challenge,
         pages.leaderboard,
         pages.logout
@@ -121,9 +124,11 @@ const routes: { [page: string]: Route[] } = {
         pages.teamDashboard,
         pages.teams,
         pages.users,
-        pages.roundsAdmin,
+        pages.rounds,
         pages.challenge,
         pages.leaderboard,
+        pages.liveFeed,
+        pages.competition,
         pages.config,
         pages.docker,
         pages.notifications,
@@ -157,7 +162,7 @@ Promise.all([
             children: availableRoutes.map(route => ({
                 path: route.path.slice(1),
                 name: route.name,
-                meta: route.meta,
+                meta: Object.assign({}, route.meta, { admin: roleResponse.data == Roles.ORGANIZER, auth: roleResponse.data != Roles.VISITOR }),
                 component: route.src.endsWith('vue') ? () => import(`../pages/${route.src}`) : { template: `<iframe src="/api/uploads${route.src}"/>` }
                 // include vue pages directly into the html using a lazy loaded import, with the root directory for src in '/src/pages/'
                 // include html pages using an iframe so they dont inherit any styling, the src requesting the html file from the server

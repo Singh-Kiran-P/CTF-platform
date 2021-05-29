@@ -38,7 +38,7 @@ const rechargeTime = 30 * 1000;
 const error = (saving?: boolean) => ({ error: 'Error ' + (saving ? 'saving' : 'fetching data') });
 const rateLimit = (time: number) => ({ error: 'Unauthorized request', rateLimit: time });
 
-const available = (res: express.Response, attempts: Attempt[], next: () => any) => {
+const available = (attempts: Attempt[], res: express.Response, next: () => any) => {
     let now = new Date().getTime();
     let buckets = bucketSize;
     let rechargeEnd = 0;
@@ -53,13 +53,13 @@ const available = (res: express.Response, attempts: Attempt[], next: () => any) 
     }).catch(() => res.send(error(true)));
 }
 
-export const loginAvailable = (res: express.Response, account: any, next: () => any): void => {
+export const loginAvailable = (account: any, res: express.Response, next: () => any): void => {
     next(); // TODO: user ip is needed to rate limit logins
 }
 
-export const solveAvailable = (res: express.Response, team: Team, next: () => any): void => {
+export const solveAvailable = (team: Team, res: express.Response, next: () => any): void => {
     if (!team) return next();
     DB.repo(Attempt).find({ where: { type: AttemptType.SOLVE, team: team } }).then(attempts => {
-        available(res, attempts, () => next());
+        available(attempts, res, () => next());
     }).catch(() => res.json(error()));
 }

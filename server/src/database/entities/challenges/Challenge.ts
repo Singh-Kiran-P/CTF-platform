@@ -1,5 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany } from 'typeorm';
-import { Environment, Solve, Question, Round, Hint, Tag, UsedHint } from '../../../database';
+import { Solve, Question, Round, Hint, Tag, UsedHint } from '../../../database';
 import { ChallengeType } from '@shared/validation/roundsForm';
 
 export { ChallengeType };
@@ -59,9 +59,6 @@ export class Challenge {
 
     @OneToMany(_ => Solve, solve => solve.challenge)
     solves: Solve[];
-
-    @OneToMany(_ => Environment, environment => environment.challenge)
-    environments: Environment[]; // TODO: remove this?
 
     constructor(params?: { round: Round, name: string, description: string, tag: Tag | null, points: number, flag: string, order: number, type: ChallengeType, id?: number,
         attachment: string, docker: string, innerPorts: string, dockerImageId: string, lock: number }) {
