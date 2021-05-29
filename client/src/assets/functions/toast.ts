@@ -11,7 +11,7 @@ const toast = {
             { class: ['text-break', 'mb-0'] },
             [
                 h('strong'),
-                `${message} `,
+                `${message}`,
             ]
         );
 
