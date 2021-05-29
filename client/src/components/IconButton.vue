@@ -33,7 +33,7 @@ button.icon {
     border-radius: var(--border-radius);
     background-color: var(--gray-light);
     box-shadow: none !important;
-    color: var(--black);
+    color: var(--black-c);
     outline: none;
     border: none;
 }
@@ -46,8 +46,8 @@ button.icon.toggled {
 @media (hover: hover) {
     button.icon:hover:not(:disabled), button.icon:focus-visible {
         &.icon {
-            background-color: var(--gray);
-            color: var(--white);
+            background-color: var(--gray-c);
+            color: var(--white-c);
         }
 
         &.darker {
@@ -70,8 +70,8 @@ button.icon.toggled {
 
 button.icon:active:not(:disabled) {
     &.icon {
-        background-color: var(--gray);
-        color: var(--white);
+        background-color: var(--gray-c);
+        color: var(--white-c);
     }
 
     &.darker {

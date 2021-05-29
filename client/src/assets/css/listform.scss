@@ -50,7 +50,7 @@
             span {
                 flex-grow: 1;
                 padding: var(--margin);
-                color: var(--gray);
+                color: var(--gray-c);
                 font-size: small;
             }
 
@@ -79,7 +79,7 @@
 
     .item-category {
         min-width: 5rem;
-        color: var(--gray);
+        color: var(--gray-c);
         display: inline-block;
     }
 

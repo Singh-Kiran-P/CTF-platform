@@ -121,8 +121,8 @@ export default Vue.extend({
 }
 .sponsor-cell-content{
     margin: 0px var(--margin);
-    background: white;
-        border-radius: 20px;
+    background: var(--white-c);
+    border-radius: 20px;
     width: 100%;
     display: flex;
     justify-content: center;

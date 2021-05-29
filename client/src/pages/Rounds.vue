@@ -230,7 +230,7 @@ span, a {
 .round-time {
     margin-bottom: var(--margin);
     padding-bottom: var(--margin);
-    border-bottom: 2px solid var(--black);
+    border-bottom: 2px solid var(--black-c);
 }
 
 .round-description {
@@ -264,7 +264,7 @@ span, a {
             pointer-events: none;
 
             .item-name {
-                color: var(--gray);
+                color: var(--gray-c);
             }
         }
     }
@@ -277,7 +277,7 @@ span, a {
 .next-rounds, .past-rounds {
     margin-top: var(--margin);
     padding-top: var(--margin);
-    border-top: 2px solid var(--black);
+    border-top: 2px solid var(--black-c);
 }
 
 .past-rounds {
@@ -288,7 +288,7 @@ span, a {
 
         .past-round-content {
             padding: var(--margin);
-            border: 2px solid var(--black);
+            border: 2px solid var(--black-c);
             border-radius: var(--border-radius);
         }
 

@@ -127,7 +127,7 @@ export default Vue.extend({
 }
 
 .show {
-    border-top: 2px solid var(--black);
+    border-top: 2px solid var(--black-c);
     padding-top: var(--double-margin);
 
     .notification-title {

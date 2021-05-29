@@ -403,10 +403,10 @@ span.info {
 
 .round {
     flex-wrap: wrap;
-    border-bottom: 2px solid var(--black);
+    border-bottom: 2px solid var(--black-c);
     
     & > button {
-        background-color: var(--white);
+        background-color: var(--white-c);
     }
 
     &:not(:last-of-type) {
@@ -458,12 +458,12 @@ span.info {
         }
 
         button {
-            background-color: var(--white);
+            background-color: var(--white-c);
         }
     }
 
     .edit-item {
-        border: 2px solid var(--black);
+        border: 2px solid var(--black-c);
         border-radius: var(--border-radius);
         padding: var(--margin);
 

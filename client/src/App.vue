@@ -69,6 +69,7 @@ export default Vue.extend({
     display: flex;
     flex-shrink: 1;
     overflow: auto;
+    background-color: var(--white-c);
 }
 
 #page > iframe, #page > div {

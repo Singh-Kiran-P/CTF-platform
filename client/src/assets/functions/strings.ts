@@ -38,8 +38,10 @@ const timerDisplay = (time: number, short?: boolean): string => {
     return large || ((h ? h + 'h ' : '') + (m || !short ? m + 'm ' : '') + (s < 10 && !short ? '0' : '') + s + 's');
 }
 
-const timeDisplay = (date: string): string => {
-    return date + 'TIME';
+const timeDisplay = (time: string): string => {
+    let date = new Date(time);
+    let display = date.toLocaleString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    return display + date.toLocaleString('nl-BE', { hour: 'numeric', minute: 'numeric', second: 'numeric' });
 }
 
 export { solvePoints, solveNames, typeName, typeDescription, durationDisplay, countdownDisplay, timerDisplay, timeDisplay };

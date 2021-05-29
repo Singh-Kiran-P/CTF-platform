@@ -1,7 +1,7 @@
 <template>
     <div>
         <div :class="['header', { 'center': center, 'left': left }]" @click="toggle()">
-            <label :class="{ 'large': large }">{{label}}</label>
+            <span :class="{ 'large': large }">{{label}}</span>
             <IconButton icon="chevron-down" :loading="loading" :class="visible ? 'danger' : 'primary'"/>
         </div>
         <b-collapse :visible="visible" :class="{ 'no-border': noborder }">
@@ -60,7 +60,7 @@ export default Vue.extend({
 }
 
 .collapse:not(.no-border) {
-    border-bottom: 2px solid var(--black);
+    border-bottom: 2px solid var(--black-c);
 }
 
 .header {
@@ -71,11 +71,11 @@ export default Vue.extend({
         justify-content: center;
     }
 
-    &:not(.center):not(.left) label {
+    &:not(.center):not(.left) span {
         flex-grow: 1;
     }
 
-    label {
+    span {
         padding-right: var(--margin);
         display: inline;
         margin-bottom: 0;

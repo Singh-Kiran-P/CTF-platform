@@ -57,7 +57,7 @@
                 <div v-if="challenge.type == typeValues.INTERACTIVE" class=interactive>
                     <span>You can {{startState == 'succes' ? 'open' : 'start'}} your interactive environment below</span>
                     <div class=controls>
-                        <b-button v-if="startState == 'succes'" variant=primary :href="environment" target=_blank><font-awesome-icon icon=external-link-alt /> Open</b-button>
+                        <b-button v-if="startState == 'succes'" variant=primary :href="TODO_PORTS" target=_blank><font-awesome-icon icon=external-link-alt /> Open</b-button>
                         <StatusButton v-else variant=primary @click="!containerInit ? initContainer() : startContainer()" :disabled="resetState == 'loading'"
                             :state="!containerInit && startState != 'error' ? 'loading' : startState" normal=Start :loading="containerInit ? 'Starting' : 'Loading'" succes=Started />
                         <StatusButton variant=info @click="resetContainer()" :disabled="stopState != 'normal'" :state="resetState" normal=Reset loading=Resetting succes=Reset />
@@ -157,7 +157,7 @@ export default Vue.extend({
         resetState: 'normal',
         stopState: 'succes',
 
-        environment: ''
+        ports: []
     }),
     computed: {
         admin(): boolean { return this.$route.meta?.admin; },
@@ -218,20 +218,15 @@ export default Vue.extend({
 
         initContainer(): void {
             this.startState = 'normal';
-            console.log('start init');
             const error = () => this.startState = 'error';
             axios.get('/api/docker/challengeContainerRunning/' + this.challenge?.id).then(res => {
-                console.log('init succes:');
-                console.log(res.data);
                 let err = res.data.statusCode == 404;
                 let started = res.data.state;
                 if (err) return error();
                 if (started) { // TODO: NOT LOCALHOST, FIX PORTS
-                    console.log('started');
-                    let ports = Object.values(res.data.ports).map((p: any) => p.map((ip: any) => ip.HostPort));
-                    this.environment = 'localhost:' + ports[0][0];
-                    console.log(ports);
+                    this.setPorts(res.data.ports);
                     this.startState = 'succes';
+                    this.stopState = 'normal';
                 }
                 this.containerInit = true;
             }).catch(() => error());
@@ -265,6 +260,10 @@ export default Vue.extend({
                 this.stopState = 'succes';
                 this.startState = 'normal';
             }).catch(() => error());
+        },
+
+        setPorts(ports: any): void {
+            // TODO:
         }
     }
 });
@@ -310,7 +309,7 @@ export default Vue.extend({
     .info {
         margin: var(--margin) 0;
         padding-bottom: var(--margin);
-        border-bottom: 2px solid var(--black);
+        border-bottom: 2px solid var(--black-c);
         flex-wrap: wrap;
 
         .tooltips {

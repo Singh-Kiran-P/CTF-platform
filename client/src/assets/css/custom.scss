@@ -5,10 +5,6 @@
 $primary: rgb(63, 181, 129);
 
 :root {
-    --black: #212529; // $gray-900
-    --gray-light: #dee2e6; // $gray-300
-    --gray-lightest: #e9ecef; // $gray-200
-    --gray-half: rgba(108, 117, 125, 0.5); // $gray-600 50% opacity
     --border-radius: 0.5rem;
     --margin: 0.5rem;
     --double-margin: calc(var(--margin) * 2);
@@ -18,6 +14,20 @@ $primary: rgb(63, 181, 129);
     --font-large: 1.25rem;
     --font-small: 90%;
     --font-smallest: 80%;
+    
+    --white-c: #ffffff; // $white
+    --black-c: #212529; // $gray-900
+    --gray-c: #6c757d; // $gray-600
+    --gray-light: #dee2e6; // $gray-300
+    --gray-lightest: #e9ecef; // $gray-200
+    --gray-half: rgba(108, 117, 125, 0.5); // $gray-600 50% opacity
+
+    --white-c-inverted: #181a1b;
+    --black-c-inverted: #d1cdc7;
+    --gray-c-inverted: #9e9689;
+    --gray-light-inverted: #282c2d;
+    --gray-lightest-inverted: #232627;
+    --gray-half-inverted: rgba(158, 150, 137, 0.5);
 }
 
 @import '~bootstrap/scss/bootstrap';
@@ -46,6 +56,10 @@ html, body {
 
 button, span {
     word-break: break-all;
+}
+
+span {
+    color: var(--black-c);
 }
 
 textarea {
@@ -83,10 +97,10 @@ textarea {
 
     & > .tooltip-inner {
         padding: var(--margin);
-        border: 2px solid var(--black);
+        border: 2px solid var(--black-c);
         max-width: calc(var(--breakpoint-sm) / 2);
         background-color: var(--gray-lightest);
         font-size: var(--font-small);
-        color: var(--black);
+        color: var(--black-c);
     }
 }
