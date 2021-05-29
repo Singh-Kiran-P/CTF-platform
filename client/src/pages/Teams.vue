@@ -52,7 +52,7 @@
                 <span class=error :v-if="error != ''">{{error}}</span>
                 <b-table id=teams-table sticky-header striped :busy="isLoading" :items="teams" :fields="teams_fields" :sort-by.sync="sortBy" sort-desc.sync="sortDesc" :per-page="0" :no-local-sorting="true" @sort-changed="sortingChanged">
                     <template v-slot:cell(name)="row">
-                        <a :href="`${home}/team/${row.item.uuid}`">{{ row.item.name }}</a>
+                        <router-link :to="'/team/'+ row.item.uuid">{{ row.item.name }}</router-link>
                     </template>
                     <template #table-busy>
                         <div class="text-center text-primary my-2">
@@ -93,12 +93,10 @@ export default Vue.extend({
             { key: 'points', sortable: true},
         ] as {key: string, sortable?: boolean, label?: string}[],
         teams: [] as {uuid: string, name: string, category: string, points: number} [],
-        home: ''
     }),
     created() {
         this.loadCategories();
         this.getData();
-        this.home = window.location.origin;
     },
     computed: {
     },

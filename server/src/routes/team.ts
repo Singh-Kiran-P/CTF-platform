@@ -88,7 +88,7 @@ router.get('/getMembers/:uuid', (req, res) => {
     let uuid: string = req.params.uuid;
 
     Promise.all([
-        DB.repo(Account).find({ where: { team: { id: uuid } }, relations: ['solves', 'solves.challenge', 'team', 'team.usedHints'] }),
+        DB.repo(Account).find({ where: { team: { id: uuid } }, relations: ['solves', 'solves.challenge', 'solves.challenge.usedHints', 'solves.challenge.usedHints.team'] }),
         DB.repo(Team).findOne({ where: { id: uuid }, relations: ['captain'] })
     ]).then(([members, team]: [Account[], Team]) => {
         members.forEach((member: Account) => {
