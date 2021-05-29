@@ -78,7 +78,7 @@ services:
       - postgres
     ports:
       - '4000:4000'
-    command: /bin/bash  -c "cp -R /node/server/node_modules /ctf/server && cp -R /node/shared/* /ctf/shared && npm run server"
+    command: /bin/bash  -c "cp -R /node/server/node_modules /ctf/server && cp -R /node/shared/node_modules /ctf/shared && npm run server"
 
     volumes:
       - ./server:/ctf/server

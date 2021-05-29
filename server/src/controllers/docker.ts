@@ -415,17 +415,17 @@ export class DockerController {
     public makeImage(dockerFileDes: string, dockerChallengeName: string) {
         return new Promise<string>((resolve, reject) => {
             let path = `${Root}${dockerFileDes}/Dockerfile`;
-
-            // check if the directory exists
-            if (!fs.existsSync(path)) reject("Docker file not found!");
-            else {
+            // check if file exists
+            if (fs.existsSync(path) == false) {
+                return reject({ error: "Dockerfile not found in your .zip!", message: "Dockerfile not found in your .zip!", statusCode: 404 });
+            } else {
                 pump(
                     build(path, { t: dockerChallengeName })
                         .on("complete", (id: any) => {
-                            resolve(id);
+                            return resolve(id);
                         }),
                     process.stdout,
-                    err => reject(err)
+                    err => reject({ error: err, message: err, statusCode: 404 })
                 )
             }
         });
@@ -439,12 +439,15 @@ export class DockerController {
         return new Promise<void>((resolve, reject) => {
             if (!imageId) return resolve();
             docker.getImage(imageId)
+                .get().catch(err => reject(err))
+
+            docker.getImage(imageId)
                 .remove({ force: { true: 'true' } }, (err, res) => {
                     if (err) {
                         reject(err);
                     }
                     resolve();
-                });
+                })
         })
     }
 
@@ -468,10 +471,10 @@ export class DockerController {
     }
 
     /**
-  * Stop a docker container by his id or name
-  * @param containerId container id
-  * @returns {Promise<void | object>} A promise that contains object {message:string, statusCode:int}
-  */
+     * Stop a docker container by his id or name
+     * @param containerId container id
+     * @returns {Promise<void | object>} A promise that contains object {message:string, statusCode:int}
+     */
     private stopContainerById(containerId: string) {
         return new Promise<void | object>((resolve, reject) => {
             let container = docker.getContainer(containerId);

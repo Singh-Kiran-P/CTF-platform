@@ -58,6 +58,8 @@ services:
       - ./client:/ctf/client
       - ./shared:/ctf/shared
     working_dir: /ctf/client
+    depends_on:
+        - nodejs-server
     networks:
       - mynet
 
