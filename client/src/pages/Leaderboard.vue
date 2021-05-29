@@ -62,8 +62,7 @@ export default Vue.extend({
         // this.$socket.$subscribe("MASTER 2", (data: any) => {
         //     console.log(data);
         // });
-        this.$root.$emit('lol', "hi");
-    },
+},
     methods: {
         //TODO: show errors using kirans dialog
         loadCategories(): void {
@@ -146,9 +145,30 @@ img {
 }
 .sponsors{
     background: var(--primary);
-    width: 100%;
     height: 15%;
     display: flex;
     justify-content: center;
+}
+body {
+    overflow-y: scroll
+}
+@media (max-width: 800px) {
+  .scoreboards {
+    height: 1350px;
+  }
+  .sponsors{
+    margin-right:17px;
+    position: fixed;
+    bottom: 0;
+    z-index: 1000;
+  }
+}
+@media (max-width: 400px) { /*mobile*/
+    .scoreboards {
+        height: 1300px;
+    }
+    .sponsors{
+        margin-right:0px;
+    }
 }
 </style>

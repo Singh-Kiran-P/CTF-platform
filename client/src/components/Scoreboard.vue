@@ -1,7 +1,22 @@
 <template>
     <div class="scoreboard">
         <div class=chart-div :id="this.category"></div>
-        <div class=table-div></div>
+        <div class=table-div>
+            <div class=table-wrapper>
+                <label for="teams-table">Top 10</label>
+                <span class=error :v-if="error != ''">{{error}}</span>
+                <b-table id=teams-table responsive striped :busy="isLoading" :items="teams" :fields="teams_fields" :sort-by="'total'" :sort-desc="true" :per-page="10" :no-local-sorting="false" table-variant="primary">
+                    <template v-slot:cell(name)="row">
+                        <router-link :to="'/team/'+ row.item.uuid">{{ row.item.name }}</router-link>
+                    </template>
+                    <template #table-busy>
+                        <div class="text-center text-primary my-2">
+                            <b-spinner variant="primary" label="Spinning"></b-spinner>
+                        </div>
+                    </template>
+                </b-table>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -18,6 +33,7 @@ declare interface Team {
     uuid: string;
     name: string;
     scores: { date: Date; score: number }[];
+    total: number;
 }
 
 export default Vue.extend({
@@ -30,7 +46,15 @@ export default Vue.extend({
         chart: (null as unknown) as am4charts.XYChart,
         teams: [] as Team[],
         scrollbar: (null as unknown) as am4charts.XYChartScrollbar,
-        dateAxis: (null as unknown) as am4charts.DateAxis
+        dateAxis: (null as unknown) as am4charts.DateAxis,
+        error: '',
+        isLoading: true,
+        totalRows: 1,
+        currentPage: 1,
+        teams_fields: [
+            { key: 'name', sortable: false},
+            { key: 'total', sortable: false, label: 'Points'},
+        ] as {key: string, sortable?: boolean, label?: string}[],
     }),
     created() {
         //TODO: solves array must start with {Data: data, score:0 } -> len[0] line 39
@@ -44,10 +68,8 @@ export default Vue.extend({
                 date: newDate1,
                 score: this.teams[0].scores[len].score + 100,
             });
-
-            // console.log(this.chart.series.getIndex(0)?.dataChangeUpdate());
-            // console.log(this.chart.series.getIndex(0)?.data);
         });
+        am4core.options.autoDispose = true;
     },
     methods: {
     createSeries(
@@ -59,7 +81,6 @@ export default Vue.extend({
         series.dataFields.dateX = "date";
         series.strokeWidth = 2;
         series.yAxis = valueAxis;
-        console.log(team.name);
 
         series.name = team.name;
         series.id = team.uuid;
@@ -71,72 +92,24 @@ export default Vue.extend({
         defaultBullet.circle.stroke = interfaceColors.getFor("background");
         defaultBullet.circle.strokeWidth = 2;
         series.data = team.scores;
-        //series.dataFields.valueYShow = "totalPercent";
-        //series.groupFields.valueY = "average";
     },
     async loadData() {
-        // var team1_points = 0;
-        // var team2_points = 0;
-        // var team3_points = 0;
-        var newDate1 = new Date("2021-05-27T09:08:19.838Z");
-
-        this.teams.push({
-            uuid: "sdfds",
-            name: "dsfdsf",
-            scores: [{ date: newDate1, score: 3 }],
-        });
-
-        // this.teams.push({
-        //          uuid: "sdsqdfds",
-        //          name: "dsfqsddsf",
-        //          scores: [],
-        // });
-        // this.teams.push({
-        //          uuid: "sdfddsqdfds",
-        //          name: "dsfqdfddsddsf",
-        //          scores: [],
-        // });
-
-        // for (var day = 0; day < 1; day++) {
-        //          for (var hour = 0; hour < 8; hour++) {
-        //                    for (var minute=0; minute < 60; minute+=30) {
-        //                             team1_points += (day + 24*hour + 60*minute + 5)*2;
-        //                             team2_points += (day + 24*hour + 60*minute + 3)*1.5;
-        //                             team3_points += (day + 24*hour + 60*minute + 3)*3;
-
-        //                             var newDate1 = new Date(2020, 0, day, hour, Math.floor(Math.random() * ((minute+4) - minute + 1) + minute), 0);
-        //                             var newDate2 = new Date(2020, 0, day, hour, Math.floor(Math.random() * ((minute+4) - minute + 1) + minute), 0);
-        //                             var newDate3 = new Date(2020, 0, day, hour, Math.floor(Math.random() * ((minute+4) - minute + 1) + minute), 0);
-        //                             this.teams[0].scores.push({
-        //                                       date: newDate1,
-        //                                       score: team1_points,
-        //                             });
-        //                             this.teams[1].scores.push({
-        //                                       date: newDate2,
-        //                                       score: team2_points,
-        //                             });
-        //                             this.teams[2].scores.push({
-        //                                       date: newDate3,
-        //                                       score: team3_points,
-        //                             });
-        //                    }
-        //          }
-        // }
+        this.isLoading = true;
         await axios.get("/api/leaderboard/getAllData").then((response) => {
             this.teams = response.data;
         });
-        // console.log(this.teams);
-        // console.log(this.teams[0].scores[0].date);
-        // console.log(this.teams[1].scores[0].date);
+        this.isLoading = false;
     },
-    emitRangeChanged() {      
-      this.$root.$emit('rangeChanged', this.chart.scrollbarX.range);
-    },
+    emitRangeChanged() {
+      this.$root.$emit('rangeChanged', this.category, this.chart.scrollbarX.range);
+    }
     },
     async mounted() {
-      this.$root.$on('rangeChanged', (data: any) => {
+      this.$root.$on('rangeChanged', (cat: string, data: any) => {
+            if(this.category == cat)
+                return;
             this.dateAxis.zoom(data);
-            this.chart.zoom(data);
+            //this.chart.zoom(data);
             this.chart.scrollbarX.start = data.start;
             this.chart.scrollbarX.end = data.end; 
             return;
@@ -180,9 +153,7 @@ export default Vue.extend({
         //pointsAxis.calculateTotals = true;
 
         // load data
-        await axios.get("/api/leaderboard/getAllData").then((response) => {
-            this.teams = response.data;
-        });
+        await this.loadData();
 
         // Create series
         for (const team of this.teams) {
@@ -201,17 +172,14 @@ export default Vue.extend({
 
         // Add cursor
         this.chart.cursor = new am4charts.XYCursor();
+        //this.chart.cursor.behavior = "none";
+        this.chart.cursor.events.on("selectended", this.emitRangeChanged, this);
 
         // generate scrollbar
         let scrollbarX = new am4charts.XYChartScrollbar();
         this.chart.scrollbarX = scrollbarX;
         this.chart.scrollbarX.events.on("up", this.emitRangeChanged, this);
-    },
-
-    beforeDestroy() {
-        if (this.chart) {
-            this.chart.dispose();
-        }
+        //setTimeout(() => { this.teams[1].total = 10000; }, 5000);
     },
 });
 </script>
@@ -233,20 +201,30 @@ body {
     height: 100%;
 }
 .table-div {
-  width: 35%;
+    margin-top: var(--margin);
+    width: 35%;
+    display: flex;
+    justify-content: center;
 }
-
-@media (max-width: 750px) {
+.table-wrapper {
+    text-align: center;
+    width: 95%;
+    height: 90%;
+}
+.table-wrapper label {
+    font-size: 1.4rem;
+}
+@media (max-width: 800px) {
   .scoreboard { 
     flex-direction: column;
-    align-items: center;
   }
   .chart-div {
-    width: 100%;
+    width: 94%;
+    height: 600px;
   }
   .table-div {
-    margin-top: var(--margin-double);
     width: 100%;
+    height: 600px;
   }
 }
 </style>

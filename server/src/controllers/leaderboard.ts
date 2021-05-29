@@ -15,6 +15,7 @@ declare interface data_send {
     uuid: string;
     name: string;
     scores: { date: Date; score: number }[];
+    total: number;
 }
 
 /**
@@ -95,8 +96,19 @@ export class LeaderBoardController {
         var team1_points = 0;
         var team2_points = 0;
         var team3_points = 0;
+        var points = [];
+        let amount = 5;
+        for (let i = 0; i <amount; i++) {
+            points.push(0);
+            this.teams.push({
+                uuid: i.toString(),
+                name: "test"+i,
+                scores: [],
+                total: 0
+            });
+        }
 
-        this.teams.push({
+        /*this.teams.push({
             uuid: "1",
             name: "test1",
             scores: [],
@@ -110,11 +122,21 @@ export class LeaderBoardController {
             uuid: "3",
             name: "test3",
             scores: [],
-        });
+        });*/
 
         for (var day = 0; day < 1; day++) {
             for (var hour = 0; hour < 5; hour++) {
                 for (var minute = 0; minute < 60; minute += 30) {
+                    for(let i = 0; i < amount; i++) {
+                        points[i] += (Math.floor(Math.random() * ((minute + 4) - minute + 1) + minute));
+                        var newDate = new Date(2020, 0, day, hour, Math.floor(Math.random() * ((minute + 4) - minute + 1) + minute), 0);
+                        this.teams[i].scores.push({
+                            date: newDate,
+                            score: points[i]
+                        });
+                        this.teams[i].total = points[i];
+                    }
+                    /*
                     team1_points += (minute + 5) * 2;
                     team2_points += (minute + 3) * 1.5;
                     team3_points += (minute + 3) * 3;
@@ -135,6 +157,7 @@ export class LeaderBoardController {
                         date: newDate3,
                         score: team3_points,
                     });
+                    */
                 }
             }
         }
