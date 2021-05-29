@@ -4,9 +4,9 @@
 import { Request, Response } from 'express';
 import Docker = require('dockerode');
 import pump from 'pump';
-import DB, { Account, Challenge, DockerChallengeContainer, DockerManagementRepo, DockerOpenPort, Team } from '../database';
+import DB, { Challenge, DockerChallengeContainer, DockerManagementRepo, DockerOpenPort, Team } from '../database';
 import { Root } from '@/files';
-const fs = require('fs')
+import fs from 'fs';
 
 let build = require('dockerode-build')
 let docker = new Docker({ socketPath: '/var/run/docker.sock' });
@@ -36,7 +36,6 @@ export class DockerController {
         this.createChallengeContainer = this.createChallengeContainer.bind(this);
         this.deleteImage = this.deleteImage.bind(this);
         this.makeImage = this.makeImage.bind(this);
-        this._checkIfFileExists = this._checkIfFileExists.bind(this);
         this.removeContainerById = this.removeContainerById.bind(this);
         this.resetContainer = this.resetContainer.bind(this);
         this.startContainer = this.startContainer.bind(this);
@@ -418,36 +417,18 @@ export class DockerController {
             let path = `${Root}${dockerFileDes}/Dockerfile`;
 
             // check if the directory exists
-            if (this._checkIfFileExists(path)) {
+            if (!fs.existsSync(path)) reject("Docker file not found!");
+            else {
                 pump(
                     build(path, { t: dockerChallengeName })
                         .on("complete", (id: any) => {
                             resolve(id);
                         }),
                     process.stdout,
-                    (err) => {
-                        reject(err)
-                    }
+                    err => reject(err)
                 )
             }
-            else {
-                reject("Docker file not found!");
-            }
-        })
-    }
-
-    private _checkIfFileExists(path: string): boolean {
-        fs.access(path, fs.F_OK, (err: any) => {
-            if (err) {
-                console.error(err)
-                return false
-            }
-            //file exists
-            return true;
-        })
-
-        return false
-
+        });
     }
 
     /**

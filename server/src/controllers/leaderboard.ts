@@ -52,7 +52,6 @@ export class LeaderBoardController {
             score: score,
             timestamp: timestamp
         }
-        console.log(data);
         socket.emit(cat, data);
     }
 
@@ -124,7 +123,6 @@ export class LeaderBoardController {
                     var newDate1 = new Date(2020, 0, day, hour, Math.floor(Math.random() * ((minute + 4) - minute + 1) + minute), 0);
                     var newDate2 = new Date(2020, 0, day, hour, Math.floor(Math.random() * ((minute + 4) - minute + 1) + minute), 0);
                     var newDate3 = new Date(2020, 0, day, hour, Math.floor(Math.random() * ((minute + 4) - minute + 1) + minute), 0);
-                    console.log(newDate1);
 
                     this.teams[0].scores.push({
                         date: newDate1,
