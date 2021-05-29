@@ -18,7 +18,7 @@ export class DockerChallengeContainer {
     @JoinColumn({ name: "challenge" })
     challenge: Challenge;
 
-    @ManyToOne(() => Team, { nullable: false })
+    @ManyToOne(() => Team, { nullable: true, onDelete: 'CASCADE' })
     @JoinColumn({ name: "team" })
     team: Team;
 
