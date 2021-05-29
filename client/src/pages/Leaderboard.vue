@@ -1,16 +1,13 @@
 <template>
     <div class="leaderboard">
         <div class=scoreboards>
-            <div class=charts>
+            <div class=scoreboards-container>
                 <Slider animation="fade" :interval="10000" :speed="2000" :stopOnHover="true" :indicators="false" class="chart-slider">
                     <SliderItem v-for="categorie in categories" :key="categorie" class="chart-cell">
                         <Scoreboard :category="categorie"></Scoreboard>
-                        <!--list-->
                     </SliderItem>
                 </Slider>
-            </div>
-            <div class=lists>
-            </div>   
+            </div> 
         </div>
         <div class=sponsors>
             <Carousel :autoplay="true" :autoplayHoverPause="true" :loop="true" :paginationEnabled="false" :perPageCustom="[[1024, 4],[750,3],[550, 2], [350,1]]" easing="linear" :autoplayTimeout="5000" :speed="1000" :centerMode="true" class=sponsor-slider>
@@ -65,6 +62,7 @@ export default Vue.extend({
         // this.$socket.$subscribe("MASTER 2", (data: any) => {
         //     console.log(data);
         // });
+        this.$root.$emit('lol', "hi");
     },
     methods: {
         //TODO: show errors using kirans dialog
@@ -96,17 +94,21 @@ export default Vue.extend({
     display: flex;
     justify-content: center;
 }
-.charts {
-    width: 65%;
+.scoreboards-container {
+    width: 100%;
 }
 .chart-slider {
-    width: 95% !important;
+    width: 100% !important;
     height: 100% !important;
 }
 .chart-cell {
     background: var(--primary);
     display: flex;
     justify-content: center;
+    width: 100%;
+}
+.scoreboard {
+    width: 95%;
 }
 .sponsor-slider{
     width:100%;

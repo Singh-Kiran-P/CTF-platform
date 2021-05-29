@@ -1,6 +1,7 @@
 <template>
     <div class="scoreboard">
-        <div class="chart-div" :id="this.category"></div>
+        <div class=chart-div :id="this.category"></div>
+        <div class=table-div></div>
     </div>
 </template>
 
@@ -10,7 +11,6 @@ import axios from "axios";
 import * as am4core from "@amcharts/amcharts4/core";
 import * as am4charts from "@amcharts/amcharts4/charts";
 import am4themes_animated from "@amcharts/amcharts4/themes/animated";
-import { length } from "@amcharts/amcharts4/.internal/core/utils/Iterator";
 
 am4core.useTheme(am4themes_animated);
 
@@ -29,6 +29,8 @@ export default Vue.extend({
     data: () => ({
         chart: (null as unknown) as am4charts.XYChart,
         teams: [] as Team[],
+        scrollbar: (null as unknown) as am4charts.XYChartScrollbar,
+        dateAxis: (null as unknown) as am4charts.DateAxis
     }),
     created() {
         //TODO: solves array must start with {Data: data, score:0 } -> len[0] line 39
@@ -127,8 +129,18 @@ export default Vue.extend({
         // console.log(this.teams[0].scores[0].date);
         // console.log(this.teams[1].scores[0].date);
     },
+    emitRangeChanged() {      
+      this.$root.$emit('rangeChanged', this.chart.scrollbarX.range);
+    },
     },
     async mounted() {
+      this.$root.$on('rangeChanged', (data: any) => {
+            this.dateAxis.zoom(data);
+            this.chart.zoom(data);
+            this.chart.scrollbarX.start = data.start;
+            this.chart.scrollbarX.end = data.end; 
+            return;
+        });
         this.chart = am4core.create(this.category, am4charts.XYChart);
         this.chart.width = am4core.percent(100);
         this.chart.height = am4core.percent(100);
@@ -139,10 +151,10 @@ export default Vue.extend({
         this.chart.dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss";
 
         // Create X axis
-        var dateAxis = this.chart.xAxes.push(new am4charts.DateAxis());
-        dateAxis.renderer.grid.template.location = 0.5;
-        dateAxis.renderer.minGridDistance = 50;
-        dateAxis.gridIntervals.setAll([
+        this.dateAxis = this.chart.xAxes.push(new am4charts.DateAxis());
+        this.dateAxis.renderer.grid.template.location = 0.5;
+        this.dateAxis.renderer.minGridDistance = 50;
+        this.dateAxis.gridIntervals.setAll([
             { timeUnit: "second", count: 1 },
             { timeUnit: "second", count: 5 },
             { timeUnit: "second", count: 10 },
@@ -193,9 +205,7 @@ export default Vue.extend({
         // generate scrollbar
         let scrollbarX = new am4charts.XYChartScrollbar();
         this.chart.scrollbarX = scrollbarX;
-        this.$root.$on("lol", (data: any) => {
-            console.log(data);
-        });
+        this.chart.scrollbarX.events.on("up", this.emitRangeChanged, this);
     },
 
     beforeDestroy() {
@@ -213,13 +223,30 @@ body {
     Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 }
 .scoreboard {
-    text-align: center;
     height: calc(100%);
-    width: 100%;
+    display: flex;
+    flex-direction: row;
 }
 .chart-div {
-    width: 100%;
+    text-align: center;
+    width: 65%;
     height: 100%;
-    margin: auto;
+}
+.table-div {
+  width: 35%;
+}
+
+@media (max-width: 750px) {
+  .scoreboard { 
+    flex-direction: column;
+    align-items: center;
+  }
+  .chart-div {
+    width: 100%;
+  }
+  .table-div {
+    margin-top: var(--margin-double);
+    width: 100%;
+  }
 }
 </style>
