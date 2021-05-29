@@ -272,7 +272,7 @@ export class DockerController {
                             await dockerChallengeContainerRepo.save(containerData);
                             container.start((err, data) => {
                                 if (err) return reject({ message: err.json, statusCode: 404 });
-                                resolve({ message: "Container started successfully", statusCode: 200 });
+                                resolve({ message: "Container started successfully",  statusCode: 200 });
                             });
                         });
                     });
@@ -319,13 +319,13 @@ export class DockerController {
                                             statusCode: 200
                                         })
                                     else
-                                        reject({ state: false, error: "not running", message: "not running", statusCode: 404 });
+                                        reject({ state: false, error: "not running", message: "not running", statusCode: 200 });
 
                                 })
                                 .catch((err) => reject({ message: err, statusCode: 404 }));
                         }
                         else
-                            reject({ state: false, error: "not running", message: "not running", statusCode: 404 })
+                            reject({ state: false, error: "not running", message: "not running", statusCode: 200 })
                     })
             }
 
@@ -333,7 +333,7 @@ export class DockerController {
             else {
                 DB.repo(Team).findOne(teamId)
                     .then((team) => {
-                        if (!team) return reject({ state: false, error: "not running", message: "not running", statusCode: 404 });
+                        if (!team) return reject({ state: false, error: "not running", message: "not running", statusCode: 200 });
                         else running(team);
                     })
                     .catch((err) => reject({ message: err.message, statusCode: 404 }))

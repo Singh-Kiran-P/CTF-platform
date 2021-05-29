@@ -17,7 +17,7 @@ const toast = {
 
         // Create the title
         const vNodesTitle = h(
-            'href',
+            'p',
             { class: ['d-flex', 'text-break', 'flex-grow-1', 'align-items-baseline', 'mr-2'] },
             [
                 h('strong', { class: 'mr-2' }, title),
