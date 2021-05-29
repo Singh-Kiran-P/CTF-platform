@@ -7,6 +7,7 @@ import pump from 'pump';
 import DB, { Challenge, DockerChallengeContainer, DockerManagementRepo, DockerOpenPort, Team } from '../database';
 import { Root } from '@/files';
 import fs from 'fs';
+import { getAccount } from '@/auth';
 
 let build = require('dockerode-build')
 let docker = new Docker({ socketPath: '/var/run/docker.sock' });
@@ -15,6 +16,7 @@ let docker = new Docker({ socketPath: '/var/run/docker.sock' });
  * This class handles the logic/contection with docker
  */
 export class DockerController {
+    adminTeamId = "admin";
     constructor() {
         this.containers_GET = this.containers_GET.bind(this);
         this.dockerConfigPorts_GET = this.dockerConfigPorts_GET.bind(this);
@@ -114,8 +116,9 @@ export class DockerController {
     public createChallengeContainer_GET(req: Request, res: Response) {
         let challengeId = req.params.challengeId;
         let teamId = req.params.teamId;
+        let isAdmin = getAccount(req).admin;
 
-        this.createChallengeContainer(challengeId, teamId)
+        this.createChallengeContainer(challengeId, teamId, isAdmin)
             .then(mess => res.json(mess))
             .catch(err => {
                 res.json(err);
@@ -131,8 +134,9 @@ export class DockerController {
     public challengeContainerRunning_GET(req: Request, res: Response) {
         let challengeId = req.params.challengeId;
         let teamId = req.params.teamId;
+        let isAdmin = getAccount(req).admin;
 
-        this.challengeContainerRunning(challengeId, teamId)
+        this.challengeContainerRunning(challengeId, teamId, isAdmin)
             .then(mess => res.json(mess))
             .catch(err => {
                 res.json(err);
@@ -148,8 +152,9 @@ export class DockerController {
     public startChallengeContainer_GET(req: Request, res: Response) {
         let challengeId = req.params.challengeId;
         let teamId = req.params.teamId;
+        let isAdmin = getAccount(req).admin;
 
-        this.startContainer(challengeId, teamId)
+        this.startContainer(challengeId, teamId, isAdmin)
             .then(mess => res.json(mess))
             .catch(err => {
                 res.json(err);
@@ -165,8 +170,9 @@ export class DockerController {
     public stopChallengeContainer_GET(req: Request, res: Response) {
         let challengeId = req.params.challengeId;
         let teamId = req.params.teamId;
+        let isAdmin = getAccount(req).admin;
 
-        this.stopContainer(challengeId, teamId)
+        this.stopContainer(challengeId, teamId, isAdmin)
             .then(mess => res.json(mess))
             .catch(err => {
                 res.json(err);
@@ -182,8 +188,9 @@ export class DockerController {
     public resetChallengeContainer_GET(req: Request, res: Response) {
         let challengeId = req.params.challengeId;
         let teamId = req.params.teamId;
+        let isAdmin = getAccount(req).admin;
 
-        this.resetContainer(challengeId, teamId)
+        this.resetContainer(challengeId, teamId, isAdmin)
             .then(mess => res.json(mess))
             .catch(err => {
                 res.json(err);
@@ -239,18 +246,18 @@ export class DockerController {
      * @param userId
      * @returns {Promise<void | object>} A promise that contains object {message:string, statusCode:int}
      */
-    private createChallengeContainer(challengeId: string, teamId: string) {
-        return new Promise<void | object>(async (resolve, reject) => {
+    private createChallengeContainer(challengeId: string, teamId: string, isAdmin: boolean) {
+        return new Promise<object>(async (resolve, reject) => {
+
             let challenge = await DB.repo(Challenge).findOne(challengeId);
             let ports = challenge.innerPorts.split(",");
-            DB.repo(Team).findOne(teamId).then(team => {
-                if (!team) return reject({ message: 'Team does not exist', statusCode: 404 });
-                let containerName = challenge.id + "-" + team.id;
+
+            const create = (team: Team) => {
+                let containerName = challenge.id + "-" + (team ? team.id : this.adminTeamId);
                 DB.repo(DockerChallengeContainer).findOne({ where: { name: containerName, team: team } })
                     .then(async (data) => {
                         if (data) return reject({ message: "Your team already created a container for this challenge!", statusCode: 404 });
                         let configData: { portBindings: object, openPorts: number[] } = await this._createPortConfig(ports);
-                        console.log(configData.portBindings);
                         docker.createContainer({
                             Image: challenge.dockerImageId,
                             name: containerName,
@@ -268,9 +275,18 @@ export class DockerController {
                             });
                         });
                     });
-            })
-                .catch((err) => reject({ message: err.message, statusCode: 404 }))
-        })
+            }
+
+            if (isAdmin) create(null);
+            else {
+                DB.repo(Team).findOne(teamId)
+                    .then(team => {
+                        if (!team) return reject({ message: 'Team does not exist', statusCode: 404 });
+                        create(team);
+                    })
+                    .catch((err) => reject({ message: err.message, statusCode: 404 }))
+            }
+        });
     }
 
     /**
@@ -279,40 +295,48 @@ export class DockerController {
      * @param teamId team id
      * @returns {Promise<void | object>} A promise that contains object { state: false, error: "not running", message: "not running", statusCode: 404 }
      */
-    private challengeContainerRunning(challengeId: string, teamId: string) {
-        return new Promise<void | object>(async (resolve, reject) => {
+    private challengeContainerRunning(challengeId: string, teamId: string, isAdmin: boolean) {
+        return new Promise<object>(async (resolve, reject) => {
             let challenge = await DB.repo(Challenge).findOne(challengeId);
-            DB.repo(Team).findOne(teamId)
-                .then((team) => {
-                    if (team != undefined) {
-                        let containerName = challenge.id + "-" + team.id;
 
-                        DB.repo(DockerChallengeContainer).findOne({ where: { name: containerName, team: team } })
-                            .then((data) => {
-                                if (data != undefined) {
-                                    //check if container is running
-                                    docker.getContainer(data.name)
-                                        .inspect()
-                                        .then(containerInfo => {
-                                            if (containerInfo.State.Running)
-                                                resolve({
-                                                    state: true,
-                                                    message: "running",
-                                                    ports: containerInfo.NetworkSettings.Ports,
-                                                    statusCode: 200
-                                                })
-                                            else
-                                                reject({ state: false, error: "not running", message: "not running", statusCode: 404 });
+            let running = (team: Team) => {
 
+                let containerName = challenge.id + "-" + (team ? team.id : this.adminTeamId);
+
+                DB.repo(DockerChallengeContainer).findOne({ where: { name: containerName, team: team } })
+                    .then((data) => {
+                        if (data != undefined) {
+                            //check if container is running
+                            docker.getContainer(data.name)
+                                .inspect()
+                                .then(containerInfo => {
+                                    if (containerInfo.State.Running)
+                                        resolve({
+                                            state: true,
+                                            message: "running",
+                                            ports: containerInfo.NetworkSettings.Ports,
+                                            statusCode: 200
                                         })
-                                        .catch((err) => reject({ message: err, statusCode: 404 }));
-                                }
-                                else
-                                    reject({ state: false, error: "not running", message: "not running", statusCode: 404 })
-                            })
-                    }
-                })
-                .catch((err) => reject({ message: err.message, statusCode: 404 }))
+                                    else
+                                        reject({ state: false, error: "not running", message: "not running", statusCode: 404 });
+
+                                })
+                                .catch((err) => reject({ message: err, statusCode: 404 }));
+                        }
+                        else
+                            reject({ state: false, error: "not running", message: "not running", statusCode: 404 })
+                    })
+            }
+
+            if (isAdmin) running(null);
+            else {
+                DB.repo(Team).findOne(teamId)
+                    .then((team) => {
+                        if (!team) return reject({ state: false, error: "not running", message: "not running", statusCode: 404 });
+                        else running(team);
+                    })
+                    .catch((err) => reject({ message: err.message, statusCode: 404 }))
+            }
         })
     }
 
@@ -322,33 +346,39 @@ export class DockerController {
      * @param userId
      * @returns {Promise<void | object>} A promise that contains object {message:string, statusCode:int}
      */
-    private startContainer(challengeId: string, teamId: string) {
-        return new Promise<void | object>(async (resolve, reject) => {
-            DB.repo(Team).findOne(teamId)
-                .then(async (userTeam) => {
-                    DB.repo(DockerChallengeContainer).findOne({ where: { challenge: challengeId, team: userTeam } })
-                        .then((containerInfo) => {
-                            if (containerInfo == undefined)
-                                reject({ message: "Your are not authorized to stop this container or this container does not exists!", statusCode: 404 })
+    private startContainer(challengeId: string, teamId: string, isAdmin: boolean) {
+        return new Promise<object>(async (resolve, reject) => {
+            const start = (team: Team) => {
+                DB.repo(DockerChallengeContainer).findOne({ where: { challenge: challengeId, team: team } })
+                    .then((containerInfo) => {
+                        if (containerInfo == undefined)
+                            return reject({ message: "Your are not authorized to stop this container or this container does not exists!", statusCode: 404 })
 
-                            let container = docker.getContainer(containerInfo.name);
+                        let container = docker.getContainer(containerInfo.name);
 
-                            this.challengeContainerRunning(challengeId, teamId)
-                                .then((data) => resolve({ message: "Container is already running", statusCode: 404 }))
-                                .catch(() => {
-                                    container.start((err, data) => {
-                                        if (err == null) {
-                                            resolve({ message: "Container started successfully", statusCode: 200 });
-                                        }
-                                        else
-                                            reject({ message: err.json, statusCode: 404 });
-                                    });
+                        this.challengeContainerRunning(challengeId, teamId, isAdmin)
+                            .then((data) => resolve({ message: "Container is already running", statusCode: 404 }))
+                            .catch(() => {
+                                container.start((err, data) => {
+                                    if (err == null) {
+                                        resolve({ message: "Container started successfully", statusCode: 200 });
+                                    }
+                                    else
+                                        reject({ message: err.json, statusCode: 404 });
                                 });
+                            });
+                    })
+            }
 
-
-                        })
-                })
-                .catch(err => reject({ message: "No team found!", statusCode: 404 }));
+            if (isAdmin) start(null);
+            else {
+                DB.repo(Team).findOne(teamId)
+                    .then((team) => {
+                        if (!team) return reject({ message: "No team found!", statusCode: 404 })
+                        else start(team);
+                    })
+                    .catch(err => reject({ message: "No team found!", statusCode: 404 }));
+            }
         });
     }
 
@@ -358,33 +388,41 @@ export class DockerController {
      * @param userId
      * @returns {Promise<void | object>} A promise that contains object {message:string, statusCode:int}
      */
-    private stopContainer(challengeId: string, teamId: string) {
-        return new Promise<void | object>(async (resolve, reject) => {
-            DB.repo(Team).findOne(teamId)
-                .then(async (userTeam) => {
-                    DB.repo(DockerChallengeContainer).findOne({ where: { challenge: challengeId, team: userTeam } })
-                        .then((containerInfo) => {
-                            if (containerInfo == undefined)
-                                reject({ message: "Your are not authorized to stop this container or this container does not exists!", statusCode: 404 })
+    private stopContainer(challengeId: string, teamId: string, isAdmin: boolean) {
+        return new Promise<object>(async (resolve, reject) => {
+            let stop = (team: Team) => {
+                DB.repo(DockerChallengeContainer).findOne({ where: { challenge: challengeId, team: team } })
+                    .then((containerInfo) => {
+                        if (containerInfo == undefined)
+                            return reject({ message: "Your are not authorized to stop this container or this container does not exists!", statusCode: 404 })
 
-                            let container = docker.getContainer(containerInfo.name);
-                            container.stop((err, data) => {
-                                if (err == null) {
-                                    container.remove(async (err, data) => {
-                                        if (err == null) {
-                                            await DB.repo(DockerChallengeContainer).remove(containerInfo);
-                                            resolve({ message: "Container stopped + removed successfully", statusCode: 200 });
-                                        }
-                                        else
-                                            reject({ message: err.json, statusCode: 404 });
-                                    });
-                                }
-                                else
-                                    reject({ message: err.json, statusCode: 404 });
-                            });
-                        })
-                })
-                .catch(err => reject({ message: "No team found!", statusCode: 404 }));
+                        let container = docker.getContainer(containerInfo.name);
+                        container.stop((err, data) => {
+                            if (err == null) {
+                                container.remove(async (err, data) => {
+                                    if (err == null) {
+                                        await DB.repo(DockerChallengeContainer).remove(containerInfo);
+                                        resolve({ message: "Container stopped + removed successfully", statusCode: 200 });
+                                    }
+                                    else
+                                        reject({ message: err.json, statusCode: 404 });
+                                });
+                            }
+                            else
+                                reject({ message: err.json, statusCode: 404 });
+                        });
+                    })
+            }
+
+            if (isAdmin) stop(null);
+            else {
+                DB.repo(Team).findOne(teamId)
+                    .then((team) => {
+                        if (!team) return reject({ message: "No team found!", statusCode: 404 });
+                        else stop(team);
+                    })
+                    .catch(err => reject({ message: "No team found!", statusCode: 404 }));
+            }
         });
     }
     /**
@@ -395,11 +433,11 @@ export class DockerController {
      * @param userId
      * @returns {Promise<void | object>} A promise that contains object {message:string, statusCode:int}
      */
-    private resetContainer(challengeId: string, teamId: string) {
-        return new Promise<void | object>((resolve, reject) => {
-            this.stopContainer(challengeId, teamId)
+    private resetContainer(challengeId: string, teamId: string, isAdmin: boolean) {
+        return new Promise<object>((resolve, reject) => {
+            this.stopContainer(challengeId, teamId, isAdmin)
                 .then((data) => {
-                    this.createChallengeContainer(challengeId, teamId)
+                    this.createChallengeContainer(challengeId, teamId, isAdmin)
                         .then(data => resolve(data))
                         .catch(err => reject(err))
                 })
