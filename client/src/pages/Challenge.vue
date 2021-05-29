@@ -229,9 +229,10 @@ export default Vue.extend({
                 if (started) { // TODO: NOT LOCALHOST, FIX PORTS
                     console.log('started');
                     let ports = Object.values(res.data.ports).map((p: any) => p.map((ip: any) => ip.HostPort));
-                    this.environment = 'localhost:' + ports[0][0];
+                    this.environment = 'http://localhost:' + ports[0][0];
                     console.log(ports);
                     this.startState = 'succes';
+                    this.stopState = 'normal';
                 }
                 this.containerInit = true;
             }).catch(() => error());
