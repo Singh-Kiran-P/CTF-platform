@@ -218,12 +218,16 @@ export default Vue.extend({
 
         initContainer(): void {
             this.startState = 'normal';
+            console.log('start init');
             const error = () => this.startState = 'error';
             axios.get('/api/docker/challengeContainerRunning/' + this.challenge?.id).then(res => {
+                console.log('init succes:');
+                console.log(res.data);
                 let err = res.data.statusCode == 404;
                 let started = res.data.state;
                 if (err) return error();
                 if (started) { // TODO: NOT LOCALHOST, FIX PORTS
+                    console.log('started');
                     let ports = Object.values(res.data.ports).map((p: any) => p.map((ip: any) => ip.HostPort));
                     this.environment = 'localhost:' + ports[0][0];
                     console.log(ports);
