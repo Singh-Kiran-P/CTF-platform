@@ -2,8 +2,8 @@
     <div class=notifications>
         <div>
             <span class=notifications-title>Notifications</span>
-            <b-form v-if="admin" class=create @submit="onSubmit($event)">
-                <b-form-input v-model="form.title" placeholder="Enter notification title"/>
+            <b-form v-if="admin" class=create @submit="onSubmit($event)" required>
+                <b-form-input v-model="form.title" placeholder="Enter notification title"  />
                 <b-form-textarea v-model="form.msg" placeholder="Enter notification message" max-rows="10"/>
                 <b-button type=submit variant=primary>Send</b-button>
             </b-form>
@@ -44,7 +44,7 @@ export default Vue.extend({
             id: number;
             title: string;
             msg: string;
-            createdAt: String;
+            createdAt: Date;
         }[],
         form: {
             title: '',
