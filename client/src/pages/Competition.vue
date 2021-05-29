@@ -196,6 +196,8 @@ import { typeName, typeDescription, durationDisplay, sortRounds, validForm } fro
 import { Tag } from '@shared/validation/configForm';
 import { serialize } from '@shared/objectFormdata';
 import path from 'path';
+import Toast from "@/assets/functions/toast";
+
 
 type Editable = { editable?: boolean };
 type ChallengesVisible = { challengesVisible?: boolean };
@@ -284,10 +286,16 @@ export default Vue.extend({
         onSubmit(e: Event): void {
             e.preventDefault();
             this.saveState = 'loading';
-            const error = () => this.saveState = 'error';
+            const error = (data:any) => {
+                this.saveState = 'error';
+                if (data.statusCode === 200) {
+                    Toast.send(this, "Message", data.message, "success");
+                } else if (data.statusCode === 404)
+                    Toast.send(this, "Message", data.message, "danger");
+                };
             axios.put('/api/rounds/save', serialize(this.form)).then(res => {
-                res.data.error ? error() : this.loadFormData(false);
-            }).catch(() => error());
+                res.data.error ? error(res.data) : this.loadFormData(false);
+            }).catch(() => error(null));
         },
 
         durationDisplay(round: Round): string { return durationDisplay(round); },
@@ -396,7 +404,7 @@ span.info {
 .round {
     flex-wrap: wrap;
     border-bottom: 2px solid black;
-    
+
     & > button {
         background-color: var(--white);
     }
@@ -404,7 +412,7 @@ span.info {
     &:not(:last-of-type) {
         margin-bottom: var(--double-margin);
     }
-    
+
     .item-name {
         font-size: var(--font-large);
     }
@@ -462,7 +470,7 @@ span.info {
         .input-tag {
             display: block;
             font-weight: bold;
-            
+
             &:not(:first-child) {
                 margin-top: var(--margin);
             }
@@ -474,7 +482,7 @@ span.info {
 
         .challenge-attachment-input {
             display: flex;
-            
+
             button {
                 margin-left: var(--margin);
             }

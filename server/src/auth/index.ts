@@ -55,11 +55,9 @@ const hasTeam = (req: express.Request, res: express.Response, next: express.Next
 const checkUserTeam = (req: express.Request, res: express.Response, next: express.NextFunction) => {
     let acc: Account = getAccount(req);
     let teamId = req.params.teamId;
-    if (acc && acc.team.id == teamId) next();
+    if (acc && (acc.admin || acc.team.id == teamId)) next();
     else res.json({ message: "Unauthorized request. You team is not allowed to access these routes!", statusCode: 404 });
 }
-
-
 
 // hash functions
 
