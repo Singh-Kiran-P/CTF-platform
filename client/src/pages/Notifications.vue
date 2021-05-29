@@ -12,8 +12,10 @@
                     <b-card class=card bg-variant=light>
                         <span class=notification-title>{{item.title}}</span>
                         <b-card-text>{{item.msg}}</b-card-text>
-                        <small class=text-muted>{{item.createdAt}}</small>
-                        <b-button v-if="admin" type=button variant=danger class=delete @click="deleteNotification(item.id)">Delete</b-button>
+                        <template #footer>
+                            <small class=text-muted>{{item.createdAt}}</small>
+                            <b-button v-if="admin" type=button variant=danger @click="deleteNotification(item.id)">Delete</b-button>
+                        </template>
                     </b-card>
                 </div>
             </div>
@@ -136,8 +138,19 @@ export default Vue.extend({
             font-weight: bold;
         }
 
-        .delete {
-            float: right;
+        .card-body {
+            padding: var(--double-margin);
+        }
+
+        .card-footer {
+            display: flex;
+            align-items: center;
+            padding: 0;
+
+            small {
+                flex-grow: 1;
+                padding: var(--margin);
+            }
         }
     }
 }
