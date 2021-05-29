@@ -74,7 +74,6 @@ router.get('/round/:id', isAuth, (req, res) => {
 
 router.get('/:id', isAuth, (req, res) => {
     challengeAvailable(req.params.id, ['questions', 'hints'], false, req, res, challenge => {
-        // TODO if (!opened) DB.save(open); opened()?
         res.send(Object.assign({}, responseChallenge(challenge, req), {
             questions: challenge.questions.map((q, i) => responseQuestion(q, i == 0)),
             hints: challenge.hints.map(hint => Object.assign({}, hint, {
@@ -120,7 +119,7 @@ const attempt = (res: express.Response, account: Account, team: Team, challenge:
             if (next) return res.send({ solved: true, next: next });
             DB.repo(Solve).save(new Solve(challenge, team, new Date().toJSON(), account)).then(solve => {
                 if (!solve) return res.json(error(true));
-                solved(team, account, responseSolve(challenge, solve), res);
+                solved(team, account, challenge, solve, res);
             }).catch(() => res.json(error(true)));
         }).catch(() => res.json(error(true)));
     }).catch(() => res.json(error(true)));
@@ -151,17 +150,16 @@ const correctAnswer = (question: Question | undefined, answer: string): boolean 
     });
 }
 
-const opened = () => {
-
-}
-
 const attempted = (attempt: Attempt, challenge: Challenge) => {
-
+    // TODO: live feed
 }
 
-const solved = (team: Team, account: Account, solve: { name: string, points: number, time: string }, res: express.Response) => {
-    leaderboardController.updateLeaderboard(account, solve.points, solve.time);
-    res.send({ solved: solve });
+const solved = (team: Team, account: Account, challenge: Challenge, solve: Solve, res: express.Response) => {
+    // TODO: delete container
+    let solved = responseSolve(challenge, solve);
+    // TODO: live feed
+    leaderboardController.updateLeaderboard(account, solved.points, solved.time);
+    res.send({ solved: solved });
 }
 
 export { responseSolve };

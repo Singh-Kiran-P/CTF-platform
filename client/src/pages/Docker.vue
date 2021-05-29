@@ -161,7 +161,7 @@ import { serialize } from "@shared/objectFormdata";
 import axios from "axios";
 
 export default Vue.extend({
-    name: "DockerTesting",
+    name: "DockerTesting", // TODO: FIX DIT
     created() {
         this.getContainers();
         this.getImages();

@@ -61,7 +61,6 @@ export default Vue.extend({
             }).catch(err => alert(err));
         },
         validateTeamname(): string {
-            console.log(this.createFeedback);
             if(this.createFeedback != '') return this.createFeedback;
             let feedback = '';
             feedback = validateString(this.form.teamname, 'Teamname', 4, 32, false);

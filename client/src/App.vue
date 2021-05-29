@@ -1,9 +1,7 @@
 <template>
     <div id=app>
-        <PageBar />
-        <div v-if="role == 'participant' || role == 'organizer'">
-            <PushNotification/>
-        </div>
+        <PageBar/>
+        <PushNotification  v-if="auth"/>
         <div id=page>
             <router-view :key="$route.fullPath"/>
         </div>
@@ -14,13 +12,9 @@
 import Vue from 'vue';
 import PageBar from '@/components/PageBar.vue';
 import PushNotification from '@/components/PushNotification.vue';
-import axios from 'axios';
 
 export default Vue.extend({
     name: 'App',
-    created() {
-        this.getRole();
-    },
     data: () => ({
         role: '',
     }),
@@ -33,6 +27,9 @@ export default Vue.extend({
     },
     updated() {
         this.setIframeBase();
+    },
+    computed: {
+        auth(): boolean { return this.$route.meta.auth; }
     },
     methods: {
         setIframeBase(): void { // set iframe base target to _parent, making links behave normally
@@ -47,13 +44,7 @@ export default Vue.extend({
             if (!iframe) return;
             if (iframe.document.readyState == 'complete') func(iframe);
             iframe.addEventListener('load', () => func(iframe));
-        },
-
-        getRole(): void {
-            axios.get('/api/auth/role').then(response => {
-                this.role = response.data;
-            });
-        },
+        }
     },
 });
 </script>

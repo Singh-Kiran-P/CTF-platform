@@ -12,7 +12,6 @@ export default Vue.extend({
     }),
     created() {
         this.$socket.$subscribe("notification", (data: any) => {
-            console.log(data);
             Toast.send(
                 this,
                 "Notification: " + data.title,
