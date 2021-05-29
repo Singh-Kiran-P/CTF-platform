@@ -219,7 +219,7 @@ export default Vue.extend({
         initContainer(): void {
             this.startState = 'normal';
             const error = () => this.startState = 'error';
-            axios.get('/api/challengeContainerRunning/' + this.challenge?.id).then(res => {
+            axios.get('/api/docker/challengeContainerRunning/' + this.challenge?.id).then(res => {
                 let err = res.data.statusCode == 404;
                 let started = res.data.state;
                 if (err) return error();
@@ -236,31 +236,31 @@ export default Vue.extend({
         startContainer(): void {
             this.startState = 'loading';
             const error = () => this.startState = 'error';
-            axios.get('/api/createChallengeContainer/' + this.challenge?.id).then(res => {
+            axios.get('/api/docker/createChallengeContainer/' + this.challenge?.id).then(res => {
                 let err = res.data.statusCode == 404;
                 if (err) error();
                 this.startState = 'succes';
                 this.stopState = 'normal';
-            }).catch(() => error());            
+            }).catch(() => error());
         },
         resetContainer(): void {
             this.resetState = 'loading';
             const error = () => this.resetState = 'error';
-            axios.get('/api/resetChallengeContainer/' + this.challenge?.id).then(res => {
+            axios.get('/api/docker/resetChallengeContainer/' + this.challenge?.id).then(res => {
                 let err = res.data.statusCode == 404;
                 if (err) return error();
                 this.resetState = 'normal';
-            }).catch(() => error());            
+            }).catch(() => error());
         },
         stopContainer(): void {
             this.stopState = 'loading';
             const error = () => this.stopState = 'error';
-            axios.get('/api/stopChallengeContainer/' + this.challenge?.id).then(res => {
+            axios.get('/api/docker/stopChallengeContainer/' + this.challenge?.id).then(res => {
                 let err = res.data.statusCode == 404;
                 if (err) return error();
                 this.stopState = 'succes';
                 this.startState = 'normal';
-            }).catch(() => error());  
+            }).catch(() => error());
         }
     }
 });
