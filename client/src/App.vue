@@ -1,7 +1,7 @@
 <template>
     <div id=app>
         <PageBar/>
-        <PushNotification  v-if="auth"/>
+        <PushNotification v-if="auth && !admin"/>
         <div id=page>
             <router-view :key="$route.fullPath"/>
         </div>
@@ -29,6 +29,7 @@ export default Vue.extend({
         this.setIframeBase();
     },
     computed: {
+        admin(): boolean { return this.$route.meta.admin; },
         auth(): boolean { return this.$route.meta.auth; }
     },
     methods: {

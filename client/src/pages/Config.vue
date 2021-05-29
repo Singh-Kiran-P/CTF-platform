@@ -141,7 +141,7 @@ import axios from 'axios';
 import Collapse from '@/components/Collapse.vue';
 import IconButton from '@/components/IconButton.vue';
 import StatusButton from '@/components/StatusButton.vue';
-import { nextOrder, moveDown } from '@/assets/listFunctions';
+import { nextOrder, moveDown } from '@/assets/functions/list';
 import { state, validInput, validForm, validate, Category, Tag, Page, Sponsor, Form, isf } from '@shared/validation/configForm';
 import { serialize } from '@shared/objectFormdata';
 import path from 'path';

@@ -22,7 +22,7 @@
 import Vue from 'vue';
 import axios from 'axios';
 import StatusButton from '@/components/StatusButton.vue';
-import { state, validInput, validateString, regexPassword, regexName } from '@shared/validate';
+import { state, validInput, validateString, regexName } from '@shared/validation';
 
 export default Vue.extend({
     name: 'Create',

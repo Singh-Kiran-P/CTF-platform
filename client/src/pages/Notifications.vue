@@ -8,15 +8,15 @@
                 <b-button type=submit variant=primary>Send</b-button>
             </b-form>
             <div class=show>
-                <div class=notification v-for="item in notifications" :key="item.id">
-                    <b-card class=card bg-variant=light>
+                <div class="list-item card" v-for="item in [...notifications].reverse()" :key="item.id">
+                    <div class=content>
                         <span class=notification-title>{{item.title}}</span>
-                        <b-card-text>{{item.msg}}</b-card-text>
-                        <template #footer>
-                            <small class=text-muted>{{item.createdAt}}</small>
-                            <b-button v-if="admin" type=button variant=danger @click="deleteNotification(item.id)">Delete</b-button>
-                        </template>
-                    </b-card>
+                        <span>{{item.msg}}</span>
+                    </div>
+                    <div class=footer>
+                        <span>{{timeDisplay(item)}}</span>
+                        <b-button v-if="admin" type=button variant=danger @click="deleteNotification(item.id)">Delete</b-button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -24,30 +24,33 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import axios from "axios";
-import Toast from "@/assets/functions/toast";
+import Vue from 'vue';
+import axios from 'axios';
+import Toast from '@/assets/functions/toast';
+import { timeDisplay } from '@/assets/functions/strings';
+
+type Notification = {
+    id: number;
+    title: string;
+    msg: string;
+    createdAt: string;
+};
 
 export default Vue.extend({
-    name: "Notifcations",
+    name: 'Notifications',
     created() {
         this.loadNotifications();
 
-        this.$socket.$subscribe("notification", (data: any) => {
+        this.$socket.$subscribe('notification', (data: any) => {
             this.notifications.push(data);
         });
 
-        this.$socket.$subscribe("notificationUpdate", (data: any) => {
+        this.$socket.$subscribe('notificationUpdate', (data: any) => {
             this.loadNotifications();
         });
     },
     data: () => ({
-        notifications: [] as {
-            id: number;
-            title: string;
-            msg: string;
-            createdAt: String;
-        }[],
+        notifications: [] as Notification[],
         form: {
             title: '',
             msg: '',
@@ -57,47 +60,44 @@ export default Vue.extend({
         admin(): boolean { return this.$route.meta.admin; }
     },
     methods: {
-        onSubmit(e: Event) {
+        timeDisplay(notification: Notification): string { return timeDisplay(notification.createdAt); },
+
+        onSubmit(e: Event): void {
             e.preventDefault();
             this.sendNotfication();
             this.form = { title: '', msg: '' };
         },
         loadNotifications(): void {
-            axios.get("/api/notification/getAll").then((response) => {
+            const error = (err: string) => Toast.send(this, 'Message', err, 'danger');
+            axios.get('/api/notification/getAll').then(response => {
                 let data = response.data;
-                this.notifications = data;
-            });
+                if (data.statusCode == 200) this.notifications = response.data;
+                else error(data.message);
+            }).catch(err => error(err));;
         },
         sendNotfication(): void {
-            axios
-                .post("/api/notification/send", this.form)
-                .then((response) => {
-                    let data = response.data;
-                    if (data.statusCode === 200) {
-                        Toast.send(this, "Message", data.message, "success");
-                    } else if (data.statusCode === 404)
-                        Toast.send(this, "Message", data.message, "danger");
-                })
-                .catch();
+            const error = (err: string) => Toast.send(this, 'Message', err, 'danger');
+            axios.post('/api/notification/send', this.form).then(response => {
+                let data = response.data;
+                if (data.statusCode == 200) Toast.send(this, 'Message', data.message, 'success');
+                else error(data.message);
+            }).catch(err => error(err));
         },
         deleteNotification(id: number): void {
-            axios
-                .delete("/api/notification/deleteById", { data: { id: id } })
-                .then((response) => {
-                    let data = response.data;
-                    if (data.statusCode === 200) {
-                        Toast.send(this, "Message", data.message, "success");
-                    } else if (data.statusCode === 404)
-                        Toast.send(this, "Message", data.message, "danger");
-                })
-                .catch();
-
-        },
-    },
+            const error = (err: string) => Toast.send(this, 'Message', err, 'danger');
+            axios.delete('/api/notification/deleteById', { data: { id: id } }).then(response => {
+                let data = response.data;
+                if (data.statusCode == 200) Toast.send(this, 'Message', data.message, 'success');
+                else error(data.message);
+            }).catch(err => error(err));
+        }
+    }
 });
 </script>
 
 <style scoped lang="scss">
+@import '@/assets/css/listform.scss';
+
 .notifications {
     display: flex;
     justify-content: center;
@@ -127,31 +127,11 @@ export default Vue.extend({
 }
 
 .show {
-    border-top: 2px solid black;
-    margin-top: var(--double-margin);
+    border-top: 2px solid var(--black);
     padding-top: var(--double-margin);
 
-    .notification {
-        margin-bottom: var(--double-margin);
-
-        .notification-title {
-            font-weight: bold;
-        }
-
-        .card-body {
-            padding: var(--double-margin);
-        }
-
-        .card-footer {
-            display: flex;
-            align-items: center;
-            padding: 0;
-
-            small {
-                flex-grow: 1;
-                padding: var(--margin);
-            }
-        }
+    .notification-title {
+        font-weight: bold;
     }
 }
 </style>

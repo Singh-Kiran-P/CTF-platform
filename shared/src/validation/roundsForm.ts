@@ -19,42 +19,6 @@ type Challenge = { id?: number, round?: Round, name: string, description: string
 type Round = { id? :number, name: string, folder: string, start: string, end: string, description: string, challenges: Challenge[] | undefined };
 type Form = { rounds: Round[] };
 
-const solvePoints = (solves: Solve[]): string => { let p = solves.reduce((acc, cur) => Math.max(acc, cur.points), 0); return `${p} point${p == 1 ? '' : 's'}`; };
-const solveNames = (solves: Solve[]): string => { return solves.reduce((acc, cur, i) => cur.name + (i == 1 ? ' and ' : (i == 0 ? '' : ', ')) + acc, ''); };
-
-const typeName = (type: string): string => type == ChallengeType.INTERACTIVE ? 'Interactive' : (type == ChallengeType.QUIZ ? 'Quiz' : 'Basic');
-const typeDescription = (type: string): string => {
-    switch (type) {
-        case ChallengeType.INTERACTIVE: return 'TODO: explain interactive challenge';
-        case ChallengeType.QUIZ: return 'TODO: explain quiz challenge';
-        default: return 'TODO: explain basic challenge';
-    };
-}
-
-const durationDisplay = (round: Round): string => {
-    let [start, end] = [round.start, round.end].map(time => new Date(time));
-    let [startday, endday] = [start, end].map(time => time.toLocaleString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }));
-    let [starttime, endtime] = [start, end].map(time => time.toLocaleString('nl-BE', { hour: 'numeric', minute: 'numeric' }));
-    return `${startday}, ${starttime} - ${startday == endday ? '' : endday + ', '}${endtime}`;
-}
-
-const countdownDisplay = (now: Date, round: Round): string => {
-    let time = [round.start, round.end].map(time => new Date(time)).filter(t => t > now).concat([now])[0];
-    return timeDisplay(Math.max(0, time.getTime() - now.getTime()));
-}
-
-const timeDisplay = (time: number, short?: boolean): string => {
-    const amount = (t: number): number => {
-        let a = Math.floor(time / t);
-        time %= t;
-        return a;
-    }
-    let [y, d, h, m, s] = [amount(1000 * 60 * 60 * 24 * 365), amount(1000 * 60 * 60 * 24), amount(1000 * 60 * 60), amount(1000 * 60), amount(1000)];
-    const t = (amount: number, time: string) => `${amount} ${time}${amount == 1 ? '' : 's'}`;
-    let large = (y ? `${t(y, 'year')}, ` : '') + (y || d ? `${t(d, 'day')}, ` : '') + (y || d ? t(h, 'hour') : '');
-    return large || ((h ? h + 'h ' : '') + (m || !short ? m + 'm ' : '') + (s < 10 && !short ? '0' : '') + s + 's');
-}
-
 const sortRounds = (rounds: Round[]): Round[] => [...rounds].sort((a, b) => new Date(a.start) < new Date(b.start) ? -1 : 1);
 const times = (round: Round) => [round.start, round.end].map(time => new Date(time).getTime());
 
@@ -156,6 +120,6 @@ const isf = {
 }
 
 export {
-    state, validInput, validate, Solve, Question, Hint, Challenge, Round, Form, ChallengeType, isf,
-    solvePoints, solveNames, typeName, typeDescription, durationDisplay, countdownDisplay, timeDisplay, sortRounds, validForm, validChallenges, validChallenge, validHints, validQuestions
+    validate, Solve, Question, Hint, Challenge, Round, Form, ChallengeType, isf,
+    state, validInput, sortRounds, validForm, validChallenges, validChallenge, validHints, validQuestions
 };

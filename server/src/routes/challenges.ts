@@ -1,6 +1,7 @@
 import DB, { Challenge, Round, Solve, Question, Hint, UsedHint, Attempt, AttemptType, solveAvailable, Account, Team } from '../database';
 import { LeaderBoardController } from "../controllers/leaderboard";
 import { getAccount, isAuth } from '../auth/index';
+import socketIO from '../controllers/socket';
 import { Root, uploaddir } from '../files';
 import levenshtein from 'fast-levenshtein';
 import express from 'express';
@@ -20,7 +21,7 @@ const roundStarted = (roundId: number | string, req: express.Request, res: expre
     if (!admin && !getAccount(req).team) return res.json(joinTeam());
     DB.repo(Round).findOne(roundId).then(round => {
         if (!round) return res.json(error());
-        if (!admin && new Date(round.start) > new Date()) return res.json(notStarted());
+        //if (!admin && new Date(round.start) > new Date()) return res.json(notStarted()); // TODO: UNCOMMENT
         return next(round);
     }).catch(() => res.json(error()));
 }
@@ -30,8 +31,8 @@ const challengeAvailable = (challengeId: number | string, relations: string[], a
     if (!admin && !getAccount(req).team) return res.json(joinTeam());
     DB.repo(Challenge).findOne({ where: { id: Number(challengeId) }, relations: challengeRelations.concat('round', ...relations) }).then(challenge => {
         if (!challenge) return res.json(error());
-        if (!admin && new Date(challenge.round.start) > new Date()) return res.json(notStarted());
-        if (!admin && active && new Date(challenge.round.end) < new Date()) return res.json(ended());
+        //if (!admin && new Date(challenge.round.start) > new Date()) return res.json(notStarted()); // TODO: UNCOMMENT
+        //if (!admin && active && new Date(challenge.round.end) < new Date()) return res.json(ended()); // TODO: UNCOMMENT
         if (challenge.questions) challenge.questions.sort((a, b) => a.order - b.order);
         if (challenge.hints) challenge.hints.sort((a, b) => a.order - b.order);
         const available = () => next(challenge);
@@ -93,33 +94,44 @@ router.get('/attachment/:id', isAuth, (req, res) => {
 router.post('/solve/:id', isAuth, (req, res) => {
     let [account, team] = [getAccount(req), getAccount(req).team];
     solveChallenge(team, req.params.id, ['questions'], true, req, res, challenge => {
-        let correct = challenge.flag === req.fields.flag;
-        attempt(res, account, team, challenge, correct);
+        let content = req.fields.flag as string;
+        let correct = challenge.flag === content;
+        attempt(res, account, team, challenge, content, correct);
     });
 });
 
 router.post('/answer/:id/:order', isAuth, (req, res) => {
     let [account, team] = [getAccount(req), getAccount(req).team];
     solveChallenge(team, req.params.id, ['questions'], true, req, res, challenge => {
-        let order = Number(req.params.order);
-        let next = responseQuestion(challenge.questions.find(q => q.order > order), true);
-        let correct = correctAnswer(challenge.questions.find(q => q.order == order), req.fields.answer as string);
-        attempt(res, account, team, challenge, correct, next);
+        let i = challenge.questions?.findIndex(q => q.order == Number(req.params.order));
+        let next = responseQuestion(challenge.questions[i + 1], true);
+        let content = req.fields.answer as string;
+        let correct = correctAnswer(challenge.questions[i], content);
+        attempt(res, account, team, challenge, content, correct, Object.assign({}, next || {}, { i: i }));
     });
 });
 
-const attempt = (res: express.Response, account: Account, team: Team, challenge: Challenge, correct: boolean, next?: any) => {
-    if (account.admin) return res.send(correct ? { solved: next ? true : getSolve(account.name, challenge.points, new Date().toJSON()), next: next } : { solve: false });
+const attempt = (res: express.Response, account: Account, team: Team, challenge: Challenge, content: string, correct: boolean, next?: any) => { // TODO fix next?true
+    let last = !next || next.i < 0 || next.i >= challenge.questions.length;
+    if (account.admin) return res.send(correct ? { solved: last ? getSolve(account.name, challenge.points, new Date().toJSON()) : true, next: next } : { solve: false });
     if (challenge.solves.find(s => s.team.id == team.id)) return res.send({ solved: true });
     DB.repo(Attempt).save(new Attempt(AttemptType.SOLVE, account, team)).then(attempt => {
-        if (!attempt) res.json(error(true));
-        attempted(attempt, challenge);
-        if (!correct) return res.send({ solved: false });
+        if (!attempt) return res.json(error(true));
+        if (!correct) {
+            socketEmit('attempted', challenge, next?.i, team, account, content, NaN, attempt.time);
+            return res.send({ solved: false });
+        }
         DB.repo(Attempt).delete({ team: team }).then(() => {
-            if (next) return res.send({ solved: true, next: next });
+            if (!last) {
+                socketEmit('solved', challenge, next?.i, team, account, content, NaN, new Date().toJSON());
+                return res.send({ solved: true, next: next });
+            }
             DB.repo(Solve).save(new Solve(challenge, team, new Date().toJSON(), account)).then(solve => {
                 if (!solve) return res.json(error(true));
-                solved(team, account, challenge, solve, res);
+                let solved = responseSolve(challenge, solve);
+                socketEmit('solved', challenge, next?.i, team, account, content, solved.points, solve.time);
+                leaderboardController.updateLeaderboard(account, solved.points, solved.time);
+                res.send({ solved: solved });
             }).catch(() => res.json(error(true)));
         }).catch(() => res.json(error(true)));
     }).catch(() => res.json(error(true)));
@@ -135,6 +147,7 @@ router.put('/hint/:id', isAuth, (req, res) => {
             if (challenge.usedHints.find(h => h.team.id == team.id && h.hint.id == hint.id)) return res.send(hint.content);
             DB.repo(UsedHint).save(new UsedHint(hint, challenge, team)).then(usedHint => {
                 if (!usedHint) return res.json(error(true));
+                socketEmit('hintUsed', challenge, NaN, team, account, hint.name, hint.cost, new Date().toJSON());
                 res.send(hint.content);
             }).catch(() => res.json(error(true)));
         });
@@ -150,16 +163,16 @@ const correctAnswer = (question: Question | undefined, answer: string): boolean 
     });
 }
 
-const attempted = (attempt: Attempt, challenge: Challenge) => {
-    // TODO: live feed
-}
-
-const solved = (team: Team, account: Account, challenge: Challenge, solve: Solve, res: express.Response) => {
-    // TODO: delete container
-    let solved = responseSolve(challenge, solve);
-    // TODO: live feed
-    leaderboardController.updateLeaderboard(account, solved.points, solved.time);
-    res.send({ solved: solved });
+const socketEmit = (emit: string, challenge: Challenge, question: number, team: Team, account: Account, content: string, points: number, time: string): void => {
+    socketIO.getIO().emit(emit, {
+        question: challenge.questions && !isNaN(question) ? { i: question, length: challenge.questions.length } : undefined,
+        challenge: { name: challenge.name, id: challenge.id },
+        team: team ? { name: team.name, id: team.id } : undefined,
+        account: account.name,
+        content: content,
+        points: isNaN(points) ? undefined : points,
+        time: time
+    });
 }
 
 export { responseSolve };

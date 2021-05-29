@@ -110,8 +110,8 @@ import Tooltip from '@/components/Tooltip.vue';
 import Collapse from '@/components/Collapse.vue';
 import AdminHeader from '@/components/AdminHeader.vue';
 import StatusButton from '@/components/StatusButton.vue';
-import { Challenge, ChallengeType, Hint, Question } from '@shared/validation/roundsForm';
-import { validChallenge, typeName, typeDescription, solvePoints, solveNames, durationDisplay, countdownDisplay, timeDisplay } from '@shared/validation/roundsForm';
+import { Challenge, ChallengeType, Hint, Question, validChallenge } from '@shared/validation/roundsForm';
+import { typeName, typeDescription, solvePoints, solveNames, durationDisplay, countdownDisplay, timerDisplay } from '@/assets/functions/strings';
 import path from 'path';
 
 export default Vue.extend({
@@ -138,7 +138,6 @@ export default Vue.extend({
         });
     },
     data: () => ({
-        typeValues: { BASIC: ChallengeType.BASIC, QUIZ: ChallengeType.QUIZ, INTERACTIVE: ChallengeType.INTERACTIVE },
         challenge: undefined as Challenge | undefined,
         input: '',
 
@@ -161,6 +160,7 @@ export default Vue.extend({
         admin(): boolean { return this.$route.meta?.admin; },
         solved(): boolean { return (this.challenge?.solves || []).length > 0; },
         ended(): boolean { return this.challenge?.round ? new Date(this.challenge.round.end) < this.time : false; },
+        typeValues() { return { BASIC: ChallengeType.BASIC, QUIZ: ChallengeType.QUIZ, INTERACTIVE: ChallengeType.INTERACTIVE }; },
 
         durationDisplay() { return this.challenge?.round ? durationDisplay(this.challenge.round) : ''; },
         countdownDisplay(): string { return this.challenge?.round ? countdownDisplay(this.time, this.challenge.round) : ''; },
@@ -173,7 +173,7 @@ export default Vue.extend({
 
         hints(): Hint[] { return (this.challenge?.hints || []).filter(h => !h.content); },
         usedHints(): Hint[] { return (this.challenge?.hints || []).filter(h => h.content); },
-        rateLimit(): string { return this.rateLimitTime <= this.time.getTime() ? '' : timeDisplay(this.rateLimitTime - this.time.getTime(), true); },
+        rateLimit(): string { return this.rateLimitTime <= this.time.getTime() ? '' : timerDisplay(this.rateLimitTime - this.time.getTime(), true); },
         rateLimited(): boolean { return this.rateLimit.length > 0; },
 
         environment(): string { return '/TODO'; },
@@ -299,7 +299,7 @@ export default Vue.extend({
     .info {
         margin: var(--margin) 0;
         padding-bottom: var(--margin);
-        border-bottom: 2px solid black;
+        border-bottom: 2px solid var(--black);
         flex-wrap: wrap;
 
         .tooltips {

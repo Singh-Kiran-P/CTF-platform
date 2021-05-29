@@ -1,7 +1,7 @@
 /**
  * @author Kiran Singh
  */
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response } from 'express';
 import DB, { Account, Solve, Sponsor } from '../database';
 import socketIO from './socket';
 
@@ -40,7 +40,6 @@ export class LeaderBoardController {
      * @param score: current score of the team
      * @param timestamp
      */
-    // TODO: @lander call this func after saving solve
     public updateLeaderboard(account: Account, score: number, timestamp: string) {
         let cat = account.category.name;
         // emit socket

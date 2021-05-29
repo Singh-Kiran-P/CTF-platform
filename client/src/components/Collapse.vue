@@ -60,7 +60,7 @@ export default Vue.extend({
 }
 
 .collapse:not(.no-border) {
-    border-bottom: 2px solid black;
+    border-bottom: 2px solid var(--black);
 }
 
 .header {

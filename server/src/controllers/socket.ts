@@ -1,7 +1,7 @@
 /**
  * @auther Kiran Singh
  */
-import { Server, Socket } from "socket.io";
+import { Server } from "socket.io";
 import { DefaultEventsMap } from "socket.io/dist/typed-events";
 
 let io: Server<DefaultEventsMap, DefaultEventsMap>;
@@ -24,4 +24,3 @@ export default {
         return io;
     }
 }
-

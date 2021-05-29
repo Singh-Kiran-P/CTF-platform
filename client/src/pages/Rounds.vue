@@ -125,8 +125,9 @@ import Loading from '@/components/Loading.vue';
 import Tooltip from '@/components/Tooltip.vue';
 import Collapse from '@/components/Collapse.vue';
 import AdminHeader from '@/components/AdminHeader.vue';
-import { toggledItems, loadItems } from '@/assets/listFunctions';
-import { Round, Challenge, validForm, validChallenges, typeName, typeDescription, solvePoints, solveNames, durationDisplay, countdownDisplay } from '@shared/validation/roundsForm';
+import { toggledItems, loadItems } from '@/assets/functions/list';
+import { Round, Challenge, validForm, validChallenges } from '@shared/validation/roundsForm';
+import { typeName, typeDescription, solvePoints, solveNames, durationDisplay, countdownDisplay } from '@/assets/functions/strings';
 
 type Visible = { visible?: boolean };
 
@@ -173,7 +174,7 @@ export default Vue.extend({
         time(): Date { return new Date(this.realTime.getTime() + this.offset); },
         pastRounds(): Round[] { return this.rounds.filter(r => new Date(r.end) < this.time).reverse(); },
         nextRounds(): Round[] { return this.rounds.filter(r => new Date(r.start) > this.time); },
-        currentRound(): (Round & Visible) | undefined { return this.rounds.find(r => new Date(r.start) < this.time && new Date(r.end) > this.time); }
+        currentRound(): (Round & Visible) | undefined { return this.rounds[0]; } // TODO: .find(r => new Date(r.start) < this.time && new Date(r.end) > this.time); }
     },
     methods: {
         durationDisplay(round: Round) { return durationDisplay(round); },
@@ -229,7 +230,7 @@ span, a {
 .round-time {
     margin-bottom: var(--margin);
     padding-bottom: var(--margin);
-    border-bottom: 2px solid black;
+    border-bottom: 2px solid var(--black);
 }
 
 .round-description {
@@ -276,7 +277,7 @@ span, a {
 .next-rounds, .past-rounds {
     margin-top: var(--margin);
     padding-top: var(--margin);
-    border-top: 2px solid black;
+    border-top: 2px solid var(--black);
 }
 
 .past-rounds {
@@ -287,7 +288,7 @@ span, a {
 
         .past-round-content {
             padding: var(--margin);
-            border: 2px solid black;
+            border: 2px solid var(--black);
             border-radius: var(--border-radius);
         }
 
