@@ -38,51 +38,5 @@ router.get("/resetChallengeContainer/:challengeId", isAuth, controller.resetChal
 
 // router.post("/resetContainer", isAuth, controller.resetContainer_POST);
 
-router.get("/test", controller.test)
-
 export default { path: "/docker", router };
 
-// /********************** TESTING ROUTES ********************/
-
-// // Gives the DockerManagement Entity
-// router.get("/dockerConfig", async (req, res) => {
-//     const dockerManagementRepo = DB.crepo(DockerManagementRepo)
-//     const a = (await dockerManagementRepo.instance());
-
-//     const dockerOpenPort = DB.repo(DockerOpenPort);
-//     (await dockerOpenPort.find().then(d => {
-//         res.send(a);
-//     }));
-// });
-
-// // Gives the DockerManagement Entity
-// router.get("/dockerConfig_", async (req, res) => {
-//     const dockerManagementRepo = DB.crepo(DockerManagementRepo)
-//     await dockerManagementRepo.setUpperBoundPort(5);
-//     const a = (await dockerManagementRepo.instance());
-// });
-
-// router.get("/dockerConfig_i", (req, res) => {
-//     const challenge = DB.repo(DockerChallengeContainer);
-//     challenge.createQueryBuilder("DockerChallengeContainer")
-//         .leftJoinAndSelect("DockerChallengeContainer.image", "x")
-//         .getMany().then(d => {
-//             res.send(d);
-//         })
-// });
-
-// router.get("/dockerConfig_createChallengeContainer", async (req, res) => {
-//     const challenge = DB.repo(DockerChallengeImage);
-//     let d = new DockerChallengeImage("hello", ["80/tcp"], 25);
-//     await challenge.save(d);
-
-//     let image = await dockerController.getImage("hello")
-
-//     if (image != undefined) {
-//         res.json({ statusCode: 200, data: d });
-
-//     }
-//     else {
-//         res.json({ statusCode: 404, msg: "Image not found" });
-//     }
-// });

@@ -6,6 +6,9 @@ import { DefaultEventsMap } from "socket.io/dist/typed-events";
 
 let io: Server<DefaultEventsMap, DefaultEventsMap>;
 export default {
+    /**
+     * Init socket.io server
+     */
     init: (httpServer: any) => {
         io = new Server(httpServer, {
             cors: {

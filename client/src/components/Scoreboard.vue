@@ -99,7 +99,7 @@ export default Vue.extend({
         ) {
             var series = this.chart.series.push(new am4charts.StepLineSeries());
             series.dataFields.valueY = "score";
-            series.dataFields.dateX = "date";
+            series.dataFields.dateX = "time";
             series.strokeWidth = 2;
             series.yAxis = valueAxis;
 
@@ -119,9 +119,12 @@ export default Vue.extend({
         },
         async loadData() {
             this.isLoading = true;
-            await axios.get("/api/leaderboard/getAllData").then((response) => {
-                this.teams = response.data;
-            });
+
+            await axios
+                .get("/api/leaderboard/getAllData/" + this.category)
+                .then((response) => {
+                    this.teams = response.data;
+                });
             this.isLoading = false;
         },
         emitRangeChanged() {
@@ -186,11 +189,8 @@ export default Vue.extend({
         for (const team of this.teams) {
             let score = 0;
             team.scores.forEach((data) => {
-
                 data.score += score;
-                // console.log(data.date);
-                data.time = data.time;
-                console.log(data);
+                data.time = new Date(data.time);
             });
 
             this.createSeries(team, pointsAxis);

@@ -1,11 +1,14 @@
 /**
  * @author Kiran Singh
  */
-import { responseSolve, solvePoints } from '@/routes/challenges';
+import { solvePoints } from '@/routes/challenges';
 import { Request, Response } from 'express';
 import DB, { Account, Solve, Sponsor, Team } from '../database';
 import socketIO from './socket';
 
+/**
+ * Interface for the leaderboard data
+ */
 declare interface data_send {
     uuid: string;
     name: string;
@@ -24,14 +27,14 @@ export class LeaderBoardController {
         this.updateLeaderboard = this.updateLeaderboard.bind(this);
         this.update = this.update.bind(this);
         this.getAllData = this.getAllData.bind(this);
-
+        this.getSponsorsData = this.getSponsorsData.bind(this);
     }
 
     /**
      * Update leaderboard [ with socket.io ]
      * @pre current score != previous score
-     * @param account: to get team and cat.
-     * @param score: current score of the team
+     * @param account To get team and category.
+     * @param score Current score of the team
      * @param timestamp
      */
     public updateLeaderboard(account: Account, score: number, timestamp: string) {
@@ -49,7 +52,7 @@ export class LeaderBoardController {
     }
 
     /**
-     * Route to send fake socket emits to front-end
+     * Route to send fake socket emits to front-end [testing]
      * @param req route request object
      * @param res route response object
      * @category Routes
@@ -67,17 +70,27 @@ export class LeaderBoardController {
             })
             .catch(err => res.json(err));
     }
+
     /**
     * Route to get data for the leaderboard
     * @param req route request object
     * @param res route response object
     * @category Routes
-    * @returns {Team[]} This is the response
+    * @returns {data_send[]} This is the response
     */
     public getAllData(req: Request, res: Response) {
+        DB.repo(Team).find({ relations: ['accounts', 'solves', 'solves.challenge', 'usedHints', 'usedHints.challenge'] })
+            .then((t) => {
+                console.log(t[0].getCategoryName());
+                console.log(req.params.cat);
 
-        DB.repo(Team).find({ relations: ['solves', 'solves.challenge', 'usedHints', 'usedHints.challenge'] })
-            .then((teams) => {
+                console.log(t[0].getCategoryName() == req.params.cat);
+
+                let teams = t.filter(team => team.getCategoryName() == req.params.cat);
+
+
+                console.log(teams);
+
                 let data: data_send[] = teams.map(team => ({
                     uuid: team.id,
                     name: team.name,
@@ -90,8 +103,6 @@ export class LeaderBoardController {
 
                 for (const teamData of data) {
                     let scores = teamData.scores
-                    console.log(teamData.scores);
-
                     let sum = 0;
                     scores = scores.map(score => {
                         sum += score.score;
@@ -106,7 +117,7 @@ export class LeaderBoardController {
 
 
     /**
-    * Route to get data sponsors dat such as link, img path, etc.
+    * Route to get sponsors data dat such as link, img path, etc.
     * @param req route request object
     * @param res route response object
     * @category Routes

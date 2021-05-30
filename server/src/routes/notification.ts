@@ -4,14 +4,15 @@
 import { isAdmin, isAuth } from "@/auth";
 import express from "express";
 const router = express.Router();
-import notificationController from "../controllers/notification";
+import { NotificationController } from "../controllers/notification";
+let controller = new NotificationController();
 
-router.get('/getAll', isAuth, notificationController.getAllNotifications_GET);
+router.get('/getAll', isAuth, controller.getAllNotifications_GET);
 
-router.post('/send', isAdmin, notificationController.send_POST);
+router.post('/send', isAdmin, controller.send_POST);
 
-router.delete('/deleteById', notificationController.deleteById_DELETE);
+router.delete('/deleteById', controller.deleteById_DELETE);
 
-router.delete('/deleteAll', isAdmin, notificationController.deleteAll_DELETE);
+router.delete('/deleteAll', isAdmin, controller.deleteAll_DELETE);
 
 export default { path: '/notification', router };

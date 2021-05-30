@@ -175,7 +175,7 @@ export default Vue.extend({
         time(): Date { return new Date(this.realTime.getTime() + this.offset); },
         pastRounds(): Round[] { return this.rounds.filter(r => new Date(r.end) < this.time).reverse(); },
         nextRounds(): Round[] { return this.rounds.filter(r => new Date(r.start) > this.time); },
-        currentRound(): (Round & Visible) | undefined { return this.rounds[0]; } // TODO: .find(r => new Date(r.start) < this.time && new Date(r.end) > this.time); }
+        currentRound(): (Round & Visible) | undefined { return this.rounds[1]; } // TODO: .find(r => new Date(r.start) < this.time && new Date(r.end) > this.time); }
     },
     methods: {
         durationDisplay(round: Round) { return durationDisplay(round); },

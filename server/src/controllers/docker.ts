@@ -17,6 +17,7 @@ let docker = new Docker({ socketPath: '/var/run/docker.sock' });
  */
 export class DockerController {
     adminTeamId = "admin";
+
     constructor() {
         this.containers_GET = this.containers_GET.bind(this);
         this.dockerConfigPorts_GET = this.dockerConfigPorts_GET.bind(this);
@@ -28,9 +29,6 @@ export class DockerController {
         this.startChallengeContainer_GET = this.startChallengeContainer_GET.bind(this);
         this.stopChallengeContainer_GET = this.stopChallengeContainer_GET.bind(this);
         this.resetChallengeContainer_GET = this.resetChallengeContainer_GET.bind(this);
-
-        this.test = this.test.bind(this);
-
 
         this._createPortConfig = this._createPortConfig.bind(this);
         this._giveRandomPort = this._giveRandomPort.bind(this);
@@ -126,7 +124,7 @@ export class DockerController {
     }
 
     /**
-     * Route for get the state of a challenge container of a team
+     * Route for getting the state of a challenge container of a team
      * @param req route request object with {challengeId: number, teamId:number}
      * @param res route response object
      * @category Routes
@@ -197,44 +195,6 @@ export class DockerController {
             })
     }
 
-    /**
-     * For testing functions
-     * @param req route request object
-     * @param res route response object
-     * @category Routes
-     */
-    public test(req: Request, res: Response) {
-        // getAccount(req).admin
-
-        // this.createChallengeContainer("301", "5eff3885-53f1-435f-b357-83ff7bc4008c")
-        //     .then(mess => res.json(mess))
-        //     .catch(err => {
-        //         res.json(err);
-        //     })
-        // this.challengeContainerRunning("301", "5eff3885-53f1-435f-b357-83ff7bc4008c")
-        //     .then(mess => res.json(mess))
-        //     .catch(err => {
-        //         res.json(err);
-        //     })
-        // this.startContainer("301", "5eff3885-53f1-435f-b357-83ff7bc4008c")
-        //     .then(mess => res.json(mess))
-        //     .catch(err => {
-        //         console.log(err);
-        //         res.json(err);
-        //     })
-        // this.stopContainer("301", "5eff3885-53f1-435f-b357-83ff7bc4008c")
-        //     .then(mess => res.json(mess))
-        //     .catch(err => {
-        //         console.log(err);
-        //         res.json(err);
-        //     })
-        // this.resetContainer("301", "5eff3885-53f1-435f-b357-83ff7bc4008c")
-        //     .then(mess => res.json(mess))
-        //     .catch(err => {
-        //         console.log(err);
-        //         res.json(err);
-        //     })
-    }
 
     //---------------------------------------------------------- Functions ----------------------------------------------------------
 
@@ -244,7 +204,8 @@ export class DockerController {
      * Image name -> challengeName-teamName
      * @param challengeId
      * @param userId
-     * @returns {Promise<void | object>} A promise that contains object {message:string, statusCode:int}
+     * @param isAdmin To check if a admin is calling this function
+     * @returns {Promise<object>} A promise that contains object {message:string, ports: [], statusCode:int}
      */
     private createChallengeContainer(challengeId: string, teamId: string, isAdmin: boolean) {
         return new Promise<object>(async (resolve, reject) => {
@@ -285,13 +246,13 @@ export class DockerController {
                                                 }
                                             )
                                         }
-                                        else{
+                                        else {
                                             return reject({ message: "Container is not running!", statusCode: 404 })
                                         }
                                     })
-                                    .catch(() =>{
+                                    .catch(() => {
                                         reject({ message: "Error finding container", statusCode: 404 })
-                                    } )
+                                    })
                             });
                         });
                     });
@@ -310,10 +271,11 @@ export class DockerController {
     }
 
     /**
-     *
+     * Checks if a challenge container is running
      * @param challengeId Check if a container is running
      * @param teamId team id
-     * @returns {Promise<void | object>} A promise that contains object { state: false, error: "not running", message: "not running", statusCode: 404 }
+     * @param isAdmin To check if a admin is calling this function
+     * @returns {Promise<object>} A promise that contains object { state: false, error: "not running", message: "not running", statusCode: 404 }
      */
     private challengeContainerRunning(challengeId: string, teamId: string, isAdmin: boolean) {
         return new Promise<object>(async (resolve, reject) => {
@@ -364,7 +326,8 @@ export class DockerController {
      * Start docker container for the team
      * @param challengeId
      * @param userId
-     * @returns {Promise<void | object>} A promise that contains object {message:string, statusCode:int}
+     * @param isAdmin To check if a admin is calling this function
+     * @returns {Promise<object>} A promise that contains object {message:string, statusCode:int}
      */
     private startContainer(challengeId: string, teamId: string, isAdmin: boolean) {
         return new Promise<object>(async (resolve, reject) => {
@@ -406,6 +369,7 @@ export class DockerController {
      * This will stop the docker container and then remove it
      * @param challengeId
      * @param userId
+     * @param isAdmin To check if a admin is calling this function
      * @returns {Promise<void | object>} A promise that contains object {message:string, statusCode:int}
      */
     private stopContainer(challengeId: string, teamId: string, isAdmin: boolean) {
@@ -449,9 +413,11 @@ export class DockerController {
      * To reset a docker container we have to do the following
      *          1) stop/remove the container
      *          2) create a new container
+     * This will generate new ports config
      * @param challengeId
      * @param userId
-     * @returns {Promise<void | object>} A promise that contains object {message:string, statusCode:int}
+     * @param isAdmin To check if a admin is calling this function
+     * @returns {Promise< object>} A promise that contains object {message:string, statusCode:int}
      */
     private resetContainer(challengeId: string, teamId: string, isAdmin: boolean) {
         return new Promise<object>((resolve, reject) => {
@@ -469,6 +435,7 @@ export class DockerController {
      * Make docker challenge image
      * @param dockerFileDes location of the docker file
      * @param dockerChallengeName challenge name = docker image name
+     * @returns {Promise<string>} A promise that contains object the id of the image
      */
     public makeImage(dockerFileDes: string, dockerChallengeName: string) {
         return new Promise<string>((resolve, reject) => {
@@ -492,6 +459,7 @@ export class DockerController {
     /**
      * Remove image from docker
      * @param imageId: string
+     * @returns {Promise<string>} A promise that contains object the id of the image
      */
     public deleteImage(imageId: string) {
         return new Promise<void>((resolve, reject) => {
@@ -586,7 +554,7 @@ export class DockerController {
     }
 
     /**
-     * This give you a port that is available to use and in the port range
+     * This give you a port that is available to use and in the port range that the admin predefined
      * @returns {Promise<number>} A promise that contains the port that can be used
      */
     private _giveRandomPort() {
@@ -603,9 +571,6 @@ export class DockerController {
                     upperBoundPort = data.upperBoundPort;
                 })
                 .then(() => {
-                    let flag: boolean = true
-                    let port: number;
-
                     const dockerOpenPort = DB.repo(DockerOpenPort);
                     return dockerOpenPort.find();
 

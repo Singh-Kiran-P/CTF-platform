@@ -5,63 +5,97 @@ import { Request, Response } from 'express';
 import DB, { Notification } from '../database';
 import socketIO from './socket';
 
-function getAllNotifications_GET(req: Request, res: Response) {
-    let notificationRepo = DB.repo(Notification);
-    notificationRepo
-        .find()
-        .then((data) => {
-            res.json(data);
-        })
-        .catch(() => res.json({ message: 'Error retrieving notifications', statusCode: 404 }));
-}
+/**
+ * This class handles notifications using socket.io
+ */
+export class NotificationController {
 
-function send_POST(req: Request, res: Response) {
-    let data = req.fields;
+    constructor() {
+        this.getAllNotifications_GET = this.getAllNotifications_GET.bind(this);
+        this.send_POST = this.send_POST.bind(this);
+        this.deleteById_DELETE = this.deleteById_DELETE.bind(this);
+        this.deleteAll_DELETE = this.deleteAll_DELETE.bind(this);
+    }
 
-    let title: string = data.title.toString();
-    let msg: string = data.msg.toString();
+    /**
+    * Route to all notifications from the db
+    * @param req route request object
+    * @param res route response object return
+    * @category Routes
+    */
+    public getAllNotifications_GET(req: Request, res: Response) {
+        let notificationRepo = DB.repo(Notification);
+        notificationRepo
+            .find()
+            .then((data) => {
+                res.json(data);
+            })
+            .catch(() => res.json({ message: 'Error retrieving notifications', statusCode: 404 }));
+    }
 
-    //save to db
-    let notificationRepo = DB.repo(Notification);
-    let notification = new Notification(title, msg);
-    notificationRepo.save(notification)
-        .then((data) => {
-            // emit socket
-            let socket = socketIO.getIO();
-            socket.emit('notification', data);
-            res.json({ message: 'Notification sent successfully!', statusCode: 200 });
-        })
-        .catch(() => res.json({ message: 'Error sending notification', statusCode: 404 }));
-}
+    /**
+    * Route to send notifications
+    *   - save notification into db
+    *   - emit a socket to channel 'notification'
+    * @param req route request object
+    * @param res route response object
+    * @category Routes
+    */
+    public send_POST(req: Request, res: Response) {
+        let data = req.fields;
 
-function deleteById_DELETE(req: Request, res: Response) {
-    let _id: number = Number(req.fields.id.toString());
-    let notificationRepo = DB.repo(Notification);
+        let title: string = data.title.toString();
+        let msg: string = data.msg.toString();
 
-    notificationRepo
-        .delete({ id: _id })
-        .then(() => {
+        //save to db
+        let notificationRepo = DB.repo(Notification);
+        let notification = new Notification(title, msg);
+        notificationRepo.save(notification)
+            .then((data) => {
+                // emit socket
+                let socket = socketIO.getIO();
+                socket.emit('notification', data);
+                res.json({ message: 'Notification sent successfully!', statusCode: 200 });
+            })
+            .catch(() => res.json({ message: 'Error sending notification', statusCode: 404 }));
+    }
+
+    /**
+    * Route to delete notification
+    *   - delete from db
+    *   - emit a socket to channel 'notificationUpdate'
+    * @param req route request object
+    * @param res route response object
+    * @category Routes
+    */
+    public deleteById_DELETE(req: Request, res: Response) {
+        let _id: number = Number(req.fields.id.toString());
+        let notificationRepo = DB.repo(Notification);
+
+        notificationRepo
+            .delete({ id: _id })
+            .then(() => {
+                // emit socket
+                let socket = socketIO.getIO();
+                socket.emit('notificationUpdate', {});
+                res.json({ message: 'Notification deleted successfully!', statusCode: 200 });
+            })
+            .catch(() => res.json({ message: 'Error deleting notification', statusCode: 404 }));
+    }
+
+    /**
+    * Route to delete all notifications
+    * @param req route request object
+    * @param res route response object
+    * @category Routes
+    */
+    public deleteAll_DELETE(req: Request, res: Response) {
+        DB.conn.query('DELETE FROM Notification;').then(() => {
             // emit socket
             let socket = socketIO.getIO();
             socket.emit('notificationUpdate', {});
-            res.json({ message: 'Notification deleted successfully!', statusCode: 200 });
+            res.json({ message: 'All notifications deleted successfully!', statusCode: 200 });
         })
-        .catch(() => res.json({ message: 'Error deleting notification', statusCode: 404 }));
-}
-
-function deleteAll_DELETE(req: Request, res: Response) {
-    DB.conn.query('DELETE FROM Notification;').then(() => {
-        // emit socket
-        let socket = socketIO.getIO();
-        socket.emit('notificationUpdate', {});
-        res.json({ message: 'All notifications deleted successfully!', statusCode: 200 });
-    })
-    .catch(() => res.json({ message: 'Error deleting notifications', statusCode: 404 }));
-}
-
-export default {
-    getAllNotifications_GET,
-    send_POST,
-    deleteById_DELETE,
-    deleteAll_DELETE
+            .catch(() => res.json({ message: 'Error deleting notifications', statusCode: 404 }));
+    }
 }
