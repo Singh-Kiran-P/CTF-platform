@@ -502,7 +502,9 @@ export class DockerController {
             docker.getImage(imageId)
                 .remove({ force: { true: 'true' } }, (err, res) => {
                     if (err) {
-                        reject(err);
+                        console.log({ error: err, message: err, statusCode: 404 });
+
+                        return reject({ error: "Can not delete image", message: err.json.message, statusCode: 404 });
                     }
                     resolve();
                 })

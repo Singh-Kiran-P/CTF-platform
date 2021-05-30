@@ -291,7 +291,7 @@ export default Vue.extend({
                 if (data.statusCode === 200) {
                     Toast.send(this, "Message", data.message, "success");
                 } else if (data.statusCode === 404)
-                    Toast.send(this, "Message", data.message, "danger");
+                    Toast.send(this, "Docker", data.message, "danger");
                 };
             axios.put('/api/rounds/save', serialize(this.form)).then(res => {
                 res.data.error ? error(res.data) : this.loadFormData(false);
@@ -404,7 +404,7 @@ span.info {
 .round {
     flex-wrap: wrap;
     border-bottom: 2px solid var(--black-c);
-    
+
     & > button {
         background-color: var(--white-c);
     }
