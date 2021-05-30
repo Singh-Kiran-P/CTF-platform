@@ -55,6 +55,10 @@ const responseSolve = (challenge: Challenge, solve: Solve) => getSolve(
     solve.time
 );
 
+const solvePoints = (team: Team, solve: Solve): number => {
+    return team.usedHints.filter(h => h.challenge.id == solve.challenge.id).reduce((acc, cur) => Math.max(acc - cur.hint.cost, 0), solve.challenge.points);
+}
+
 const getSolve = (name: string, points: number, time: string) => ({ name: name, points: points, time: time });
 
 const responseQuestion = (question: Question | undefined, unlocked: boolean) => {
@@ -175,5 +179,5 @@ const socketEmit = (emit: string, challenge: Challenge, question: number, team: 
     });
 }
 
-export { responseSolve };
+export { responseSolve, solvePoints };
 export default { path: '/challenges', router };

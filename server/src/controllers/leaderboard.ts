@@ -1,7 +1,7 @@
 /**
  * @author Kiran Singh
  */
-import { responseSolve } from '@/routes/challenges';
+import { responseSolve, solvePoints } from '@/routes/challenges';
 import { Request, Response } from 'express';
 import DB, { Account, Solve, Sponsor, Team } from '../database';
 import socketIO from './socket';
@@ -81,9 +81,6 @@ export class LeaderBoardController {
     */
     public getAllData(req: Request, res: Response) {
 
-        const solvePoints = (team: Team, solve: Solve): number => {
-            return team.usedHints.filter(h => h.challenge.id == solve.challenge.id).reduce((acc, cur) => Math.max(acc - cur.hint.cost, 0), solve.challenge.points);
-        }
 
         DB.repo(Team).find({ relations: ['solves', 'solves.challenge', 'usedHints', 'usedHints.challenge'] })
             .then((teams) => {

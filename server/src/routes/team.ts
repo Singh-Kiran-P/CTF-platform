@@ -1,6 +1,6 @@
 import DB, { Team, Account, Solve } from '../database';
 import { isAuth, hasTeam, getAccount, generatePassword } from '../auth/index';
-import { responseSolve } from './challenges';
+import { responseSolve, solvePoints } from './challenges';
 import { ILike } from 'typeorm';
 import express from 'express';
 const router = express.Router();
@@ -74,15 +74,15 @@ router.get('/infoDashboard/:uuid', (req, res) => {
             let acc: Account = getAccount(req);
             if (team.captain.id == acc.id || acc.admin) { isCaptainOrAdmin = true; data.inviteCode = team.inviteCode; }
             if (team.captain.id == acc.id) { isCaptain = true; data.inviteCode = team.inviteCode; }
-            else if (acc.admin) {isAdmin = true; data.inviteCode = team.inviteCode; }
+            else if (acc.admin) { isAdmin = true; data.inviteCode = team.inviteCode; }
             else if (team.accounts.some(member => member.id == acc.id)) { isMember = true; }
         }
         data.name = team.name;
         data.points = team.getPoints();
-        team.getPlacement().then((place: number)=> {
+        team.getPlacement().then((place: number) => {
             data.placement = place;
             return res.json({ info: data, isMember: isMember, isCaptain: isCaptain, isAdmin: isAdmin });
-        }).catch((err)=> res.json({error: 'Error retrieving placement'}));
+        }).catch((err) => res.json({ error: 'Error retrieving placement' }));
     }).catch((err) => res.json({ error: 'Team not found' }));
 });
 
@@ -103,20 +103,17 @@ router.get('/getMembers/:uuid', (req, res) => {
 
 
 router.get('/getSolves/:uuid', (req, res) => {
-    let data: { name: string, category: { name: string, description: string }, value: number, date: string }[] = [];
     let uuid: string = req.params.uuid;
 
-    DB.repo(Solve).find({ where: { team: uuid }, relations: ['account', 'team', 'challenge', 'challenge.usedHints', 'challenge.usedHints.team'] }).then(solves => {
-        solves.forEach(solve => {
-            data.push({
+    DB.repo(Team).findOne({ where: { id: uuid }, relations: ['solves', 'solves.challenge', 'usedHints', 'usedHints.challenge'] })
+        .then(team => {
+            res.json(team.solves.map(solve => ({
                 name: solve.challenge.name,
                 category: { name: solve.challenge.tag.name, description: solve.challenge.tag.description },
-                value: responseSolve(solve.challenge, solve).points,
+                value: solvePoints(team, solve),
                 date: solve.time
-            });
-        });
-        res.json(data);
-    }).catch((err) => { res.json({ error: 'Error retrieving solves' }) });
+            })));
+        }).catch((err) => { res.json({ error: 'Error retrieving solves' }) });
 });
 
 router.post('/removeMember/:uuid/:memberName', isAuth, (req, res) => {
@@ -146,8 +143,8 @@ router.get('/getTeams', (req, res) => {
         nameOrder = params.sortDirection;
 
     DB.repo(Team).find({
-            where: { name: ILike('%' + filter + '%') }, order: { name: nameOrder },
-            relations: ['accounts', 'solves', 'solves.challenge', 'usedHints'],
+        where: { name: ILike('%' + filter + '%') }, order: { name: nameOrder },
+        relations: ['accounts', 'solves', 'solves.challenge', 'usedHints'],
     }).then(teamsDB => {
         let teamsData: { uuid: string, name: string, category: string, points: number }[] = [];
         teamsDB.forEach(team => {
