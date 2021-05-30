@@ -36,12 +36,13 @@ export class DockerController {
         this.createChallengeContainer = this.createChallengeContainer.bind(this);
         this.deleteImage = this.deleteImage.bind(this);
         this.makeImage = this.makeImage.bind(this);
-        this.removeContainerById = this.removeContainerById.bind(this);
         this.resetContainer = this.resetContainer.bind(this);
         this.startContainer = this.startContainer.bind(this);
-        this.startContainerById = this.startContainerById.bind(this);
         this.stopContainer = this.stopContainer.bind(this);
+
+        this.startContainerById = this.startContainerById.bind(this);
         this.stopContainerById = this.stopContainerById.bind(this);
+        this.removeContainerById = this.removeContainerById.bind(this);
     }
     //---------------------------------------------------------- Routes ----------------------------------------------------------
     /**

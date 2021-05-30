@@ -46,6 +46,8 @@ app.all(/./, (_, __, next) => {
 
 // serve docs
 app.use('/docs', express.static(path.join(__dirname, "../../../", 'docs')));
+app.use('/docs-routes', express.static(path.join(__dirname, "../../../", 'routes-docs')));
+
 
 //to fetch images
 app.use('/sponsors', express.static(path.join(__dirname, "../../../" , 'uploads', 'sponsors')));
