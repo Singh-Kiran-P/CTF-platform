@@ -134,12 +134,13 @@ export default Vue.extend({
         solves_isLoading: true,
         solvesLoadingError: '',
         solves_fields: [
-            { key: 'name', sortable: true},
+            { key: 'challenge', sortable: true},
+            { key: 'solvedBy', label: 'Solved by', sortable: true},
             { key: 'category', label: 'Category', sortable: true},
             { key: 'value', sortable: true},
             { key: 'date', sortable: true},
         ] as {key: string, sortable?: boolean, label?: string}[],
-        solves: [] as { name: string, category: {name: string, description: string}, value: number, date: string} [],
+        solves: [] as { challenge: string, solvedBy: string, category: {name: string, description: string}, value: number, date: string} [],
         modal_invite: {
             open: false,
             copied: false,

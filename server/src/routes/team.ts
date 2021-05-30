@@ -105,14 +105,16 @@ router.get('/getMembers/:uuid', (req, res) => {
 router.get('/getSolves/:uuid', (req, res) => {
     let uuid: string = req.params.uuid;
 
-    DB.repo(Team).findOne({ where: { id: uuid }, relations: ['solves', 'solves.challenge', 'usedHints', 'usedHints.challenge'] })
+    DB.repo(Team).findOne({ where: { id: uuid }, relations: ['solves', 'solves.account', 'solves.challenge', 'usedHints', 'usedHints.challenge'] })
         .then(team => {
-            res.json(team.solves.map(solve => ({
-                name: solve.challenge.name,
-                category: { name: solve.challenge.tag.name, description: solve.challenge.tag.description },
+            let solves = team.solves.map(solve => ({
+                challenge: solve.challenge.name,
+                solvedBy: solve.account.name,
+                category: solve.challenge.tag ? { name: solve.challenge.tag.name, description: solve.challenge.tag.description } : {name: "None", description: "None"},
                 value: solvePoints(team, solve),
                 date: solve.time
-            })));
+            }));
+            res.json(solves);
         }).catch((err) => { res.json({ error: 'Error retrieving solves' }) });
 });
 
