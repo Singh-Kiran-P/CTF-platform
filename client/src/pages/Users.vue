@@ -50,9 +50,9 @@
             <div class=table>
                 <label for="users-table">Users</label>
                 <span class=error :v-if="error != ''">{{error}}</span>
-                <b-table id=users-table sticky-header striped :busy="isLoading" :items="users" :fields="users_fields" :sort-by.sync="sortBy" sort-desc.sync="sortDesc" :per-page="0" :no-local-sorting="true" @sort-changed="sortingChanged">
+                <b-table id=users-table striped :busy="isLoading" :items="users" :fields="users_fields" :sort-by.sync="sortBy" sort-desc.sync="sortDesc" :per-page="0" :no-local-sorting="true" @sort-changed="sortingChanged">
                     <template v-slot:cell(team)="row">
-                        <a v-if="row.item.team != 'None'" :href="`${home}/team/${row.item.teamUuid}`">{{ row.item.team }}</a>
+                        <router-link v-if="row.item.team != 'None'" :to="'/team/' + row.item.teamUuid">{{ row.item.team }}</router-link>
                         <span v-else>{{ row.item.team }}</span>
                     </template>
                     <template #table-busy>
@@ -94,12 +94,10 @@ export default Vue.extend({
             { key: 'points', sortable: true},
         ] as {key: string, sortable?: boolean, label?: string}[],
         users: [] as {id: number, name: string, category: string, points: number, team: string, teamUuid: string} [],
-        home: ''
     }),
     created() {
         this.loadCategories();
         this.getData();
-        this.home = window.location.origin;
     },
     computed: {
     },
