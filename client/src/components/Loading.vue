@@ -1,6 +1,6 @@
 <template>
     <div class=loading>
-        <b-spinner variant=primary type=grow label="Loading..."/>
+        <b-spinner variant=primary type=grow label=Loading />
     </div>
 </template>
 

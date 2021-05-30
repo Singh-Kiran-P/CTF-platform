@@ -9,7 +9,7 @@ router.post('/register', isAuth, (req, res) => {
     req.body = req.fields;
     const teamRepo = DB.repo(Team);
     teamRepo.findOne({ name: req.body.teamname }).then((team: Team) => {
-        if (team) return res.json({ error: "Teamname already in use" });
+        if (team) return res.json({ error: "Team name already exists" });
         let creator: Account = getAccount(req);
         const newTeam = new Team(req.body.teamname, creator);
         teamRepo.save(newTeam).then((teamDB: Team) => {
@@ -17,7 +17,7 @@ router.post('/register', isAuth, (req, res) => {
                 return res.json({});
             }).catch((err) => { return res.json({ error: 'Cannot add account to team' }); })
         }).catch((err) => { return res.json({ error: 'Cannot create team' }) });
-    }).catch((err) => { return res.json({ error: 'Cannot retrieve data from DB' }); });
+    }).catch((err) => { return res.json({ error: 'Error retrieving data' }); });
 });
 
 router.post('/delete/:uuid', isAuth, (req, res) => {
@@ -108,11 +108,10 @@ router.get('/getSolves/:uuid', (req, res) => {
     DB.repo(Team).findOne({ where: { id: uuid }, relations: ['solves', 'solves.account', 'solves.challenge', 'usedHints', 'usedHints.challenge'] })
         .then(team => {
             let solves = team.solves.map(solve => ({
-                challenge: solve.challenge.name,
+                challenge: { name: solve.challenge.name, id: solve.challenge.id },
                 solvedBy: solve.account.name,
-                category: { name: solve.challenge.tag?.name, description: solve.challenge.tag?.description },
-                value: solvePoints(team, solve),
-                date: solve.time
+                points: solvePoints(team, solve),
+                time: solve.time
             }));
             res.json(solves);
         }).catch((err) => { res.json({ error: 'Error retrieving solves' }) });

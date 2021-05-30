@@ -1,96 +1,86 @@
 <template>
     <Loading v-if="isLoading"/>
-    <div v-else id="Dashboard">
-        <div class=header>
-            <b-container class=info>
-                <div v-if="error">
-                    <span>{{error}}</span>
+    <div v-else-if="error">
+        <span class=top-error>Something went wrong, return to the <router-link :to="{ name: 'Teams' }">teams page</router-link></span>
+    </div>
+    <div v-else class=dashboard>
+        <div>
+            <span class=name>{{team.name}}</span>
+            <div class=buttons v-if="isCaptain || isAdmin || isMember">
+                <div v-if="isCaptain || isAdmin">
+                    <b-button variant=primary @click="openInviteModal($event)"><font-awesome-icon icon=envelope /> Invite</b-button>
+                    <b-button variant=danger @click="modal_delete.open=true"><font-awesome-icon icon=trash-alt /> Delete</b-button>
                 </div>
-                <div class=team-info v-else>
-                    <span class=teamname>{{team.name}}</span>
-                    <span class=placing>place: {{team.placement}}</span>
-                    <span class=points>points: {{team.points}}</span>
+                <div v-else-if="isMember">
+                    <StatusButton variant=danger :state="leavingState" normal="Leave Team" loading=Leaving succes=Left @click="leaveTeam"/>
                 </div>
-            </b-container>
-        </div>
-        <div v-if="!error" class=content>
-            <div class=buttons>
-                <b-button-group v-if="isCaptain||isAdmin">
-                    <!--<b-button variant="outline-primary">
-                        <b-icon icon="tools"></b-icon> Settings
-                    </b-button>-->
-                    <b-button variant="outline-primary" @click="openInviteModal($event)">
-                        <b-icon icon="envelope-fill"></b-icon> Invite
-                    </b-button>
-                    <b-button variant="outline-primary" @click="modal_delete.open=true">
-                        <b-icon icon="trash-fill"></b-icon> Delete
-                    </b-button>
-                </b-button-group>
-                <b-button-group v-else-if="isMember">
-                    <StatusButton :disabled="leavingState == 'loading'" variant=danger :state="leavingState" normal="Leave Team" loading="Leaving" succes="Left" @click="leaveTeam"/>
-                </b-button-group>
             </div>
+            
+            <span class=place><font-awesome-icon icon=chart-bar class=icon-info /> Placed #{{team.placement}}</span>
+            <span class=points><font-awesome-icon icon=check class=icon-primary /> {{team.points}} Point{{team.points == 1 ? '' : 's'}}</span>
 
             <div class=members>
-                <label for="member-table">Members</label>
-                <span class=error :v-if="membersLoadingError != ''">{{membersLoadingError}}</span>
-                <b-table id=member-table sticky-header striped :items="members" :fields="members_fields" :busy="members_isLoading">
+                <label for=member-table>Members</label>
+                <span class=error v-if="membersLoadingError">{{membersLoadingError}}</span>
+                <b-table id=member-table striped :items="members" :fields="members_fields" :busy="members_isLoading">
                     <template v-slot:cell(name)="row">
                         <span>{{row.item.name}}</span>
-                        <b-icon-star id=captainIcon v-if="row.item.captain"></b-icon-star>
+                        <Tooltip v-if="row.item.captain" :title="`${row.item.name} is the captain of ${team.name}`" content="The captain can delete the team, remove members and generate new invite links" class=captain-icon>
+                            <font-awesome-icon icon=star />
+                        </Tooltip>
                     </template>
-                    <template v-if="isCaptain||isAdmin" v-slot:cell(remove)="row">
-                        <StatusButton v-if="!row.item.captain" :disabled="removingMember" size=sm variant=danger :state="row.item.removingState" normal="Remove" loading="Removing" succes="Removed" @click="removeMember(row.item, $event)"/>
+                    <template v-if="isCaptain || isAdmin" v-slot:cell(remove)="row">
+                        <StatusButton v-if="!row.item.captain" size=sm variant=danger :state="row.item.removingState" normal=Remove loading=Removing succes=Removed @click="removeMember(row.item, $event)"/>
                     </template>
                     <template #table-busy>
-                        <div class="text-center text-primary my-2">
-                            <b-spinner variant="primary" label="Spinning"></b-spinner>
+                        <div class="text-center text-primary">
+                            <b-spinner variant=primary label=Loading />
                         </div>
                     </template>
                 </b-table>
             </div>
 
             <div class=solves>
-                <label for="solves-table">Solves</label>
-                <span class=error :v-if="solvesLoadingError != ''">{{solvesLoadingError}}</span>
-                <b-table id=solves-table sticky-header striped :items="solves" :fields="solves_fields" :busy="solves_isLoading">
-                    <!--correctly loading info for category and description on hover-->
-                    <template v-slot:cell(category)="row">
-                        <span v-b-tooltip.hover :title="row.item.category.description">{{row.item.category.name}}</span>
+                <label for=solves-table>Solves</label>
+                <span class=error v-if="solvesLoadingError">{{solvesLoadingError}}</span>
+                <b-table id=solves-table striped :items="solves" :fields="solves_fields" :busy="solves_isLoading">
+                    <template v-slot:cell(challenge)="row">
+                        <router-link :to="'/challenge/' + row.item.challenge.id">{{row.item.challenge.name}}</router-link>
+                    </template>
+                    <template v-slot:cell(time)="row">
+                        <span>{{timeDisplay(row.item.time)}}</span>
                     </template>
                     <template #table-busy>
-                        <div class="text-center text-primary my-2">
-                            <b-spinner variant="primary" label="Spinning"></b-spinner>
+                        <div class="text-center text-primary">
+                            <b-spinner variant=primary label=Loading />
                         </div>
                     </template>
                 </b-table>
             </div>
 
-            <b-modal id="invite-modal" centered v-model="modal_invite.open">
-                <template #modal-title>
-                    Invite link
-                </template>
+            <b-modal id=invite-modal centered v-model="modal_invite.open">
+                <template #modal-title>Invite link</template>
                 <div class=invite-modal-content>
                     <span>{{this.inviteLink}}</span>
-                    <b-button class="clipboard-btn" size=sm variant="primary" @click="copyInvite($event)" >
-                            <b-icon-clipboard-check v-if="modal_invite.copied"></b-icon-clipboard-check>
-                            <b-icon-clipboard v-else></b-icon-clipboard>
-                    </b-button>
                 </div>
                 <template #modal-footer id=invite-modal-footer>
-                    <StatusButton class=float-right variant=info :state="modal_invite.renewState" normal="Generate new link" loading="Generating" succes="Succes" @click="generateNewLink($event)"/>
-                    <!--<b-button class=float-right variant=primary @click="modal_invite.open=false"> Close </b-button>-->
+                    <b-button class="clipboard-btn" variant="primary" @click="copyInvite($event)">
+                        <template v-if="!modal_invite.copied">
+                            <font-awesome-icon icon=clipboard /> Copy
+                        </template>
+                        <template v-else>
+                            <font-awesome-icon icon=clipboard-check /> Copied
+                        </template>
+                    </b-button>
+                    <StatusButton class=float-right variant=info :state="modal_invite.renewState" normal="Generate new link" loading=Generating succes=Generated @click="generateNewLink($event)"/>
                 </template>
             </b-modal>
-            <b-modal id="delete-modal" centered v-model="modal_delete.open">
-                <template #modal-title>
-                    Delete Team
-                </template>
+            <b-modal id=delete-modal centered v-model="modal_delete.open">
+                <template #modal-title>Delete Team</template>
                 <div class=invite-modal-content>
                     <span>Are you sure you want to delete your team?</span>
                 </div>
                 <template #modal-footer>
-                    <!--<b-button class="float-right" @click="modal_delete.open=false"> Cancel </b-button>-->
                     <StatusButton class="float-right" variant=danger :state="modal_delete.deletingState" normal="Confirm" loading="Deleting" succes="Deleted" @click="deleteTeam($event)"/>
                 </template>
             </b-modal>
@@ -100,14 +90,17 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import Loading from '../components/Loading.vue'
-import StatusButton from '@/components/StatusButton.vue';
 import axios, { AxiosResponse } from 'axios';
+import Loading from '@/components/Loading.vue'
+import Tooltip from '@/components/Tooltip.vue';
+import StatusButton from '@/components/StatusButton.vue';
+import { timeDisplay } from '@/assets/functions/strings';
 
 export default Vue.extend({
     name: 'Dashboard',
     components: {
         StatusButton,
+        Tooltip,
         Loading
     },
     data: () => ({
@@ -127,20 +120,19 @@ export default Vue.extend({
         members_isLoading: true,
         membersLoadingError: '',
         members_fields: [
-            {key: 'name', sortable:true},
-            {key: 'points', sortable: true}
+            { key: 'name', sortable:true },
+            { key: 'points', sortable: true }
         ] as {key: string, sortable?: boolean, tdClass?: string}[],
         members: [] as { name: string, points: number, captain: boolean, removingState: 'normal' }[],
         solves_isLoading: true,
         solvesLoadingError: '',
         solves_fields: [
-            { key: 'challenge', sortable: true},
-            { key: 'solvedBy', label: 'Solved by', sortable: true},
-            { key: 'category', label: 'Category', sortable: true},
-            { key: 'value', sortable: true},
-            { key: 'date', sortable: true},
+            { key: 'challenge', sortable: true },
+            { key: 'solvedBy', label: 'Solved by', sortable: true },
+            { key: 'points', sortable: true },
+            { key: 'time', sortable: true }
         ] as {key: string, sortable?: boolean, label?: string}[],
-        solves: [] as { challenge: string, solvedBy: string, category: {name: string, description: string}, value: number, date: string} [],
+        solves: [] as { challenge: { name: string, id: number }, solvedBy: string, points: number, time: string} [],
         modal_invite: {
             open: false,
             copied: false,
@@ -152,11 +144,9 @@ export default Vue.extend({
         },
         leavingState: 'normal'
     }),
-    watch: {
-    },
-    computed: {
-    },
     methods: {
+        timeDisplay(time: string): string { return timeDisplay(time); },
+        
         getMembers() {
             this.members_isLoading = true;
             axios.get('/api/team/getMembers/'+this.team.uuid).then((response)=>{
@@ -175,22 +165,20 @@ export default Vue.extend({
         },
         removeMember(member: { name: string, points: number, captain: boolean, removingState: string }, event: Event) {
             event.preventDefault();
-            this.removingMember = true;
             member.removingState = 'loading';
             axios.post(`/api/team/removeMember/${this.team.uuid}/${member.name}`).then((response)=>{
-                if(response.data.error) {this.removingMember = false; member.removingState = 'error'; return;};
+                if(response.data.error) {member.removingState = 'error'; return;};
                 this.getMembers();
-                this.removingMember=false;
-            }).catch((err)=>{this.removingMember = false; member.removingState = 'error'; return;});
+            }).catch((err)=>{member.removingState = 'error'; return;});
         },
         createdHandleResponse(response: AxiosResponse) {
-            if(response.data.error) return alert(response.data.error);
+            if(response.data.error) return this.error = response.data.error;
             this.team = response.data.info;
             this.inviteLink = this.generateInviteLink(response.data.info.inviteCode);
             this.isAdmin = response.data.isAdmin;
             this.isCaptain = response.data.isCaptain;
             this.isMember = response.data.isMember;
-            if(this.isCaptain||this.isAdmin) this.members_fields.push({ key: 'remove', sortable: false, tdClass: 'text-center' }); //add remove field if captain or admin
+            if(this.isCaptain||this.isAdmin) this.members_fields.push({ key: 'remove', sortable: false, tdClass: '' });
             this.getMembers();
             this.getSolves();
         },
@@ -287,52 +275,69 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-.info span {
-    font-weight: bold;
-    
-}
-.team-info, .info {
-    padding: var(--triple-margin);
-    margin: auto;
+.dashboard {
     display: flex;
-    flex-direction: column;
-}
-.header {
-    background-color: #343a40f3;
-    color: var(--primary);
-    width: 100%;
-    text-align: center;
-    margin-bottom: var(--margin);
-}
-.buttons {
-    padding: var(--margin);
-    margin: auto;
-    display: flex;
-    flex-direction: row;
     justify-content: center;
+    overflow-y: scroll !important;
+    padding: var(--double-margin);
+    padding-bottom: 0;
+
+    & > div {
+        width: min(100%, var(--breakpoint-lg));
+    }
 }
-.solves, .members {    
-    padding: var(--margin);
-    width: min(100%, 750px);
-    margin: auto;
-    /*display: flex;
-    flex-direction: column;*/
+
+.name {
+    display: block;
+    font-weight: bold;
+    text-align: center;
+    font-size: var(--font-massive);
+    margin-bottom: var(--double-margin);
 }
+
+.buttons {
+    display: flex;
+    justify-content: center;
+    margin-bottom: var(--double-margin);
+
+    button + button {
+        margin-left: var(--double-margin);
+    }
+}
+
+.points, .place {
+    display: block;
+    font-weight: bold;
+    text-align: center;
+}
+
+.icon-primary {
+    color: var(--primary);
+}
+
+.icon-info {
+    color: var(--info);
+}
+
+.top-error {
+    display: block;
+    text-align: center;
+    margin-top: var(--double-margin);
+}
+
 .error {
     color: red;
     margin-left: var(--margin);
 }
-table {
-    border: 1px solid lightgray;
-}
+
 label {
-    size: 3rem;
     font-weight: bold;
+    font-size: var(--font-large);
+    margin-top: var(--double-margin);
 }
-#captainIcon, .clipboard-btn {
+
+.captain-icon {
+    display: inline-block;
     margin-left: var(--margin);
-}
-.invite-modal-content {
-    word-wrap: break-word;
 }
 </style>
