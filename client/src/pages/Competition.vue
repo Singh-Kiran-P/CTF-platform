@@ -88,7 +88,7 @@
                                         <span class=input-tag>Docker inner ports</span>
                                         <b-form-input type=text trim v-model="challenge.innerPorts" placeholder="Enter docker inner ports"
                                             :state="state(challengeFeedback(round, challenge))"/>
-                                        <span class=info>Multiple inner ports should be seperated with a comma, for example: '8080/tcp, 900/udp'</span>
+                                        <span class=info>Multiple inner ports should be seperated with a comma, for example: '8080/tcp, 900/tcp'</span>
                                     </template>
                                     <b-form-invalid-feedback>{{challengeFeedback(round, challenge)}}</b-form-invalid-feedback>
                                     <b-form-group v-if="challenge.type == typeValues.QUIZ" :state="state(questionsFeedback(challenge))" :invalid-feedback="questionsFeedback(challenge)">

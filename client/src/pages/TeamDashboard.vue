@@ -230,10 +230,7 @@ export default Vue.extend({
 
             try {
                 var successful = document.execCommand('copy');
-                if(!successful) alert('Error copying to clipboard');
-            } catch (err) {
-                alert('Error copying to clipboard');
-            }
+            } catch (err) {}
 
             document.body.removeChild(textArea);
         },
