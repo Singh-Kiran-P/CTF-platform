@@ -272,7 +272,26 @@ export class DockerController {
                             await dockerChallengeContainerRepo.save(containerData);
                             container.start((err, data) => {
                                 if (err) return reject({ message: err.json, statusCode: 404 });
-                                resolve({ message: "Container started successfully",  statusCode: 200 });
+
+                                docker.getContainer(container.id)
+                                    .inspect()
+                                    .then((containerInfo) => {
+                                        if (containerInfo.State.Running) {
+                                            resolve(
+                                                {
+                                                    message: "Container started successfully",
+                                                    ports: containerInfo.NetworkSettings.Ports,
+                                                    statusCode: 200
+                                                }
+                                            )
+                                        }
+                                        else{
+                                            return reject({ message: "Container is not running!", statusCode: 404 })
+                                        }
+                                    })
+                                    .catch(() =>{
+                                        reject({ message: "Error finding container", statusCode: 404 })
+                                    } )
                             });
                         });
                     });

@@ -76,8 +76,8 @@ export default Vue.extend({
             const error = (err: string) => Toast.send(this, 'Message', err, 'danger');
             axios.post('/api/notification/send', this.form).then(response => {
                 let data = response.data;
-                /* if (data.statusCode == 200) Toast.send(this, 'Message', data.message, 'success');
-                else error(data.message); */
+                if (data.statusCode == 200) Toast.send(this, 'Message', data.message, 'success');
+                else error(data.message);
             }).catch(err => error(err));
         },
         deleteNotification(id: number): void {
@@ -117,7 +117,7 @@ export default Vue.extend({
     textarea, button {
         margin-top: var(--margin);
     }
-    
+
     button {
         width: 100%;
     }
