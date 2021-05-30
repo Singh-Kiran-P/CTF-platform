@@ -11,7 +11,7 @@ router.get('/getAll', isAuth, controller.getAllNotifications_GET);
 
 router.post('/send', isAdmin, controller.send_POST);
 
-router.delete('/deleteById', controller.deleteById_DELETE);
+router.delete('/deleteById',isAdmin, controller.deleteById_DELETE);
 
 router.delete('/deleteAll', isAdmin, controller.deleteAll_DELETE);
 
