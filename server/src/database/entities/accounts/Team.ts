@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany, OneToOne, JoinColumn, Repository, AfterInsert, BeforeUpdate, AfterUpdate } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany, OneToOne, JoinColumn, Repository, AfterInsert } from 'typeorm';
 import DB,{ Attempt, Solve, Account, UsedHint } from '../../../database';
 import { generatePassword } from '../../../auth/index';
 import { Category } from './Category';

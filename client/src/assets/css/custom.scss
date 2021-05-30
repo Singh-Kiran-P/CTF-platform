@@ -48,6 +48,13 @@ $primary: rgb(63, 181, 129);
     --gray-half-c: rgba(158, 150, 137, 0.5);
 }
 
+.no-transition * {
+    -webkit-transition: none !important;
+    -moz-transition: none !important;
+    -o-transition: none !important;
+    transition: none !important;
+}
+
 // must be defined before import and with everything important, because css is very good
 .b-form-timepicker, .b-form-datepicker {
     label {
@@ -88,7 +95,6 @@ $primary: rgb(63, 181, 129);
     font-family: Avenir, Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    scrollbar-color: var(--white-c);
 }
 
 ::-webkit-scrollbar {
@@ -101,13 +107,6 @@ $primary: rgb(63, 181, 129);
 
 ::-webkit-scrollbar-thumb {
     background: var(--gray-light-c);
-}
-
-.no-transition {
-    -webkit-transition: none !important;
-    -moz-transition: none !important;
-    -o-transition: none !important;
-    transition: none !important;
 }
 
 html, body {
@@ -128,7 +127,7 @@ button, span, label {
     word-break: break-all;
 }
 
-:not(.b-form-timepicker):not(.b-form-datepicker):not(.navbar-brand) > button:not(.icon) {
+:not(.b-form-timepicker):not(.b-form-datepicker):not(.navbar-brand) > button:not(.icon):not(.page-link) {
     &, span {
         color: var(--white-c) !important;
     }
@@ -149,6 +148,70 @@ input, textarea, select, .custom-file-label, .custom-file-label::after, .b-form-
 
 .bs-tooltip-bottom .arrow::before {
     border-bottom-color: var(--black-c) !important;
+}
+
+.pagination {
+    li, li {
+        span, button {
+            background-color: var(--white-c) !important;
+        }
+
+        button {
+            color: var(--black-c) !important;
+            border-color: var(--black-c) !important;
+        }
+        
+        button:hover {
+            background-color: var(--gray-light-c) !important;
+        }
+        
+        span {
+            color: var(--gray-half-c) !important;
+            border-color: var(--gray-half-c) !important;
+        }
+
+        &.active button {
+            background-color: var(--primary) !important;
+            color: var(--white-c) !important;
+            border: none !important;
+        }
+    }
+}
+
+.b-table {
+    thead > tr > th {
+        color: var(--black-c);
+        border-color: var(--black-c);
+    }
+
+    tbody > tr {
+        border-color: green !important;
+        
+        &:nth-child(odd) {
+            background-color: var(--gray-light-c);
+        }
+        
+        & > td {
+            border-color: var(--black-c);
+            color: var(--black-c);
+        }
+    }
+}
+
+.dark-mode {
+    .table.b-table > thead > tr, table.b-table > tfoot > tr, .table.b-table > thead > tr {
+        & > [aria-sort=ascending] {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='101' height='101' view-box='0 0 101 101' preserveAspectRatio='none'%3e%3cpath fill='white' d='M51 1l25 23 24 22H1l25-22z'/%3e%3cpath fill='white' opacity='.3' d='M51 101l25-23 24-22H1l25 22z'/%3e%3c/svg%3e");
+        }
+
+        & > [aria-sort=descending] {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='101' height='101' view-box='0 0 101 101' preserveAspectRatio='none'%3e%3cpath fill='white' opacity='.3' d='M51 1l25 23 24 22H1l25-22z'/%3e%3cpath fill='white' d='M51 101l25-23 24-22H1l25 22z'/%3e%3c/svg%3e")
+        }
+
+        & > [aria-sort=none] {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='101' height='101' view-box='0 0 101 101' preserveAspectRatio='none'%3e%3cpath fill='white' opacity='.3' d='M51 1l25 23 24 22H1l25-22zM51 101l25-23 24-22H1l25 22z'/%3e%3c/svg%3e");
+        }
+    }
 }
 
 input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {

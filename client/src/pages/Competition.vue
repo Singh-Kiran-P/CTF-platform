@@ -195,8 +195,8 @@ import { Form, Round, Challenge, ChallengeType, Hint, Question, state, validate,
 import { typeName, typeDescription, durationDisplay } from '@/assets/functions/strings';
 import { Tag } from '@shared/validation/configForm';
 import { serialize } from '@shared/objectFormdata';
+import Toast from '@/assets/functions/toast';
 import path from 'path';
-import Toast from "@/assets/functions/toast";
 
 
 type Editable = { editable?: boolean };
@@ -286,16 +286,13 @@ export default Vue.extend({
         onSubmit(e: Event): void {
             e.preventDefault();
             this.saveState = 'loading';
-            const error = (data:any) => {
+            const error = (data?: any) => {
                 this.saveState = 'error';
-                if (data.statusCode === 200) {
-                    Toast.send(this, "Message", data.message, "success");
-                } else if (data.statusCode === 404)
-                    Toast.send(this, "Docker", data.message, "danger");
-                };
+                if (data?.statusCode == 404)Toast.send(this, 'Docker', data.message, 'danger');
+            };
             axios.put('/api/rounds/save', serialize(this.form)).then(res => {
                 res.data.error ? error(res.data) : this.loadFormData(false);
-            }).catch(() => error(null));
+            }).catch(() => error());
         },
 
         durationDisplay(round: Round): string { return durationDisplay(round); },

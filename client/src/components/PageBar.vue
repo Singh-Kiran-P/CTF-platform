@@ -70,6 +70,8 @@ export default Vue.extend({
         },
 
         setMode(): void {
+            let darkMode = 'dark-mode';
+            this.dark ? document.body.classList.add(darkMode) : document.body.classList.remove(darkMode);
             const style = getComputedStyle(document.documentElement);
             const get = (prop: string) => style.getPropertyValue('--' + prop);
             const set = (prop: string, val: any) => document.documentElement.style.setProperty('--' + prop, val);

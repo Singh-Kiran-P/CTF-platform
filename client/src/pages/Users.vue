@@ -1,63 +1,34 @@
 <template>
-    <div class=wrapper>
-        <div class="users">
+    <div class=users>
+        <div>
             <div class=top-table>
-                <b-form-group>
-                    <label for="filter-input">Filter</label>
-                    <b-form-input
-                        @input="handleFilterChange"
-                        size=sm
-                        id="filter-input"
-                        v-model="filter"
-                        type="search"
-                        placeholder="Search by name"
-                        debounce="150"
-                        trim
-                    ></b-form-input>
-                </b-form-group>
-                <b-form-group>
-                    <label for="per-page-select">Per page</label>
-                    <b-form-select 
-                        @change="handlePerPageChange"
-                        size=sm
-                        id="per-page-select"
-                        v-model="perPage"
-                        :options="perPageOptions"
-                    ></b-form-select>
-                </b-form-group>
-                <b-form-group>
-                    <label for="category-select">Category</label>
-                    <b-form-select 
-                        @change="handleCategoryChange"
-                        size=sm
-                        id="category-select"
-                        v-model="filterCategory"
-                        :options="filterCategoryOptions"
-                    ></b-form-select>
-                </b-form-group>
+                <div>
+                    <label for=filter-input>Filter</label>
+                    <b-form-input type=text trim size=sm id=filter-input v-model="filter" @input="handleFilterChange" placeholder="Search by name" debounce="150"/>
+                </div>
+                <div>
+                    <label for=per-page-select>Per page</label>
+                    <b-form-select size=sm id=per-page-select v-model="perPage" :options="perPageOptions" @change="handlePerPageChange"/>
+                </div>
+                <div>
+                    <label for=category-select>Category</label>
+                    <b-form-select size=sm id=category-select v-model="filterCategory" :options="filterCategoryOptions" @change="handleCategoryChange"/>
+                </div>
             </div>
 
-            <b-pagination
-                v-model="currentPage"
-                :total-rows="totalRows"
-                :per-page="perPage"
-                align="fill"
-                size="sm"
-                class="my-0"
-                @change="handleCurrentPageChange"
-            ></b-pagination>
+            <b-pagination v-model="currentPage" :total-rows="totalRows" :per-page="perPage" align=fill size=sm @change="handleCurrentPageChange"/>
 
             <div class=table>
-                <label for="users-table">Users</label>
-                <span class=error :v-if="error != ''">{{error}}</span>
-                <b-table id=users-table sticky-header striped :busy="isLoading" :items="users" :fields="users_fields" :sort-by.sync="sortBy" sort-desc.sync="sortDesc" :per-page="0" :no-local-sorting="true" @sort-changed="sortingChanged">
+                <label for=users-table>Users</label>
+                <span class=error v-if="error">{{error}}</span>
+                <b-table id=users-table striped :busy="isLoading" :items="users" :fields="users_fields" :sort-by.sync="sortBy" sort-desc.sync="sortDesc" :per-page="0" no-local-sorting @sort-changed="sortingChanged">
                     <template v-slot:cell(team)="row">
-                        <a v-if="row.item.team != 'None'" :href="`${home}/team/${row.item.teamUuid}`">{{ row.item.team }}</a>
-                        <span v-else>{{ row.item.team }}</span>
+                        <a v-if="row.item.team != 'None'" :href="`${home}/team/${row.item.teamUuid}`">{{row.item.team}}</a>
+                        <span v-else>{{row.item.team}}</span>
                     </template>
                     <template #table-busy>
-                        <div class="text-center text-primary my-2">
-                            <b-spinner variant="primary" label="Spinning"></b-spinner>
+                        <div class="text-center text-primary">
+                            <b-spinner variant=primary label=Spinning />
                         </div>
                     </template>
                 </b-table>
@@ -83,8 +54,8 @@ export default Vue.extend({
         sortDesc: false,
         totalRows: 1,
         currentPage: 1,
-        perPage: 5,
-        perPageOptions: [1, 2, 5, 10, 15],
+        perPage: 25,
+        perPageOptions: [10, 25, 50],
         filterCategoryOptions: [{ value: '', text: 'All categories'}] as any[],
         filterCategory: '',
         users_fields: [
@@ -150,57 +121,73 @@ export default Vue.extend({
 
 <style scoped lang="scss">
 .users {    
-    padding: var(--double-margin);
-    width: min(100%, 900px);
-    margin: auto;
-}
-.table {
-    margin-top: 1rem;
-}
-.top-table {
     display: flex;
-    flex-direction: row;
-}
-.form-group {
-    width: 33%;
-}
-@media (max-width: 775px) {
-    ::v-deep .form-group div {
-        display: flex;
-        flex-direction: column;
+    justify-content: center;
+    padding: var(--double-margin);
+    padding-bottom: 0;
+
+    & > div {
+        width: min(100%, var(--breakpoint-lg));
     }
 }
 
-@media (max-width: 600px) {
-    .top-table {
-        flex-direction: column;
+label {
+    margin-right: var(--margin);
+}
+
+.top-table {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: var(--double-margin);
+
+    & > div {
+        width: 0;
+        flex-grow: 1;
+        display: flex;
+        padding: 0 20px;
+
+        &:first-of-type {
+            padding-left: 0;
+        }
+
+        &:last-of-type {
+            padding-right: 0;
+        }
+
+        select, input {
+            width: 0;
+            flex-grow: 1;
+        }
     }
 }
-.form-control {
-    display: inline-block;
+
+$breakpoint-sm: 576px;
+@media (max-width: $breakpoint-sm) {
+    .top-table {
+        flex-direction: column;
+
+        & > div {
+            width: 100%;
+            padding: 0;
+            flex-direction: row;
+
+            label {
+                min-width: 5rem;
+            }
+
+            &:not(:last-of-type) {
+                margin-bottom: var(--double-margin);
+            }
+        }
+    }
 }
-#filter-input, #category-select {
-    width: 70%;
-    min-width: 9rem;
-}
-#per-page-select {
-    width: 30%;
-    min-width: 3rem;
-}
+
 .error {
     color: red;
     margin-left: var(--margin);
 }
-table {
-    border: 1px solid lightgray;
-}
-.top-table label {
-    font-size: 1rem;
-    font-weight: normal;
-}
-label {
-    font-size: 1rem;
+
+.table label {
     font-weight: bold;
-    margin-right: var(--margin);
 }
 </style>
