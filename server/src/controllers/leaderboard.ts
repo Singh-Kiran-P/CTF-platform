@@ -6,16 +6,11 @@ import { Request, Response } from 'express';
 import DB, { Account, Solve, Sponsor, Team } from '../database';
 import socketIO from './socket';
 
-declare interface raw_data {
-    uuid: string;
-    name: string;
-    solves: Solve[];
-}
-
 declare interface data_send {
     uuid: string;
     name: string;
     scores: { time: string; score: number }[];
+    total: number;
 }
 
 /**
@@ -81,7 +76,6 @@ export class LeaderBoardController {
     */
     public getAllData(req: Request, res: Response) {
 
-
         DB.repo(Team).find({ relations: ['solves', 'solves.challenge', 'usedHints', 'usedHints.challenge'] })
             .then((teams) => {
                 let data: data_send[] = teams.map(team => ({
@@ -90,11 +84,24 @@ export class LeaderBoardController {
                     scores: team.solves.map(solve => ({
                         time: solve.time,
                         score: solvePoints(team, solve)
-                    }))
+                    })),
+                    total: 0
                 }));
+
+                for (const teamData of data) {
+                    let scores = teamData.scores
+                    console.log(teamData.scores);
+
+                    let sum = 0;
+                    scores = scores.map(score => {
+                        sum += score.score;
+                        return Object.assign({}, score, { score: sum });
+                    });
+                    teamData.scores = scores;
+                    teamData.total = sum;
+                }
                 res.json(data);
             })
-
     }
 
 

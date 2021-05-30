@@ -1,17 +1,34 @@
 <template>
     <div class="scoreboard">
-        <div class=chart-div :id="this.category"></div>
-        <div class=table-div>
-            <div class=table-wrapper>
+        <div class="chart-div" :id="this.category"></div>
+        <div class="table-div">
+            <div class="table-wrapper">
                 <label for="teams-table">Top 10</label>
-                <span class=error :v-if="error != ''">{{error}}</span>
-                <b-table id=teams-table responsive striped :busy="isLoading" :items="teams" :fields="teams_fields" :sort-by="'total'" :sort-desc="true" :per-page="10" :no-local-sorting="false" variant="dark">
+                <span class="error" :v-if="error != ''">{{ error }}</span>
+                <b-table
+                    id="teams-table"
+                    responsive
+                    striped
+                    :busy="isLoading"
+                    :items="teams"
+                    :fields="teams_fields"
+                    :sort-by="'total'"
+                    :sort-desc="true"
+                    :per-page="10"
+                    :no-local-sorting="false"
+                    variant="dark"
+                >
                     <template v-slot:cell(name)="row">
-                        <router-link :to="'/team/'+ row.item.uuid">{{ row.item.name }}</router-link>
+                        <router-link :to="'/team/' + row.item.uuid">{{
+                            row.item.name
+                        }}</router-link>
                     </template>
                     <template #table-busy>
                         <div class="text-center text-primary my-2">
-                            <b-spinner variant="primary" label="Spinning"></b-spinner>
+                            <b-spinner
+                                variant="primary"
+                                label="Spinning"
+                            ></b-spinner>
                         </div>
                     </template>
                 </b-table>
@@ -32,7 +49,7 @@ am4core.useTheme(am4themes_animated);
 declare interface Team {
     uuid: string;
     name: string;
-    scores: { date: Date; score: number }[];
+    scores: { time: Date; score: number }[];
     total: number;
 }
 
@@ -47,71 +64,81 @@ export default Vue.extend({
         teams: [] as Team[],
         scrollbar: (null as unknown) as am4charts.XYChartScrollbar,
         dateAxis: (null as unknown) as am4charts.DateAxis,
-        error: '',
+        error: "",
         isLoading: true,
         totalRows: 1,
         currentPage: 1,
         teams_fields: [
-            { key: 'name', sortable: false},
-            { key: 'total', sortable: false, label: 'Points'},
-        ] as {key: string, sortable?: boolean, label?: string}[],
+            { key: "name", sortable: false },
+            { key: "total", sortable: false, label: "Points" },
+        ] as { key: string; sortable?: boolean; label?: string }[],
     }),
     created() {
         //TODO: solves array must start with {Data: data, score:0 } -> len[0] line 39
         this.$socket.$subscribe(this.category, (data: any) => {
-            var newDate1 = new Date("2019-12-31T05:36");
-            console.log(newDate1);
+            // console.log(data);
 
-            let len = this.teams[0].scores.length - 1;
-            // get the serie (team serie) and add a point
-            this.chart.series.getIndex(0)?.addData({
-                date: newDate1,
-                score: this.teams[0].scores[len].score + 100,
-            });
+            let team = this.teams.find((team) => team.uuid == data.teamId);
+            if (team) {
+                let len = team.scores.length;
+                if (team.scores.length != 0) len = team.scores.length - 1;
+                // get the serie (team serie) and add a point
+                this.chart.series.getIndex(0)?.addData({
+                    date: data.date,
+                    score: team.scores[len].score + data.score,
+                });
+            }
         });
+
         am4core.options.autoDispose = true;
     },
     methods: {
-    createSeries(
-        team: Team,
-        valueAxis: am4charts.ValueAxis<am4charts.AxisRenderer>
-    ) {
-        var series = this.chart.series.push(new am4charts.StepLineSeries());
-        series.dataFields.valueY = "score";
-        series.dataFields.dateX = "date";
-        series.strokeWidth = 2;
-        series.yAxis = valueAxis;
+        createSeries(
+            team: Team,
+            valueAxis: am4charts.ValueAxis<am4charts.AxisRenderer>
+        ) {
+            var series = this.chart.series.push(new am4charts.StepLineSeries());
+            series.dataFields.valueY = "score";
+            series.dataFields.dateX = "date";
+            series.strokeWidth = 2;
+            series.yAxis = valueAxis;
 
-        series.name = team.name;
-        series.id = team.uuid;
-        series.tooltipText = "{name}: [bold]{valueY}[/] \n Date: {date} {valueX}";
-        series.tensionX = 0.8;
-        series.showOnInit = true;
-        var interfaceColors = new am4core.InterfaceColorSet();
-        var defaultBullet = series.bullets.push(new am4charts.CircleBullet());
-        defaultBullet.circle.stroke = interfaceColors.getFor("background");
-        defaultBullet.circle.strokeWidth = 2;
-        series.data = team.scores;
-    },
-    async loadData() {
-        this.isLoading = true;
-        await axios.get("/api/leaderboard/getAllData").then((response) => {
-            this.teams = response.data;
-        });
-        this.isLoading = false;
-    },
-    emitRangeChanged() {
-      this.$root.$emit('rangeChanged', this.category, this.chart.scrollbarX.range);
-    }
+            series.name = team.name;
+            series.id = team.uuid;
+            series.tooltipText =
+                "{name}: [bold]{valueY}[/] \n Date: {date} {valueX}";
+            series.tensionX = 0.8;
+            series.showOnInit = true;
+            var interfaceColors = new am4core.InterfaceColorSet();
+            var defaultBullet = series.bullets.push(
+                new am4charts.CircleBullet()
+            );
+            defaultBullet.circle.stroke = interfaceColors.getFor("background");
+            defaultBullet.circle.strokeWidth = 2;
+            series.data = team.scores;
+        },
+        async loadData() {
+            this.isLoading = true;
+            await axios.get("/api/leaderboard/getAllData").then((response) => {
+                this.teams = response.data;
+            });
+            this.isLoading = false;
+        },
+        emitRangeChanged() {
+            this.$root.$emit(
+                "rangeChanged",
+                this.category,
+                this.chart.scrollbarX.range
+            );
+        },
     },
     async mounted() {
-      this.$root.$on('rangeChanged', (cat: string, data: any) => {
-            if(this.category == cat)
-                return;
+        this.$root.$on("rangeChanged", (cat: string, data: any) => {
+            if (this.category == cat) return;
             this.dateAxis.zoom(data);
             //this.chart.zoom(data);
             this.chart.scrollbarX.start = data.start;
-            this.chart.scrollbarX.end = data.end; 
+            this.chart.scrollbarX.end = data.end;
             return;
         });
         this.chart = am4core.create(this.category, am4charts.XYChart);
@@ -159,9 +186,11 @@ export default Vue.extend({
         for (const team of this.teams) {
             let score = 0;
             team.scores.forEach((data) => {
+
                 data.score += score;
                 // console.log(data.date);
-                data.date = new Date(data.date);
+                data.time = data.time;
+                console.log(data);
             });
 
             this.createSeries(team, pointsAxis);
@@ -186,8 +215,9 @@ export default Vue.extend({
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
-    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+        Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+        "Segoe UI Symbol";
 }
 .scoreboard {
     height: calc(100%);
@@ -214,16 +244,16 @@ body {
     font-size: 1.4rem;
 }
 @media (max-width: 800px) {
-  .scoreboard { 
-    flex-direction: column;
-  }
-  .chart-div {
-    width: 94%;
-    height: 600px;
-  }
-  .table-div {
-    width: 100%;
-    height: 600px;
-  }
+    .scoreboard {
+        flex-direction: column;
+    }
+    .chart-div {
+        width: 94%;
+        height: 600px;
+    }
+    .table-div {
+        width: 100%;
+        height: 600px;
+    }
 }
 </style>
