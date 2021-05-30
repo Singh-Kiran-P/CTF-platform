@@ -317,7 +317,7 @@ export default Vue.extend({
     .info {
         margin: var(--margin) 0;
         padding-bottom: var(--margin);
-        border-bottom: 2px solid var(--black-c);
+        border-bottom: var(--border-c) solid var(--black-c);
         flex-wrap: wrap;
 
         .tooltips {

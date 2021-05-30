@@ -16,6 +16,7 @@ $primary: rgb(63, 181, 129);
     --font-smallest: 80%;
     
     // light mode colors
+    --border-l: 2px;
     --white-l: #ffffff;
     --black-l: #212529;
     --gray-l: #6c757d;
@@ -24,6 +25,7 @@ $primary: rgb(63, 181, 129);
     --gray-half-l: rgba(108, 117, 125, 0.5);
 
     // dark mode colors, reverse of light mode: white is actually black, lightest gray is actually darkest gray, ...
+    --border-d: 1px;
     --white-d: #181a1b;
     --black-d: #d1cdc7;
     --gray-d: #9e9689;
@@ -40,12 +42,13 @@ $primary: rgb(63, 181, 129);
     --gray-half-c: rgba(108, 117, 125, 0.5); */
 
     // default to dark mode (visible for a fraction of a second on refresh, then the selected mode is shown)
-    --white-c: #181a1b;
-    --black-c: #d1cdc7;
-    --gray-c: #9e9689;
-    --gray-light-c: #282c2d;
-    --gray-lightest-c: #232627;
-    --gray-half-c: rgba(158, 150, 137, 0.5);
+    --border-c: var(--border-d);
+    --white-c: var(--white-d);
+    --black-c: var(--black-d);
+    --gray-c: var(--gray-d);
+    --gray-light-c: var(--gray-light-d);
+    --gray-lightest-c: var(--gray-lightest-d);
+    --gray-half-c: var(--gray-half-d);
 }
 
 .no-transition * {
@@ -85,6 +88,7 @@ $primary: rgb(63, 181, 129);
         }
     }
 }
+
 
 @import '~bootstrap/scss/bootstrap';
 @import '~bootstrap-vue/src';
@@ -127,12 +131,6 @@ button, span, label {
     word-break: break-all;
 }
 
-:not(.b-form-timepicker):not(.b-form-datepicker):not(.navbar-brand) > button:not(.icon):not(.page-link) {
-    &, span {
-        color: var(--white-c) !important;
-    }
-}
-
 span, label {
     color: var(--black-c);
 }
@@ -140,6 +138,12 @@ span, label {
 input, textarea, select, .custom-file-label, .custom-file-label::after, .b-form-timepicker, .b-form-datepicker {
     background-color: var(--gray-lightest-c) !important;
     color: var(--black-c) !important;
+}
+
+input, textarea, select {
+    &:not(.is-valid):not(.is-invalid) {
+        border-color: var(--gray-half-c) !important;
+    }
 }
 
 .bs-tooltip-top .arrow::before {
@@ -172,7 +176,7 @@ input, textarea, select, .custom-file-label, .custom-file-label::after, .b-form-
 
         &.active button {
             background-color: var(--primary) !important;
-            color: var(--white-c) !important;
+            color: var(--white-l) !important;
             border: none !important;
         }
     }
@@ -185,14 +189,16 @@ input, textarea, select, .custom-file-label, .custom-file-label::after, .b-form-
     }
 
     tbody > tr {
-        border-color: green !important;
-        
         &:nth-child(odd) {
             background-color: var(--gray-light-c);
         }
+
+        &:first-of-type > td {
+            border: none;
+        }
         
         & > td {
-            border-color: var(--black-c);
+            border-color: var(--gray-half-c);
             color: var(--black-c);
         }
     }
@@ -211,6 +217,10 @@ input, textarea, select, .custom-file-label, .custom-file-label::after, .b-form-
         & > [aria-sort=none] {
             background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='101' height='101' view-box='0 0 101 101' preserveAspectRatio='none'%3e%3cpath fill='white' opacity='.3' d='M51 1l25 23 24 22H1l25-22zM51 101l25-23 24-22H1l25 22z'/%3e%3c/svg%3e");
         }
+    }
+
+    .custom-select {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='4' height='5' viewBox='0 0 4 5'%3e%3cpath fill='white' opacity='.7' d='M2 0L0 2h4zm0 5L0 3h4z'/%3e%3c/svg%3e");
     }
 }
 

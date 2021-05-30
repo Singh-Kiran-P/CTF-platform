@@ -131,10 +131,12 @@ export default Vue.extend({
 
 label {
     margin-right: var(--margin);
+    margin-bottom: 0;
 }
 
 .top-table {
     display: flex;
+    align-items: center;
     justify-content: space-between;
     margin-bottom: var(--double-margin);
 
@@ -187,5 +189,7 @@ $breakpoint-sm: 576px;
 
 .table label {
     font-weight: bold;
+    font-size: var(--font-large);
+    margin-bottom: var(--margin);
 }
 </style>

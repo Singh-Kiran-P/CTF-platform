@@ -37,7 +37,7 @@ export default Vue.extend({
 
     .title, .content {
         display: block;
-        word-break: initial;
+        word-break: normal;
     }
 
     .title {

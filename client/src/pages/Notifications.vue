@@ -76,7 +76,7 @@ export default Vue.extend({
             const error = (err: string) => Toast.send(this, 'Message', err, 'danger');
             axios.post('/api/notification/send', this.form).then(response => {
                 let data = response.data;
-                if (data.statusCode == 200) Toast.send(this, 'Message', data.message, 'success');
+                if (data.statusCode == 200) {}//Toast.send(this, 'Message', data.message, 'success');
                 else error(data.message);
             }).catch(err => error(err));
         },
@@ -84,8 +84,8 @@ export default Vue.extend({
             const error = (err: string) => Toast.send(this, 'Message', err, 'danger');
             axios.delete('/api/notification/deleteById', { data: { id: id } }).then(response => {
                 let data = response.data;
-                /* if (data.statusCode == 200) Toast.send(this, 'Message', data.message, 'success');
-                else error(data.message); */
+                if (data.statusCode == 200) {}//Toast.send(this, 'Message', data.message, 'success');
+                else error(data.message);
             }).catch(err => error(err));
         }
     }
@@ -124,7 +124,7 @@ export default Vue.extend({
 }
 
 .show {
-    border-top: 2px solid var(--black-c);
+    border-top: var(--border-c) solid var(--black-c);
     padding-top: var(--margin);
 
     .notification-title {
@@ -132,6 +132,7 @@ export default Vue.extend({
     }
 
     .notification-message {
+        word-break: normal;
         white-space: pre-wrap;
     }
 }

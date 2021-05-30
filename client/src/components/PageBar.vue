@@ -75,7 +75,7 @@ export default Vue.extend({
             const style = getComputedStyle(document.documentElement);
             const get = (prop: string) => style.getPropertyValue('--' + prop);
             const set = (prop: string, val: any) => document.documentElement.style.setProperty('--' + prop, val);
-            let props = ['white', 'black', 'gray', 'gray-light', 'gray-lightest', 'gray-half'];
+            let props = ['border', 'white', 'black', 'gray', 'gray-light', 'gray-lightest', 'gray-half'];
             let noTransition = 'no-transition';
             document.body.classList.add(noTransition);
             props.forEach(prop => set(prop + '-c', get(prop + (this.dark ? '-d' : '-l'))));

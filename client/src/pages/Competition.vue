@@ -400,7 +400,7 @@ span.info {
 
 .round {
     flex-wrap: wrap;
-    border-bottom: 2px solid var(--black-c);
+    border-bottom: var(--border-c) solid var(--black-c);
 
     & > button {
         background-color: var(--white-c);
@@ -460,7 +460,7 @@ span.info {
     }
 
     .edit-item {
-        border: 2px solid var(--black-c);
+        border: var(--border-c) solid var(--black-c);
         border-radius: var(--border-radius);
         padding: var(--margin);
 
