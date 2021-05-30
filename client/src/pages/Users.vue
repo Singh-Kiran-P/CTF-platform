@@ -50,7 +50,7 @@
             <div class=table>
                 <label for="users-table">Users</label>
                 <span class=error :v-if="error != ''">{{error}}</span>
-                <b-table id=users-table sticky-header striped :busy="isLoading" :items="users" :fields="users_fields" :sort-by.sync="sortBy" sort-desc.sync="sortDesc" :per-page="0" :no-local-sorting="true" @sort-changed="sortingChanged">
+                <b-table id=users-table striped :busy="isLoading" :items="users" :fields="users_fields" :sort-by.sync="sortBy" sort-desc.sync="sortDesc" :per-page="0" :no-local-sorting="true" @sort-changed="sortingChanged">
                     <template v-slot:cell(team)="row">
                         <router-link v-if="row.item.team != 'None'" :to="'/team/' + row.item.teamUuid">{{ row.item.team }}</router-link>
                         <span v-else>{{ row.item.team }}</span>

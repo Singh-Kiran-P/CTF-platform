@@ -5,7 +5,7 @@
             <div class=table-wrapper>
                 <label for="teams-table">Top 10</label>
                 <span class=error :v-if="error != ''">{{error}}</span>
-                <b-table id=teams-table responsive striped :busy="isLoading" :items="teams" :fields="teams_fields" :sort-by="'total'" :sort-desc="true" :per-page="10" :no-local-sorting="false" table-variant="primary">
+                <b-table id=teams-table responsive striped :busy="isLoading" :items="teams" :fields="teams_fields" :sort-by="'total'" :sort-desc="true" :per-page="10" :no-local-sorting="false" variant="dark">
                     <template v-slot:cell(name)="row">
                         <router-link :to="'/team/'+ row.item.uuid">{{ row.item.name }}</router-link>
                     </template>
@@ -179,7 +179,6 @@ export default Vue.extend({
         let scrollbarX = new am4charts.XYChartScrollbar();
         this.chart.scrollbarX = scrollbarX;
         this.chart.scrollbarX.events.on("up", this.emitRangeChanged, this);
-        //setTimeout(() => { this.teams[1].total = 10000; }, 5000);
     },
 });
 </script>

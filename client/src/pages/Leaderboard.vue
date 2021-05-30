@@ -101,7 +101,6 @@ export default Vue.extend({
     height: 100% !important;
 }
 .chart-cell {
-    background: var(--primary);
     display: flex;
     justify-content: center;
     width: 100%;
@@ -144,7 +143,6 @@ img {
     width: 35%;
 }
 .sponsors{
-    background: var(--primary);
     height: 15%;
     display: flex;
     justify-content: center;
