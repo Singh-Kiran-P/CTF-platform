@@ -8,7 +8,7 @@ const toast = {
             variant: type,
             solid: true,
             noFade: true,
-            autoHideDelay:1500,
+            autoHideDelay: 1500,
             appendToast: append
         });
     }

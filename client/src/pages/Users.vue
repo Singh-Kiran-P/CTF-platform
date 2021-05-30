@@ -28,10 +28,11 @@
                     </template>
                     <template #table-busy>
                         <div class="text-center text-primary">
-                            <b-spinner variant=primary label=Spinning />
+                            <b-spinner variant=primary label=Loading />
                         </div>
                     </template>
                 </b-table>
+                <div class=bottom-padding />
             </div>
         </div>
     </div>
@@ -144,7 +145,7 @@ label {
         width: 0;
         flex-grow: 1;
         display: flex;
-        padding: 0 20px;
+        padding: 0 var(--double-margin);
 
         &:first-of-type {
             padding-left: 0;
@@ -187,9 +188,13 @@ $breakpoint-sm: 576px;
     margin-left: var(--margin);
 }
 
-.table label {
-    font-weight: bold;
-    font-size: var(--font-large);
-    margin-bottom: var(--margin);
+.table {
+    margin-bottom: 0;
+    
+    label {
+        font-weight: bold;
+        font-size: var(--font-large);
+        margin-bottom: var(--margin);
+    }
 }
 </style>

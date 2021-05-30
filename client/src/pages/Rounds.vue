@@ -9,7 +9,7 @@
             <span class=center>The competition does not yet have any rounds</span>
         </div>
         <div v-else>
-            <AdminHeader v-if="admin" v-model="offset" :names="this.rounds.map(r => r.name)" :times="this.rounds.map(r => r.start)"/>
+            <AdminHeader v-if="admin || true /*TODO REMOVE || TRUE*/" v-model="offset" :names="this.rounds.map(r => r.name)" :times="this.rounds.map(r => r.start)"/>
             <div v-if="currentRound">
                 <span class="round-name center">{{currentRound.name}}</span>
                 <span class="round-duration center">{{durationDisplay(currentRound)}}</span>
@@ -53,6 +53,7 @@
                             </span>
                         </template>
                     </div>
+                    <div class=bottom-padding />
                 </Collapse>
             </div>
             <div v-else-if="nextRounds.length > 0">
@@ -68,6 +69,7 @@
                     <span class=item-name>{{round.name}}</span>
                     <span>{{durationDisplay(round)}}</span>
                 </div>
+                <div class=bottom-padding />
             </Collapse>
 
             <Collapse v-if="pastRounds.length > 0" class=past-rounds label="Past rounds" large noborder :value="!currentRound && nextRounds.length == 0">
@@ -175,7 +177,7 @@ export default Vue.extend({
         time(): Date { return new Date(this.realTime.getTime() + this.offset); },
         pastRounds(): Round[] { return this.rounds.filter(r => new Date(r.end) < this.time).reverse(); },
         nextRounds(): Round[] { return this.rounds.filter(r => new Date(r.start) > this.time); },
-        currentRound(): (Round & Visible) | undefined { return this.rounds[0]; } // TODO: .find(r => new Date(r.start) < this.time && new Date(r.end) > this.time); }
+        currentRound(): (Round & Visible) | undefined { return this.rounds.find(r => new Date(r.start) < this.time && new Date(r.end) > this.time); }
     },
     methods: {
         durationDisplay(round: Round) { return durationDisplay(round); },
@@ -215,7 +217,7 @@ span, a {
     padding-bottom: 0;
 
     & > * {
-        width: min(100%, var(--breakpoint-md));
+        width: min(100%, var(--breakpoint-lg));
     }
 
     .round {
@@ -269,10 +271,6 @@ span, a {
             }
         }
     }
-
-    .challenge:last-child {
-        margin-bottom: var(--double-margin);
-    }
 }
 
 .next-rounds, .past-rounds {
@@ -282,10 +280,8 @@ span, a {
 }
 
 .past-rounds {
-    padding-bottom: var(--double-margin);
-
     .past-round {
-        padding: var(--margin) 0;
+        padding-top: var(--margin);
 
         .past-round-content {
             padding: var(--margin);

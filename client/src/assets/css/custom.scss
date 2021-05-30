@@ -8,7 +8,6 @@ $primary: rgb(63, 181, 129);
     --border-radius: 0.5rem;
     --margin: 0.5rem;
     --double-margin: calc(var(--margin) * 2);
-    --triple-margin: calc(var(--margin) * 3);
     --half-margin: calc(var(--margin) / 2);
     --font-massive: 1.75rem;
     --font-large: 1.25rem;
@@ -29,26 +28,18 @@ $primary: rgb(63, 181, 129);
     --white-d: #181a1b;
     --black-d: #d1cdc7;
     --gray-d: #9e9689;
-    --gray-light-d: #282c2d;
-    --gray-lightest-d: #232627;
+    --gray-light-d: #303436;
+    --gray-lightest-d: #282c2d;
     --gray-half-d: rgba(158, 150, 137, 0.5);
 
-
-    /* --white-c: #ffffff;
-    --black-c: #212529;
-    --gray-c: #6c757d;
-    --gray-light-c: #dee2e6;
-    --gray-lightest-c: #e9ecef;
-    --gray-half-c: rgba(108, 117, 125, 0.5); */
-
     // default to dark mode (visible for a fraction of a second on refresh, then the selected mode is shown)
-    --border-c: var(--border-d);
-    --white-c: var(--white-d);
-    --black-c: var(--black-d);
-    --gray-c: var(--gray-d);
-    --gray-light-c: var(--gray-light-d);
-    --gray-lightest-c: var(--gray-lightest-d);
-    --gray-half-c: var(--gray-half-d);
+    --border-c: var(--border-l);
+    --white-c: var(--white-l);
+    --black-c: var(--black-l);
+    --gray-c: var(--gray-l);
+    --gray-light-c: var(--gray-light-l);
+    --gray-lightest-c: var(--gray-lightest-l);
+    --gray-half-c: var(--gray-half-l);
 }
 
 .no-transition * {
@@ -127,12 +118,18 @@ html, body {
     }
 }
 
-button, span, label {
+span, label, button {
     word-break: break-all;
 }
 
 span, label {
     color: var(--black-c);
+}
+
+:not(.b-form-timepicker):not(.b-form-datepicker):not(.navbar-brand):not(.modal-header) > button:not(.icon):not(.page-link) {
+    &, span {
+        color: var(--white-l) !important;
+    }
 }
 
 input, textarea, select, .custom-file-label, .custom-file-label::after, .b-form-timepicker, .b-form-datepicker {
@@ -190,7 +187,7 @@ input, textarea, select {
 
     tbody > tr {
         &:nth-child(odd) {
-            background-color: var(--gray-light-c);
+            background-color: var(--gray-lightest-c);
         }
 
         &:first-of-type > td {
@@ -278,4 +275,32 @@ textarea {
         font-size: var(--font-small);
         color: var(--black-c);
     }
+}
+
+.modal-content {
+    color: var(--black-c);
+    background-color: var(--gray-lightest-c);
+    
+    .modal-header {
+        border-bottom: var(--border-c) solid var(--gray-half-c);
+        
+        .modal-title {
+            font-size: var(--font-large);
+            font-weight: bold;
+        }
+        
+        button {
+            color: var(--black-c);
+            outline: none;
+        }
+        
+    }
+
+    .modal-footer {
+        border-top: var(--border-c) solid var(--gray-half-c);
+    }
+}
+
+.modal, .modal-open {
+    padding: 0 !important;
 }

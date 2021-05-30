@@ -4,7 +4,7 @@
         <div class="table-div">
             <div class="table-wrapper">
                 <label for="teams-table">Top 10</label>
-                <span class="error" :v-if="error != ''">{{ error }}</span>
+                <span class="error" v-if="error != ''">{{ error }}</span>
                 <b-table
                     id="teams-table"
                     responsive

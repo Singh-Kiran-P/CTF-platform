@@ -3,11 +3,12 @@
         <div>
             <span class=notifications-title>Notifications</span>
             <b-form v-if="admin" class=create @submit="onSubmit($event)" required>
-                <b-form-input trim v-model="form.title" placeholder="Enter notification title" state/>
-                <b-form-textarea v-model="form.msg" placeholder="Enter notification message" max-rows="10" state/>
-                <b-button type=submit variant=primary :disabled="!input">Send</b-button>
+                <b-form-input trim v-model="form.title" placeholder="Enter notification title" state @input="state= 'normal'"/>
+                <b-form-textarea v-model="form.msg" placeholder="Enter notification message" max-rows="10" state @input="state= 'normal'"/>
+                <StatusButton type=submit variant=primary normal=Send loading=Sending succes=Sent :state="state" :disabled="!input"/>
             </b-form>
             <div class=show>
+                <span v-if="notifications.length == 0" class=empty>There are no notifications yet</span>
                 <div class="list-item card" v-for="item in [...notifications].reverse()" :key="item.id">
                     <div class=content>
                         <span class=notification-title>{{item.title}}</span>
@@ -15,7 +16,7 @@
                     </div>
                     <div class=footer>
                         <span>{{timeDisplay(item)}}</span>
-                        <b-button v-if="admin" type=button variant=danger @click="deleteNotification(item.id)">Delete</b-button>
+                        <StatusButton v-if="admin" variant=danger normal=Delete loading=Deleting succes=Deleted :state="item.state" @click="deleteNotification(item)"/>
                     </div>
                 </div>
                 <div class=bottom-padding />
@@ -29,19 +30,24 @@ import Vue from 'vue';
 import axios from 'axios';
 import Toast from '@/assets/functions/toast';
 import { timeDisplay } from '@/assets/functions/strings';
+import StatusButton from '@/components/StatusButton.vue';
 
 type Notification = {
-    id: number;
-    title: string;
-    msg: string;
-    createdAt: string;
+    id: number,
+    title: string,
+    msg: string,
+    createdAt: string,
+    state: string
 };
 
 export default Vue.extend({
     name: 'Notifications',
+    components: {
+        StatusButton
+    },
     created() {
         this.loadNotifications();
-        this.$socket.$subscribe('notification', (data: any) => this.notifications.push(data));
+        this.$socket.$subscribe('notification', (data: any) => this.notifications.push(this.newNotification(data)));
         this.$socket.$subscribe('notificationUpdate', (data: any) => this.loadNotifications());
     },
     data: () => ({
@@ -49,7 +55,8 @@ export default Vue.extend({
         form: {
             title: '',
             msg: '',
-        }
+        },
+        state: 'normal'
     }),
     computed: {
         admin(): boolean { return this.$route.meta.admin; },
@@ -61,7 +68,6 @@ export default Vue.extend({
             e.preventDefault();
             if (!this.input) return;
             this.sendNotfication();
-            this.form = { title: '', msg: '' };
         },
 
         loadNotifications(): void {
@@ -69,24 +75,33 @@ export default Vue.extend({
             axios.get('/api/notification/getAll').then(response => {
                 let data = response.data;
                 if (data.statusCode == 404) error(data.message);
-                else this.notifications = response.data;
+                else this.notifications = response.data.map((notification: any) => this.newNotification(notification));
             }).catch(err => error(err));;
         },
         sendNotfication(): void {
-            const error = (err: string) => Toast.send(this, 'Message', err, 'danger');
+            this.state = 'loading';
+            const error = () => this.state = 'error';
             axios.post('/api/notification/send', this.form).then(response => {
                 let data = response.data;
-                if (data.statusCode == 200) {}//Toast.send(this, 'Message', data.message, 'success');
-                else error(data.message);
-            }).catch(err => error(err));
+                if (data.statusCode == 200) {
+                    this.state = 'succes';
+                    this.form = { title: '', msg: '' };
+                }
+                else error();
+            }).catch(() => error());
         },
-        deleteNotification(id: number): void {
-            const error = (err: string) => Toast.send(this, 'Message', err, 'danger');
-            axios.delete('/api/notification/deleteById', { data: { id: id } }).then(response => {
+        deleteNotification(notification: Notification): void {
+            notification.state = 'loading';
+            const error = () => notification.state = 'error';
+            axios.delete('/api/notification/deleteById', { data: { id: notification.id } }).then(response => {
                 let data = response.data;
-                if (data.statusCode == 200) {}//Toast.send(this, 'Message', data.message, 'success');
-                else error(data.message);
-            }).catch(err => error(err));
+                if (data.statusCode == 200) this.state = 'succes';
+                else error();
+            }).catch(() => error());
+        },
+
+        newNotification(notification: Notification): Notification {
+            return Object.assign({}, notification, { state: 'normal' });
         }
     }
 });
@@ -111,6 +126,7 @@ export default Vue.extend({
     display: block;
     text-align: center;
     font-size: var(--font-massive);
+    margin-bottom: var(--margin);
 }
 
 .create {
@@ -126,6 +142,11 @@ export default Vue.extend({
 .show {
     border-top: var(--border-c) solid var(--black-c);
     padding-top: var(--margin);
+
+    .empty {
+        display: block;
+        text-align: center;
+    }
 
     .notification-title {
         font-weight: bold;

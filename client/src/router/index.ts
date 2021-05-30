@@ -26,19 +26,19 @@ const pages: { [page: string]: Route } = {
     },
     team: {
         path: '/team',
-        name: 'Team',
+        name: 'Your Team',
         src: 'Team.vue',
     },
     teamDashboard: {
         path: '/team/:uuid',
-        name: 'TeamDashboard',
+        name: 'Team Dashboard',
         src: 'TeamDashboard.vue',
         meta: {hidden:true}
     },
     joinTeam: {
         path: '/team/join/:invite',
-        name: 'joinTeam',
-        src: 'joinTeam.vue',
+        name: 'Join Team',
+        src: 'JoinTeam.vue',
         meta: { hidden: true }
     },
     teams: {
@@ -103,27 +103,27 @@ const routes: { [page: string]: Route[] } = {
     [Roles.VISITOR]: [
         pages.login,
         pages.register,
-        pages.leaderboard,
-        pages.teamDashboard,
+        pages.users,
         pages.teams,
-        pages.users
+        pages.leaderboard,
+        pages.teamDashboard
     ],
     [Roles.PARTICIPANT]: [
+        pages.users,
+        pages.teams,
         pages.team,
         pages.teamDashboard,
         pages.joinTeam,
-        pages.notifications,
-        pages.teams,
-        pages.users,
         pages.rounds,
         pages.challenge,
         pages.leaderboard,
+        pages.notifications,
         pages.logout
     ],
     [Roles.ORGANIZER]: [
-        pages.teamDashboard,
-        pages.teams,
         pages.users,
+        pages.teams,
+        pages.teamDashboard,
         pages.rounds,
         pages.challenge,
         pages.leaderboard,

@@ -65,6 +65,7 @@ export default Vue.extend({
         toggleDark(): void {
             axios.get('/api/darkMode/toggle').then(res => {
                 this.dark = res.data;
+                Vue.prototype.$darkMode = this.dark;
                 this.setMode();
             });
         },

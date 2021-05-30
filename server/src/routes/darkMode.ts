@@ -9,6 +9,8 @@ router.get('/toggle', (req, res) => {
 
 router.get('/state', (req, res) => {
     let session: any = req.session;
+    if (session.darkMode == undefined)
+        session.darkMode = true;
     res.send(session.darkMode);
 });
 

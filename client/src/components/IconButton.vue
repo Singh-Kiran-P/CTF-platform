@@ -1,6 +1,6 @@
 <template>
     <b-button type=button :class="['icon', { toggled: toggled }, { darker: toggled && !icon2 }]" :disabled="disabled" @click="$emit('click', $event)">
-        <b-spinner v-if="loading" small/>
+        <b-spinner v-if="loading" label=Loading small/>
         <font-awesome-icon v-else :icon="toggled && icon2 ? icon2 : icon" />
     </b-button>
 </template>
@@ -47,10 +47,13 @@ button.icon.toggled {
     button.icon:hover:not(:disabled), button.icon:focus-visible {
         &.icon {
             background-color: var(--gray-c);
-            color: var(--white-c);
         }
 
-        &.darker {
+        &.icon, &.icon span {
+            color: var(--white-c) !important;
+        }
+
+        &.darker, &.darker span {
             color: var(--gray-light-c);
         }
 
@@ -69,12 +72,12 @@ button.icon.toggled {
 }
 
 button.icon:active:not(:disabled) {
-    &.icon {
+    &.icon, &.icon span {
         background-color: var(--gray-c);
-        color: var(--white-c);
+        color: var(--white-c) !important;
     }
 
-    &.darker {
+    &.darker, &.darker span {
         color: var(--gray-light-c);
     }
 
