@@ -41,7 +41,7 @@ const timerDisplay = (time: number, short?: boolean): string => {
 const timeDisplay = (time: string): string => {
     let date = new Date(time);
     let display = date.toLocaleString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-    return display + date.toLocaleString('nl-BE', { hour: 'numeric', minute: 'numeric', second: 'numeric' });
+    return display + ', at ' + date.toLocaleString('nl-BE', { hour: 'numeric', minute: 'numeric', second: 'numeric' });
 }
 
 export { solvePoints, solveNames, typeName, typeDescription, durationDisplay, countdownDisplay, timerDisplay, timeDisplay };

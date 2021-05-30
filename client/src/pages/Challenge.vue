@@ -55,13 +55,19 @@
             </span></span>
             <template v-if="!solved && !ended">
                 <div v-if="challenge.type == typeValues.INTERACTIVE" class=interactive>
-                    <span>You can {{startState == 'succes' ? 'open' : 'start'}} your interactive environment below</span>
+                    <span>Manage your interactive environment</span>
                     <div class=controls>
-                        <b-button v-if="startState == 'succes'" variant=primary :href="TODO_PORTS" target=_blank><font-awesome-icon icon=external-link-alt /> Open</b-button>
-                        <StatusButton v-else variant=primary @click="!containerInit ? initContainer() : startContainer()" :disabled="resetState == 'loading'"
+                        <StatusButton variant=primary @click="!containerInit ? initContainer() : startContainer()" :disabled="resetState == 'loading'"
                             :state="!containerInit && startState != 'error' ? 'loading' : startState" normal=Start :loading="containerInit ? 'Starting' : 'Loading'" succes=Started />
                         <StatusButton variant=info @click="resetContainer()" :disabled="stopState != 'normal'" :state="resetState" normal=Reset loading=Resetting succes=Reset />
                         <StatusButton variant=danger @click="stopContainer()" :disabled="resetState == 'loading'" :state="stopState" normal=Stop loading=Stopping succes=Stopped />
+                    </div>
+                    <div v-if="startState == 'succes'" class=ports>
+                        <span v-if="ports.length > 0">Available ports: </span>
+                        <span v-else>No ports available, contact the organizer for help</span>
+                        <b-button variant=primary :disabled="stopState != 'normal'" v-for="port in ports" :href="`${domain}/${'TODO'}`" target=_blank :key="port">
+                            <font-awesome-icon icon=external-link-alt /> {{port}}
+                        </b-button>
                     </div>
                 </div>
                 <div class=submit>
@@ -97,7 +103,7 @@
                     </Tooltip>
                 </div>
             </Collapse>
-            <span>TODO: admin</span>
+            <div class=bottom-padding />
         </div>
     </div>
 </template>
@@ -130,7 +136,8 @@ export default Vue.extend({
             else if (res.data.locked) this.locked = res.data.locked;
             else if (validChallenge(res.data)) {
                 this.challenge = res.data;
-                this.initContainer();
+                if (this.challenge?.type == ChallengeType.INTERACTIVE)
+                    this.initContainer();
             }
 
             setInterval(() => this.time = new Date(), 100);
@@ -157,7 +164,8 @@ export default Vue.extend({
         resetState: 'normal',
         stopState: 'succes',
 
-        ports: []
+        domain: 'localhost', // TODO NOT HARDCODED
+        ports: [] as string[]
     }),
     computed: {
         admin(): boolean { return this.$route.meta?.admin; },
@@ -223,7 +231,7 @@ export default Vue.extend({
                 let err = res.data.statusCode == 404;
                 let started = res.data.state;
                 if (err) return error();
-                if (started) { // TODO: NOT LOCALHOST, FIX PORTS
+                if (started) {
                     this.setPorts(res.data.ports);
                     this.startState = 'succes';
                     this.stopState = 'normal';
@@ -263,7 +271,7 @@ export default Vue.extend({
         },
 
         setPorts(ports: any): void {
-            // TODO:
+            this.ports = ['8080', '9090', '100100']; // TODO NOT HARDCODED
         }
     }
 });
@@ -354,13 +362,10 @@ export default Vue.extend({
     .interactive {
         margin-top: var(--double-margin);
 
-        span {
+        & > span {
+            font-weight: bold;
             text-align: center;
             margin-bottom: var(--margin);
-
-            a {
-                font-weight: bold;
-            }
         }
 
         .controls {
@@ -377,6 +382,25 @@ export default Vue.extend({
 
             a:hover {
                 text-decoration: none !important;
+            }
+        }
+
+        .ports {
+            display: flex;
+            margin-top: var(--double-margin);
+            align-items: center;
+
+            span {
+                font-weight: bold;
+                margin-right: var(--double-margin);
+            }
+
+            a {
+                flex-grow: 1;
+
+                &:not(:last-of-type) {
+                    margin-right: var(--double-margin);
+                }
             }
         }
     }

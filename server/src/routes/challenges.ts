@@ -111,7 +111,7 @@ router.post('/answer/:id/:order', isAuth, (req, res) => {
     });
 });
 
-const attempt = (res: express.Response, account: Account, team: Team, challenge: Challenge, content: string, correct: boolean, next?: any) => { // TODO fix next?true
+const attempt = (res: express.Response, account: Account, team: Team, challenge: Challenge, content: string, correct: boolean, next?: any) => {
     let last = !next || next.i < 0 || next.i >= challenge.questions.length;
     if (account.admin) return res.send(correct ? { solved: last ? getSolve(account.name, challenge.points, new Date().toJSON()) : true, next: next } : { solve: false });
     if (challenge.solves.find(s => s.team.id == team.id)) return res.send({ solved: true });

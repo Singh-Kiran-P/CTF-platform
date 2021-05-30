@@ -2,7 +2,7 @@
     <div>
         <div :class="['header', { 'center': center, 'left': left }]" @click="toggle()">
             <span :class="{ 'large': large }">{{label}}</span>
-            <IconButton icon="chevron-down" :loading="loading" :class="visible ? 'danger' : 'primary'"/>
+            <IconButton icon=chevron-down :loading="loading" :class="visible ? 'danger' : 'primary'"/>
         </div>
         <b-collapse :visible="visible" :class="{ 'no-border': noborder }">
             <slot/>
@@ -88,6 +88,7 @@ export default Vue.extend({
 
     button {
         flex-shrink: 0;
+        color: var(--black-c) !important;
     }
 
     button.danger {

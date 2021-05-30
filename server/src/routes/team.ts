@@ -141,7 +141,7 @@ router.post('/removeMember/:uuid/:memberName', isAuth, (req, res) => {
     DB.repo(Team).findAndCount(
         {
             where: { name: ILike('%' + filter + '%') }, order: { name: "ASC" },
-            relations: ['accounts', 'solves', 'solves.challenge', 'solves.usedHints'], TODO: SOLVES DONT HAVE USED HINTS, USE TEAM.USEDHINTS
+            relations: ['accounts', 'solves', 'solves.challenge', 'solves.usedHints'], TODO: SOLVES DONT HAVE USED HINTS, USE CHALLENGE.USEDHINTS
             take: perPage,
             skip: skip
         }

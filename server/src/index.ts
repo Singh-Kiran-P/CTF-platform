@@ -18,11 +18,11 @@ app.use(formidable());
 // setup to get Ip address
 app.use(expressip().getIpInfoMiddleware);
 
-let sess = {
+let sess: session.SessionOptions = {
     resave: false,
     saveUninitialized: false,
     secret: process.env.SECRET,
-    cookie: { secure: false }
+    cookie: { secure: false, maxAge: 1000 * 60 * 60 * 24 * 31 }
 };
 
 // set secure cookies for production, TODO: test and verify if this works, potentially remove this

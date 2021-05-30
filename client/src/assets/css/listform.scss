@@ -22,14 +22,14 @@
     &:not(.nostyle) {
         padding: var(--margin);
         border-radius: var(--border-radius);
-        background-color: var(--gray-light);
+        background-color: var(--gray-light-c);
     }
 
     &.card {
         padding: 0;
         border: none;
-        margin-bottom: var(--double-margin);
-        background-color: var(--gray-lightest);
+        margin-top: var(--double-margin);
+        background-color: var(--gray-lightest-c);
 
         .content {
             padding: var(--double-margin);
@@ -42,8 +42,8 @@
         .footer {
             display: flex;
             align-items: center;
-            background-color: var(--gray-light);
-            border-top: 1px solid var(--gray-half);
+            background-color: var(--gray-light-c);
+            border-top: 1px solid var(--gray-half-c);
             border-bottom-left-radius: var(--border-radius);
             border-bottom-right-radius: var(--border-radius);
 

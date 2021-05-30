@@ -31,7 +31,7 @@ button.icon {
     align-items: center;
     justify-content: center;
     border-radius: var(--border-radius);
-    background-color: var(--gray-light);
+    background-color: var(--gray-light-c);
     box-shadow: none !important;
     color: var(--black-c);
     outline: none;
@@ -51,7 +51,7 @@ button.icon.toggled {
         }
 
         &.darker {
-            color: var(--gray-light);
+            color: var(--gray-light-c);
         }
 
         &.primary {
@@ -75,7 +75,7 @@ button.icon:active:not(:disabled) {
     }
 
     &.darker {
-        color: var(--gray-light);
+        color: var(--gray-light-c);
     }
 
     &.primary {

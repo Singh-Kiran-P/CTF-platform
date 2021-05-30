@@ -27,7 +27,6 @@ export default Vue.extend({
         show: Boolean
     }
 });
- 
 </script>
 
 <style scoped lang="scss">

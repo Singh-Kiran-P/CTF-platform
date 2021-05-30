@@ -9,6 +9,7 @@ import challenges from './challenges';
 import competition from './competition';
 import notification from './notification'
 import leaderboard from './leaderboard';
+import darkMode from './darkMode';
 
 export default [
     competition,
@@ -22,5 +23,6 @@ export default [
     account,
     challenges,
     notification,
-    leaderboard
+    leaderboard,
+    darkMode
 ];

@@ -67,15 +67,15 @@ export default Vue.extend({
     padding-bottom: var(--margin);
 }
 
+.disclaimer span {
+    font-weight: bold;
+    margin-right: var(--margin);
+}
+
 .header-tooltip {
     display: inline-block;
     color: var(--info);
     flex-shrink: 0;
-}
-
-.disclaimer span {
-    font-weight: bold;
-    margin-right: var(--margin);
 }
 
 .options {

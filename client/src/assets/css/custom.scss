@@ -15,19 +15,68 @@ $primary: rgb(63, 181, 129);
     --font-small: 90%;
     --font-smallest: 80%;
     
-    --white-c: #ffffff; // $white
-    --black-c: #212529; // $gray-900
-    --gray-c: #6c757d; // $gray-600
-    --gray-light: #dee2e6; // $gray-300
-    --gray-lightest: #e9ecef; // $gray-200
-    --gray-half: rgba(108, 117, 125, 0.5); // $gray-600 50% opacity
+    // light mode colors
+    --white-l: #ffffff;
+    --black-l: #212529;
+    --gray-l: #6c757d;
+    --gray-light-l: #dee2e6;
+    --gray-lightest-l: #e9ecef;
+    --gray-half-l: rgba(108, 117, 125, 0.5);
 
-    --white-c-inverted: #181a1b;
-    --black-c-inverted: #d1cdc7;
-    --gray-c-inverted: #9e9689;
-    --gray-light-inverted: #282c2d;
-    --gray-lightest-inverted: #232627;
-    --gray-half-inverted: rgba(158, 150, 137, 0.5);
+    // dark mode colors, reverse of light mode: white is actually black, lightest gray is actually darkest gray, ...
+    --white-d: #181a1b;
+    --black-d: #d1cdc7;
+    --gray-d: #9e9689;
+    --gray-light-d: #282c2d;
+    --gray-lightest-d: #232627;
+    --gray-half-d: rgba(158, 150, 137, 0.5);
+
+
+    /* --white-c: #ffffff;
+    --black-c: #212529;
+    --gray-c: #6c757d;
+    --gray-light-c: #dee2e6;
+    --gray-lightest-c: #e9ecef;
+    --gray-half-c: rgba(108, 117, 125, 0.5); */
+
+    // deault to dark mode (visible for a fraction of a second on refresh, then the selected mode is shown)
+    --white-c: #181a1b;
+    --black-c: #d1cdc7;
+    --gray-c: #9e9689;
+    --gray-light-c: #282c2d;
+    --gray-lightest-c: #232627;
+    --gray-half-c: rgba(158, 150, 137, 0.5);
+}
+
+// must be defined before import and with everything important, because css is very good
+.b-form-timepicker, .b-form-datepicker {
+    label {
+        color: var(--black-c) !important;
+    }
+
+    .dropdown-menu {
+        border: 1px solid var(--black-c) !important;
+    }
+
+    .dropdown-menu, .b-form-spinbutton, .b-calendar-grid, .small {
+        background-color: var(--white-c) !important;
+        
+        &, button svg, span.btn {
+            color: var(--black-c) !important;
+        }
+        
+        span.btn.text-muted {
+            color: var(--gray-c) !important;
+        }
+
+        span.btn.active, span.btn:hover {
+            color: var(--white-c) !important;
+        }
+
+        span.btn:hover {
+            background-color: var(--black-c);
+        }
+    }
 }
 
 @import '~bootstrap/scss/bootstrap';
@@ -39,11 +88,32 @@ $primary: rgb(63, 181, 129);
     font-family: Avenir, Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    scrollbar-color: var(--white-c);
+}
+
+::-webkit-scrollbar {
+    width: calc(calc(var(--double-margin) + var(--margin)) / 2);
+}
+
+::-webkit-scrollbar-track {
+    background: var(--white-c); 
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--gray-light-c);
+}
+
+.no-transition {
+    -webkit-transition: none !important;
+    -moz-transition: none !important;
+    -o-transition: none !important;
+    transition: none !important;
 }
 
 html, body {
     width: 100%;
     height: 100%;
+    background-color: var(--white-c);
 }
 
 @media (hover: hover) {
@@ -54,12 +124,40 @@ html, body {
     }
 }
 
-button, span {
+button, span, label {
     word-break: break-all;
 }
 
-span {
+:not(.b-form-timepicker):not(.b-form-datepicker):not(.navbar-brand) > button:not(.icon) {
+    &, span {
+        color: var(--white-c) !important;
+    }
+}
+
+span, label {
     color: var(--black-c);
+}
+
+input, textarea, select, .custom-file-label, .custom-file-label::after, .b-form-timepicker, .b-form-datepicker {
+    background-color: var(--gray-lightest-c) !important;
+    color: var(--black-c) !important;
+}
+
+.bs-tooltip-top .arrow::before {
+    border-top-color: var(--black-c) !important;
+}
+
+.bs-tooltip-bottom .arrow::before {
+    border-bottom-color: var(--black-c) !important;
+}
+
+input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type=number] {
+    -moz-appearance: textfield;
 }
 
 textarea {
@@ -70,13 +168,17 @@ textarea {
     text-align: center;
 }
 
+.bottom-padding {
+    display: block;
+    padding-bottom: var(--double-margin);
+}
+
 // .custom-file-label styling must be defined here for some ungodly reason, dont ask me why
 .list-item:not(.nostyle) .item-content.editable {
     input, textarea, .custom-file-label, .custom-file-label::after {
         margin: 0;
         padding-top: 0;
         padding-bottom: 0;
-        background-color: var(--gray-lightest);
         height: auto;
     }
 
@@ -99,7 +201,7 @@ textarea {
         padding: var(--margin);
         border: 2px solid var(--black-c);
         max-width: calc(var(--breakpoint-sm) / 2);
-        background-color: var(--gray-lightest);
+        background-color: var(--gray-lightest-c);
         font-size: var(--font-small);
         color: var(--black-c);
     }

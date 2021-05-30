@@ -1,12 +1,25 @@
 <template>
     <div class=live-feed>
         <div>
+            <div class=disclaimer>
+                <span>Showing live data</span>
+                <Tooltip below class=disclaimer-tooltip title="Showing used hints, attempts and solves"
+                    content="
+                    The data being shown will be lost upon reloading or leaving this page<br/><br/>
+                    Any item links you click will automatically open in a new page to prevent this from happening<br/><br/>
+                    Dismissing an item does not undo the action">
+                    <font-awesome-icon icon=info-circle />
+                </Tooltip>
+            </div>
+            <div v-if="feed.length == 0" class=empty>
+                <span>Nothing has happened yet...</span>
+            </div>
             <div class="list-item card" v-for="(item, i) in [...feed].reverse()" :key="`${item.time}-${i}`">
                 <div class=content>
                     <span>
                         <b>{{item.account}}</b>
-                        <template v-if="item.team">from <a :href="'/team/' + item.team.id" target=_blank>{{item.team.name}}</a></template>
-                        has <span class=inline v-html="action(item)"/>
+                        <template v-if="item.team"> from <a :href="'/team/' + item.team.id" target=_blank>{{item.team.name}} </a></template>
+                        <span class=inline v-html="action(item)"/>
                         <template v-if="item.question"> question {{item.question.i}} / {{item.question.length}} from</template>
                         <a :href="'/challenge/' + item.challenge.id" target=_blank> {{item.challenge.name}}</a>
                         <template v-if="item.points"> for <b>{{(item.type == typeValues.HINT ? '-' : '') + item.points}}</b> point{{item.points == 1 ? '' : 's'}}</template>
@@ -18,6 +31,7 @@
                     <b-button type=button variant=danger @click="dismiss(i)">Dismiss</b-button>
                 </div>
             </div>
+            <div class=bottom-padding />
         </div>
     </div>
 </template>
@@ -25,6 +39,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import { is } from '@shared/validation';
+import Tooltip from '@/components/Tooltip.vue';
 import { timeDisplay } from'@/assets/functions/strings';
 
 enum Type {
@@ -46,6 +61,9 @@ type Item = {
 
 export default Vue.extend({
     name: 'LiveFeed',
+    components: {
+        Tooltip
+    },
     created() {
         this.$socket.$subscribe('attempted', (data: any) => this.add(data, Type.ATTEMPT));
         this.$socket.$subscribe('solved', (data: any) => this.add(data, Type.SOLVE));
@@ -72,7 +90,7 @@ export default Vue.extend({
         },
 
         timeDisplay(item: Item): string { return timeDisplay(item.time); },
-        action(item: Item) { return item.type == Type.SOLVE ? 'solved' : (item.type == Type.ATTEMPT ? 'attempted to solve' : `used hint <b>${item.content}</b> from`) }
+        action(item: Item) { return item.type == Type.SOLVE ? 'solved' : (item.type == Type.ATTEMPT ? 'attempted to solve' : `used <b>${item.content}</b> from`) }
     }
 });
 </script>
@@ -90,6 +108,31 @@ export default Vue.extend({
     & > div {
         width: min(100%, var(--breakpoint-sm));
     }
+}
+
+.disclaimer {
+    padding-bottom: var(--double-margin);
+    border-bottom: 2px solid var(--black-c);
+    
+    span {
+        font-weight: bold;
+        margin-right: var(--margin);
+    }
+
+    .disclaimer-tooltip {
+        display: inline-block;
+        color: var(--info);
+        flex-shrink: 0;
+    }
+}
+
+.empty {
+    margin-top: var(--margin);
+    text-align: center;
+}
+
+.icon-info {
+    color: var(--info);
 }
 
 .content {

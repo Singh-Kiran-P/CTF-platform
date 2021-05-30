@@ -114,6 +114,7 @@
                     </div>
                 </div>
             </Collapse>
+            <div class=bottom-padding />
         </div>
     </div>
 </template>
