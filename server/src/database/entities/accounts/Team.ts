@@ -63,6 +63,18 @@ export class Team {
     getCategoryName(): string {
         return this.getCategory().name;
     }
+    getPlacement(): Promise<number> {
+        return new Promise<number>(async (resolve, reject)=> {
+            DB.repo(Team).find({relations: ['accounts', 'solves', 'solves.challenge', 'solves.challenge.usedHints', 'solves.challenge.usedHints.team']}).then((teamsDB: Team[]) => {
+                let currentCat = this.getCategory();
+                let currentPoints = this.getPoints();
+                let placement = teamsDB.filter(t => t.id != this.id && t.getCategory().id == currentCat.id).reduce((acc, cur) => {
+                    return cur.getPoints() > currentPoints ? acc + 1 : acc;
+                }, 1);
+                resolve(placement);
+            }).catch((error)=>{reject(error);})
+        });
+    }
 }
 
 export class TeamRepoCustom extends Repository<Team> {

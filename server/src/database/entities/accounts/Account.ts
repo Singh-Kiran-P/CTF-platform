@@ -46,6 +46,6 @@ export class Account {
 
     getPoints(): number {
         return this.solves.reduce((acc, cur) =>
-            acc + Math.max(0, (cur.challenge.points - this.team.usedHints.filter(h => h.challenge.id == cur.challenge.id).reduce((acc, cur) => acc + cur.hint.cost, 0))), 0);
+            acc + Math.max(0, (cur.challenge.points - cur.challenge.usedHints.filter(h => h.team.id == this.team.id).reduce((acc, cur) => acc + cur.hint.cost, 0))), 0);
     }
 }

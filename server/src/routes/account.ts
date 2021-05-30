@@ -31,7 +31,7 @@ router.get('/getUsers', (req, res) => {
 
     DB.repo(Account).find({
         where: { name: ILike('%' + filter + '%'), admin: false }, order: { name: nameOrder },
-        relations: ['solves', 'solves.challenge', 'team', 'team.usedHints'],
+        relations: ['solves', 'solves.challenge', 'solves.challenge.usedHints', 'solves.challenge.usedHints.team'],
     }).then((accountsDB: Account[]) => {
         let accountsData: { id: number, name: string, category: string, points: number, team: string, teamUuid: string }[] = [];
         accountsDB.forEach((account: Account) => {
@@ -40,12 +40,8 @@ router.get('/getUsers', (req, res) => {
             accountData.name = account.name;
             accountData.category = account.category.name;
             accountData.points = account.getPoints();
-            if (account.team) {
-                accountData.team = account.team.name;
-                accountData.teamUuid = account.team.id;
-            } else {
-                accountData.team = 'None';
-            }
+            accountData.team = account.team?.name;
+            accountData.teamUuid = account.team?.id;
             if (filterCategory == '') accountsData.push(accountData);
             else if (filterCategory == account.category.name) accountsData.push(accountData);
         });
