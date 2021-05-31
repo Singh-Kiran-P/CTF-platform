@@ -5,13 +5,13 @@ import { is } from '@shared/validation';
 type PortsA = {
     [string: string]: {
         HostIp: string,
-        HortPort: string
+        HostPort: string
     }[]
 };
 
 const portsa = (ports: PortsA): number[] => {
     if (!valida(ports)) return [];
-    return [...new Set(Object.values(ports).map(v => v.map(d => Number.parseInt(d.HortPort)).filter(p => p && p > 0)).flat())];
+    return [...new Set(Object.values(ports).map(v => v.map(d => Number.parseInt(d.HostPort)).filter(p => p && p > 0)).flat())];
 }
 
 const valida = (ports: any): boolean => {
@@ -23,12 +23,16 @@ type PortsB = {
 }[];
 
 const portsb = (ports: PortsB): number[] => {
+    console.log(ports);
+
     if (!validb(ports)) return [];
+    console.log("valid");
+
     return [...new Set(ports.map(p => p.PublicPort).filter(p => p && p > 0))];
 }
 
 const validb = (ports: any): boolean => {
-    return is.array(ports, p => is.object(p) && is.string(p?.PublicPort));
+    return is.array(ports, p => is.object(p));
 }
 
 export { portsa, portsb };

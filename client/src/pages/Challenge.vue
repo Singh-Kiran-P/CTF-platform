@@ -56,7 +56,7 @@
                 </span>
             </span></span>
             <template v-if="!solved && !ended">
-                <div v-if="true || challenge.type == typeValues.INTERACTIVE" class=interactive>
+                <div v-if="challenge.type == typeValues.INTERACTIVE" class=interactive>
                     <span>Manage your interactive environment</span>
                     <div class=controls>
                         <StatusButton variant=primary @click="!containerInit ? initContainer() : startContainer()" :disabled="resetState == 'loading'"
@@ -67,7 +67,7 @@
                     <div v-if="startState == 'succes'" class=ports>
                         <span v-if="ports.length > 0">Available ports: </span>
                         <span v-else>No ports available, contact the organizer for help</span>
-                        <b-button variant=primary :disabled="stopState != 'normal'" v-for="port in ports" :href="`${domain}:${port}`" target=_blank :key="port" @click="openPort($event)">
+                        <b-button variant=primary :disabled="stopState != 'normal' || resetState != 'normal'" v-for="port in ports" :href="`${domain}:${port}`" target=_blank :key="port" @click="openPort($event)">
                             <font-awesome-icon icon=external-link-alt /> {{port}}
                         </b-button>
                     </div>
@@ -163,12 +163,12 @@ export default Vue.extend({
         incorrect: false,
         rateLimitTime: 0,
 
-        containerInit: true, // TODO false
-        startState: 'succes', // TODO normal
+        containerInit: false,
+        startState: 'normal',
         resetState: 'normal',
-        stopState: 'normal', // TODO succes
+        stopState: 'succes',
 
-        domain: window.location.origin, // TODO test
+        domain: window.location.origin,
         ports: [80] as number[]
     }),
     computed: {
@@ -253,6 +253,8 @@ export default Vue.extend({
                 this.stopState = 'normal';
                 this.startState = 'succes';
                 this.ports = portsa(res.data.ports);
+                console.log(this.ports);
+
             }).catch(() => error());
         },
         resetContainer(): void {
