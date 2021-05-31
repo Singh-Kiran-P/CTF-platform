@@ -1,20 +1,21 @@
 <template>
-    <div class="leaderboard">
+    <div class=leaderboard>
         <div class=scoreboards>
             <div class=scoreboards-container>
-                <Slider animation="fade" :interval="10000" :speed="2000" :stopOnHover="true" :indicators="false" class="chart-slider">
-                    <SliderItem v-for="categorie in categories" :key="categorie" class="chart-cell">
-                        <Scoreboard :category="categorie"></Scoreboard>
+                <Slider animation="fade" :interval="10000" :speed="2000" stopOnHover :indicators="false" class=chart-slider>
+                    <SliderItem v-for="category in categories" :key="category" class=chart-cell>
+                        <Scoreboard :category="category"/>
                     </SliderItem>
                 </Slider>
             </div> 
         </div>
         <div class=sponsors>
-            <Carousel :autoplay="true" :autoplayHoverPause="true" :loop="true" :paginationEnabled="false" :perPageCustom="[[1024, 4],[750,3],[550, 2], [350,1]]" easing="linear" :autoplayTimeout="5000" :speed="1000" :centerMode="true" class=sponsor-slider>
+            <Carousel class=sponsor-slider autoplay autoplayHoverPause loop paginationEnabled centerMode :autoplayTimeout="5000" :speed="1000" easing="linear"
+                :perPageCustom="[[1024, 4], [750, 3], [550, 2], [350, 1]]">
                     <Slide v-for="sponsor in sponsors" :key="sponsor.id" class=sponsor-cell>
                         <div class=sponsor-cell-content>
                             <a :href="sponsor.link" target="_blank" rel="noopener noreferrer">
-                                <b-img :alt="sponsor.name" :src="'/api'+sponsor.icon"></b-img>
+                                <b-img :alt="sponsor.name" :src="'/api'+sponsor.icon"/>
                             </a>
                         </div>
                     </Slide>
@@ -24,69 +25,52 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import axios from "axios";
-import { Carousel, Slide } from "vue-carousel";
-import { Slider, SliderItem } from "vue-easy-slider";
-import Scoreboard from "../components/Scoreboard.vue";
-
-declare interface sponsor {icon: string, id:number, name: string, link: string, order:number};
+import Vue from 'vue';
+import axios from 'axios';
+import { Carousel, Slide } from 'vue-carousel';
+import { Slider, SliderItem } from 'vue-easy-slider';
+import { Sponsor } from '@shared/validation/configForm';
+import Scoreboard from '@/components/Scoreboard.vue';
 
 export default Vue.extend({
-    name: "Leaderboard",
+    name: 'Leaderboard',
     components: {
         Scoreboard,
-        Slider,
         SliderItem,
         Carousel,
+        Slider,
         Slide
     },
     data: () => ({
         categories: [] as String[],
-        sponsors: [] as sponsor[], 
+        sponsors: [] as Sponsor[], 
     }),
     created() {
         this.loadCategories();
         this.loadSponsors();
-
-        // this.$socket.$subscribe("BACH 1", (data: any) => {
-        //     console.log(data);
-        //     this.$socket.$subscribe("BACH 2", (data: any) => {});
-        // });
-        // this.$socket.$subscribe("BACH 3", (data: any) => {
-        //     console.log(data);
-        // });
-        // this.$socket.$subscribe("MASTER 1", (data: any) => {
-        //     console.log(data);
-        // });
-        // this.$socket.$subscribe("MASTER 2", (data: any) => {
-        //     console.log(data);
-        // });
-},
+    },
     methods: {
-        //TODO: show errors using kirans dialog
         loadCategories(): void {
-            axios.get("/api/competition/categories").then((response) => {
-                if (response.data.error)
-                    return console.log(response.data.error); //this.error = response.data.error;
-                this.categories = this.categories.concat(response.data);
+            axios.get('/api/competition/categories').then(res => {
+                if (res.data.error) return console.log(res.data.error); // TODO: this.error = res.data.error;
+                this.categories = this.categories.concat(res.data);
             });
         },
         loadSponsors() {
-            axios.get("/api/leaderboard/sponsors").then((response)=> {
-                if (response.data.error)
-                    return console.log(response.data.error); //this.error = response.data.error;
-                this.sponsors = response.data.sponsors;
+            axios.get('/api/leaderboard/sponsors').then(res => {
+                if (res.data.error) return console.log(res.data.error); // TODO: this.error = res.data.error;
+                this.sponsors = res.data.sponsors;
                 console.log(this.sponsors);
             });
         }
-    },
-    mounted() {},
+    }
 });
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
+<style scoped lang="scss">
+
+
+
 /*TODO: Align items vertically when smaller then 750px;*/
 .scoreboards {
     height: 85%;

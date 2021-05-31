@@ -2,6 +2,8 @@ import DB, { Team, Competition, Category, Challenge, ChallengeType, Tag, Account
 import { DockerManagement } from './entities/docker/DockerManagement';
 import { DockerOpenPort } from './entities/docker/DockerOpenPort';
 
+// TODO: good test data
+
 /**
  * loads test entries into the database
  * this function is called each time the database connection is made, after emptying the database
