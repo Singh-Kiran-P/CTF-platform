@@ -122,7 +122,7 @@ export class LeaderBoardController {
     * @returns {Sponsor[]} This is the response
     */
     public getSponsorsData(req: Request, res: Response) {
-        DB.repo(Sponsor).find().then((sponsors: Sponsor[]) => {
+        DB.repo(Sponsor).find({order: {order: 'ASC'}}).then((sponsors: Sponsor[]) => {
             res.json({ sponsors: sponsors });
         }).catch(() => {
             res.json({ message: "Cannot retrieve sponsors", statusCode: 404 })
