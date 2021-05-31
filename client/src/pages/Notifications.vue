@@ -124,14 +124,13 @@ export default Vue.extend({
 
 .notifications-title {
     display: block;
-    text-align: center;
     font-size: var(--font-massive);
     margin-bottom: var(--margin);
 }
 
 .create {
     textarea, button {
-        margin-top: var(--margin);
+        margin-top: var(--double-margin);
     }
 
     button {

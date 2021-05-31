@@ -1,9 +1,10 @@
 /**
  * @author Kiran Singh
  */
-import { solvePoints } from '@/routes/challenges';
 import { Request, Response } from 'express';
-import DB, { Account, Solve, Sponsor, Team } from '../database';
+import { solvePoints } from '@/routes/challenges';
+import { sortRounds } from '@shared/validation/roundsForm';
+import DB, { Account, Round, Sponsor, Team } from '../database';
 import socketIO from './socket';
 
 /**
@@ -39,16 +40,13 @@ export class LeaderBoardController {
      */
     public updateLeaderboard(account: Account, score: number, timestamp: string) {
         let cat = account.category.name;
-        // emit socket
-        let socket = socketIO.getIO();
-        let data = {
+        socketIO.getIO().emit(cat, {
             cat: cat,
             teamId: account.team.id,
             teamName: account.team.name,
             score: score,
             timestamp: timestamp
-        }
-        socket.emit(cat, data);
+        });
     }
 
     /**
@@ -66,7 +64,7 @@ export class LeaderBoardController {
                 //save data
                 // this.teams[0].scores.push({ date, score });
                 this.updateLeaderboard(acc, score, date.toJSON());
-                res.send("oke")
+                res.send('oke');
             })
             .catch(err => res.json(err));
     }
@@ -79,40 +77,41 @@ export class LeaderBoardController {
     * @returns {data_send[]} This is the response
     */
     public getAllData(req: Request, res: Response) {
-        DB.repo(Team).find({ relations: ['accounts', 'solves', 'solves.challenge', 'usedHints', 'usedHints.challenge'] })
-            .then((t) => {
-                console.log(t[0].getCategoryName());
-                console.log(req.params.cat);
+        DB.repo(Team).find({ relations: ['accounts', 'solves', 'solves.challenge', 'usedHints', 'usedHints.challenge'] }).then(teams => {
+            // TODO
+            //console.log(teams[0].getCategoryName());
+            //console.log(req.params.cat);
+            //console.log(teams[0].getCategoryName() == req.params.cat);
+            teams = teams.filter(team => team.getCategoryName() == req.params.cat);
+            //console.log(teams);
 
-                console.log(t[0].getCategoryName() == req.params.cat);
+            let teamsData: data_send[] = teams.map(team => ({
+                uuid: team.id,
+                name: team.name,
+                scores: team.solves.map(solve => ({
+                    time: solve.time,
+                    score: solvePoints(team, solve)
+                })),
+                total: 0
+            }));
 
-                let teams = t.filter(team => team.getCategoryName() == req.params.cat);
+            for (const team of teamsData) {
+                let sum = 0;
+                team.scores = team.scores.map(score => {
+                    sum += score.score;
+                    return Object.assign({}, score, { score: sum });
+                });
+                team.total = sum;
+            }
 
-
-                console.log(teams);
-
-                let data: data_send[] = teams.map(team => ({
-                    uuid: team.id,
-                    name: team.name,
-                    scores: team.solves.map(solve => ({
-                        time: solve.time,
-                        score: solvePoints(team, solve)
-                    })),
-                    total: 0
-                }));
-
-                for (const teamData of data) {
-                    let scores = teamData.scores
-                    let sum = 0;
-                    scores = scores.map(score => {
-                        sum += score.score;
-                        return Object.assign({}, score, { score: sum });
-                    });
-                    teamData.scores = scores;
-                    teamData.total = sum;
-                }
-                res.json(data);
-            })
+            DB.repo(Round).find().then(rounds => {
+                let startTime = rounds.reduce((acc, cur, i) => {
+                    let start = new Date(cur.start);
+                    return i == 0 || start < acc ? start : acc;
+                }, new Date());
+                res.json({ teams: teamsData, startTime: startTime.toJSON() });
+            }).catch(() => res.json({ error: 'Error retrieving data' }));
+        }).catch(() => res.json({ error: 'Error retrieving data' }));
     }
 
 

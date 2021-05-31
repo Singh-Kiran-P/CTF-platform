@@ -2,9 +2,9 @@
     <div id=pageBar>
         <b-navbar toggleable=sm type=dark variant=dark>
             <b-navbar-toggle target=nav-collapse />
-            <b-navbar-brand>
+            <b-navbar-brand v-if="name || toggle">
                 <span id=name @click="home($event)">{{name}}</span>
-                <b-button type=button class=toggle-dark @click="toggleDark()">
+                <b-button v-if="toggle" type=button class=toggle-dark @click="toggleDark()">
                     <font-awesome-icon :icon="dark ? 'moon' : 'sun'" />
                 </b-button>
             </b-navbar-brand>
@@ -57,6 +57,9 @@ export default Vue.extend({
         dark: true,
         name: ''
     }),
+    computed: {
+        toggle(): boolean { return this.$route.meta.toggle; }
+    },
     methods: {
         home(e: MouseEvent) {
             e?.ctrlKey ? window.open('/', '_blank') : this.$router.push('/');
@@ -97,7 +100,7 @@ export default Vue.extend({
         border: none;
         color: var(--white-l);
         padding: 0 var(--margin);
-        margin: 0 var(--margin);
+        margin-left: var(--margin);
 
         &:not(:focus) {
             background-color: transparent;

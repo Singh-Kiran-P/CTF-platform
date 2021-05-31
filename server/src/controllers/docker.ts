@@ -212,7 +212,7 @@ export class DockerController {
         return new Promise<object>(async (resolve, reject) => {
 
             let challenge = await DB.repo(Challenge).findOne(challengeId);
-            // TODO if !challenge return reject(error)
+            if (!challenge) return reject({ message: 'Could not load challenge', statusCode: 404 });
             let ports = challenge.innerPorts.split(",").map(p => p.trim());
 
             const create = (team: Team) => {
@@ -281,7 +281,7 @@ export class DockerController {
     private challengeContainerRunning(challengeId: string, teamId: string, isAdmin: boolean) {
         return new Promise<object>(async (resolve, reject) => {
             let challenge = await DB.repo(Challenge).findOne(challengeId);
-            // TODO if !challenge return reject(error)
+            if (!challenge) return reject({ message: 'Could not load challenge', statusCode: 404 });
             let running = (team: Team) => {
 
                 let containerName = challenge.id + "-" + (team ? team.id : this.adminTeamId);
@@ -541,17 +541,17 @@ export class DockerController {
      * @returns {Promise<any>} A promise that contains the ports information
      */
     private async _createPortConfig(ports: string[]) {
-
-        let openPorts: Array<Number> = [];
-        let portBindings: { [port: string]: { HostPort: string }[] } = {};
-        for (let i = 0; i < ports.length; i++) {
-            let p = await this._giveRandomPort();
-            openPorts.push(p)
-            portBindings[ports[i]] = [{ HostPort: p.toString() }];
-        }
-        return new Promise<any>((resolve) => {
+        return new Promise<any>(async (resolve, reject) => {
+            let openPorts: Array<Number> = [];
+            let portBindings: { [port: string]: { HostPort: string }[] } = {};
+            for (let i = 0; i < ports.length; i++) {
+                let p = await this._giveRandomPort();
+                if (!p || p < 0) return reject();
+                openPorts.push(p)
+                portBindings[ports[i]] = [{ HostPort: p.toString() }];
+            }
             resolve({ openPorts: openPorts, portBindings: portBindings });
-        })
+        });
     }
 
     /**
@@ -574,17 +574,21 @@ export class DockerController {
                 .then(() => {
                     const dockerOpenPort = DB.repo(DockerOpenPort);
                     return dockerOpenPort.find();
-
                 })
                 .then((d) => {
-                    let port_: number = this._randomIntFromInterval(lowerBoundPort, upperBoundPort);
-                    const portIsOpen = d.find((item) => { return item.openPorts == port_ });
-
-                    if (portIsOpen == undefined) {
-                        const dockerOpenPort = DB.repo(DockerOpenPort);
-                        dockerOpenPort.save(new DockerOpenPort(port_));
-                        resolve(port_)
+                    let attempts = upperBoundPort - lowerBoundPort;
+                    while (--attempts >= 0) {
+                        let port_: number = this._randomIntFromInterval(lowerBoundPort, upperBoundPort);
+                        const portExists = d.find((item) => item.openPorts == port_);
+    
+                        if (!portExists) {
+                            const dockerOpenPort = DB.repo(DockerOpenPort);
+                            dockerOpenPort.save(new DockerOpenPort(port_)).then(() => resolve(port_)).catch(() => resolve(-1));
+                            attempts = -1;
+                            break;
+                        }
                     }
+                    resolve(-1);
                 });
         });
     }

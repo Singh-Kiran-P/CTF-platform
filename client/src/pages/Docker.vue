@@ -1,371 +1,240 @@
 <template>
-    <div>
-        <h2>Images</h2>
-        <div class="docker-planel">
-            <b-table striped hover :items="images"></b-table>
+    <div v-if="true" class=docker>
+        <div>
+            <div class=ports>
+                <span>Ports</span>
+                <Tooltip below content="Ports for interactive environments will be assigned within this range" class=info-tooltip>
+                    <font-awesome-icon icon=info-circle />
+                </Tooltip>
+                <label>Lower bound port
+                    <b-input type=number number v-model="lowerbound" :state="portState" placeholder="Enter lower bound port" @input="portInput()"/>
+                </label>
+                <label>Upper bound port
+                    <b-input type=number number v-model="upperbound" :state="portState" placeholder="Enter upper bound port" @input="portInput()"/>
+                </label>
+                <b-form-invalid-feedback :state="state(validatePorts)">{{validatePorts}}</b-form-invalid-feedback>
+                <div class=buttons>
+                    <StatusButton variant=danger normal=Cancel loading=Loaded succes=Loaded :state="cancelState" @click="cancelPorts()" :disabled="cancelDisabled"/>
+                    <StatusButton variant=primary normal=Save loading=Saving succes=Saved :state="saveState" @click="savePorts()" :disabled="saveDisabled"/>
+                </div>
+            </div>
         </div>
-        <h2>Containers</h2>
-        <div class="docker-planel">
-            <b-table striped hover :items="containers"></b-table>
+        <span class=info>You can view your docker images and containers below, and you can manage them <a :href="manage" target=_blank>here</a></span>
+        <div class=images>
+            <label>Images</label>
+            <Tooltip below content="TODO: images explanation" class=info-tooltip>
+                <font-awesome-icon icon=info-circle />
+            </Tooltip>
+            <b-table striped :busy="loadingImages" :fields="imageFields" :items="images">
+                <template #table-busy>
+                    <div class="text-center text-primary">
+                        <b-spinner variant=primary label=Loading />
+                    </div>
+                </template>
+            </b-table>
         </div>
-        <div class="create">
-            <h2>Config Ports</h2>
-            <b-form
-                @submit="onSubmit_configPort($event)"
-                @reset="onReset_configPort($event)"
-                v-if="show"
-            >
-                <b-form-group
-                    id="input-group-1"
-                    label="Lower Bound Port:"
-                    label-for="input-1"
-                    required
-                >
-                    <b-form-input
-                        id="input-1"
-                        v-model="form_configPorts.lowerBoundPort"
-                        type="Lower Bound Port:"
-                        placeholder="Lower Bound Port"
-                        required
-                    ></b-form-input>
-                </b-form-group>
-                <b-form-group
-                    id="input-group-1"
-                    label="Upper Bound Port:"
-                    label-for="input-1"
-                    required
-                >
-                    <b-form-input
-                        id="input-1"
-                        v-model="form_configPorts.upperBoundPort"
-                        type="Upper Bound Port:"
-                        placeholder="Upper Bound Port"
-                        required
-                    ></b-form-input>
-                </b-form-group>
-
-                <b-button type="submit" variant="primary">Update</b-button>
-                <b-button type="reset" variant="danger">Reset</b-button>
-            </b-form>
-            <!-- <b-card class="mt-3" header="Form Data Result">
-                <pre class="m-0">{{ form_configPorts }}</pre>
-            </b-card> -->
-        </div>
-
-        <div class="create">
-            <h2>Create Challenge Image</h2>
-            <b-form
-                @submit="onSubmit_createImage($event)"
-                @reset="onReset_createImage($event)"
-                v-if="show"
-            >
-                <b-form-group
-                    id="input-group-1"
-                    label="Challenge Image name:"
-                    label-for="input-1"
-                    required
-                >
-                    <b-form-input
-                        id="input-1"
-                        v-model="form_createImage.name"
-                        type="Challenge Image name:"
-                        placeholder="Enter Challenge Image name"
-                        required
-                    ></b-form-input>
-                </b-form-group>
-
-                <b-form-group
-                    id="input-group-1"
-                    label="Inner ports:"
-                    label-for="input-1"
-                    required
-                >
-                    <b-form-input
-                        id="input-1"
-                        v-model="form_createImage.innerPorts"
-                        type="Inner ports:"
-                        placeholder="Enter Inner ports"
-                        required
-                    ></b-form-input>
-                </b-form-group>
-
-                <b-form-group id="input-group-1" label-for="input-1" required>
-                    <!-- Upload -->
-                    <b-form-file
-                        accept=".zip"
-                        v-model="form_createImage.file"
-                        placeholder="Upload Docker files as .zip"
-                    />
-                </b-form-group>
-                <b-card class="mt-3" header="Form Data Result">
-                    <pre class="m-0">{{ form_createImage }}</pre>
-                </b-card>
-                <b-button type="submit" variant="primary">Create</b-button>
-                <b-button type="reset" variant="danger">Reset</b-button>
-            </b-form>
-            <!-- <b-card class="mt-3" header="Form Data Result">
-        <pre class="m-0">{{ form_createChallenge }}</pre>
-      </b-card> -->
-        </div>
-
-        <div class="create">
-            <h2>Create Challenge for team!</h2>
-            <b-form
-                @submit="onSubmit_createChallenge($event)"
-                @reset="onReset_createChallenge($event)"
-                v-if="show"
-            >
-                <b-form-group
-                    id="input-group-1"
-                    label="Challenge Image:"
-                    label-for="input-1"
-                    required
-                >
-                    <b-form-input
-                        id="input-1"
-                        v-model="form_createChallenge.challengeImage"
-                        type="Challenge Image:"
-                        placeholder="Enter Image Name"
-                        required
-                    ></b-form-input>
-                </b-form-group>
-                <b-form-group
-                    id="input-group-1"
-                    label="Challenge Name:"
-                    label-for="input-1"
-                    required
-                >
-                    <b-form-input
-                        id="input-1"
-                        v-model="form_createChallenge.containerName"
-                        type="Challenge Name"
-                        placeholder="Enter Challenge Name"
-                        required
-                    ></b-form-input>
-                </b-form-group>
-
-                <b-button type="submit" variant="primary">Create</b-button>
-                <b-button type="reset" variant="danger">Reset</b-button>
-            </b-form>
-            <!-- <b-card class="mt-3" header="Form Data Result">
-        <pre class="m-0">{{ form_createChallenge }}</pre>
-      </b-card> -->
+        <div class=containers>
+            <label>Containers</label>
+            <Tooltip below content="TODO: containers explanation" class=info-tooltip>
+                <font-awesome-icon icon=info-circle />
+            </Tooltip>
+            <b-table striped :busy="loadingContainers" :fields="containerFields" :items="containers">
+                <template #table-busy>
+                    <div class="text-center text-primary">
+                        <b-spinner variant=primary label=Loading />
+                    </div>
+                </template>
+            </b-table>
         </div>
     </div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import { serialize } from "@shared/objectFormdata";
-
 import axios from "axios";
+import Tooltip from '@/components/Tooltip.vue';
+import StatusButton from '@/components/StatusButton.vue';
+import { validateNumber, state } from '@shared/validation';
+import ports from '@/assets/functions/ports';
+
+type Container = {
+    name: string,
+    image: string,
+    ports: String,
+    state: string,
+    status: string
+};
+
+type Image = {
+    name: string,
+    size: string
+}
 
 export default Vue.extend({
-    name: "DockerTesting", // TODO: FIX DIT
+    name: 'Docker',
+    components: {
+        StatusButton,
+        Tooltip
+    },
     created() {
         this.getContainers();
         this.getImages();
-        this.getConfigPorts();
+        this.cancelPorts();
     },
     data: () => ({
-        form_createImage: {
-            name: "",
-            innerPorts: "",
-            file: null as File | null,
-        },
-        containers: [] as {
-            Name: string;
-            Image: string;
-            Ports: String;
-            State: string;
-            Status: string;
-        }[],
-        images: [] as {
-            Name: string;
-            Size: string;
-        }[],
-        form_createChallenge: {
-            challengeImage: "",
-            containerName: "",
-        },
-        form_configPorts: {
-            upperBoundPort: "",
-            lowerBoundPort: "",
-        },
-        show: true,
+        images: [] as Image[],
+        containers: [] as Container[],
+        loadingImages: false,
+        loadingContainers: false,
+
+        imageFields: [
+            { key: 'name', sortable: true },
+            { key: 'size', sortable: true }
+        ],
+        containerFields: [
+            { key: 'name', sortable: true },
+            { key: 'image', sortable: true },
+            { key: 'ports', sortable: true },
+            { key: 'state', sortable: true },
+            { key: 'status', sortable: true }
+        ],
+        
+        upperbound: NaN,
+        lowerbound: NaN,
+        
+        portState: true,
+        saveState: 'normal',
+        cancelState: 'normal',
+
+        manage: window.location.origin + ':8080' // TODO
     }),
-
+    computed: {
+        empty(): boolean { return !this.lowerbound || !this.upperbound },
+        cancelDisabled(): boolean { return this.empty },
+        saveDisabled(): boolean { return this.empty || !state(this.validatePorts) },
+        validatePorts(): string {
+            let minPort = 500;
+            let maxPort = Math.pow(2, 16) - 1;
+            let v = validateNumber(this.lowerbound, 'Lower bound', false, minPort, maxPort);
+            if (!v) v = validateNumber(this.upperbound, 'Upper bound', false, this.lowerbound, maxPort);
+            return v;
+        }
+    },
     methods: {
-        onSubmit_createChallenge(e: Event) {
-            e.preventDefault();
-            this.createChallengeContainer();
-        },
-        onReset_createChallenge(e: Event) {
-            e.preventDefault();
-            // Reset our form values
-            this.form_createChallenge.challengeImage = "";
-            this.form_createChallenge.containerName = "";
+        state,
 
-            // Trick to reset/clear native browser form validation state
-            this.show = false;
-            this.$nextTick(() => {
-                this.show = true;
-            });
+        portInput(): void {
+            this.saveState = 'normal';
+            this.cancelState = 'normal';
         },
-        onSubmit_configPort(e: Event) {
-            e.preventDefault();
-            this.updateConfigPorts();
-        },
-        onReset_configPort(e: Event) {
-            e.preventDefault();
-            // Reset our form values
-            this.form_configPorts.upperBoundPort = "";
-            this.form_configPorts.lowerBoundPort = "";
 
-            // Trick to reset/clear native browser form validation state
-            this.show = false;
-            this.$nextTick(() => {
-                this.show = true;
-            });
+        cancelPorts(): void {
+            this.cancelState = 'loading';
+            const error = () => this.cancelState = 'error';
+            axios.get('/api/docker/dockerConfigPorts').then(res => {
+                if (!res.data) return error();
+                this.lowerbound = Number(res.data.lowerBoundPort);
+                this.upperbound = Number(res.data.upperBoundPort);
+                this.cancelState = 'succes';
+            }).catch(() => error());
         },
-        onSubmit_createImage(e: Event) {
-            e.preventDefault();
-            this.createImage();
+        savePorts(): void {
+            this.saveState = 'loading';
+            const error = () => this.saveState = 'error';
+            axios.post('/api/docker/dockerConfigPorts', { lowerBoundPort: this.lowerbound.toString(), upperBoundPort: this.upperbound.toString() }).then(res => {
+                if (res.data.statusCode == 404) error();
+                else this.saveState = 'succes';
+            }).catch(() => error());
         },
-        onReset_createImage(e: Event) {
-            e.preventDefault();
-            // Reset our form values
-            this.form_createImage.name = "";
-            this.form_createImage.innerPorts = "";
-            this.form_createImage.file = null;
 
-            // Trick to reset/clear native browser form validation state
-            this.show = false;
-            this.$nextTick(() => {
-                this.show = true;
-            });
-        },
-        createImage(): void {
-            axios
-                .post("/api/docker/makeImage", serialize(this.form_createImage))
-                .then((res) => {});
+        getImages(): void {
+            this.loadingImages = true;
+            axios.get('/api/docker/images').then(res => {
+                this.loadingImages = false;
+                if (!res.data) return;
+                this.images = res.data.map((item: any) => ({
+                    name: item.RepoTags[0],
+                    size: (item.Size / Math.pow(1024, 2)).toFixed(2) + ' MB'
+                }));
+            }).catch(() => this.loadingImages = false);
         },
         getContainers(): void {
-            //TODO: Multiple ports
-            axios.get("/api/docker/containers").then((response) => {
-                let data = response.data;
-                data.forEach((item: any) => {
-                    this.containers.push({
-                        Name: item.Names[0].slice(1),
-                        Image: item.Image,
-                        Ports: item.Ports[0].PublicPort,
-                        State: item.State,
-                        Status: item.Status,
-                    });
-                });
-                console.log(data);
-            });
-        },
-        getImages(): void {
-            axios.get("/api/docker/images").then((response) => {
-                let data = response.data;
-                data.forEach((item: any) => {
-                    this.images.push({
-                        Name: item.RepoTags[0],
-                        Size: (item.Size / Math.pow(10, 6)).toFixed(2) + " mb",
-                    });
-                });
-            });
-        },
-
-        getConfigPorts(): void {
-            axios.get("/api/docker/dockerConfigPorts").then((response) => {
-                let data = response.data;
-                this.form_configPorts.upperBoundPort = data.upperBoundPort;
-                this.form_configPorts.lowerBoundPort = data.lowerBoundPort;
-            });
-        },
-        updateConfigPorts(): void {
-            let axiosConfig = {
-                headers: {
-                    "Content-Type": "application/json;charset=UTF-8",
-                    "Access-Control-Allow-Origin": "*",
-                },
-            };
-            axios
-                .post(
-                    "/api/docker/dockerConfigPorts",
-                    {
-                        upperBoundPort: this.form_configPorts.upperBoundPort,
-                        lowerBoundPort: this.form_configPorts.lowerBoundPort,
-                    },
-                    axiosConfig
-                )
-                .then((response) => {
-                    let data = response.data;
-                    if (data.statusCode === 200) {
-                        this.toast(data.message, "success");
-                    } else if (data.statusCode === 404)
-                        this.toast(data.message, "danger");
-                });
-        },
-        createChallengeContainer(): void {
-            let axiosConfig = {
-                headers: {
-                    "Content-Type": "application/json;charset=UTF-8",
-                    "Access-Control-Allow-Origin": "*",
-                },
-            };
-            axios
-                .post(
-                    "/api/docker/createChallengeContainer",
-                    {
-                        challengeImage: this.form_createChallenge
-                            .challengeImage,
-                        containerName: this.form_createChallenge.containerName,
-                    },
-                    axiosConfig
-                )
-                .then((response) => {
-                    let data = response.data;
-                    if (data.statusCode === 200) {
-                        this.toast(data.message, "success");
-                    } else if (data.statusCode === 404)
-                        this.toast(data.message, "danger");
-                });
-        },
-        toast(message: string, type: string, append = false) {
-            this.$bvToast.toast(message, {
-                title: "Message",
-                toaster: "b-toaster-bottom-right",
-                variant: type,
-                solid: true,
-                appendToast: append,
-            });
-        },
-    },
+            this.loadingContainers = true;
+            axios.get('/api/docker/containers').then(res => {
+                this.loadingContainers = false;
+                if (!res.data) return;
+                this.containers = res.data.map((item: any) => ({
+                    name: item.names[0], // TODO: slice(1)? waarom
+                    image: item.image,
+                    ports: ports(item.ports).reduce((acc, cur, i) => acc + (i == 0 ? '' : ', ') + cur, ''),
+                    state: item.state,
+                    status: item.status,
+                }));
+            }).catch(() => this.loadingContainers = false);
+        }
+    }
 });
 </script>
 
-
 <style scoped lang="scss">
-.docker-planel {
+.docker {    
     display: flex;
-    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    padding: var(--double-margin);
     padding-bottom: 0;
-    margin: 10px auto 20px auto;
-    width: 60%;
+
+    & > div:first-child {
+        width: min(100%, var(--breakpoint-sm));
+    }
+
+    .images {
+        width: min(100%, var(--breakpoint-md));
+    }
+
+    .containers {
+        width: min(100%, var(--breakpoint-lg));
+    }
 }
-h2 {
-    display: flex;
-    justify-content: center;
-    padding-bottom: 0;
-    margin: 10px auto 20px auto;
-    width: 60%;
+
+.info-tooltip {
+    color: var(--info);
+    display: inline-block;
+    margin-left: var(--margin);
 }
-.create {
-    margin: 50px auto 20px auto;
-    width: 50%;
-    border-top: 1px solid var(--black-c);
+
+.info {
+    margin-bottom: var(--margin);
+    margin-top: var(--double-margin);
+
+    a {
+        font-weight: bold;
+    }
+}
+
+.ports span, .images label, .containers label {
+    font-weight: bold;
+    font-size: var(--font-large);
+    margin-bottom: var(--margin);
+}
+
+.ports {
+    label {
+        display: block;
+    }
+    
+    .buttons {
+        display: flex;
+        margin-top: var(--double-margin);
+
+        button {
+            width: 0;
+            flex-grow: 1;
+
+            &:first-of-type {
+                margin-right: var(--double-margin);
+            }
+        }
+    }
 }
 </style>

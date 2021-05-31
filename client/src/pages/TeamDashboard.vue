@@ -20,9 +20,9 @@
             <span class=points><font-awesome-icon icon=check class=icon-primary /> {{team.points}} Point{{team.points == 1 ? '' : 's'}}</span>
 
             <div class=members>
-                <label for=member-table>Members</label>
+                <label>Members</label>
                 <span class=error v-if="membersLoadingError">{{membersLoadingError}}</span>
-                <b-table id=member-table striped :items="members" :fields="members_fields" :busy="members_isLoading">
+                <b-table striped :items="members" :fields="members_fields" :busy="members_isLoading">
                     <template v-slot:cell(name)="row">
                         <span>{{row.item.name}}</span>
                         <Tooltip v-if="row.item.captain" :title="`${row.item.name} is the captain of ${team.name}`" content="The captain can delete the team, remove members and generate new invite links" class=captain-icon>
@@ -41,9 +41,9 @@
             </div>
 
             <div class=solves>
-                <label for=solves-table>Solves</label>
+                <label>Solves</label>
                 <span class=error v-if="solvesLoadingError">{{solvesLoadingError}}</span>
-                <b-table id=solves-table striped :items="solves" :fields="solves_fields" :busy="solves_isLoading">
+                <b-table striped :items="solves" :fields="solves_fields" :busy="solves_isLoading">
                     <template v-slot:cell(challenge)="row">
                         <router-link :to="'/challenge/' + row.item.challenge.id">{{row.item.challenge.name}}</router-link>
                     </template>
@@ -230,10 +230,7 @@ export default Vue.extend({
 
             try {
                 var successful = document.execCommand('copy');
-                if(!successful) alert('Error copying to clipboard');
-            } catch (err) {
-                alert('Error copying to clipboard');
-            }
+            } catch (err) {}
 
             document.body.removeChild(textArea);
         },

@@ -1,10 +1,7 @@
 /**
  * @author Kiran Singh
  */
-import { isAdmin, isAuth } from "@/auth";
 import express from "express";
-import { Db } from "typeorm";
-import DB, { Sponsor } from '../database';
 const router = express.Router();
 import { LeaderBoardController } from "../controllers/leaderboard";
 let controller = new LeaderBoardController();

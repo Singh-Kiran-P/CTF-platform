@@ -1,6 +1,6 @@
-import DB, { Team, Account, Solve } from '../database';
+import DB, { Team, Account } from '../database';
 import { isAuth, hasTeam, getAccount, generatePassword } from '../auth/index';
-import { responseSolve, solvePoints } from './challenges';
+import { solvePoints } from './challenges';
 import { ILike } from 'typeorm';
 import express from 'express';
 const router = express.Router();
@@ -59,7 +59,6 @@ router.get('/infoDashboard', isAuth, hasTeam, (req, res) => {
     res.redirect('/api/team/infoDashboard/' + acc.team.id);
 })
 
-//TODO: get placement
 router.get('/infoDashboard/:uuid', (req, res) => {
     let isCaptainOrAdmin = false;
     let isAdmin = false;

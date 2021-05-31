@@ -2,6 +2,8 @@ import DB, { Team, Competition, Category, Challenge, ChallengeType, Tag, Account
 import { DockerManagement } from './entities/docker/DockerManagement';
 import { DockerOpenPort } from './entities/docker/DockerOpenPort';
 
+// TODO: good test data
+
 /**
  * loads test entries into the database
  * this function is called each time the database connection is made, after emptying the database
@@ -17,7 +19,7 @@ async function loadTestData() {
     ]))[0];
 
     let pages: Page[] = await save([
-        new Page({ name: 'Test', path: '/', source: '/pages/_page/sharks.html', order: 1 })
+        new Page({ name: 'Test', path: '/', source: '/pages/_page/index.html', order: 1 })
     ]);
 
     let categories: Category[] = await save([

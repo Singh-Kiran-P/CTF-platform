@@ -126,7 +126,7 @@ span, label {
     color: var(--black-c);
 }
 
-:not(.b-form-timepicker):not(.b-form-datepicker):not(.navbar-brand):not(.modal-header) > button:not(.icon):not(.page-link) {
+:not(.b-form-timepicker):not(.b-form-datepicker):not(.navbar-brand):not(.modal-header):not(.toast-header) > button:not(.icon):not(.page-link) {
     &, span {
         color: var(--white-l) !important;
     }
