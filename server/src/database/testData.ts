@@ -69,10 +69,10 @@ async function loadTestData() {
     ]);
 
     let sponsors: Sponsor[] = (await save([
-        new Sponsor({name: "Cegeka", link: "https://www.cegeka.com/nl-be/", icon: "/sponsors/cegeka/logo_cegeka_w.png", order: 1}),
-        new Sponsor({name: "IBM", link: "https://www.ibm.com/be-en", icon: "/sponsors/ibm/ibm-banner.jpg", order: 2}),
-        new Sponsor({name: "EDM UHasselt", link: "https://www.uhasselt.be/edm", icon: "/sponsors/edm uhasselt/EDM-logo.png", order: 3}),
-        new Sponsor({name: "Intigriti", link: "https://www.intigriti.com/", icon: "/sponsors/intigriti/intigriti.png", order: 4}),
+        new Sponsor({ name: "Cegeka", link: "https://www.cegeka.com/nl-be/", icon: "/sponsors/cegeka/logo_cegeka_w.png", order: 1 }),
+        new Sponsor({ name: "IBM", link: "https://www.ibm.com/be-en", icon: "/sponsors/ibm/ibm-banner.jpg", order: 2 }),
+        new Sponsor({ name: "EDM UHasselt", link: "https://www.uhasselt.be/edm", icon: "/sponsors/edm uhasselt/EDM-logo.png", order: 3 }),
+        new Sponsor({ name: "Intigriti", link: "https://www.intigriti.com/", icon: "/sponsors/intigriti/intigriti.png", order: 4 }),
     ]));
 
     const teamRepo = new TeamRepoCustom;
@@ -91,16 +91,18 @@ async function loadTestData() {
     ]))[0];
 
     let dockerOpenPort: DockerOpenPort[] = (await save([
+        // vue server
         new DockerOpenPort(80),
+        // node server
         new DockerOpenPort(4000),
+        // postgresSQL
+        new DockerOpenPort(5432),
+        // pgAdmin
+        new DockerOpenPort(8080),
+        // docker portainer
         new DockerOpenPort(8000),
         new DockerOpenPort(9000),
     ]));
-
-
-    /* let dockerimages: DockerChallengeImage[] = (await save([
-        new DockerChallengeImage("challenge1", ["8080/tcp"], 521)
-    ])); */ // TODO: in challenge instead
 }
 
 /**
