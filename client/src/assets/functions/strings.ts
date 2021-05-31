@@ -8,9 +8,9 @@ const solveNames = (solves: Solve[]): string => { return solves.reduce((acc, cur
 const typeName = (type: string): string => type == ChallengeType.INTERACTIVE ? 'Interactive' : (type == ChallengeType.QUIZ ? 'Quiz' : 'Basic');
 const typeDescription = (type: string): string => {
     switch (type) {
-        case ChallengeType.INTERACTIVE: return 'TODO: explain interactive challenge';
-        case ChallengeType.QUIZ: return 'TODO: explain quiz challenge';
-        default: return 'TODO: explain basic challenge';
+        case ChallengeType.INTERACTIVE: return 'These challenges take place in an interactive environment within which you will have to find the flag in order to solve the challenge';
+        case ChallengeType.QUIZ: return 'These challenges consist of a number of questions you have to answer correctly in order to solve the challenge';
+        default: return 'These challenges require you to find a flag in order to solve the challenge';
     };
 }
 

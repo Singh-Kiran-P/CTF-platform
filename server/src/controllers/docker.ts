@@ -212,7 +212,7 @@ export class DockerController {
         return new Promise<object>(async (resolve, reject) => {
 
             let challenge = await DB.repo(Challenge).findOne(challengeId);
-            // TODO if !challenge return reject(error)
+            if (!challenge) return reject({ message: 'Could not load challenge', statusCode: 404 });
             let ports = challenge.innerPorts.split(",").map(p => p.trim());
 
             const create = (team: Team) => {
@@ -281,7 +281,7 @@ export class DockerController {
     private challengeContainerRunning(challengeId: string, teamId: string, isAdmin: boolean) {
         return new Promise<object>(async (resolve, reject) => {
             let challenge = await DB.repo(Challenge).findOne(challengeId);
-            // TODO if !challenge return reject(error)
+            if (!challenge) return reject({ message: 'Could not load challenge', statusCode: 404 });
             let running = (team: Team) => {
 
                 let containerName = challenge.id + "-" + (team ? team.id : this.adminTeamId);

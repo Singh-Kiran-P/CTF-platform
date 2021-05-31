@@ -54,7 +54,6 @@ router.get('/getUsers', (req, res) => {
     }).catch((err) => { return res.json({ error: err }) });
 });
 
-//TODO: do solves need to be removed? from team? or user?
 router.post('/leaveTeam', isAuth, (req, res) => {
     let acc: Account = getAccount(req);
     DB.repo(Account).update(acc.id, {team: null}).then((response)=>{res.json({})}).catch((err)=>{res.json({error: 'DB error, cannot leave team'})});

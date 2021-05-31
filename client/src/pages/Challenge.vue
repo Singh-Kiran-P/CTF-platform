@@ -33,13 +33,15 @@
                     <Tooltip :content="typeDescription" below center>
                         <span class=type>{{typeName}}</span>
                     </Tooltip>
-                    <Tooltip content="TODO: points explanation" below center>
+                    <Tooltip below center
+                        :content="'Points are earned upon entering the correct flag or solving all questions' +
+                        (challenge.hints.length > 0 ? ', using hints will reduce your earned points' : '')">
                         <span class=points>{{challenge.points}} Point{{challenge.points == 1 ? '' : 's'}}</span>
                     </Tooltip>
                     <Tooltip v-if="challenge.tag" :content="challenge.tag.description" below center>
                         <span class=tag>{{challenge.tag.name}}</span>
                     </Tooltip>
-                    <Tooltip v-else content="This challenge has not been given a tag" below center>
+                    <Tooltip v-else content="No tag set" below center>
                         <span class=tag>No tag</span>
                     </Tooltip>
                 </div>
@@ -54,7 +56,7 @@
                 </span>
             </span></span>
             <template v-if="!solved && !ended">
-                <div v-if="challenge.type == typeValues.INTERACTIVE" class=interactive>
+                <div v-if="true || challenge.type == typeValues.INTERACTIVE" class=interactive>
                     <span>Manage your interactive environment</span>
                     <div class=controls>
                         <StatusButton variant=primary @click="!containerInit ? initContainer() : startContainer()" :disabled="resetState == 'loading'"
@@ -65,7 +67,7 @@
                     <div v-if="startState == 'succes'" class=ports>
                         <span v-if="ports.length > 0">Available ports: </span>
                         <span v-else>No ports available, contact the organizer for help</span>
-                        <b-button variant=primary :disabled="stopState != 'normal'" v-for="port in ports" :href="`${domain}/${'TODO'}`" target=_blank :key="port">
+                        <b-button variant=primary :disabled="stopState != 'normal'" v-for="port in ports" :href="`${domain}:${port}`" target=_blank :key="port" @click="openPort($event)">
                             <font-awesome-icon icon=external-link-alt /> {{port}}
                         </b-button>
                     </div>
@@ -88,16 +90,17 @@
                         <span class=item-name>{{hint.name}}</span>
                         <span class=hint-content>{{hint.content}}</span>
                     </div>
-                    <Tooltip :title="hint.name" :content="`This hint costed you ${costName(hint).toLowerCase()}`" center>
+                    <Tooltip :title="hint.name" center
+                        :content="`This hint ${solved ? 'costed you' : 'will cost you'} ${costName(hint).toLowerCase()} ${solved ? '' : 'if you manage to solve this challenge'}`">
                         <span class=hint-cost>-{{costName(hint)}}</span>
                     </Tooltip>
                 </div>
             </Collapse>
             <Collapse v-if="hints.length > 0" label=Hints center noborder class=hints>
-                <span>TODO: hints explanation</span>
                 <div class=list-item v-for="hint in hints" :key="hint.order">
                     <span class="item-name item-content">{{hint.name}}</span>
-                    <Tooltip :title="hint.name" :content="solved ? 'You did not use this hint' : `Using this hint will cost you ${costName(hint).toLowerCase()}`" center>
+                    <Tooltip center :title="hint.name"
+                        :content="solved ? 'You did not use this hint' : `Using this hint will cost you ${costName(hint).toLowerCase()} if you manage to solve this challenge`">
                         <StatusButton variant=danger size=sm @click="useHint(hint)" :state="hint.state || 'normal'" :disabled="solved"
                             :normal="'-' + costName(hint)" loading=Loading succes=Used />
                     </Tooltip>
@@ -118,6 +121,7 @@ import AdminHeader from '@/components/AdminHeader.vue';
 import StatusButton from '@/components/StatusButton.vue';
 import { Challenge, ChallengeType, Hint, Question, validChallenge } from '@shared/validation/roundsForm';
 import { typeName, typeDescription, solvePoints, solveNames, durationDisplay, countdownDisplay, timerDisplay } from '@/assets/functions/strings';
+import ports from '@/assets/functions/ports';
 import path from 'path';
 
 export default Vue.extend({
@@ -159,13 +163,13 @@ export default Vue.extend({
         incorrect: false,
         rateLimitTime: 0,
 
-        containerInit: false,
-        startState: 'normal',
+        containerInit: true, // TODO false
+        startState: 'succes', // TODO normal
         resetState: 'normal',
-        stopState: 'succes',
+        stopState: 'normal', // TODO succes
 
-        domain: 'localhost', // TODO NOT HARDCODED
-        ports: [] as string[]
+        domain: window.location.origin, // TODO test
+        ports: [80] as number[]
     }),
     computed: {
         admin(): boolean { return this.$route.meta?.admin; },
@@ -232,9 +236,9 @@ export default Vue.extend({
                 let started = res.data.state;
                 if (err) return error();
                 if (started) {
-                    this.setPorts(res.data.ports);
-                    this.startState = 'succes';
                     this.stopState = 'normal';
+                    this.startState = 'succes';
+                    this.ports = ports(res.data.ports);
                 }
                 this.containerInit = true;
             }).catch(() => error());
@@ -245,9 +249,10 @@ export default Vue.extend({
             const error = () => this.startState = 'error';
             axios.get('/api/docker/createChallengeContainer/' + this.challenge?.id).then(res => {
                 let err = res.data.statusCode == 404;
-                if (err) error();
-                this.startState = 'succes';
+                if (err) return error();
                 this.stopState = 'normal';
+                this.startState = 'succes';
+                this.ports = ports(res.data.ports);
             }).catch(() => error());
         },
         resetContainer(): void {
@@ -257,6 +262,7 @@ export default Vue.extend({
                 let err = res.data.statusCode == 404;
                 if (err) return error();
                 this.resetState = 'normal';
+                this.ports = ports(res.data.ports);
             }).catch(() => error());
         },
         stopContainer(): void {
@@ -265,13 +271,10 @@ export default Vue.extend({
             axios.get('/api/docker/stopChallengeContainer/' + this.challenge?.id).then(res => {
                 let err = res.data.statusCode == 404;
                 if (err) return error();
-                this.stopState = 'succes';
                 this.startState = 'normal';
+                this.stopState = 'succes';
+                this.ports = [];
             }).catch(() => error());
-        },
-
-        setPorts(ports: any): void {
-            this.ports = ['8080', '9090', '100100']; // TODO NOT HARDCODED
         }
     }
 });

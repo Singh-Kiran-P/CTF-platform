@@ -425,13 +425,6 @@ span.info {
     }
 }
 
-.item-description.nowrap {
-    display: block;
-    overflow-x: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-}
-
 .challenges {
     width: 100%;
     margin: var(--margin) 0;

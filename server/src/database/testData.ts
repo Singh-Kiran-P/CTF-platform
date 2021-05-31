@@ -17,7 +17,7 @@ async function loadTestData() {
     ]))[0];
 
     let pages: Page[] = await save([
-        new Page({ name: 'Test', path: '/', source: '/pages/_page/sharks.html', order: 1 })
+        new Page({ name: 'Test', path: '/', source: '/pages/_page/index.html', order: 1 })
     ]);
 
     let categories: Category[] = await save([
