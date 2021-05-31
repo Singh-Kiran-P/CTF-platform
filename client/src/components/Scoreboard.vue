@@ -46,7 +46,6 @@ export default Vue.extend({
         chart: (null as unknown) as am4charts.XYChart,
         scrollbar: (null as unknown) as am4charts.XYChartScrollbar,
         dateAxis: (null as unknown) as am4charts.DateAxis,
-        startTime: new Date(),
         teams: [] as Team[],
         isLoading: true,
         totalRows: 1,
@@ -135,8 +134,7 @@ export default Vue.extend({
                 axios.get('/api/leaderboard/getAllData/' + this.category).then(res => {
                     this.isLoading = false;
                     if (res.data.error) return reject();
-                    this.startTime = new Date(res.data.startTime); // TODO USE START TIME
-                    this.teams = res.data.teams;
+                    this.teams = res.data;
                     resolve();
                 }).catch(() => reject());
             });

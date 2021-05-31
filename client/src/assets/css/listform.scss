@@ -132,7 +132,7 @@ $breakpoint-sm: 576px;
             flex-wrap: wrap;
         }
 
-        .item-category ~ *:not(span) {
+        .item-category ~ *:not(span):not(.item-value-tooltip) {
             width: 100%;
         }
     }

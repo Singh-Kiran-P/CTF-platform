@@ -48,7 +48,7 @@ router.put('/save', isAdmin, (req, res) => {
             if (challengeRounds.length == 0) res.send(); else challengeRounds.forEach((round, i) => {
                 Promise.all(round.challenges.map((c: Challenge & VChallenge) => c.type != ChallengeType.INTERACTIVE ? Docker.deleteImage(c.dockerImageId) : (!c.dockerFile ? null : chain(
                     () => Docker.deleteImage(c.dockerImageId).catch(err => res.json(err)),
-                    () => Docker.makeImage(uploaddir + round.folder + parentDir(c.docker), `${i}-${c.order}-${new Date().getTime()}`).then(id => c.dockerImageId = id).catch(err => res.json(err)))
+                    () => Docker.makeImage(uploaddir + round.folder + parentDir(c.docker), `${i}-${c.order}-${new Date().getTime()}`).then(id => c.dockerImageId = id))
                 ))).then(() => {
                     let challenges = round.challenges.map(x => new Challenge(Object.assign({}, x, { round: round })));
                     DB.setRepo(DB.repo(Challenge), challenges, { where: { round: round } }, x => cfolder(x) ? [uploaddir + round.folder + cfolder(x)] : [], true).then(challenges => {

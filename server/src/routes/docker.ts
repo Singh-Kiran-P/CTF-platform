@@ -14,7 +14,7 @@ router.get("/dockerConfigPorts", isAdmin, controller.dockerConfigPorts_GET)
 
 router.post("/dockerConfigPorts", isAdmin, controller.dockerConfigPorts_POST)
 
-router.post("/usedPorts", controller.saveUsedPorts_POST);
+router.post("/usedPorts", isAdmin, controller.saveUsedPorts_POST);
 
 router.get("/containers", isAdmin, controller.containers_GET);
 
@@ -29,6 +29,8 @@ router.get("/startChallengeContainer/:challengeId", isAuth, controller.startChal
 router.get("/stopChallengeContainer/:challengeId", isAuth, controller.stopChallengeContainer_GET);
 
 router.get("/resetChallengeContainer/:challengeId", isAuth, controller.resetChallengeContainer_GET);
+
+// TODO: remove comments
 
 // router.post("/makeImage", isAdmin, controller.makeImage_POST);
 

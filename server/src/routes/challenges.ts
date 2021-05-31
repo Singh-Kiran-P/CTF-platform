@@ -111,7 +111,7 @@ router.post('/answer/:id/:order', isAuth, (req, res) => {
         let next = responseQuestion(challenge.questions[i + 1], true);
         let content = req.fields.answer as string;
         let correct = correctAnswer(challenge.questions[i], content);
-        attempt(res, account, team, challenge, content, correct, Object.assign({}, next || {}, { i: i }));
+        attempt(res, account, team, challenge, content, correct, Object.assign({}, next || {}, { i: i + 1 }));
     });
 });
 

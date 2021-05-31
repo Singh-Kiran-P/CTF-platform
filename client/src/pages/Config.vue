@@ -71,7 +71,7 @@
                             <span class=item-description>
                                 <span class=item-category>Source</span>
                                 <span v-if="!page.editable" class=item-value>{{source(page)}}</span>
-                                <template v-else>
+                                <template v-else> <!-- TODO: half -->
                                     <b-form-file class=half accept=".html" v-model="page.html" :placeholder="htmlPlaceholder(page)" :state="state(pageFeedback(page))"/>
                                     <b-form-file class=half accept=".zip" v-model="page.zip" :placeholder="zipPlaceholder(page)" :state="state(pageFeedback(page))"/>
                                 </template>
