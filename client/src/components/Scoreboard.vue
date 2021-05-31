@@ -135,7 +135,8 @@ export default Vue.extend({
             series.id = team.uuid;
             series.tooltipText = '{name}: [bold]{valueY}[/] \n Date: {date} {valueX}';
             series.tensionX = 0.8;
-            series.showOnInit = true;
+            // disable animations
+            series.showOnInit = false;
             var interfaceColors = new am4core.InterfaceColorSet();
             var defaultBullet = series.bullets.push(new am4charts.CircleBullet());
             defaultBullet.circle.stroke = interfaceColors.getFor('background');
