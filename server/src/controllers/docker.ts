@@ -87,9 +87,11 @@ export class DockerController {
      * @category Routes
      */
     public saveUsedPorts_POST(req: Request, res: Response) {
-        let ports = req.fields.ports.toString().split(",").map(p => p.trim());
+        let ports = req.fields.ports.toString().split(",").map(p => Number.parseInt(p.trim())).filter(p => p && !isNaN(p));
+        console.log(ports);
+
         const dockerOpenPortRepo = DB.repo(DockerOpenPort);
-        Promise.all(ports.map(p => dockerOpenPortRepo.save(new DockerOpenPort(Number.parseInt(p)))))
+        Promise.all(ports.map(p => dockerOpenPortRepo.save(new DockerOpenPort(p))))
             .then(() => res.json({ message: "Ports successfully saved!", statusCode: 200 }))
             .catch((err) => res.json({ message: "Error saving ports!", statusCode: 404 }));
     }
@@ -591,10 +593,9 @@ export class DockerController {
                 })
                 .then((d) => {
                     let attempts = upperBoundPort - lowerBoundPort;
-                    while (--attempts >= 0) {
+                    while (--attempts > 0) {
                         let port_: number = this._randomIntFromInterval(lowerBoundPort, upperBoundPort);
                         const portExists = d.find((item) => item.openPorts == port_);
-
                         if (!portExists) {
                             const dockerOpenPort = DB.repo(DockerOpenPort);
                             dockerOpenPort.save(new DockerOpenPort(port_)).then(() => resolve(port_)).catch(() => resolve(-1));
@@ -602,7 +603,8 @@ export class DockerController {
                             break;
                         }
                     }
-                    resolve(-1);
+                    if (attempts == 0)
+                        resolve(-1);
                 });
         });
     }

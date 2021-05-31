@@ -109,7 +109,7 @@ export default Vue.extend({
         upperbound: NaN,
         lowerbound: NaN,
         excluded: '',
-        
+
         portState: true,
         saveState: 'normal',
         cancelState: 'normal',
@@ -168,7 +168,7 @@ export default Vue.extend({
                 if (!res.data) return;
                 this.images = res.data.map((item: any) => ({
                     name: item.RepoTags[0],
-                    size: (item.Size / Math.pow(1024, 2)).toFixed(2) + ' MB'
+                    size: (item.Size / Math.pow(1024, 2)).toFixed(2) + ' Mb'
                 }));
             }).catch(() => this.loadingImages = false);
         },
@@ -178,11 +178,11 @@ export default Vue.extend({
                 this.loadingContainers = false;
                 if (!res.data) return;
                 this.containers = res.data.map((item: any) => ({
-                    name: item.names[0], // TODO: slice(1)? waarom
-                    image: item.image,
-                    ports: portsb(item.ports).reduce((acc, cur, i) => acc + (i == 0 ? '' : ', ') + cur, ''),
-                    state: item.state,
-                    status: item.status,
+                    name: item.Names[0].slice(1),
+                    image: item.Image,
+                    ports: portsb(item.Ports).reduce((acc, cur, i) => acc + (i == 0 ? '' : ', ') + cur, ''),
+                    state: item.State,
+                    status: item.Status,
                 }));
             }).catch(() => this.loadingContainers = false);
         }

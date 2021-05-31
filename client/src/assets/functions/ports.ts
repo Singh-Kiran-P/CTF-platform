@@ -23,12 +23,16 @@ type PortsB = {
 }[];
 
 const portsb = (ports: PortsB): number[] => {
+    console.log(ports);
+
     if (!validb(ports)) return [];
+    console.log("valid");
+
     return [...new Set(ports.map(p => p.PublicPort).filter(p => p && p > 0))];
 }
 
 const validb = (ports: any): boolean => {
-    return is.array(ports, p => is.object(p) && is.string(p?.PublicPort));
+    return is.array(ports, p => is.object(p));
 }
 
 export { portsa, portsb };
