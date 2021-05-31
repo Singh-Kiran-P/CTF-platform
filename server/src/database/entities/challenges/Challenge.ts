@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany } from 'typeorm';
 import { Solve, Question, Round, Hint, Tag, UsedHint } from '../../../database';
-import { ChallengeType } from '@shared/validation/roundsForm';
+import { ChallengeType } from '@/shared/src/validation/roundsForm';
 
 export { ChallengeType };
 

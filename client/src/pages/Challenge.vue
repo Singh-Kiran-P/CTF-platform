@@ -119,7 +119,7 @@ import Tooltip from '@/components/Tooltip.vue';
 import Collapse from '@/components/Collapse.vue';
 import AdminHeader from '@/components/AdminHeader.vue';
 import StatusButton from '@/components/StatusButton.vue';
-import { Challenge, ChallengeType, Hint, Question, validChallenge } from '@shared/validation/roundsForm';
+import { Challenge, ChallengeType, Hint, Question, validChallenge } from '@/shared/src/validation/roundsForm';
 import { typeName, typeDescription, solvePoints, solveNames, durationDisplay, countdownDisplay, timerDisplay } from '@/assets/functions/strings';
 import ports from '@/assets/functions/ports';
 import path from 'path';

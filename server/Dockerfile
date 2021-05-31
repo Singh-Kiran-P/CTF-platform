@@ -1,10 +1,12 @@
+# @author Kiran Singh
 FROM mrsingh00/node14-docker
 
-WORKDIR /ctf/server
+WORKDIR  /ctf/server/
 
-# COPY package*.json ./
+COPY . /ctf/server/
+# COPY /../shared/ /ctf/
 
-# COPY  . .
+RUN npm install
 
 EXPOSE 4000
 

@@ -38,7 +38,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { is } from '@shared/validation';
+import { is } from '@/shared/src/validation';
 import Tooltip from '@/components/Tooltip.vue';
 import { timeDisplay } from'@/assets/functions/strings';
 
@@ -113,7 +113,7 @@ export default Vue.extend({
 .disclaimer {
     padding-bottom: var(--double-margin);
     border-bottom: var(--border-c) solid var(--black-c);
-    
+
     span {
         font-weight: bold;
         margin-right: var(--margin);

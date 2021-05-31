@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import axios from 'axios';
 import VueRouter from 'vue-router';
-import Roles from '@shared/roles';
+import Roles from '@/shared/src/roles';
 Vue.use(VueRouter);
 
 type Route = { path: string, name: string, src: string, meta?: {} };

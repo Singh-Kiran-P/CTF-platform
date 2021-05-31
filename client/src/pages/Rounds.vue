@@ -125,10 +125,10 @@ import axios from 'axios';
 import Loading from '@/components/Loading.vue';
 import Tooltip from '@/components/Tooltip.vue';
 import Collapse from '@/components/Collapse.vue';
-import { Tag } from '@shared/validation/configForm';
+import { Tag } from '@/shared/src/validation/configForm';
 import AdminHeader from '@/components/AdminHeader.vue';
 import { toggledItems, loadItems } from '@/assets/functions/list';
-import { Round, Challenge, validForm, validChallenges } from '@shared/validation/roundsForm';
+import { Round, Challenge, validForm, validChallenges } from '@/shared/src/validation/roundsForm';
 import { typeName, typeDescription, solvePoints, solveNames, durationDisplay, countdownDisplay } from '@/assets/functions/strings';
 
 type Visible = { visible?: boolean };

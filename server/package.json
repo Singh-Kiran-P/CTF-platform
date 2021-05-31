@@ -6,7 +6,7 @@
         "docker-test": "npm run build && npm run server_with_auto_reload_files",
         "server_watch_TS": "tsc --watch",
         "client": "npm run client --prefix ../client",
-        "server": "npm run build && concurrently --kill-others  \"tsc --watch\" \"nodemon --legacy-watch dist/server/src\"",
+        "server": "npm run build && concurrently --kill-others  \"tsc --watch\" \"nodemon --legacy-watch dist\"",
         "dev": "concurrently --kill-others  \"npm run client\" \"npm run server\"",
         "makeDocs": "npx typedoc --out docs src",
         "makeDocs-dark": "npx typedoc --out docs src"

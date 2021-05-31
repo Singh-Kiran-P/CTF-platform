@@ -7,7 +7,7 @@
                         <Scoreboard :category="category"/>
                     </SliderItem>
                 </Slider>
-            </div> 
+            </div>
         </div>
         <div class=sponsors>
             <Carousel class=sponsor-slider autoplay autoplayHoverPause loop :paginationEnabled="false" centerMode :autoplayTimeout="5000" :speed="1000" easing="linear"
@@ -29,7 +29,7 @@ import Vue from 'vue';
 import axios from 'axios';
 import { Carousel, Slide } from 'vue-carousel';
 import { Slider, SliderItem } from 'vue-easy-slider';
-import { Sponsor } from '@shared/validation/configForm';
+import { Sponsor } from '@/shared/src/validation/configForm';
 import Scoreboard from '@/components/Scoreboard.vue';
 
 export default Vue.extend({
@@ -43,7 +43,7 @@ export default Vue.extend({
     },
     data: () => ({
         categories: [] as String[],
-        sponsors: [] as Sponsor[], 
+        sponsors: [] as Sponsor[],
     }),
     created() {
         this.loadCategories();

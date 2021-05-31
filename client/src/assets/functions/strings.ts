@@ -1,6 +1,6 @@
 // general functions for displaying values as strings
 
-import { Round, Solve, ChallengeType } from '@shared/validation/roundsForm';
+import { Round, Solve, ChallengeType } from '@/shared/src/validation/roundsForm';
 
 const solvePoints = (solves: Solve[]): string => { let p = solves.reduce((acc, cur) => Math.max(acc, cur.points), 0); return `${p} point${p == 1 ? '' : 's'}`; };
 const solveNames = (solves: Solve[]): string => { return solves.reduce((acc, cur, i) => cur.name + (i == 1 ? ' and ' : (i == 0 ? '' : ', ')) + acc, ''); };

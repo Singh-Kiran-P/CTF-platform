@@ -3,10 +3,8 @@ FROM node:10-alpine
 
 WORKDIR  /node/client
 
-COPY package*.json /node/client/
+COPY . /node/client/
 RUN npm install
-
-# COPY . .
 
 EXPOSE 80
 

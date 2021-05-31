@@ -1,6 +1,6 @@
 import { uploaddir } from '../routes/uploads';
 import { File as UFile } from 'formidable';
-import { is } from '@shared/validation';
+import { is } from '@/shared/src/validation';
 import fse, { mkdir } from 'fs-extra';
 import extract from 'extract-zip';
 import { ncp } from 'ncp';

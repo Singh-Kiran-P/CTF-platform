@@ -1,3 +1,4 @@
+# @author Kiran Singh
 # docker-compose.yml
 version: "3.7"
 
@@ -22,8 +23,8 @@ services:
     restart: always
     image: dpage/pgadmin4
     environment:
-        PGADMIN_DEFAULT_EMAIL: admin@ctf.be
-        PGADMIN_DEFAULT_PASSWORD: secret
+        PGADMIN_DEFAULT_EMAIL: admin@ctf-platform.be
+        PGADMIN_DEFAULT_PASSWORD: admin
         PGADMIN_LISTEN_PORT: 80
     ports:
         - '8080:80'
@@ -52,13 +53,18 @@ services:
     container_name: vue-ui
     build:
       context: ./client
+    #   dockerfile: client/Dockerfile
     ports:
       - "80:80"
-    volumes:
-      - ./client:/ctf/client
-      - ./shared:/ctf/shared
+    # command: /bin/sh  -c "cp -R ./shared /ctf/shared"
+
+    # volumes:
+    #   - ./client:/ctf/client
+    #   - ./shared:/ctf/shared
     working_dir: /ctf/client
     depends_on:
+        - nodejs-server
+    links:
         - nodejs-server
     networks:
       - mynet
@@ -67,19 +73,24 @@ services:
     container_name: nodejs-server
     build:
       context: ./server
+    #   dockerfile: server/Dockerfile
     depends_on:
       - postgres
     links:
       - postgres
     ports:
       - '4000:4000'
+    # command: /bin/sh  -c "cp -R ./shared /ctf/shared"
+
     volumes:
-      - ./server:/ctf/server
-      - ./shared:/ctf/shared
-      - ./shared:/ctf/client
+    #   - ./server:/ctf/server
+    #   - ./shared:/ctf/shared
+    #   - ./shared:/ctf/client
       # For accessing docker works ONLY in Linux
       - /var/run/docker.sock:/var/run/docker.sock
     working_dir: /ctf/server
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
     networks:
       - mynet
 

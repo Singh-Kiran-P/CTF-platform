@@ -1,14 +1,11 @@
 {
     "compilerOptions": {
+        "strict": true,
         "target": "es6",
         "module": "commonjs",
-        "noImplicitAny": true,
         "esModuleInterop": true,
         "moduleResolution": "node",
-        "emitDecoratorMetadata": true,
-        "experimentalDecorators": true,
         "sourceMap": true,
-        "outDir": "dist",
         "baseUrl": ".",
         "paths": {
             "*": [
@@ -18,13 +15,6 @@
                 "src/*"
             ]
         }
-    },
-    "typedocOptions":{
-        "entryPoints": ["src/controllers/docker.ts"],
-        "out": "docs",
-        "defaultCategory": "",
-        "categoryOrder": ["Routes", "*"],
-        "categorizeByGroup": true,
     },
     "include": [
         "src/**/*.ts"

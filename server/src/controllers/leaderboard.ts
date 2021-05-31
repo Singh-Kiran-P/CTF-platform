@@ -3,7 +3,7 @@
  */
 import { Request, Response } from 'express';
 import { solvePoints } from '@/routes/challenges';
-import { sortRounds } from '@shared/validation/roundsForm';
+import { sortRounds } from '@/shared/src/validation/roundsForm';
 import DB, { Account, Round, Sponsor, Team } from '../database';
 import socketIO from './socket';
 
