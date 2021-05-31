@@ -74,10 +74,10 @@
                                 <template v-else>
                                     <b-form-file class=half accept=".html" v-model="page.html" :placeholder="htmlPlaceholder(page)" :state="state(pageFeedback(page))"/>
                                     <b-form-file class=half accept=".zip" v-model="page.zip" :placeholder="zipPlaceholder(page)" :state="state(pageFeedback(page))"/>
-                                    <b-form-invalid-feedback>{{pageFeedback(page)}}</b-form-invalid-feedback>
-                                    <span v-if="page.html && page.source" class=info>You are uploading a new page, any old depencies will be removed</span>
                                 </template>
                             </span>
+                            <span v-if="page.html && page.source && !page.zip" class=info>You are uploading a new page, any old depencies will be removed</span>
+                            <b-form-invalid-feedback class=info>{{pageFeedback(page)}}</b-form-invalid-feedback>
                         </div>
                         <IconButton class=info icon=pen icon2=save :toggled="page.editable" :disabled="page.editable && !state(pageFeedback(page))" @click="editPage(page)"/>
                         <IconButton class=primary icon=chevron-down @click="pageDown(page)"/>
@@ -89,7 +89,7 @@
                         <b-form-input type=text trim v-model="add.page.path" placeholder="Enter new page path" :state="state(newPageFeedback)"/>
                         <b-form-file class=half accept=".html" v-model="add.page.html" :placeholder="htmlPlaceholder()" :state="state(newPageFeedback)"/>
                         <b-form-file class=half accept=".zip" v-model="add.page.zip" :placeholder="zipPlaceholder()" :state="state(newPageFeedback)"/>
-                        <b-form-invalid-feedback>{{newPageFeedback}}</b-form-invalid-feedback>
+                        <b-form-invalid-feedback class=info>{{newPageFeedback}}</b-form-invalid-feedback>
                         <span class=info>Page dependencies are unzipped inside the same folder as the page HTML</span>
                     </div>
                 </Collapse>

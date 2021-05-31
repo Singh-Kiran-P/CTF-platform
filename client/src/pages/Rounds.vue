@@ -20,14 +20,16 @@
                     <div class=challenges>
                         <div class=tag-challenges v-for="tag in roundTags(currentRound)" :key="tagName(tag)">
                             <Collapse :label="tagName(tag)" center noborder :infoContent="tagDescription(tag)">
-                                <div v-for="challenge in tagChallenges(currentRound, tag)" :key="challenge.order" :tabindex="unlocked(challenge, currentRound.challenges) ? 0 : -1"
+                                <div v-for="challenge in tagChallenges(currentRound, tag)" :key="challenge.order" :tabindex="0"
                                     :class="['challenge', 'list-item', unlocked(challenge, currentRound.challenges) ? 'unlocked' : 'locked', { 'solved': solved(challenge) }]"
-                                    @click="redirectChallenge(challenge.id, $event)" @keydown.enter="redirectChallenge(challenge.id, $event)">
+                                    @click="redirectChallenge(challenge, currentRound.challenges, $event)" @keydown.enter="redirectChallenge(challenge, currentRound.challenges, $event)">
                                     <span v-if="solved(challenge)">
                                         <font-awesome-icon icon=check class=icon-primary /> Solved by <b>{{solveNames(challenge)}}</b> for <b>{{solvePoints(challenge)}}</b>
                                     </span>
                                     <template v-if="!unlocked(challenge, currentRound.challenges)">
-                                        <span><font-awesome-icon icon=lock class=icon-info /> Locked until <b>{{lockedName(challenge, currentRound.challenges)}}</b> is solved</span>
+                                        <span><font-awesome-icon icon=lock class=icon-info />
+                                            Locked until <b class=item-lock>{{lockedName(challenge, currentRound.challenges)}}</b> is solved
+                                        </span>
                                         <span class=item-name>{{challenge.name}}</span>
                                     </template>
                                     <template v-else>
@@ -82,7 +84,7 @@
                                     <Collapse :label="tagName(tag)" center noborder :infoContent="tagDescription(tag)">
                                         <div v-for="challenge in tagChallenges(round, tag)" :key="challenge.order" :tabindex="0"
                                             :class="['challenge', 'list-item', 'unlocked', solved(challenge) ? 'solved' : 'unsolved']"
-                                            @click="redirectChallenge(challenge.id, $event)" @keydown.enter="redirectChallenge(challenge.id, $event)">
+                                            @click="redirectChallenge(challenge, [], $event)" @keydown.enter="redirectChallenge(challenge, [], $event)">
                                             <span v-if="!solved(challenge)"><font-awesome-icon icon=times class=icon-danger /> Not solved</span>
                                             <span v-else>
                                                 <font-awesome-icon icon=check class=icon-primary /> Solved by <b>{{solveNames(challenge)}}</b> for <b>{{solvePoints(challenge)}}</b>
@@ -191,8 +193,9 @@ export default Vue.extend({
         typeDescription(challenge: Challenge): string { return typeDescription(challenge.type); },
         toggledChallenges(round: Round & Visible): void { toggledItems(round, 'loading', round.visible, round.challenges, r => this.loadChallenges(r)); },
         loadChallenges(round: Round) { return loadItems(round, 'challenges', 'loading', 'visible', '/api/challenges/round/', (data: any) => validChallenges(data)); },
-        redirectChallenge(id: number | string, e?: MouseEvent | KeyboardEvent): void {
-            let route = { name: 'Challenge', params: { id: id.toString() } };
+        redirectChallenge(challenge: Challenge, challenges: Challenge[], e?: MouseEvent | KeyboardEvent): void {
+            let lock = this.lockedChallenge(challenge, challenges);
+            let route = { name: 'Challenge', params: { id: (this.unlocked(challenge, challenges) ? challenge.id : lock?.id)?.toString() || '0' } };
             e?.ctrlKey ? window.open(this.$router.resolve(route).href, '_blank') : this.$router.push(route);
         },
 
@@ -262,7 +265,12 @@ $min-column-width: calc(var(--breakpoint-sm) / 2);
     -moz-column-fill: balance;
     column-fill: balance;
 
-
+    @supports (-moz-appearance:none) {
+        -webkit-columns: 0 1;
+        -moz-columns: 0 1;
+        columns: 0 1;
+    }
+    
     & > * {
         padding-bottom: var(--double-margin);
         -webkit-column-break-inside: avoid;
@@ -283,23 +291,19 @@ $min-column-width: calc(var(--breakpoint-sm) / 2);
             border-color: var(--danger);
         }
 
-        &.unlocked:hover, &.unlocked:focus-visible {
+        &:hover, &:focus-visible {
             outline: none;
             cursor: pointer;
             border-left-width: var(--double-margin);
 
-            .item-name {
+            &.unlocked .item-name, &.locked .item-lock {
                 color: var(--primary);
                 text-decoration: underline;
             }
         }
 
-        &.locked  {
-            pointer-events: none;
-
-            .item-name {
-                color: var(--gray-c);
-            }
+        &.locked .item-name {
+            color: var(--gray-c);
         }
     }
 }

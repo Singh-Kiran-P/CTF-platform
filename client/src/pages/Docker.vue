@@ -3,7 +3,10 @@
         <div>
             <div class=ports>
                 <span>Ports</span>
-                <Tooltip below content="Ports for interactive environments will be assigned within this range" class=info-tooltip>
+                <Tooltip below class=info-tooltip
+                    content="
+                        Ports for interactive environments will be assigned within this range<br/><br/>
+                        Adding exluded ports will prevent them from being assigned, you cannot undo this">
                     <font-awesome-icon icon=info-circle />
                 </Tooltip>
                 <label>Lower bound port
@@ -11,6 +14,10 @@
                 </label>
                 <label>Upper bound port
                     <b-input type=number number v-model="upperbound" :state="portState" placeholder="Enter upper bound port" @input="portInput()"/>
+                </label>
+                <label>Add excluded ports
+                    <b-input type=text trim v-model="excluded" :state="portState" placeholder="Enter excluded ports to be added" @input="portInput()"/>
+                    <span>Multiple ports should be seperated with a comma, for example: '8080, 900'</span>
                 </label>
                 <b-form-invalid-feedback :state="state(validatePorts)">{{validatePorts}}</b-form-invalid-feedback>
                 <div class=buttons>
@@ -101,22 +108,25 @@ export default Vue.extend({
         
         upperbound: NaN,
         lowerbound: NaN,
+        excluded: '',
         
         portState: true,
         saveState: 'normal',
         cancelState: 'normal',
 
-        manage: window.location.origin + ':8080' // TODO
+        manage: window.location.origin + ':9000'
     }),
     computed: {
         empty(): boolean { return !this.lowerbound || !this.upperbound },
         cancelDisabled(): boolean { return this.empty },
         saveDisabled(): boolean { return this.empty || !state(this.validatePorts) },
         validatePorts(): string {
-            let minPort = 500;
+            let minPort = 1000;
             let maxPort = Math.pow(2, 16) - 1;
             let v = validateNumber(this.lowerbound, 'Lower bound', false, minPort, maxPort);
             if (!v) v = validateNumber(this.upperbound, 'Upper bound', false, this.lowerbound, maxPort);
+            if (!v && this.excluded)
+                v = this.excluded.split(',').map(p => p.trim()).reduce((acc, cur) => acc + validateNumber(Number.parseInt(cur), 'Excluded ports', false, 1, maxPort), '');
             return v;
         }
     },
@@ -133,6 +143,7 @@ export default Vue.extend({
             const error = () => this.cancelState = 'error';
             axios.get('/api/docker/dockerConfigPorts').then(res => {
                 if (!res.data) return error();
+                this.excluded = '';
                 this.lowerbound = Number(res.data.lowerBoundPort);
                 this.upperbound = Number(res.data.upperBoundPort);
                 this.cancelState = 'succes';
@@ -141,9 +152,12 @@ export default Vue.extend({
         savePorts(): void {
             this.saveState = 'loading';
             const error = () => this.saveState = 'error';
-            axios.post('/api/docker/dockerConfigPorts', { lowerBoundPort: this.lowerbound.toString(), upperBoundPort: this.upperbound.toString() }).then(res => {
-                if (res.data.statusCode == 404) error();
-                else this.saveState = 'succes';
+            let bounds = axios.post('/api/docker/dockerConfigPorts', { lowerBoundPort: this.lowerbound.toString(), upperBoundPort: this.upperbound.toString() });
+            let exclude = axios.post('/api/docker/usedPorts', { ports: this.excluded });
+            Promise.all([bounds, exclude]).then(([res1, res2]) => {
+                if (res1.data.statusCode == 404 || res2.data.statusCode == 404)return error();
+                this.saveState = 'succes';
+                this.excluded = '';
             }).catch(() => error());
         },
 
@@ -212,10 +226,14 @@ export default Vue.extend({
     }
 }
 
-.ports span, .images label, .containers label {
+.ports > span, .images > label, .containers > label {
     font-weight: bold;
     font-size: var(--font-large);
     margin-bottom: var(--margin);
+}
+
+label span {
+    font-size: var(--font-small);
 }
 
 .ports {

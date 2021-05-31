@@ -87,7 +87,7 @@ async function loadTestData() {
     }*/
 
     let dockerManagement: DockerManagement = (await save([
-        new DockerManagement(500, 5400)
+        new DockerManagement(1000, 5000)
     ]))[0];
 
     let dockerOpenPort: DockerOpenPort[] = (await save([

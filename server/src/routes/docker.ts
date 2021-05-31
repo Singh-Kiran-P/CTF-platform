@@ -14,7 +14,7 @@ router.get("/dockerConfigPorts", isAdmin, controller.dockerConfigPorts_GET)
 
 router.post("/dockerConfigPorts", isAdmin, controller.dockerConfigPorts_POST)
 
-router.post("/usedPorts" ,controller.saveUsedPorts_POST)
+router.post("/usedPorts", controller.saveUsedPorts_POST);
 
 router.get("/containers", isAdmin, controller.containers_GET);
 

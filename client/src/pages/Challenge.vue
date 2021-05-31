@@ -485,4 +485,8 @@ export default Vue.extend({
 .icon-danger {
     color: var(--danger);
 }
+
+.icon-info {
+    color: var(--info);
+}
 </style>

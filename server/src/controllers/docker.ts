@@ -87,7 +87,7 @@ export class DockerController {
      * @category Routes
      */
     public saveUsedPorts_POST(req: Request, res: Response) {
-        let ports = req.fields.ports.toString().split(",");
+        let ports = req.fields.ports.toString().split(",").map(p => p.trim());
         const dockerOpenPortRepo = DB.repo(DockerOpenPort);
 
         new Promise<number[]>((resolve, reject) => {
