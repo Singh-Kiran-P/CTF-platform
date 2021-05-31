@@ -5,6 +5,13 @@ import { ILike } from 'typeorm';
 import express from 'express';
 const router = express.Router();
 
+/**
+ * This route is for register
+ * @param req { ports: string} like "8080,900,468,5965,..."
+ * @param res route response object
+ * @category Routes
+ * @returns {string}
+ */
 router.post('/register', isAuth, (req, res) => {
     req.body = req.fields;
     const teamRepo = DB.repo(Team);

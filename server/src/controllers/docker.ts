@@ -81,6 +81,46 @@ export class DockerController {
     }
 
     /**
+     * Save used port into db
+     * @param req { ports: string} like "8080,900,468,5965,..."
+     * @param res route response object
+     * @category Routes
+     */
+    public saveUsedPorts_POST(req: Request, res: Response) {
+        let ports = req.fields.ports.toString().split(",");
+        const dockerOpenPortRepo = DB.repo(DockerOpenPort);
+
+        new Promise<number[]>((resolve, reject) => {
+            let arr: number[] = [];
+
+            for (const port of ports) {
+                console.log(port);
+
+                let containerData = new DockerOpenPort(Number.parseInt(port));
+                dockerOpenPortRepo.findOne({ where: { openPorts: port } })
+                    .then((port_) => {
+
+                        if (!port_) {
+                            console.log(containerData);
+
+                            dockerOpenPortRepo.save(containerData)
+                                .catch((err) => console.log({ message: "Can not save into db! " + err, statusCode: 404 }))
+                        } else {
+                            console.log("dsf");
+
+                            arr.push(port_.openPorts);
+                        }
+                    })
+                    .catch((err) => console.log({ message: "Can not save into db!" + err, statusCode: 404 }))
+            }
+            console.log(arr);
+
+            resolve(arr);
+        })
+            .then((arr) => console.log(arr))
+    }
+
+    /**
      * Get all docker containers information
      * @param req route request object
      * @param res route response object
@@ -580,7 +620,7 @@ export class DockerController {
                     while (--attempts >= 0) {
                         let port_: number = this._randomIntFromInterval(lowerBoundPort, upperBoundPort);
                         const portExists = d.find((item) => item.openPorts == port_);
-    
+
                         if (!portExists) {
                             const dockerOpenPort = DB.repo(DockerOpenPort);
                             dockerOpenPort.save(new DockerOpenPort(port_)).then(() => resolve(port_)).catch(() => resolve(-1));

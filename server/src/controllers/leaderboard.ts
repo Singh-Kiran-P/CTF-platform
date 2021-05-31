@@ -79,11 +79,7 @@ export class LeaderBoardController {
     public getAllData(req: Request, res: Response) {
         DB.repo(Team).find({ relations: ['accounts', 'solves', 'solves.challenge', 'usedHints', 'usedHints.challenge'] }).then(teams => {
             // TODO
-            //console.log(teams[0].getCategoryName());
-            //console.log(req.params.cat);
-            //console.log(teams[0].getCategoryName() == req.params.cat);
             teams = teams.filter(team => team.getCategoryName() == req.params.cat);
-            //console.log(teams);
 
             let teamsData: data_send[] = teams.map(team => ({
                 uuid: team.id,
@@ -109,6 +105,9 @@ export class LeaderBoardController {
                     let start = new Date(cur.start);
                     return i == 0 || start < acc ? start : acc;
                 }, new Date());
+                for (const team of teamsData) {
+                    team.scores.unshift({time: startTime.toISOString(), score:0 });
+                }
                 res.json({ teams: teamsData, startTime: startTime.toJSON() });
             }).catch(() => res.json({ error: 'Error retrieving data' }));
         }).catch(() => res.json({ error: 'Error retrieving data' }));

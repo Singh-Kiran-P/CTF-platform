@@ -10,7 +10,7 @@
             </div> 
         </div>
         <div class=sponsors>
-            <Carousel class=sponsor-slider autoplay autoplayHoverPause loop paginationEnabled centerMode :autoplayTimeout="5000" :speed="1000" easing="linear"
+            <Carousel class=sponsor-slider autoplay autoplayHoverPause loop :paginationEnabled="false" centerMode :autoplayTimeout="5000" :speed="1000" easing="linear"
                 :perPageCustom="[[1024, 4], [750, 3], [550, 2], [350, 1]]">
                     <Slide v-for="sponsor in sponsors" :key="sponsor.id" class=sponsor-cell>
                         <div class=sponsor-cell-content>
