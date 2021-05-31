@@ -2,7 +2,7 @@
 // use deserialize when receiving a serialized object with express
 // doing this makes it so that the files contained within the original object are uploaded and present in the deserialized object
 
-import { Fields, Files as UFiles } from 'formidable';
+import { Fields, Files as UFiles } from './formidableTypes';
 type Obj = { [key: string]: any };
 const fields = 'fields';
 

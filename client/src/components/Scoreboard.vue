@@ -59,7 +59,7 @@ export default Vue.extend({
     created() {
         // TODO: solves array must start with {Data: data, score:0 } -> len[0]
         this.setListeners();
-        am4core.options.autoDispose = true;
+        //am4core.options.autoDispose = true;
     },
     mounted() {
         this.chart = am4core.create(this.category, am4charts.XYChart);
@@ -75,10 +75,7 @@ export default Vue.extend({
         this.dateAxis.renderer.grid.template.location = 0.5;
         this.dateAxis.renderer.minGridDistance = 50;
         this.dateAxis.gridIntervals.setAll([
-            { timeUnit: 'second', count: 1 },
-            { timeUnit: 'second', count: 5 },
             { timeUnit: 'second', count: 10 },
-            { timeUnit: 'second', count: 30 },
             { timeUnit: 'minute', count: 1 },
             { timeUnit: 'minute', count: 5 },
             { timeUnit: 'minute', count: 10 },
@@ -86,17 +83,6 @@ export default Vue.extend({
             { timeUnit: 'day', count: 1 },
             { timeUnit: 'week', count: 1 }
         ]);
-
-        /*dateAxis.groupData = true;
-        dateAxis.groupIntervals.setAll([
-            { timeUnit: 'minute', count: 1 },
-            { timeUnit: 'minute', count: 5 },
-            { timeUnit: 'minute', count: 10 },
-            { timeUnit: 'hour', count: 1 },
-            { timeUnit: 'day', count: 1 },
-            { timeUnit: 'week', count: 1 }
-        ]);
-        dateAxis.groupCount = 31;*/
 
         var pointsAxis = this.chart.yAxes.push(new am4charts.ValueAxis());
         //pointsAxis.calculateTotals = true;
@@ -133,7 +119,7 @@ export default Vue.extend({
 
             series.name = team.name;
             series.id = team.uuid;
-            series.tooltipText = '{name}: [bold]{valueY}[/] \n Date: {date} {valueX}';
+            series.tooltipText = '{name}: [bold]{valueY}[/] \n Date: {time} {valueX}';
             series.tensionX = 0.8;
             // disable animations
             series.showOnInit = false;

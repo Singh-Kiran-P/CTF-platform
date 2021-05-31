@@ -1,6 +1,6 @@
 // functions to validate the competition form
 
-import { File as UFile } from 'formidable';
+import { File as UFile } from '../formidableTypes';
 import { state, validInput, validateString, validateCharacters, validateList, is } from '.';
 
 type Category = { name: string, order: number };

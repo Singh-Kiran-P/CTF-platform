@@ -36,18 +36,19 @@ export default Vue.extend({
     data: () => ({
         value: 0,
         option: 0,
-        time: new Date()
+        time: new Date(),
+        roundOptions: [{ value: 0, text: 'Current round' }]
     }),
+    created() {
+        this.roundOptions = this.roundOptions.concat(this.roundNames.map((name, i) => ({
+            value: i + 1,
+            text: name
+        })));
+    },
     computed: {
         options(): boolean { return this.names?.length > 0 && this.times?.length > 0; },
         roundNames(): string[] { return (this.names || []) as string[]; },
-        roundTimes(): string[] { return (this.times || []) as string[]; },
-        roundOptions(): { value: number, text: string }[] {
-            return [{ value: 0, text: 'Current round' }].concat(this.roundNames.map((name, i) => ({
-                value: i + 1,
-                text: name
-            })));
-        }
+        roundTimes(): string[] { return (this.times || []) as string[]; }
     },
     watch: {
         option() {
