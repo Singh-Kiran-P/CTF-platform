@@ -1,29 +1,27 @@
 <template>
     <div v-if="true" class=docker>
-        <div>
-            <div class=ports>
-                <span>Ports</span>
-                <Tooltip below class=info-tooltip
-                    content="
-                        Ports for interactive environments will be assigned within this range<br/><br/>
-                        Adding exluded ports will prevent them from being assigned, you cannot undo this">
-                    <font-awesome-icon icon=info-circle />
-                </Tooltip>
-                <label>Lower bound port
-                    <b-input type=number number v-model="lowerbound" :state="portState" placeholder="Enter lower bound port" @input="portInput()"/>
-                </label>
-                <label>Upper bound port
-                    <b-input type=number number v-model="upperbound" :state="portState" placeholder="Enter upper bound port" @input="portInput()"/>
-                </label>
-                <label>Add excluded ports
-                    <b-input type=text trim v-model="excluded" :state="portState" placeholder="Enter excluded ports to be added" @input="portInput()"/>
-                    <span>Multiple ports should be seperated with a comma, for example: '8080, 900'</span>
-                </label>
-                <b-form-invalid-feedback :state="state(validatePorts)">{{validatePorts}}</b-form-invalid-feedback>
-                <div class=buttons>
-                    <StatusButton variant=danger normal=Cancel loading=Loaded succes=Loaded :state="cancelState" @click="cancelPorts()" :disabled="cancelDisabled"/>
-                    <StatusButton variant=primary normal=Save loading=Saving succes=Saved :state="saveState" @click="savePorts()" :disabled="saveDisabled"/>
-                </div>
+        <div class=ports>
+            <span>Ports</span>
+            <Tooltip below class=info-tooltip
+                content="
+                    Ports for interactive environments will be assigned within this range<br/><br/>
+                    Adding exluded ports will prevent them from being assigned, you cannot undo this">
+                <font-awesome-icon icon=info-circle />
+            </Tooltip>
+            <label>Lower bound port
+                <b-input type=number number v-model="lowerbound" :state="portState" placeholder="Enter lower bound port" @input="portInput()"/>
+            </label>
+            <label>Upper bound port
+                <b-input type=number number v-model="upperbound" :state="portState" placeholder="Enter upper bound port" @input="portInput()"/>
+            </label>
+            <label>Add excluded ports
+                <b-input type=text trim v-model="excluded" :state="portState" placeholder="Enter excluded ports to be added" @input="portInput()"/>
+                <span>Multiple ports should be seperated with a comma, for example: '8080, 900'</span>
+            </label>
+            <b-form-invalid-feedback :state="state(validatePorts)">{{validatePorts}}</b-form-invalid-feedback>
+            <div class=buttons>
+                <StatusButton variant=danger normal=Cancel loading=Loaded succes=Loaded :state="cancelState" @click="cancelPorts()" :disabled="cancelDisabled"/>
+                <StatusButton variant=primary normal=Save loading=Saving succes=Saved :state="saveState" @click="savePorts()" :disabled="saveDisabled"/>
             </div>
         </div>
         <span class=info>You can view your docker images and containers below, and you can manage them <a :href="manage" target=_blank>here</a></span>
@@ -53,6 +51,7 @@
                 </template>
             </b-table>
         </div>
+        <div class=bottom-padding />
     </div>
 </template>
 
@@ -114,7 +113,7 @@ export default Vue.extend({
         saveState: 'normal',
         cancelState: 'normal',
 
-        manage: window.location.origin + ':9000'
+        manage: window.location.origin + ':9000' // TODO: mention portainer?
     }),
     computed: {
         empty(): boolean { return !this.lowerbound || !this.upperbound },
@@ -161,26 +160,26 @@ export default Vue.extend({
             }).catch(() => error());
         },
 
-        getImages(): void {
+        getImages(): void { // TODO: delete button
             this.loadingImages = true;
             axios.get('/api/docker/images').then(res => {
                 this.loadingImages = false;
                 if (!res.data) return;
                 this.images = res.data.map((item: any) => ({
-                    name: item.RepoTags[0],
+                    name: item.RepoTags[0], // TODO good name, created time
                     size: (item.Size / Math.pow(1024, 2)).toFixed(2) + ' Mb'
                 }));
             }).catch(() => this.loadingImages = false);
         },
-        getContainers(): void {
+        getContainers(): void { // TODO: delete button
             this.loadingContainers = true;
             axios.get('/api/docker/containers').then(res => {
                 this.loadingContainers = false;
                 if (!res.data) return;
                 this.containers = res.data.map((item: any) => ({
                     name: item.Names[0].slice(1),
-                    image: item.Image,
-                    ports: portsb(item.Ports).reduce((acc, cur, i) => acc + (i == 0 ? '' : ', ') + cur, ''),
+                    image: item.Image, // TODO good image id
+                    ports: portsb(item.Ports).reduce((acc, cur, i) => acc + (i == 0 ? '' : ', ') + cur, ''), // TODO: port links
                     state: item.State,
                     status: item.Status,
                 }));
@@ -194,11 +193,12 @@ export default Vue.extend({
 .docker {
     display: flex;
     align-items: center;
+    overflow-y: scroll !important;
     flex-direction: column;
     padding: var(--double-margin);
     padding-bottom: 0;
 
-    & > div:first-child {
+    .ports {
         width: min(100%, var(--breakpoint-sm));
     }
 

@@ -3,7 +3,6 @@
  */
 import { Request, Response } from 'express';
 import { solvePoints } from '@/routes/challenges';
-import { sortRounds } from '@shared/validation/roundsForm';
 import DB, { Account, Round, Sponsor, Team } from '../database';
 import socketIO from './socket';
 
@@ -78,7 +77,6 @@ export class LeaderBoardController {
     */
     public getAllData(req: Request, res: Response) {
         DB.repo(Team).find({ relations: ['accounts', 'solves', 'solves.challenge', 'usedHints', 'usedHints.challenge'] }).then(teams => {
-            // TODO
             teams = teams.filter(team => team.getCategoryName() == req.params.cat);
 
             let teamsData: data_send[] = teams.map(team => ({
@@ -105,10 +103,9 @@ export class LeaderBoardController {
                     let start = new Date(cur.start);
                     return i == 0 || start < acc ? start : acc;
                 }, new Date());
-                for (const team of teamsData) {
-                    team.scores.unshift({time: startTime.toISOString(), score:0 });
-                }
-                res.json({ teams: teamsData, startTime: startTime.toJSON() });
+                for (const team of teamsData)
+                    team.scores.unshift({ time: startTime.toJSON(), score: 0 });
+                res.json(teamsData);
             }).catch(() => res.json({ error: 'Error retrieving data' }));
         }).catch(() => res.json({ error: 'Error retrieving data' }));
     }

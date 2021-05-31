@@ -31,14 +31,14 @@
                                     <span class="item-description nowrap">{{challenge.description}}</span>
                                     <span class=item-description>
                                         <span class=item-category>Type</span>
-                                        <span class=item-value>{{typeName(challenge.type)}}</span>
+                                        <span class=item-value>{{typeName(challenge.type)}}</span> <!-- TODO wrap -->
                                         <Tooltip class=item-value-tooltip :title="typeName(challenge.type)" :content="typeDescription(challenge.type)">
                                             <font-awesome-icon icon=info-circle class=icon-info />
                                         </Tooltip>
                                     </span>
                                     <span class=item-description v-if="challenge.tag">
                                         <span class=item-category>Tag</span>
-                                        <span class=item-value>{{challenge.tag.name}}</span>
+                                        <span class=item-value>{{challenge.tag.name}}</span>  <!-- TODO wrap -->
                                         <Tooltip class=item-value-tooltip :title="challenge.tag.name" :content="challenge.tag.description" below>
                                             <font-awesome-icon icon=info-circle class=icon-info />
                                         </Tooltip>

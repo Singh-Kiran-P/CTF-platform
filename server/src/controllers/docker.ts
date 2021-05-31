@@ -563,7 +563,7 @@ export class DockerController {
             for (let i = 0; i < ports.length; i++) {
                 let p = await this._giveRandomPort();
                 if (!p || p < 0) return reject();
-                openPorts.push(p)
+                openPorts.push(p);
                 portBindings[ports[i]] = [{ HostPort: p.toString() }];
             }
             resolve({ openPorts: openPorts, portBindings: portBindings });

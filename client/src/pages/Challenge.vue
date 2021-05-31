@@ -67,7 +67,8 @@
                     <div v-if="startState == 'succes'" class=ports>
                         <span v-if="ports.length > 0">Available ports: </span>
                         <span v-else>No ports available, contact the organizer for help</span>
-                        <b-button variant=primary :disabled="stopState != 'normal' || resetState != 'normal'" v-for="port in ports" :href="`${domain}:${port}`" target=_blank :key="port" @click="openPort($event)">
+                        <b-button variant=primary v-for="port in ports" :href="`${domain}:${port}`" target=_blank :key="port" :disabled="stopState != 'normal' || resetState != 'normal'"
+                            @click="openPort($event)">
                             <font-awesome-icon icon=external-link-alt /> {{port}}
                         </b-button>
                     </div>
@@ -169,7 +170,7 @@ export default Vue.extend({
         stopState: 'succes',
 
         domain: window.location.origin,
-        ports: [80] as number[]
+        ports: [] as number[]
     }),
     computed: {
         admin(): boolean { return this.$route.meta?.admin; },
@@ -253,7 +254,6 @@ export default Vue.extend({
                 this.stopState = 'normal';
                 this.startState = 'succes';
                 this.ports = portsa(res.data.ports);
-                console.log(this.ports);
 
             }).catch(() => error());
         },

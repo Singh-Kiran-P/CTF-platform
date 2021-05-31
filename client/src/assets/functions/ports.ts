@@ -1,4 +1,4 @@
-// function to get all ports from a response
+// functions to get all ports from a response
 
 import { is } from '@shared/validation';
 
@@ -23,11 +23,7 @@ type PortsB = {
 }[];
 
 const portsb = (ports: PortsB): number[] => {
-    console.log(ports);
-
     if (!validb(ports)) return [];
-    console.log("valid");
-
     return [...new Set(ports.map(p => p.PublicPort).filter(p => p && p > 0))];
 }
 
