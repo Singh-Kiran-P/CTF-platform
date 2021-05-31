@@ -262,6 +262,7 @@ $min-column-width: calc(var(--breakpoint-sm) / 2);
     -moz-column-fill: balance;
     column-fill: balance;
 
+
     & > * {
         padding-bottom: var(--double-margin);
         -webkit-column-break-inside: avoid;

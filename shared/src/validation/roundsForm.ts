@@ -1,7 +1,7 @@
 // functions to validate the rounds form
 
-import { File as UFile } from 'formidable';
 import { Tag, isf as iscf } from './configForm';
+import { File as UFile } from '../formidableTypes';
 import { state, validInput, validateString, validateNumber, validateCharacters, validateList, is } from '../validation';
 
 enum ChallengeType {
