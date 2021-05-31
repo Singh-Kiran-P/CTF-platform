@@ -464,6 +464,7 @@ export class DockerController {
                 pump(
                     build(path, { t: dockerChallengeName })
                         .on("complete", (id: any) => {
+                            console.log(id);
                             return resolve(id);
                         }),
                     process.stdout,
