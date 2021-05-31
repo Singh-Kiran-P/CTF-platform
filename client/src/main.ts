@@ -21,7 +21,9 @@ Vue.use(VueSweetalert2, {});
 Vue.use(VueMeta, { refreshOnceOnNavigation: true });
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 
-let hostURL = `http://${process.env.VUE_APP_API_HOST}:${process.env.VUE_APP_API_PORT}`;
+let url = new URL(window.location.href).host
+let hostURL = `http://${url}:${process.env.VUE_APP_API_PORT}`;
+
 Vue.use(VueSocketIOExt, io(hostURL));
 
 router.onReady = router => {
