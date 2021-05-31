@@ -98,10 +98,10 @@ export default Vue.extend({
             { key: 'state', sortable: true },
             { key: 'status', sortable: true }
         ],
-        
+
         upperbound: NaN,
         lowerbound: NaN,
-        
+
         portState: true,
         saveState: 'normal',
         cancelState: 'normal',
@@ -146,7 +146,9 @@ export default Vue.extend({
                 else this.saveState = 'succes';
             }).catch(() => error());
         },
-
+        saveUsedPorts(): void{
+            //TODO:
+        },
         getImages(): void {
             this.loadingImages = true;
             axios.get('/api/docker/images').then(res => {
@@ -177,7 +179,7 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-.docker {    
+.docker {
     display: flex;
     align-items: center;
     flex-direction: column;
@@ -222,7 +224,7 @@ export default Vue.extend({
     label {
         display: block;
     }
-    
+
     .buttons {
         display: flex;
         margin-top: var(--double-margin);
