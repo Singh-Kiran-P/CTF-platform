@@ -62,7 +62,7 @@ import axios from "axios";
 import Tooltip from '@/components/Tooltip.vue';
 import StatusButton from '@/components/StatusButton.vue';
 import { validateNumber, state } from '@shared/validation';
-import ports from '@/assets/functions/ports';
+import { portsb } from '@/assets/functions/ports';
 
 type Container = {
     name: string,
@@ -160,7 +160,7 @@ export default Vue.extend({
                 this.excluded = '';
             }).catch(() => error());
         },
-        
+
         getImages(): void {
             this.loadingImages = true;
             axios.get('/api/docker/images').then(res => {
@@ -180,7 +180,7 @@ export default Vue.extend({
                 this.containers = res.data.map((item: any) => ({
                     name: item.names[0], // TODO: slice(1)? waarom
                     image: item.image,
-                    ports: ports(item.ports).reduce((acc, cur, i) => acc + (i == 0 ? '' : ', ') + cur, ''),
+                    ports: portsb(item.ports).reduce((acc, cur, i) => acc + (i == 0 ? '' : ', ') + cur, ''),
                     state: item.state,
                     status: item.status,
                 }));

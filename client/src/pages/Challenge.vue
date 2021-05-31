@@ -121,7 +121,7 @@ import AdminHeader from '@/components/AdminHeader.vue';
 import StatusButton from '@/components/StatusButton.vue';
 import { Challenge, ChallengeType, Hint, Question, validChallenge } from '@shared/validation/roundsForm';
 import { typeName, typeDescription, solvePoints, solveNames, durationDisplay, countdownDisplay, timerDisplay } from '@/assets/functions/strings';
-import ports from '@/assets/functions/ports';
+import { portsa } from '@/assets/functions/ports';
 import path from 'path';
 
 export default Vue.extend({
@@ -238,7 +238,7 @@ export default Vue.extend({
                 if (started) {
                     this.stopState = 'normal';
                     this.startState = 'succes';
-                    this.ports = ports(res.data.ports);
+                    this.ports = portsa(res.data.ports);
                 }
                 this.containerInit = true;
             }).catch(() => error());
@@ -252,7 +252,7 @@ export default Vue.extend({
                 if (err) return error();
                 this.stopState = 'normal';
                 this.startState = 'succes';
-                this.ports = ports(res.data.ports);
+                this.ports = portsa(res.data.ports);
             }).catch(() => error());
         },
         resetContainer(): void {
@@ -262,7 +262,7 @@ export default Vue.extend({
                 let err = res.data.statusCode == 404;
                 if (err) return error();
                 this.resetState = 'normal';
-                this.ports = ports(res.data.ports);
+                this.ports = portsa(res.data.ports);
             }).catch(() => error());
         },
         stopContainer(): void {
