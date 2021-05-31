@@ -81,7 +81,8 @@
                     <b-input type=text trim v-model="input" :state="!incorrect" @input="incorrect = false; state = 'normal'" :placeholder="`Enter ${quiz ? 'answer' : 'challenge flag'}`"/>
                     <Tooltip :title="rateLimited ? 'Your team is being rate limited' : ''" :content="rateLimited ? 'Your last submission has not been checked' : ''" center show>
                         <StatusButton @click="submit()" :disabled="input.length == 0 || incorrect || rateLimited" :state="incorrect || rateLimited ? 'error' : (solved ? 'succes' : state)"
-                            variant=primary normal=Submit loading=Submitting succes=Solved :error="rateLimited ? `Retry in ${rateLimit}` : (incorrect ? 'Incorrect' : undefined)"/>
+                            :error="rateLimited ? `Retry in ${rateLimit}` : (incorrect ? 'Incorrect' : undefined)"
+                            :variant="incorrect ? 'danger' : 'primary'" normal=Submit loading=Submitting succes=Solved />
                     </Tooltip>
                 </div>
             </template>

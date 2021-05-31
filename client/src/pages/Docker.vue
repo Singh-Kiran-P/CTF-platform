@@ -30,7 +30,7 @@
             <Tooltip below content="TODO: images explanation" class=info-tooltip>
                 <font-awesome-icon icon=info-circle />
             </Tooltip>
-            <b-table striped :busy="loadingImages" :fields="imageFields" :items="images">
+            <b-table striped :fields="imageFields" :items="images" :busy="loadingImages">
                 <template #table-busy>
                     <div class="text-center text-primary">
                         <b-spinner variant=primary label=Loading />
@@ -43,7 +43,7 @@
             <Tooltip below content="TODO: containers explanation" class=info-tooltip>
                 <font-awesome-icon icon=info-circle />
             </Tooltip>
-            <b-table striped :busy="loadingContainers" :fields="containerFields" :items="containers">
+            <b-table striped :fields="containerFields" :items="containers" :busy="loadingContainers">
                 <template #table-busy>
                     <div class="text-center text-primary">
                         <b-spinner variant=primary label=Loading />
@@ -194,8 +194,8 @@ export default Vue.extend({
     display: flex;
     align-items: center;
     overflow-y: scroll !important;
-    flex-direction: column;
     padding: var(--double-margin);
+    flex-direction: column;
     padding-bottom: 0;
 
     .ports {

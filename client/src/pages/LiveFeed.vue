@@ -136,6 +136,10 @@ export default Vue.extend({
 }
 
 .content {
+    * {
+        word-break: normal;
+    }
+
     span .inline {
         display: inline-block !important;
     }

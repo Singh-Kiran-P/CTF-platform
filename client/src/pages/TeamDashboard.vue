@@ -57,6 +57,7 @@
                     </template>
                 </b-table>
             </div>
+            <div class=bottom-padding />
 
             <b-modal id=invite-modal centered v-model="modal_invite.open">
                 <template #modal-title>Invite link</template>

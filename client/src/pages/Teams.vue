@@ -68,8 +68,6 @@ export default Vue.extend({
         this.loadCategories();
         this.getData();
     },
-    computed: {
-    },
     methods: {
         handleCurrentPageChange(val: number) {
             this.currentPage = val;

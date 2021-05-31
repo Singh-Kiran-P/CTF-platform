@@ -18,7 +18,7 @@ export default Vue.extend({
         Dashboard,
         Loading
     },
-    data: () => ({ 
+    data: () => ({
         isLoading: true,
         hasTeam: false,
         error: false
