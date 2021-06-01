@@ -68,7 +68,7 @@
                         <span v-if="ports.length > 0">Available ports: </span>
                         <span v-else>No ports available, contact the organizer for help</span>
                         <b-button variant=primary v-for="port in ports" :href="`${domain}:${port}`" target=_blank :key="port" :disabled="stopState != 'normal' || resetState != 'normal'"
-                            @click="openPort($event)">
+                            >
                             <font-awesome-icon icon=external-link-alt /> {{port}}
                         </b-button>
                     </div>
@@ -255,6 +255,10 @@ export default Vue.extend({
                 this.stopState = 'normal';
                 this.startState = 'succes';
                 this.ports = portsa(res.data.ports);
+                console.log(res.data.ports);
+                console.log(this.ports);
+
+
 
             }).catch(() => error());
         },

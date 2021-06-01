@@ -78,7 +78,7 @@
             <Tooltip
                 center
                 below
-                content="TODO: portainer explanation"
+                content="Portainer explanation is a third party docker manager"
                 class="link-tooltip"
             >
                 <a :href="`${domain}:9000`" target="_blank">Portainer</a>
@@ -88,7 +88,7 @@
             <label>Images</label>
             <Tooltip
                 below
-                content="TODO: images explanation"
+                content="Images running on the docker host engine<br><br>Interactive challenge image names are formatted like:<br>roundIndex-challengeOrder-timestamp"
                 class="info-tooltip"
             >
                 <font-awesome-icon icon="info-circle" />
@@ -122,7 +122,7 @@
             <label>Containers</label>
             <Tooltip
                 below
-                content="TODO: containers explanation"
+                content="Container running on the docker host engine<br><br>Interactive challenge container names are formatted like:<br>challengeId-teamId-timestamp"
                 class="info-tooltip"
             >
                 <font-awesome-icon icon="info-circle" />
@@ -190,6 +190,7 @@ type Image = {
     size: string;
     created: string;
     deleting: string;
+    id: string;
 };
 
 export default Vue.extend({
@@ -282,6 +283,7 @@ export default Vue.extend({
         },
     },
     methods: {
+        state,
         portInput(): void {
             this.saveState = "normal";
             this.cancelState = "normal";
@@ -329,6 +331,8 @@ export default Vue.extend({
             axios
                 .get("/api/docker/images")
                 .then((res) => {
+                    console.log(res.data);
+
                     this.loadingImages = false;
                     if (!res.data) return;
                     this.images = res.data.map((item: any) => ({
@@ -339,6 +343,7 @@ export default Vue.extend({
                             new Date(item.Created * 1000).toJSON()
                         ),
                         deleting: "normal",
+                        id: item.Id
                     }));
                 })
                 .catch(() => (this.loadingImages = false));
@@ -350,9 +355,10 @@ export default Vue.extend({
                 .then((res) => {
                     this.loadingContainers = false;
                     if (!res.data) return;
+                    let prefix = "sha256:";
                     this.containers = res.data.map((item: any) => ({
                         name: item.Names[0].slice(1),
-                        image: item.Image,
+                        image: item.Image.startsWith(prefix) ? item.Image.slice(prefix.length) : item.Image,
                         ports: portsb(item.Ports),
                         state: item.State,
                         status: item.Status,
@@ -363,17 +369,16 @@ export default Vue.extend({
         },
 
         deleteImage(image: any): void {
-            console.log(image);
             image.deleting = "loading";
             const error = () => (image.deleting = "error");
 
             axios
-                .post("/api/docker/deleteImage", { name: image.name })
+                .post("/api/docker/deleteImage", { name: image.id })
                 .then((response) => {
                     let data = response.data;
                     if (data.statusCode == 200) {
-                        toast.send(this, "Message", data.message, "success");
                         image.deleting = "succes";
+                        this.getImages();
                     } else {
                         toast.send(this, "Message", data.message, "danger");
                         image.deleting = "error";
@@ -383,8 +388,6 @@ export default Vue.extend({
                 .catch(() => error());
         },
         deleteContainer(container: any): void {
-            console.log(container);
-
             container.deleting = "loading";
             const error = () => (container.deleting = "error");
 
@@ -393,8 +396,8 @@ export default Vue.extend({
                 .then((response) => {
                     let data = response.data;
                     if (data.statusCode == 200) {
-                        toast.send(this, "Message", data.message, "success");
                         container.deleting = "succes";
+                        this.getContainers();
                     } else {
                         toast.send(this, "Message", data.message, "danger");
                         container.deleting = "error";
