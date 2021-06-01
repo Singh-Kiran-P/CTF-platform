@@ -79,11 +79,13 @@ export class Team {
 
 export class TeamRepoCustom extends Repository<Team> {
     //used for testdata
-    saveWithCaptain(name: string, creator: Account) {
+    saveWithCaptain(name: string, creator: Account, members: Account[]) {
         return new Promise<Team>(async (resolve, reject)=> {
             let newTeam: Team = new Team(name, creator);
             DB.repo(Team).save(newTeam).then((teamDB: Team) => {
-                DB.repo(Account).update(creator.id, {team: teamDB}).then(() => {resolve(teamDB);}).catch(()=> {reject("DB ERROR MEMBER");})
+                Promise.all([creator].concat(members).map(account => {
+                    DB.repo(Account).update(account.id, { team: teamDB })
+                })).then(() => resolve(teamDB)).catch(()=> reject("DB ERROR MEMBER"));
             }).catch(()=>{reject("DB ERROR TEAM");})
         });
     }
