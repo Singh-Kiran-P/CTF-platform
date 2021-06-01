@@ -1,14 +1,14 @@
-import dotenv from 'dotenv';
-import express from 'express';
 import cors from 'cors';
+import express from 'express';
 import passport from 'passport';
 import session from 'express-session';
 import formidable from 'express-formidable';
-import path from 'path';
+import { Root, uploaddir, docsdir } from './files';
+const expressip = require('express-ip');
 import { strategy } from './auth';
 import routes from './routes';
 import DB from './database';
-const expressip = require('express-ip');
+import dotenv from 'dotenv';
 dotenv.config();
 
 // setup express
@@ -39,16 +39,16 @@ app.all(/./, (_, __, next) => {
 });
 
 // static serving files
-app.use('/docs', express.static(path.join(__dirname, "../../../", 'docs')));
-app.use('/docs-routes', express.static(path.join(__dirname, "../../../", 'routes-docs')));
-app.use('/sponsors', express.static(path.join(__dirname, "../../../" , 'uploads', 'sponsors')));
-app.use('/pages', express.static(path.join(__dirname, "../../../" , 'uploads', 'pages')));
+app.use('/docs', express.static(Root + docsdir + '/docs'));
+app.use('/docs-routes', express.static(Root + docsdir + '/routes-docs'));
+app.use('/sponsors', express.static(Root + uploaddir + '/sponsors'));
+app.use('/pages', express.static(Root + uploaddir + '/pages'));
 
 // register all routes
 routes.forEach(route => app.use(route.path, route.router));
 
 // CORS middleware
-app.use(cors())
+app.use(cors());
 
 // start the server
 const server = app.listen(process.env.SERVER_PORT);

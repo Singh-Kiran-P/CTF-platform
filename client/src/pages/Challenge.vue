@@ -3,7 +3,7 @@
     <div v-else class=challenge>
         <div v-if="joinTeam">
             <span class=center>You have to be part of a team to join the competition</span>
-            <router-link class=center :to="{ name: 'Team' }">Create or join a team</router-link>
+            <router-link class=center :to="{ name: 'Your Team' }">Create or join a team</router-link>
         </div>
         <div v-else-if="notStarted">
             <span class=center>This challenge is not yet available</span>

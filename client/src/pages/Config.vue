@@ -315,7 +315,7 @@ span.info {
     .item-category ~ span:not(.item-value), .item-category ~ .invalid-feedback {
         width: 100%;
     }
-    
+
     .b-form-file.half:first-of-type {
         margin-right: var(--margin);
     }

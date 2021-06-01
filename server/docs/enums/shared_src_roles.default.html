@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>session | server</title>
+	<title>default | server</title>
 	<meta name="description" content="Documentation for server">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -55,55 +55,74 @@
 					<a href="../modules.html">server</a>
 				</li>
 				<li>
-					<a href="../modules/config_session.html">config/session</a>
+					<a href="../modules/shared_src_roles.html">shared/src/roles</a>
 				</li>
 				<li>
-					<a href="../modules/config_session.express.html">Express</a>
-				</li>
-				<li>
-					<a href="../modules/config_session.express.request.html">Request</a>
-				</li>
-				<li>
-					<a href="config_session.express.request.session.html">session</a>
+					<a href="shared_src_roles.default.html">default</a>
 				</li>
 			</ul>
-			<h1>Interface session</h1>
+			<h1>Enumeration default</h1>
 		</div>
 	</div>
 </header>
 <div class="container container-main">
 	<div class="row">
 		<div class="col-8 col-content">
-			<section class="tsd-panel tsd-hierarchy">
-				<h3>Hierarchy</h3>
-				<ul class="tsd-hierarchy">
-					<li>
-						<span class="target">session</span>
-					</li>
-				</ul>
-			</section>
 			<section class="tsd-panel-group tsd-index-group">
 				<h2>Index</h2>
 				<section class="tsd-panel tsd-index-panel">
 					<div class="tsd-index-content">
-						<section class="tsd-index-section tsd-is-external">
-							<h3>Properties</h3>
+						<section class="tsd-index-section ">
+							<h3>Enumeration members</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-external"><a href="config_session.express.request.session.html#iscaptain" class="tsd-kind-icon">is<wbr>Captain</a></li>
+								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="shared_src_roles.default.html#captain" class="tsd-kind-icon">CAPTAIN</a></li>
+								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="shared_src_roles.default.html#organizer" class="tsd-kind-icon">ORGANIZER</a></li>
+								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="shared_src_roles.default.html#participant" class="tsd-kind-icon">PARTICIPANT</a></li>
+								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="shared_src_roles.default.html#visitor" class="tsd-kind-icon">VISITOR</a></li>
 							</ul>
 						</section>
 					</div>
 				</section>
 			</section>
-			<section class="tsd-panel-group tsd-member-group tsd-is-external">
-				<h2>Properties</h2>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-external">
-					<a name="iscaptain" class="tsd-anchor"></a>
-					<h3>is<wbr>Captain</h3>
-					<div class="tsd-signature tsd-kind-icon">is<wbr>Captain<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Enumeration members</h2>
+				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
+					<a name="captain" class="tsd-anchor"></a>
+					<h3>CAPTAIN</h3>
+					<div class="tsd-signature tsd-kind-icon">CAPTAIN<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = &quot;captain&quot;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/INF-Vakken-PSOPV-20-21/inf-psopv-20-21-team-groep-2/blob/1e6e33ed/server/src/config/session.d.ts#L4">server/src/config/session.d.ts:4</a></li>
+							<li>Defined in src/shared/src/roles.ts:4</li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
+					<a name="organizer" class="tsd-anchor"></a>
+					<h3>ORGANIZER</h3>
+					<div class="tsd-signature tsd-kind-icon">ORGANIZER<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = &quot;organizer&quot;</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in src/shared/src/roles.ts:5</li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
+					<a name="participant" class="tsd-anchor"></a>
+					<h3>PARTICIPANT</h3>
+					<div class="tsd-signature tsd-kind-icon">PARTICIPANT<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = &quot;participant&quot;</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in src/shared/src/roles.ts:3</li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
+					<a name="visitor" class="tsd-anchor"></a>
+					<h3>VISITOR</h3>
+					<div class="tsd-signature tsd-kind-icon">VISITOR<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = &quot;visitor&quot;</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in src/shared/src/roles.ts:2</li>
 						</ul>
 					</aside>
 				</section>
@@ -116,17 +135,7 @@
 						<a href="../modules.html">Exports</a>
 					</li>
 					<li class="current tsd-kind-module">
-						<a href="../modules/config_session.html">config/session</a>
-						<ul>
-							<li class="current tsd-kind-namespace tsd-parent-kind-module tsd-is-external">
-								<a href="../modules/config_session.express.html">Express</a>
-								<ul>
-									<li class="current tsd-kind-namespace tsd-parent-kind-namespace tsd-is-external">
-										<a href="../modules/config_session.express.request.html">Request</a>
-									</li>
-								</ul>
-							</li>
-						</ul>
+						<a href="../modules/shared_src_roles.html">shared/src/roles</a>
 					</li>
 				</ul>
 			</nav>
@@ -134,11 +143,20 @@
 				<ul class="before-current">
 				</ul>
 				<ul class="current">
-					<li class="current tsd-kind-interface tsd-parent-kind-namespace tsd-is-external">
-						<a href="config_session.express.request.session.html" class="tsd-kind-icon">session</a>
+					<li class="current tsd-kind-enum tsd-parent-kind-module">
+						<a href="shared_src_roles.default.html" class="tsd-kind-icon">default</a>
 						<ul>
-							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-external">
-								<a href="config_session.express.request.session.html#iscaptain" class="tsd-kind-icon">is<wbr>Captain</a>
+							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
+								<a href="shared_src_roles.default.html#captain" class="tsd-kind-icon">CAPTAIN</a>
+							</li>
+							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
+								<a href="shared_src_roles.default.html#organizer" class="tsd-kind-icon">ORGANIZER</a>
+							</li>
+							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
+								<a href="shared_src_roles.default.html#participant" class="tsd-kind-icon">PARTICIPANT</a>
+							</li>
+							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
+								<a href="shared_src_roles.default.html#visitor" class="tsd-kind-icon">VISITOR</a>
 							</li>
 						</ul>
 					</li>
@@ -157,9 +175,13 @@
 				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
 				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
 				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
+				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
 			</ul>
 			<ul class="tsd-legend">
 				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
 			</ul>
 			<ul class="tsd-legend">
 				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>

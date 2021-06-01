@@ -124,7 +124,7 @@ async function loadTestData() {
         new DockerManagement(1000, 5000)
     ]))[0];
 
-    let dockerOpenPort: DockerOpenPort[] = (await save([ // TODO keep hardcoded?
+    let dockerOpenPort: DockerOpenPort[] = (await save([
         new DockerOpenPort(80), // vue server
         new DockerOpenPort(Number.parseInt(process.env.SERVER_PORT)), // node server
         new DockerOpenPort(Number.parseInt(process.env.DB_PORT)), // postgresSQL

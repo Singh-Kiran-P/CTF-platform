@@ -2,7 +2,7 @@ import express from 'express';
 import passport from 'passport';
 import Roles from '@shared/roles';
 import DB, { Account, Category, loginAvailable } from '../database';
-import { validForm, Form } from '@shared/validation/registerForm'; 
+import { validForm, Form } from '@shared/validation/registerForm';
 import { getAccount } from '../auth';
 const router = express.Router();
 

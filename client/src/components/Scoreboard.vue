@@ -70,7 +70,6 @@ export default Vue.extend({
         this.$root.$on('rangeChanged', (cat: string, data: any) => {
             if (this.category == cat) return;
             this.dateAxis.zoom(data);
-            // this.chart.zoom(data);
             this.chart.scrollbarX.start = data.start;
             this.chart.scrollbarX.end = data.end;
         });

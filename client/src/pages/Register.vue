@@ -76,7 +76,7 @@ export default Vue.extend({
         usernameError: '',
         categoryFeedback: ''
     }),
-    
+
     computed: {
         usernameFeedback(): string { return this.usernameError || validateUsername(this.form.username, false); },
         passwordFeedback(): string { return validatePassword(this.form.password, this.form.confirmPassword, false); },

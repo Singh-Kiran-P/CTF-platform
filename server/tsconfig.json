@@ -27,7 +27,7 @@
         "out": "docs",
         "defaultCategory": "",
         "categoryOrder": ["Routes", "*"],
-        "categorizeByGroup": true,
+        "categorizeByGroup": true
     },
     "include": [
         "src/**/*.ts"

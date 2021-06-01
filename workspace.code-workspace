@@ -14,7 +14,9 @@
 		"vetur.format.options.tabSize": 4,
 		"search.exclude": {
 			"**/package-lock.json": true,
-			"**/uploads/*": true
+			"**/uploads/*": true,
+			"**/routes-docs/*": true,
+			"**/docs/*": true
 		}
 	}
 }

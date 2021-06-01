@@ -3,7 +3,7 @@
     <div v-else class=rounds>
         <div v-if="joinTeam">
             <span class=center>You have to be part of a team to join the competition</span>
-            <router-link class=center :to="{ name: 'Team' }">Create or join a team</router-link>
+            <router-link class=center :to="{ name: 'Your Team' }">Create or join a team</router-link>
         </div>
         <div v-else-if="rounds.length == 0">
             <span class=center>The competition does not yet have any rounds</span>
@@ -270,7 +270,7 @@ $min-column-width: calc(var(--breakpoint-sm) / 2);
         -moz-columns: 0 1;
         columns: 0 1;
     }
-    
+
     & > * {
         padding-bottom: var(--double-margin);
         -webkit-column-break-inside: avoid;
