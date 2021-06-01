@@ -371,12 +371,12 @@ export default Vue.extend({
                 .post("/api/docker/deleteImage", { name: image.name })
                 .then((response) => {
                     let data = response.data;
-                    console.log(data);
                     if (data.statusCode == 200) {
                         toast.send(this, "Message", data.message, "success");
                         image.deleting = "succes";
                     } else {
                         toast.send(this, "Message", data.message, "danger");
+                        image.deleting = "error";
                         error();
                     }
                 })
@@ -392,13 +392,12 @@ export default Vue.extend({
                 .post("/api/docker/deleteContainer", { name: container.name })
                 .then((response) => {
                     let data = response.data;
-                    console.log(data);
-
                     if (data.statusCode == 200) {
                         toast.send(this, "Message", data.message, "success");
                         container.deleting = "succes";
                     } else {
                         toast.send(this, "Message", data.message, "danger");
+                        container.deleting = "error";
                         error();
                     }
                 })

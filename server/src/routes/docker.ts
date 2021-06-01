@@ -34,8 +34,4 @@ router.post("/deleteImage", isAuth, controller.deleteImage_POST);
 
 router.post("/deleteContainer", isAuth, controller.deleteContainer_POST);
 
-
-
-
 export default { path: "/docker", router };
-
