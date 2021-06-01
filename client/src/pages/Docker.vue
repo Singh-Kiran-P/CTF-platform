@@ -373,23 +373,16 @@ export default Vue.extend({
                 .post("/api/docker/deleteImage", { name: image.name })
                 .then((response) => {
                     let data = response.data;
-                    console.log(data);
                     if (data.statusCode == 200) {
-                        this.state = "succes";
                         toast.send(this, "Message", data.message, "success");
                         image.deleting = "succes";
                     } else {
                         toast.send(this, "Message", data.message, "danger");
+                        image.deleting = "error";
                         error();
                     }
                 })
                 .catch(() => error());
-
-            setTimeout(() => {
-                let err = true;
-                if (err) return error();
-                image.deleting = "succes";
-            }, 1000); //.catch(() => error());
         },
         deleteContainer(container: any): void {
             console.log(container);
@@ -401,24 +394,16 @@ export default Vue.extend({
                 .post("/api/docker/deleteContainer", { name: container.name })
                 .then((response) => {
                     let data = response.data;
-                    console.log(data);
-
                     if (data.statusCode == 200) {
-                        this.state = "succes";
                         toast.send(this, "Message", data.message, "success");
                         container.deleting = "succes";
                     } else {
                         toast.send(this, "Message", data.message, "danger");
+                        container.deleting = "error";
                         error();
                     }
                 })
                 .catch(() => error());
-
-            setTimeout(() => {
-                let err = true;
-                if (err) return error();
-                container.deleting = "succes";
-            }, 1000); //.catch(() => error());
         },
     },
 });
