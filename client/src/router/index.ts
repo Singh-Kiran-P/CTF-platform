@@ -163,7 +163,7 @@ Promise.all([
                 path: route.path.slice(1),
                 name: route.name,
                 meta: Object.assign({}, route.meta, { admin: roleResponse.data == Roles.ORGANIZER, auth: roleResponse.data != Roles.VISITOR, toggle: route.src.endsWith('vue') }),
-                component: route.src.endsWith('vue') ? () => import(`../pages/${route.src}`) : { template: `<iframe src="/api/uploads${route.src}"/>` }
+                component: route.src.endsWith('vue') ? () => import(`../pages/${route.src}`) : { template: `<iframe src="/api${route.src}"/>` }
                 // include vue pages directly into the html using a lazy loaded import, with the root directory for src in '/src/pages/'
                 // include html pages using an iframe so they dont inherit any styling, the src requesting the html file from the server
             }))
