@@ -58,7 +58,7 @@ class Database extends EventEmitter {
             this.conn = conn;
             await this.conn.query(`SET search_path TO ${process.env.DB_SCHEMA};`);
             let loaded = (await this.conn.query('SELECT * from competition')).length > 0;
-            if (!loaded || process.env.DB_LOAD_DATA == 'true') await loadTestData();
+            if (!loaded || process.env.DB_RESET_DATA == 'true') await loadTestData();
             this.emit('connect');
         }).catch(error => this.emit('error', error));
     }

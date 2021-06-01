@@ -73,15 +73,17 @@ async function loadTestData() {
         teamRepo.saveWithCaptain('The old crew', accounts[11], [accounts[12], accounts[13], accounts[14]])
     ]);
 
-    const round = (name: string, description: string, start: Date, end: Date) => new Round({
-        name: name, folder: '/rounds/' + name.toLowerCase(), description: description, start: start.toJSON(), end: end.toJSON()
+    let o = 1000 * 60 * 30;
+    let t = new Date().getTime();
+    const round = (name: string, description: string, start: number, end: number) => new Round({
+        name: name, folder: '/rounds/' + name.toLowerCase(), description: description, start: new Date(t + start).toJSON(), end: new Date(t + end).toJSON()
     });
 
     let rounds: Round[] = await save([ // TODO DATES
-        round('The very beginning', 'In this round you will be getting familiar with the flow of a CTF competition.', new Date(2021, 5, 1, 10), new Date(2021, 5, 1, 11)),
-        round('The first hardships', 'Things will start to get harder in this round, try to keep up!', new Date(2021, 5, 1, 11, 30), new Date(2021, 5, 1, 13)),
-        round('A real challenge', 'Hope things weren\'t too hard so far, because they are getting even harder!', new Date(2021, 5, 1, 14), new Date(2021, 5, 1, 16)),
-        round('The final stretch', 'Don\'t give up now! This is the last round', new Date(2021, 5, 1, 17), new Date(2021, 5, 1, 18))
+        round('The very beginning', 'In this round you will be getting familiar with the flow of a CTF competition.', -o / 2, o / 2),
+        round('The first hardships', 'Things will start to get harder in this round, try to keep up!', o * 2, o * 4),
+        round('A real challenge', 'Hope things weren\'t too hard so far, because they are getting even harder!', o * 7, o * 10),
+        round('The final stretch', 'Don\'t give up now! This is the last round', o * 12, o * 14)
     ]);
 
     const challenge = (order: number, round: number, tag: number, type: ChallengeType,
