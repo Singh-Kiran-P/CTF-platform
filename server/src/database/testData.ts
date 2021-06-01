@@ -78,8 +78,10 @@ async function loadTestData() {
         round('The final stretch', 'Don\'t give up now! This is the last round', new Date(2021, 5, 1, 17), new Date(2021, 5, 1, 18))
     ]);
 
-    const challenge = (o: number, r: number, ta: number, ty: ChallengeType, n: string, d: string, p: number, f: string, a: string, l: number) => new Challenge({
-        order: o, round: rounds[r], tag: tags[ta], type: ty, name: n, description: d, points: p, flag: f, attachment: a, lock: l, docker: '', dockerImageId: '', innerPorts: ''
+    const challenge = (order: number, round: number, tag: number, type: ChallengeType,
+                       name: string, description: string, points: number, flag: string, attachment: string, lock: number) => new Challenge({
+        order: order, round: rounds[round], tag: tags[tag], type: type, name: name, description: description, points: points, flag: flag, attachment: attachment, lock: lock,
+        docker: '', dockerImageId: '', innerPorts: ''
     });
 
     let challenges: Challenge[] = await save([ // TODO
