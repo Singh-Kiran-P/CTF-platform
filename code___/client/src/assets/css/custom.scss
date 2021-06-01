@@ -1,0 +1,342 @@
+// set theme colors such as $dark, $blue, $primary, $danger, ... and add new global variables in :root
+// use var(--colorName) in css to use these colors
+// more info: https://getbootstrap.com/docs/4.5/getting-started/theming/
+
+$primary: rgb(63, 181, 129);
+
+:root {
+    --border-radius: 0.5rem;
+    --margin: 0.5rem;
+    --double-margin: calc(var(--margin) * 2);
+    --half-margin: calc(var(--margin) / 2);
+    --font-massive: 1.75rem;
+    --font-large: 1.25rem;
+    --font-small: 90%;
+    --font-smallest: 80%;
+    
+    // light mode colors
+    --border-l: 2px;
+    --white-l: #ffffff;
+    --black-l: #212529;
+    --gray-l: #6c757d;
+    --gray-light-l: #dee2e6;
+    --gray-lightest-l: #e9ecef;
+    --gray-half-l: rgba(108, 117, 125, 0.5);
+
+    // dark mode colors, reverse of light mode: white is actually black, lightest gray is actually darkest gray, ...
+    --border-d: 1px;
+    --white-d: #181a1b;
+    --black-d: #d1cdc7;
+    --gray-d: #9e9689;
+    --gray-light-d: #303436;
+    --gray-lightest-d: #282c2d;
+    --gray-half-d: rgba(158, 150, 137, 0.5);
+
+    // default to dark mode (visible for a fraction of a second on refresh, then the selected mode is shown)
+    --border-c: var(--border-l);
+    --white-c: var(--white-l);
+    --black-c: var(--black-l);
+    --gray-c: var(--gray-l);
+    --gray-light-c: var(--gray-light-l);
+    --gray-lightest-c: var(--gray-lightest-l);
+    --gray-half-c: var(--gray-half-l);
+}
+
+.no-transition * {
+    -webkit-transition: none !important;
+    -moz-transition: none !important;
+    -o-transition: none !important;
+    transition: none !important;
+}
+
+// must be defined before import and with everything important, because css is very good
+.b-form-timepicker, .b-form-datepicker {
+    label {
+        color: var(--black-c) !important;
+    }
+
+    .dropdown-menu {
+        border: 1px solid var(--black-c) !important;
+    }
+
+    .dropdown-menu, .b-form-spinbutton, .b-calendar-grid, .small {
+        background-color: var(--white-c) !important;
+        
+        &, button svg, span.btn {
+            color: var(--black-c) !important;
+        }
+        
+        span.btn.text-muted {
+            color: var(--gray-c) !important;
+        }
+
+        span.btn.active, span.btn:hover {
+            color: var(--white-c) !important;
+        }
+
+        span.btn:hover {
+            background-color: var(--black-c);
+        }
+    }
+}
+
+
+@import '~bootstrap/scss/bootstrap';
+@import '~bootstrap-vue/src';
+
+// set global default styling
+
+* {
+    font-family: Avenir, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+::-webkit-scrollbar {
+    width: calc(calc(var(--double-margin) + var(--margin)) / 2);
+}
+
+::-webkit-scrollbar-track {
+    background: var(--white-c); 
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--gray-light-c);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--gray-half-c);
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    background-color: var(--white-c);
+    overflow-y: hidden;
+}
+
+@media (hover: hover) {
+    a:hover, a:focus-visible {
+        text-decoration: underline !important;
+        color: var(--primary);
+        outline: none;
+    }
+}
+
+span, label, button {
+    word-break: break-all;
+}
+
+span, label {
+    color: var(--black-c);
+}
+
+:not(.b-form-timepicker):not(.b-form-datepicker):not(.navbar-brand):not(.modal-header):not(.toast-header) > button:not(.icon):not(.page-link) {
+    &, span {
+        color: var(--white-l) !important;
+    }
+}
+
+input, textarea, select, .custom-file-label, .custom-file-label::after, .b-form-timepicker, .b-form-datepicker {
+    background-color: var(--gray-lightest-c) !important;
+    color: var(--black-c) !important;
+}
+
+input, textarea, select {
+    &:not(.is-valid):not(.is-invalid) {
+        border-color: var(--gray-half-c) !important;
+    }
+}
+
+.bs-tooltip-top .arrow::before {
+    border-top-color: var(--black-c) !important;
+}
+
+.bs-tooltip-bottom .arrow::before {
+    border-bottom-color: var(--black-c) !important;
+}
+
+.pagination {
+    li, li {
+        span, button {
+            background-color: var(--white-c) !important;
+        }
+
+        button {
+            color: var(--black-c) !important;
+            border-color: var(--black-c) !important;
+        }
+        
+        button:hover {
+            background-color: var(--gray-light-c) !important;
+        }
+        
+        span {
+            color: var(--gray-half-c) !important;
+            border-color: var(--gray-half-c) !important;
+        }
+
+        &.active button {
+            background-color: var(--primary) !important;
+            color: var(--white-l) !important;
+            border: none !important;
+        }
+    }
+}
+
+.b-table {
+    thead > tr > th {
+        color: var(--black-c);
+        border-color: var(--black-c);
+    }
+
+    tbody > tr {
+        &:nth-child(odd) {
+            background-color: var(--gray-lightest-c);
+        }
+
+        &:first-of-type > td {
+            border: none;
+        }
+        
+        & > td {
+            color: var(--black-c);
+            border-color: var(--gray-half-c);
+
+            &, span {
+                overflow: hidden;
+                white-space: nowrap;
+            }
+
+            &:hover {
+                &, & > span, & > a {
+                    overflow: initial;
+                    overflow-y: auto;
+                }
+            }
+        }
+    }
+}
+
+.slider-btn {
+    background: none !important;
+    width: 3rem !important;
+    padding: 0 !important;
+
+    .slider-icon {
+        border-left: var(--half-margin) solid var(--gray-c) !important;
+        border-bottom: var(--half-margin) solid var(--gray-c) !important;
+    }
+
+    &:hover .slider-icon {
+        border-color: var(--black-c) !important;
+    }
+}
+
+.slider-item {
+    padding: 0 3rem;
+}
+
+.dark-mode {
+    .table.b-table > thead > tr, table.b-table > tfoot > tr, .table.b-table > thead > tr {
+        & > [aria-sort=ascending] {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='101' height='101' view-box='0 0 101 101' preserveAspectRatio='none'%3e%3cpath fill='white' d='M51 1l25 23 24 22H1l25-22z'/%3e%3cpath fill='white' opacity='.3' d='M51 101l25-23 24-22H1l25 22z'/%3e%3c/svg%3e");
+        }
+
+        & > [aria-sort=descending] {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='101' height='101' view-box='0 0 101 101' preserveAspectRatio='none'%3e%3cpath fill='white' opacity='.3' d='M51 1l25 23 24 22H1l25-22z'/%3e%3cpath fill='white' d='M51 101l25-23 24-22H1l25 22z'/%3e%3c/svg%3e")
+        }
+
+        & > [aria-sort=none] {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='101' height='101' view-box='0 0 101 101' preserveAspectRatio='none'%3e%3cpath fill='white' opacity='.3' d='M51 1l25 23 24 22H1l25-22zM51 101l25-23 24-22H1l25 22z'/%3e%3c/svg%3e");
+        }
+    }
+
+    .custom-select {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='4' height='5' viewBox='0 0 4 5'%3e%3cpath fill='white' opacity='.7' d='M2 0L0 2h4zm0 5L0 3h4z'/%3e%3c/svg%3e");
+    }
+}
+
+input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type=number] {
+    -moz-appearance: textfield;
+}
+
+textarea {
+    overflow-y: hidden !important;
+}
+
+.center {
+    text-align: center;
+}
+
+.bottom-padding {
+    display: block;
+    padding-bottom: var(--double-margin);
+}
+
+// .custom-file-label styling must be defined here for some ungodly reason, dont ask me why
+.list-item:not(.nostyle) .item-content.editable {
+    input, textarea, .custom-file-label, .custom-file-label::after {
+        margin: 0;
+        padding-top: 0;
+        padding-bottom: 0;
+        height: auto;
+    }
+
+    input, textarea, .custom-file-label {
+        padding-left: var(--half-margin);
+    }
+
+    .b-form-file {
+        line-height: 1.3;
+        height: auto;
+    }
+}
+
+// custom tooltip styling must be defined here as well, god is dead
+.tooltip {
+    top: 0; // do not remove, required to make b-tooltip not shit the bed
+    opacity: 1 !important;
+
+    & > .tooltip-inner {
+        padding: var(--margin);
+        border: 2px solid var(--black-c);
+        max-width: calc(var(--breakpoint-sm) / 2);
+        background-color: var(--gray-lightest-c);
+        font-size: var(--font-small);
+        color: var(--black-c);
+    }
+}
+
+.modal-content {
+    color: var(--black-c);
+    background-color: var(--gray-lightest-c);
+    
+    .modal-header {
+        border-bottom: var(--border-c) solid var(--gray-half-c);
+        
+        .modal-title {
+            font-size: var(--font-large);
+            font-weight: bold;
+        }
+        
+        button {
+            color: var(--black-c);
+            outline: none;
+        }
+        
+    }
+
+    .modal-footer {
+        border-top: var(--border-c) solid var(--gray-half-c);
+    }
+}
+
+.modal, .modal-open {
+    padding: 0 !important;
+}

@@ -1,0 +1,13 @@
+# @author Kiran Singh
+FROM node:10-alpine
+
+WORKDIR  /node/client
+
+COPY package*.json /node/client/
+RUN npm install
+
+# COPY . .
+
+EXPOSE 80
+
+CMD ["npm", "run", "client"]
