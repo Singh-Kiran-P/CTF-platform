@@ -30,5 +30,12 @@ router.get("/stopChallengeContainer/:challengeId", isAuth, controller.stopChalle
 
 router.get("/resetChallengeContainer/:challengeId", isAuth, controller.resetChallengeContainer_GET);
 
+router.post("/deleteImage", isAuth, controller.deleteImage_POST);
+
+router.post("/deleteContainer", isAuth, controller.deleteContainer_POST);
+
+
+
+
 export default { path: "/docker", router };
 

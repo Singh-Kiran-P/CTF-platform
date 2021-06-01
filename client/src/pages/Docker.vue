@@ -1,106 +1,202 @@
 <template>
-    <div v-if="true" class=docker>
-        <div class=ports>
+    <div v-if="true" class="docker">
+        <div class="ports">
             <span>Ports</span>
-            <Tooltip below class=info-tooltip
+            <Tooltip
+                below
+                class="info-tooltip"
                 content="
                     Ports for interactive environments will be assigned within this range<br/><br/>
-                    Adding exluded ports will prevent them from being assigned, you cannot undo this">
-                <font-awesome-icon icon=info-circle />
+                    Adding exluded ports will prevent them from being assigned, you cannot undo this"
+            >
+                <font-awesome-icon icon="info-circle" />
             </Tooltip>
-            <label>Lower bound port
-                <b-input type=number number v-model="lowerbound" :state="portState" placeholder="Enter lower bound port" @input="portInput()"/>
+            <label
+                >Lower bound port
+                <b-input
+                    type="number"
+                    number
+                    v-model="lowerbound"
+                    :state="portState"
+                    placeholder="Enter lower bound port"
+                    @input="portInput()"
+                />
             </label>
-            <label>Upper bound port
-                <b-input type=number number v-model="upperbound" :state="portState" placeholder="Enter upper bound port" @input="portInput()"/>
+            <label
+                >Upper bound port
+                <b-input
+                    type="number"
+                    number
+                    v-model="upperbound"
+                    :state="portState"
+                    placeholder="Enter upper bound port"
+                    @input="portInput()"
+                />
             </label>
-            <label>Add excluded ports
-                <b-input type=text trim v-model="excluded" :state="portState" placeholder="Enter excluded ports to be added" @input="portInput()"/>
-                <span>Multiple ports should be seperated with a comma, for example: '8080, 900'</span>
+            <label
+                >Add excluded ports
+                <b-input
+                    type="text"
+                    trim
+                    v-model="excluded"
+                    :state="portState"
+                    placeholder="Enter excluded ports to be added"
+                    @input="portInput()"
+                />
+                <span
+                    >Multiple ports should be seperated with a comma, for
+                    example: '8080, 900'</span
+                >
             </label>
-            <b-form-invalid-feedback :state="state(validatePorts)">{{validatePorts}}</b-form-invalid-feedback>
-            <div class=buttons>
-                <StatusButton variant=danger normal=Cancel loading=Loaded succes=Loaded :state="cancelState" @click="cancelPorts()" :disabled="cancelDisabled"/>
-                <StatusButton variant=primary normal=Save loading=Saving succes=Saved :state="saveState" @click="savePorts()" :disabled="saveDisabled"/>
+            <b-form-invalid-feedback :state="state(validatePorts)">{{
+                validatePorts
+            }}</b-form-invalid-feedback>
+            <div class="buttons">
+                <StatusButton
+                    variant="danger"
+                    normal="Cancel"
+                    loading="Loaded"
+                    succes="Loaded"
+                    :state="cancelState"
+                    @click="cancelPorts()"
+                    :disabled="cancelDisabled"
+                />
+                <StatusButton
+                    variant="primary"
+                    normal="Save"
+                    loading="Saving"
+                    succes="Saved"
+                    :state="saveState"
+                    @click="savePorts()"
+                    :disabled="saveDisabled"
+                />
             </div>
         </div>
-        <span class=info>
-            A simple overview of your docker is provided below, for more control you can use
-            <Tooltip center below content="TODO: portainer explanation" class=link-tooltip>
-                <a :href="`${domain}:9000`" target=_blank>Portainer</a>
+        <span class="info">
+            A simple overview of your docker is provided below, for more control
+            you can use
+            <Tooltip
+                center
+                below
+                content="TODO: portainer explanation"
+                class="link-tooltip"
+            >
+                <a :href="`${domain}:9000`" target="_blank">Portainer</a>
             </Tooltip>
         </span>
-        <div class=images>
+        <div class="images">
             <label>Images</label>
-            <Tooltip below content="TODO: images explanation" class=info-tooltip>
-                <font-awesome-icon icon=info-circle />
+            <Tooltip
+                below
+                content="TODO: images explanation"
+                class="info-tooltip"
+            >
+                <font-awesome-icon icon="info-circle" />
             </Tooltip>
-            <b-table fixed striped :fields="imageFields" :items="images" :busy="loadingImages">
+            <b-table
+                fixed
+                striped
+                :fields="imageFields"
+                :items="images"
+                :busy="loadingImages"
+            >
                 <template v-slot:cell(delete)="row">
-                    <StatusButton variant=danger size=sm normal=Delete loading=Deleting succes=Deleted :state="row.item.deleting" @click="deleteImage(row.item)"/>
+                    <StatusButton
+                        variant="danger"
+                        size="sm"
+                        normal="Delete"
+                        loading="Deleting"
+                        succes="Deleted"
+                        :state="row.item.deleting"
+                        @click="deleteImage(row.item)"
+                    />
                 </template>
                 <template #table-busy>
                     <div class="text-center text-primary">
-                        <b-spinner variant=primary label=Loading />
+                        <b-spinner variant="primary" label="Loading" />
                     </div>
                 </template>
             </b-table>
         </div>
-        <div class=containers>
+        <div class="containers">
             <label>Containers</label>
-            <Tooltip below content="TODO: containers explanation" class=info-tooltip>
-                <font-awesome-icon icon=info-circle />
+            <Tooltip
+                below
+                content="TODO: containers explanation"
+                class="info-tooltip"
+            >
+                <font-awesome-icon icon="info-circle" />
             </Tooltip>
-            <b-table fixed striped :fields="containerFields" :items="containers" :busy="loadingContainers">
+            <b-table
+                fixed
+                striped
+                :fields="containerFields"
+                :items="containers"
+                :busy="loadingContainers"
+            >
                 <template v-slot:cell(ports)="row">
                     <template v-for="(port, i) in row.item.ports">
-                        <a :key="port" :href="`${domain}:${port}`" target=_blank>{{port}}</a>{{i == row.item.ports.length - 1 ? '' : ', '}}
+                        <a
+                            :key="port"
+                            :href="`${domain}:${port}`"
+                            target="_blank"
+                            >{{ port }}</a
+                        >{{ i == row.item.ports.length - 1 ? "" : ", " }}
                     </template>
                 </template>
                 <template v-slot:cell(delete)="row">
-                    <StatusButton variant=danger size=sm normal=Delete loading=Deleting succes=Deleted :state="row.item.deleting" @click="deleteContainer(row.item)"/>
+                    <StatusButton
+                        variant="danger"
+                        size="sm"
+                        normal="Delete"
+                        loading="Deleting"
+                        succes="Deleted"
+                        :state="row.item.deleting"
+                        @click="deleteContainer(row.item)"
+                    />
                 </template>
                 <template #table-busy>
                     <div class="text-center text-primary">
-                        <b-spinner variant=primary label=Loading />
+                        <b-spinner variant="primary" label="Loading" />
                     </div>
                 </template>
             </b-table>
         </div>
-        <div class=bottom-padding />
+        <div class="bottom-padding" />
     </div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import axios from "axios";
-import Tooltip from '@/components/Tooltip.vue';
-import StatusButton from '@/components/StatusButton.vue';
-import { validateNumber, state } from '@shared/validation';
-import { shortTimeDisplay } from '@/assets/functions/strings';
-import { portsb } from '@/assets/functions/ports';
+import Tooltip from "@/components/Tooltip.vue";
+import StatusButton from "@/components/StatusButton.vue";
+import { validateNumber, state } from "@shared/validation";
+import { shortTimeDisplay } from "@/assets/functions/strings";
+import { portsb } from "@/assets/functions/ports";
+import toast from "@/assets/functions/toast";
 
 type Container = {
-    name: string,
-    image: string,
-    ports: number[],
-    state: string,
-    status: string,
-    deleting: string
+    name: string;
+    image: string;
+    ports: number[];
+    state: string;
+    status: string;
+    deleting: string;
 };
 
 type Image = {
-    name: string,
-    size: string,
-    created: string,
-    deleting: string
-}
+    name: string;
+    size: string;
+    created: string;
+    deleting: string;
+};
 
 export default Vue.extend({
-    name: 'Docker',
+    name: "Docker",
     components: {
         StatusButton,
-        Tooltip
+        Tooltip,
     },
     created() {
         this.getContainers();
@@ -114,123 +210,217 @@ export default Vue.extend({
         loadingContainers: false,
 
         imageFields: [
-            { key: 'name', sortable: true },
-            { key: 'size', sortable: true },
-            { key: 'created', sortable: true },
-            { key: 'delete', sortable: false }
+            { key: "name", sortable: true },
+            { key: "size", sortable: true },
+            { key: "created", sortable: true },
+            { key: "delete", sortable: false },
         ],
         containerFields: [
-            { key: 'name', sortable: true },
-            { key: 'image', sortable: true },
-            { key: 'ports', sortable: true },
-            { key: 'state', sortable: true },
-            { key: 'status', sortable: true },
-            { key: 'delete', sortable: false }
+            { key: "name", sortable: true },
+            { key: "image", sortable: true },
+            { key: "ports", sortable: true },
+            { key: "state", sortable: true },
+            { key: "status", sortable: true },
+            { key: "delete", sortable: false },
         ],
 
         upperbound: NaN,
         lowerbound: NaN,
-        excluded: '',
+        excluded: "",
 
         portState: true,
-        saveState: 'normal',
-        cancelState: 'normal',
+        saveState: "normal",
+        cancelState: "normal",
 
-        domain: window.location.origin
+        domain: window.location.origin,
     }),
     computed: {
-        empty(): boolean { return !this.lowerbound || !this.upperbound },
-        cancelDisabled(): boolean { return this.empty },
-        saveDisabled(): boolean { return this.empty || !state(this.validatePorts) },
+        empty(): boolean {
+            return !this.lowerbound || !this.upperbound;
+        },
+        cancelDisabled(): boolean {
+            return this.empty;
+        },
+        saveDisabled(): boolean {
+            return this.empty || !state(this.validatePorts);
+        },
         validatePorts(): string {
             let minPort = 1000;
             let maxPort = Math.pow(2, 16) - 1;
-            let v = validateNumber(this.lowerbound, 'Lower bound', false, minPort, maxPort);
-            if (!v) v = validateNumber(this.upperbound, 'Upper bound', false, this.lowerbound, maxPort);
+            let v = validateNumber(
+                this.lowerbound,
+                "Lower bound",
+                false,
+                minPort,
+                maxPort
+            );
+            if (!v)
+                v = validateNumber(
+                    this.upperbound,
+                    "Upper bound",
+                    false,
+                    this.lowerbound,
+                    maxPort
+                );
             if (!v && this.excluded)
-                v = this.excluded.split(',').map(p => p.trim()).reduce((acc, cur) => acc + validateNumber(Number.parseInt(cur), 'Excluded ports', false, 1, maxPort), '');
+                v = this.excluded
+                    .split(",")
+                    .map((p) => p.trim())
+                    .reduce(
+                        (acc, cur) =>
+                            acc +
+                            validateNumber(
+                                Number.parseInt(cur),
+                                "Excluded ports",
+                                false,
+                                1,
+                                maxPort
+                            ),
+                        ""
+                    );
             return v;
-        }
+        },
     },
     methods: {
         state,
 
         portInput(): void {
-            this.saveState = 'normal';
-            this.cancelState = 'normal';
+            this.saveState = "normal";
+            this.cancelState = "normal";
         },
 
         cancelPorts(): void {
-            this.cancelState = 'loading';
-            const error = () => this.cancelState = 'error';
-            axios.get('/api/docker/dockerConfigPorts').then(res => {
-                if (!res.data) return error();
-                this.excluded = '';
-                this.lowerbound = Number(res.data.lowerBoundPort);
-                this.upperbound = Number(res.data.upperBoundPort);
-                this.cancelState = 'succes';
-            }).catch(() => error());
+            this.cancelState = "loading";
+            const error = () => (this.cancelState = "error");
+            axios
+                .get("/api/docker/dockerConfigPorts")
+                .then((res) => {
+                    if (!res.data) return error();
+                    this.excluded = "";
+                    this.lowerbound = Number(res.data.lowerBoundPort);
+                    this.upperbound = Number(res.data.upperBoundPort);
+                    this.cancelState = "succes";
+                })
+                .catch(() => error());
         },
         savePorts(): void {
-            this.saveState = 'loading';
-            const error = () => this.saveState = 'error';
-            let bounds = axios.post('/api/docker/dockerConfigPorts', { lowerBoundPort: this.lowerbound.toString(), upperBoundPort: this.upperbound.toString() });
-            let exclude = axios.post('/api/docker/usedPorts', { ports: this.excluded });
-            Promise.all([bounds, exclude]).then(([res1, res2]) => {
-                if (res1.data.statusCode == 404 || res2.data.statusCode == 404)return error();
-                this.saveState = 'succes';
-                this.excluded = '';
-            }).catch(() => error());
+            this.saveState = "loading";
+            const error = () => (this.saveState = "error");
+            let bounds = axios.post("/api/docker/dockerConfigPorts", {
+                lowerBoundPort: this.lowerbound.toString(),
+                upperBoundPort: this.upperbound.toString(),
+            });
+            let exclude = axios.post("/api/docker/usedPorts", {
+                ports: this.excluded,
+            });
+            Promise.all([bounds, exclude])
+                .then(([res1, res2]) => {
+                    if (
+                        res1.data.statusCode == 404 ||
+                        res2.data.statusCode == 404
+                    )
+                        return error();
+                    this.saveState = "succes";
+                    this.excluded = "";
+                })
+                .catch(() => error());
         },
 
         getImages(): void {
             this.loadingImages = true;
-            axios.get('/api/docker/images').then(res => {
-                this.loadingImages = false;
-                if (!res.data) return;
-                this.images = res.data.map((item: any) => ({
-                    name: item.RepoTags[0],
-                    size: (item.Size / Math.pow(1024, 2)).toFixed(2) + ' mb',
-                    created: shortTimeDisplay(new Date(item.Created * 1000).toJSON()),
-                    deleting: 'normal'
-                }));
-            }).catch(() => this.loadingImages = false);
+            axios
+                .get("/api/docker/images")
+                .then((res) => {
+                    this.loadingImages = false;
+                    if (!res.data) return;
+                    this.images = res.data.map((item: any) => ({
+                        name: item.RepoTags[0],
+                        size:
+                            (item.Size / Math.pow(1024, 2)).toFixed(2) + " mb",
+                        created: shortTimeDisplay(
+                            new Date(item.Created * 1000).toJSON()
+                        ),
+                        deleting: "normal",
+                    }));
+                })
+                .catch(() => (this.loadingImages = false));
         },
         getContainers(): void {
             this.loadingContainers = true;
-            axios.get('/api/docker/containers').then(res => {
-                this.loadingContainers = false;
-                if (!res.data) return;
-                this.containers = res.data.map((item: any) => ({
-                    name: item.Names[0].slice(1),
-                    image: item.Image,
-                    ports: portsb(item.Ports),
-                    state: item.State,
-                    status: item.Status,
-                    deleting: 'normal'
-                }));
-            }).catch(() => this.loadingContainers = false);
+            axios
+                .get("/api/docker/containers")
+                .then((res) => {
+                    this.loadingContainers = false;
+                    if (!res.data) return;
+                    this.containers = res.data.map((item: any) => ({
+                        name: item.Names[0].slice(1),
+                        image: item.Image,
+                        ports: portsb(item.Ports),
+                        state: item.State,
+                        status: item.Status,
+                        deleting: "normal",
+                    }));
+                })
+                .catch(() => (this.loadingContainers = false));
         },
 
         deleteImage(image: any): void {
-            image.deleting = 'loading';
-            const error = () => image.deleting = 'error';
+            console.log(image);
+            image.deleting = "loading";
+            const error = () => (image.deleting = "error");
+
+            axios
+                .post("/api/docker/deleteImage", { name: image.name })
+                .then((response) => {
+                    let data = response.data;
+                    console.log(data);
+                    if (data.statusCode == 200) {
+                        this.state = "succes";
+                        toast.send(this, "Message", data.message, "success");
+                        image.deleting = "succes";
+                    } else {
+                        toast.send(this, "Message", data.message, "danger");
+                        error();
+                    }
+                })
+                .catch(() => error());
+
             setTimeout(() => {
                 let err = true;
                 if (err) return error();
-                image.deleting = 'succes';
-            }, 1000);//.catch(() => error());
+                image.deleting = "succes";
+            }, 1000); //.catch(() => error());
         },
         deleteContainer(container: any): void {
-            container.deleting = 'loading';
-            const error = () => container.deleting = 'error';
+            console.log(container);
+
+            container.deleting = "loading";
+            const error = () => (container.deleting = "error");
+
+            axios
+                .post("/api/docker/deleteContainer", { name: container.name })
+                .then((response) => {
+                    let data = response.data;
+                    console.log(data);
+
+                    if (data.statusCode == 200) {
+                        this.state = "succes";
+                        toast.send(this, "Message", data.message, "success");
+                        container.deleting = "succes";
+                    } else {
+                        toast.send(this, "Message", data.message, "danger");
+                        error();
+                    }
+                })
+                .catch(() => error());
+
             setTimeout(() => {
                 let err = true;
                 if (err) return error();
-                container.deleting = 'succes';
-            }, 1000);//.catch(() => error());
-        }
-    }
+                container.deleting = "succes";
+            }, 1000); //.catch(() => error());
+        },
+    },
 });
 </script>
 
@@ -275,7 +465,9 @@ export default Vue.extend({
     }
 }
 
-.ports > span, .images > label, .containers > label {
+.ports > span,
+.images > label,
+.containers > label {
     font-weight: bold;
     font-size: var(--font-large);
     margin-bottom: var(--margin);

@@ -29,6 +29,8 @@ export class DockerController {
         this.startChallengeContainer_GET = this.startChallengeContainer_GET.bind(this);
         this.stopChallengeContainer_GET = this.stopChallengeContainer_GET.bind(this);
         this.resetChallengeContainer_GET = this.resetChallengeContainer_GET.bind(this);
+        this.deleteImage_POST = this.deleteImage_POST.bind(this)
+        this.deleteContainer_POST = this.deleteContainer_POST.bind(this)
 
         this._createPortConfig = this._createPortConfig.bind(this);
         this._giveRandomPort = this._giveRandomPort.bind(this);
@@ -45,6 +47,40 @@ export class DockerController {
         this.removeContainerById = this.removeContainerById.bind(this);
     }
     //---------------------------------------------------------- Routes ----------------------------------------------------------
+
+    /**
+     * Delete image
+     * @param req route request object
+     * @param res route response object
+     * @category Routes
+     */
+    public deleteImage_POST(req: Request, res: Response) {
+        let name = req.fields.name.toString()
+        this.deleteImage(name)
+            .then(() => res.json({ message: "Image successfully deleted", statusCode: 200 }))
+            .catch((err) => res.json(err));
+    }
+
+    /**
+     * Delete container
+     * @param req route request object
+     * @param res route response object
+     * @category Routes
+     */
+    public deleteContainer_POST(req: Request, res: Response) {
+        let name = req.fields.name.toString()
+        console.log(name);
+        this.stopContainerById(name)
+            .then(() => {
+                this.removeContainerById(name)
+                    .then((d) => res.json(d))
+                    .catch((err) => res.json(err));
+            })
+            .catch((err) => res.json(err));
+
+    }
+
+
     /**
      * Get docker ports config
      * @param req route request object
@@ -492,6 +528,8 @@ export class DockerController {
 
                         return reject({ error: "Can not delete image", message: err.json.message, statusCode: 404 });
                     }
+                    console.log(res);
+
                     resolve();
                 })
         })
@@ -529,7 +567,7 @@ export class DockerController {
                     resolve({ message: "Container stopped successfully", statusCode: 200 });
                 }
                 else
-                    reject({ message: err.json, statusCode: 404 });
+                    reject({ error: err.json.message,message: err.json.message, statusCode: 404 });
             });
         })
     }
@@ -547,7 +585,7 @@ export class DockerController {
                     resolve({ message: "Container removed successfully", statusCode: 200 });
                 }
                 else
-                    reject({ message: err.json, statusCode: 404 });
+                    reject({ error: err.json.message, message: err.json.message, statusCode: 404 });
             });
         })
     }
