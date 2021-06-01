@@ -9,7 +9,7 @@
             <span class=center>The competition does not yet have any rounds</span>
         </div>
         <div v-else>
-            <AdminHeader v-if="admin || true /*TODO REMOVE '|| TRUE'*/" v-model="offset" :names="this.rounds.map(r => r.name)" :times="this.rounds.map(r => r.start)"/>
+            <AdminHeader v-if="admin" v-model="offset" :names="this.rounds.map(r => r.name)" :times="this.rounds.map(r => r.start)"/>
             <div v-if="currentRound">
                 <span class="round-name center">{{currentRound.name}}</span>
                 <span class="round-duration center">{{durationDisplay(currentRound)}}</span>

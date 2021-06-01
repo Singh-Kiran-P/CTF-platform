@@ -6,7 +6,7 @@
         "esModuleInterop": true,
         "moduleResolution": "node",
         "jsx": "preserve",
-        "sourceMap": true,
+        "sourceMap": false,
         "baseUrl": ".",
         "importHelpers": true,
         "experimentalDecorators": true,

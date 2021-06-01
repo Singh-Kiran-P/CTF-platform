@@ -25,12 +25,6 @@ let sess: session.SessionOptions = {
     cookie: { secure: false, maxAge: 1000 * 60 * 60 * 24 * 31 }
 };
 
-// set secure cookies for production, TODO: test and verify if this works, potentially remove this
-if (process.env.NODE_ENV == 'production') {
-    app.set('trust proxy', 1);
-    sess.cookie.secure = true;
-}
-
 // setup session and passport
 app.use(session(sess));
 passport.use(strategy);

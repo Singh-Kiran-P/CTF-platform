@@ -236,4 +236,23 @@ export default Vue.extend({
         }
     }
 }
+
+$breakpoint-md: 768px;
+@media (max-width: $breakpoint-md) {
+    .scoreboard {
+        flex-direction: column;
+        overflow-y: auto;
+
+        .chart {
+            width: 100%;
+            height: calc(100% - 140px);
+            flex-shrink: 0;
+        }
+
+        .table {
+            margin: var(--double-margin) 0;
+            width: 100%;
+        }
+    }
+}
 </style>

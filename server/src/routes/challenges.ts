@@ -1,5 +1,6 @@
 import DB, { Challenge, Round, Solve, Question, Hint, UsedHint, Attempt, AttemptType, solveAvailable, Account, Team } from '../database';
 import { LeaderBoardController } from "../controllers/leaderboard";
+import { DockerController } from "../controllers/docker";
 import { getAccount, isAuth } from '../auth/index';
 import socketIO from '../controllers/socket';
 import { Root, uploaddir } from '../files';
@@ -7,6 +8,7 @@ import levenshtein from 'fast-levenshtein';
 import express from 'express';
 const router = express.Router();
 let leaderboardController = new LeaderBoardController();
+let controller = new DockerController();
 
 const challengeRelations = ['solves', 'solves.team', 'solves.account', 'usedHints', 'usedHints.team'];
 
@@ -21,7 +23,7 @@ const roundStarted = (roundId: number | string, req: express.Request, res: expre
     if (!admin && !getAccount(req).team) return res.json(joinTeam());
     DB.repo(Round).findOne(roundId).then(round => {
         if (!round) return res.json(error());
-        //if (!admin && new Date(round.start) > new Date()) return res.json(notStarted()); // TODO: UNCOMMENT
+        if (!admin && new Date(round.start) > new Date()) return res.json(notStarted());
         return next(round);
     }).catch(() => res.json(error()));
 }
@@ -31,8 +33,8 @@ const challengeAvailable = (challengeId: number | string, relations: string[], a
     if (!admin && !getAccount(req).team) return res.json(joinTeam());
     DB.repo(Challenge).findOne({ where: { id: Number(challengeId) }, relations: challengeRelations.concat('round', ...relations) }).then(challenge => {
         if (!challenge) return res.json(error());
-        //if (!admin && new Date(challenge.round.start) > new Date()) return res.json(notStarted()); // TODO: UNCOMMENT
-        //if (!admin && active && new Date(challenge.round.end) < new Date()) return res.json(ended()); // TODO: UNCOMMENT
+        if (!admin && new Date(challenge.round.start) > new Date()) return res.json(notStarted());
+        if (!admin && active && new Date(challenge.round.end) < new Date()) return res.json(ended());
         if (challenge.questions) challenge.questions.sort((a, b) => a.order - b.order);
         if (challenge.hints) challenge.hints.sort((a, b) => a.order - b.order);
         const available = () => next(challenge);
@@ -132,7 +134,8 @@ const attempt = (res: express.Response, account: Account, team: Team, challenge:
             }
             DB.repo(Solve).save(new Solve(challenge, team, new Date().toJSON(), account)).then(solve => {
                 if (!solve) return res.json(error(true));
-                let solved = responseSolve(challenge, solve); // TODO: delete container?
+                let solved = responseSolve(challenge, solve);
+                controller.stopContainer(challenge.id.toString(), team.id, false);
                 socketEmit('solved', challenge, next?.i, team, account, content, solved.points, solve.time);
                 leaderboardController.updateLeaderboard(account, solved.points, solved.time);
                 res.send({ solved: solved });

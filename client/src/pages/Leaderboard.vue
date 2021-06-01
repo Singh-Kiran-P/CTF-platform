@@ -4,7 +4,7 @@
     <div v-else class=leaderboard>
         <div>
             <div class=scoreboards>
-                <Slider animation="fade" :interval="200000000" :speed="1000" stopOnHover :indicators="false">
+                <Slider animation="fade" :interval="10000" :speed="1000" stopOnHover :indicators="false">
                     <SliderItem v-for="category in categories" :key="category">
                         <Scoreboard :category="category"/>
                     </SliderItem>
@@ -64,7 +64,7 @@ export default Vue.extend({
     },
     computed: {
         loading(): boolean { return this.categories.length == 0; },
-        perPageCustom() { return [...Array(5).keys()].map(n => [300 * (n + 1), n + 1]); }
+        perPageCustom() { return [...Array(6).keys()].map(n => [300 * (n == 0 ? 0.5 : n), Math.max(n, 1)]); }
     }
 });
 </script>

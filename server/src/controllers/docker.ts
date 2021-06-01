@@ -425,7 +425,7 @@ export class DockerController {
      * @param isAdmin To check if a admin is calling this function
      * @returns {Promise<void | object>} A promise that contains object {message:string, statusCode:int}
      */
-    private stopContainer(challengeId: string, teamId: string, isAdmin: boolean) {
+    public stopContainer(challengeId: string, teamId: string, isAdmin: boolean) {
         return new Promise<object>(async (resolve, reject) => {
             let stop = (team: Team) => {
                 DB.repo(DockerChallengeContainer).findOne({ where: { challenge: challengeId, team: team } })

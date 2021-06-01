@@ -25,12 +25,11 @@ async function loadTestData() {
     let tags: Tag[] = await save([
         new Tag({ name: 'Crypto', description: 'Cryptography challenges focus on being able to decrypt encrypted data', order: 1 }),
         new Tag({ name: 'Networking', description: 'Networking challenges focus on all things to with the internet', order: 2 }),
-        new Tag({ name: 'TODO MORE', description: 'TODO MORE', order: 3 }),
-        new Tag({ name: 'TODO MORE', description: 'TODO MORE', order: 4 }),
-        new Tag({ name: 'TODO MORE', description: 'TODO MORE', order: 5 })
+        new Tag({ name: 'Programming', description: 'Programming challenges require you to write programs', order: 3 }),
+        new Tag({ name: 'Forensics', description: 'Forensics require you to analyze and dissect given attachments', order: 4 })
     ]);
 
-    let pages: Page[] = await save([
+    let pages: Page[] = await save([ // TODO
         new Page({ name: 'Home', path: '/', source: '/pages/_page/index.html', order: 1 }),
         new Page({ name: 'About', path: '/about', source: '/pages/about/_page/index.html', order: 2 })
     ]);
@@ -49,19 +48,29 @@ async function loadTestData() {
     let accounts: Account[] = await save([
         admin,
         new Account('Edward', 'password', categories[0]),
+        new Account('Johnathan', 'password', categories[0]),
+        new Account('Jeff', 'password', categories[0]),
+        new Account('Michael', 'password', categories[0]),
         new Account('Thomas', 'password', categories[1]),
         new Account('John', 'password', categories[1]),
         new Account('Bob', 'password', categories[1]),
+        new Account('Brent', 'password', categories[1]),
+        new Account('Jay', 'password', categories[1]),
+        new Account('Bob', 'password', categories[1]),
         new Account('Tim', 'password', categories[2]),
+        new Account('Boris', 'password', categories[2]),
+        new Account('Chad', 'password', categories[2]),
         new Account('Ronald', 'password', categories[2])
     ]);
 
     const teamRepo = new TeamRepoCustom();
     let teams: Team[] = await Promise.all([
         teamRepo.saveWithCaptain('Edward\'s team', accounts[1], []),
-        teamRepo.saveWithCaptain('Johmas', accounts[2], [accounts[3]]),
-        teamRepo.saveWithCaptain('Bob the coder', accounts[4], []),
-        teamRepo.saveWithCaptain('Roland and Tim', accounts[5], [accounts[6]])
+        teamRepo.saveWithCaptain('CTF Experts', accounts[2], [accounts[3], accounts[4]]),
+        teamRepo.saveWithCaptain('Johmas', accounts[5], [accounts[6]]),
+        teamRepo.saveWithCaptain('Bob the coder', accounts[7], []),
+        teamRepo.saveWithCaptain('The challengers', accounts[8], [accounts[9], accounts[10]]),
+        teamRepo.saveWithCaptain('The old crew', accounts[11], [accounts[12], accounts[13], accounts[14]])
     ]);
 
     const round = (name: string, description: string, start: Date, end: Date) => new Round({

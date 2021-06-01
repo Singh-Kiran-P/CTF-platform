@@ -3,18 +3,12 @@
 import { is } from '@shared/validation';
 
 type PortsA = {
-    [string: string]: {
-        HostPort: string
-    }[]
+    [string: string]: { HostPort: string }[]
 };
 
 const portsa = (ports: PortsA): number[] => {
-    console.log(ports);
-
     if (!valida(ports)) return [];
-    console.log("valid");
-
-    return [...new Set(Object.values(ports).filter(port => port).map(v => v.map(d => Number.parseInt(d.HostPort)).filter(p => p && p > 0)).flat())];
+    return [...new Set(Object.values(ports).filter(v => v).map(v => v.map(d => Number.parseInt(d.HostPort)).filter(p => p && p > 0)).flat())];
 }
 
 const valida = (ports: any): boolean => {
