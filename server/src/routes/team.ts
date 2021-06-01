@@ -1,5 +1,5 @@
-import DB, { Team, Account } from '../database';
-import { isAuth, hasTeam, getAccount, generatePassword } from '../auth/index';
+import DB, { Team, Account, Solve, UsedHint } from '../database';
+import { isAuth, isAdmin, hasTeam, getAccount, generatePassword } from '../auth/index';
 import { solvePoints } from './challenges';
 import { ILike } from 'typeorm';
 import express from 'express';
@@ -114,6 +114,7 @@ router.get('/getSolves/:uuid', (req, res) => {
     DB.repo(Team).findOne({ where: { id: uuid }, relations: ['solves', 'solves.account', 'solves.challenge', 'usedHints', 'usedHints.challenge'] })
         .then(team => {
             let solves = team.solves.map(solve => ({
+                id: solve.id,
                 challenge: { name: solve.challenge.name, id: solve.challenge.id },
                 solvedBy: solve.account.name,
                 points: solvePoints(team, solve),
@@ -135,6 +136,17 @@ router.post('/removeMember/:uuid/:memberName', isAuth, (req, res) => {
             return res.json({});
         }).catch((err) => res.json({ error: 'Cannot remove member' }));
     }).catch((err) => res.json({ error: 'Cannot find team' }));
+});
+
+router.post('/removeSolve/:id/:teamId/:challengeId', isAuth, isAdmin, (req, res) => {
+    let id: string = req.params.id;
+    let team: string = req.params.teamId;
+    let challenge: number = Number.parseInt(req.params.challengeId);
+
+    DB.repo(Solve).delete(id).then(()=> {
+        DB.repo(UsedHint).delete({team: {id: team}, challenge:{id: challenge}}).then(()=>res.json({})).catch((err)=> res.json({error: 'Cannot remove usedHints of Solve'}));
+    })
+    .catch((err) => res.json({ error: 'Cannot remove solve' }));
 });
 
 router.get('/getTeams', (req, res) => {

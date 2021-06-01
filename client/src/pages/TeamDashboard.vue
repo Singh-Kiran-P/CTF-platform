@@ -50,6 +50,9 @@
                     <template v-slot:cell(time)="row">
                         <span>{{timeDisplay(row.item.time)}}</span>
                     </template>
+                    <template v-if="isAdmin" v-slot:cell(remove)="row">
+                        <StatusButton size=sm variant=danger :state="row.item.removingState" normal=Remove loading=Removing succes=Removed @click="removeSolve(row.item, $event)"/>
+                    </template>
                     <template #table-busy>
                         <div class="text-center text-primary">
                             <b-spinner variant=primary label=Loading />
@@ -132,8 +135,8 @@ export default Vue.extend({
             { key: 'solvedBy', label: 'Solved by', sortable: true },
             { key: 'points', sortable: true },
             { key: 'time', sortable: true }
-        ] as {key: string, sortable?: boolean, label?: string}[],
-        solves: [] as { challenge: { name: string, id: number }, solvedBy: string, points: number, time: string} [],
+        ] as {key: string, sortable?: boolean, label?: string, tdClass?: string}[],
+        solves: [] as { id: number, challenge: { name: string, id: number }, solvedBy: string, points: number, time: string, removingState: 'normal'} [],
         modal_invite: {
             open: false,
             copied: false,
@@ -172,6 +175,14 @@ export default Vue.extend({
                 this.getMembers();
             }).catch((err)=>{member.removingState = 'error'; return;});
         },
+        removeSolve(solve: {id: number, challenge: { name: string, id: number }, solvedBy: string, points: number, time: string, removingState: string}, event: Event) {
+            event.preventDefault();
+            solve.removingState = 'loading';
+            axios.post(`/api/team/removeSolve/${solve.id}/${this.team.uuid}/${solve.challenge.id}`).then((response)=>{
+                if(response.data.error) {solve.removingState = 'error'; return;};
+                this.getSolves();
+            }).catch((err)=>{solve.removingState = 'error'; return;});
+        },
         createdHandleResponse(response: AxiosResponse) {
             if(response.data.error) return this.error = response.data.error;
             this.team = response.data.info;
@@ -180,6 +191,7 @@ export default Vue.extend({
             this.isCaptain = response.data.isCaptain;
             this.isMember = response.data.isMember;
             if(this.isCaptain||this.isAdmin) this.members_fields.push({ key: 'remove', sortable: false, tdClass: '' });
+            if(this.isAdmin) this.solves_fields.push({ key: 'remove', sortable: false, tdClass: '' });
             this.getMembers();
             this.getSolves();
         },
