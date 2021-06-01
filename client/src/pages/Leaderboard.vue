@@ -1,25 +1,26 @@
 <template>
-    <div class=leaderboard>
-        <div class=scoreboards>
-            <div class=scoreboards-container>
-                <Slider animation="fade" :interval="10000" :speed="2000" stopOnHover :indicators="false" class=chart-slider>
-                    <SliderItem v-for="category in categories" :key="category" class=chart-cell>
+    <span v-if="error" class=error>Something went wrong</span>
+    <Loading v-else-if="loading"/>
+    <div v-else class=leaderboard>
+        <div>
+            <div class=scoreboards>
+                <Slider animation="fade" :interval="200000000" :speed="1000" stopOnHover :indicators="false">
+                    <SliderItem v-for="category in categories" :key="category">
                         <Scoreboard :category="category"/>
                     </SliderItem>
                 </Slider>
-            </div> 
-        </div>
-        <div class=sponsors>
-            <Carousel class=sponsor-slider autoplay autoplayHoverPause loop :paginationEnabled="false" centerMode :autoplayTimeout="5000" :speed="1000" easing="linear"
-                :perPageCustom="[[1024, 4], [750, 3], [550, 2], [350, 1]]">
-                    <Slide v-for="sponsor in sponsors" :key="sponsor.id" class=sponsor-cell>
-                        <div class=sponsor-cell-content>
+            </div>
+            <div class=sponsors>
+                <Carousel autoplay loop centerMode :paginationEnabled="false" :autoplayTimeout="10000" :speed="1000" easing=linear :perPageCustom="perPageCustom">
+                    <Slide v-for="sponsor in sponsors" :key="sponsor.id" class=sponsor>
+                        <div class=list-item>
                             <a :href="sponsor.link" target="_blank" rel="noopener noreferrer">
-                                <b-img :alt="sponsor.name" :src="'/api'+sponsor.icon"/>
+                                <b-img :alt="sponsor.name" :src="'/api' + sponsor.icon"/>
                             </a>
                         </div>
                     </Slide>
-            </Carousel>
+                </Carousel>
+            </div>
         </div>
     </div>
 </template>
@@ -27,6 +28,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import axios from 'axios';
+import Loading from '@/components/Loading.vue';
 import { Carousel, Slide } from 'vue-carousel';
 import { Slider, SliderItem } from 'vue-easy-slider';
 import { Sponsor } from '@shared/validation/configForm';
@@ -35,6 +37,7 @@ import Scoreboard from '@/components/Scoreboard.vue';
 export default Vue.extend({
     name: 'Leaderboard',
     components: {
+        Loading,
         Scoreboard,
         SliderItem,
         Carousel,
@@ -42,115 +45,85 @@ export default Vue.extend({
         Slide
     },
     data: () => ({
+        error: false,
         categories: [] as String[],
-        sponsors: [] as Sponsor[], 
+        sponsors: [] as Sponsor[]
     }),
     created() {
-        this.loadCategories();
-        this.loadSponsors();
+        const error = () => this.error = true;
+
+        axios.get('/api/competition/categories').then(res => {
+            if (res.data.error) return error();
+            this.categories = this.categories.concat(res.data);
+        }).catch(() => error());
+
+        axios.get('/api/leaderboard/sponsors').then(res => {
+            if (res.data.error) return error();
+            this.sponsors = res.data.sponsors;
+        }).catch(() => error());
     },
-    methods: {
-        loadCategories(): void {
-            axios.get('/api/competition/categories').then(res => {
-                if (res.data.error) return console.log(res.data.error); // TODO: this.error = res.data.error;
-                this.categories = this.categories.concat(res.data);
-            });
-        },
-        loadSponsors() {
-            axios.get('/api/leaderboard/sponsors').then(res => {
-                if (res.data.error) return console.log(res.data.error); // TODO: this.error = res.data.error;
-                this.sponsors = res.data.sponsors;
-                console.log(this.sponsors);
-            });
-        }
+    computed: {
+        loading(): boolean { return this.categories.length == 0; },
+        perPageCustom() { return [...Array(5).keys()].map(n => [300 * (n + 1), n + 1]); }
     }
 });
 </script>
 
 <style scoped lang="scss">
+@import '@/assets/css/listform.scss';
 
+.error {
+    width: 100%;
+    display: block;
+    text-align: center;
+    margin-top: var(--double-margin);
+}
 
+.leaderboard {
+    display: flex;
+    justify-content: center;
+    overflow-y: scroll !important;
+    padding: var(--double-margin);
+    padding-bottom: 0;
 
-/*TODO: Align items vertically when smaller then 750px;*/
-.scoreboards {
-    height: 85%;
-    display: flex;
-    justify-content: center;
-}
-.scoreboards-container {
-    width: 100%;
-}
-.chart-slider {
-    width: 100% !important;
-    height: 100% !important;
-}
-.chart-cell {
-    display: flex;
-    justify-content: center;
-    width: 100%;
-}
-.scoreboard {
-    width: 95%;
-}
-.sponsor-slider{
-    width:100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-}
-.sponsor-cell {
-    height: 12vh;
-    display: flex;
-    justify-content: center;
-}
-.sponsor-cell-content{
-    margin: 0px var(--margin);
-    background: var(--white-c);
-    border-radius: 20px;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-.sponsor-cell-content a {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-img {
-    flex-shrink:0;
-    -webkit-flex-shrink: 0;
-    max-width:70%;
-    max-height:90%;
-}
-.lists {
-    width: 35%;
-}
-.sponsors{
-    height: 15%;
-    display: flex;
-    justify-content: center;
-}
-body {
-    overflow-y: scroll
-}
-@media (max-width: 800px) {
-  .scoreboards {
-    height: 1350px;
-  }
-  .sponsors{
-    margin-right:17px;
-    position: fixed;
-    bottom: 0;
-    z-index: 1000;
-  }
-}
-@media (max-width: 400px) { /*mobile*/
-    .scoreboards {
-        height: 1300px;
+    & > div {
+        width: min(100%, 1600px);
+        flex-direction: column;
+        display: flex;
     }
-    .sponsors{
-        margin-right:0px;
+
+    .scoreboards {
+        height: 0;
+        flex-grow: 1;
+
+        .slider {
+            height: 100% !important;
+        }
+    }
+
+    .sponsors {
+        padding: var(--double-margin) 0;
+
+        .list-item {
+            padding: 0;
+            margin: 0 var(--double-margin);
+
+            &:hover {
+                background-color: var(--gray-lightest-c);
+            }
+
+            a {
+                width: 100%;
+                display: flex;
+                justify-content: center;
+                padding: var(--double-margin);
+
+                img {
+                    height: 50px;
+                    max-width: 100%;
+                }
+            }
+        }
     }
 }
 </style>

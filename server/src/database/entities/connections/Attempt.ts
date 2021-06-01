@@ -54,7 +54,7 @@ const available = (attempts: Attempt[], res: express.Response, next: () => any) 
 }
 
 export const loginAvailable = (account: any, res: express.Response, next: () => any): void => {
-    next(); // TODO: user ip is needed to rate limit logins
+    next(); // user ip is needed to rate limit logins
 }
 
 export const solveAvailable = (team: Team, res: express.Response, next: () => any): void => {

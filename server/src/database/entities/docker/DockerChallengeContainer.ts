@@ -1,10 +1,9 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryColumn, UpdateDateColumn } from "typeorm";
-import { Team } from "../accounts/Team";
 import { Challenge } from "../challenges/Challenge";
+import { Team } from "../accounts/Team";
 
 /**
  * One dockerChallenge is made only for one team
- * TODO:->FK team
  */
 @Entity()
 export class DockerChallengeContainer {

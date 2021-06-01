@@ -32,11 +32,11 @@ export class Account {
     @OneToMany(_ => Attempt, attempt => attempt.account)
     attempts: Attempt[];
 
-    constructor(name: string, password: string, category?: Category) {
+    constructor(name: string, password: string, category?: Category, team?: Team) {
         this.name = name;
         this.category = category;
+        this.team = team ? null : team;
         this.admin = false;
-        this.team = null;
         
         if (!password) return;
         let pass = generatePassword(password);

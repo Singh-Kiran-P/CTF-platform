@@ -1,6 +1,7 @@
-import DB, { Team, Competition, Category, Challenge, ChallengeType, Tag, Account, Round, Page, TeamRepoCustom, Sponsor, Hint } from '../database';
-import { DockerManagement } from './entities/docker/DockerManagement';
-import { DockerOpenPort } from './entities/docker/DockerOpenPort';
+import DB, { Team, Competition, Category, Challenge, ChallengeType, Tag, Account, Round, Page, TeamRepoCustom, Sponsor, Hint, DockerManagement, DockerOpenPort } from '../database';
+import dotenv from 'dotenv';
+import { Question } from '@shared/validation/roundsForm';
+dotenv.config();
 
 // TODO: good test data
 
@@ -9,99 +10,112 @@ import { DockerOpenPort } from './entities/docker/DockerOpenPort';
  * this function is called each time the database connection is made, after emptying the database
  */
 async function loadTestData() {
-    const save = async (entries: any[]): Promise<any[]> => {
-        await DB.conn.manager.save(entries);
-        return entries;
-    }
+    const save = async (entries: any[]): Promise<any[]> => await DB.conn.manager.save(entries);
 
     let competition: Competition = (await save([
-        new Competition('CTFompetition')
+        new Competition('CTF Demo')
     ]))[0];
 
-    let pages: Page[] = await save([
-        new Page({ name: 'Test', path: '/', source: '/pages/_page/index.html', order: 1 })
-    ]);
-
     let categories: Category[] = await save([
-        new Category({ name: 'BACH 1', order: 1 }),
-        new Category({ name: 'BACH 2', order: 2 }),
-        new Category({ name: 'BACH 3', order: 3 }),
-        new Category({ name: 'MAST 1', order: 4 }),
-        new Category({ name: 'MAST 2', order: 5 })
+        new Category({ name: 'Bach 1', order: 1 }),
+        new Category({ name: 'Bach 2', order: 2 }),
+        new Category({ name: 'Bach 3', order: 3 })
     ]);
 
     let tags: Tag[] = await save([
-        new Tag({ name: 'Crypto', description: 'Yeah so this is like cryptography and stuff', order: 1 }),
-        new Tag({ name: 'Networking', description: 'WEB', order: 2 }),
-        new Tag({ name: 'idk anymore man', description: 'What is Lorem Ipsum? Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.', order: 3 })
+        new Tag({ name: 'Crypto', description: 'Cryptography challenges focus on being able to decrypt encrypted data', order: 1 }),
+        new Tag({ name: 'Networking', description: 'Networking challenges focus on all things to with the internet', order: 2 }),
+        new Tag({ name: 'TODO MORE', description: 'TODO MORE', order: 3 }),
+        new Tag({ name: 'TODO MORE', description: 'TODO MORE', order: 4 }),
+        new Tag({ name: 'TODO MORE', description: 'TODO MORE', order: 5 })
     ]);
 
-    let rounds: Round[] = await save([
-        new Round({ name: 'First round!!', folder: '/rounds/first round!!', description: 'haha teste te bal bla bla', start: new Date(2021, 5, 1, 10).toJSON(), end: new Date(2021, 5, 1, 11).toJSON() }),
-        new Round({ name: 'GIVE IT UP FOR ROUND 22@', folder: '/rounds/give it up for round 22@', description: '', start: new Date(2021, 5, 1, 11, 30).toJSON(), end: new Date(2021, 5, 1, 12, 30).toJSON() }),
-        new Round({ name: '~le tour final est arrivé~', folder: '/rounds/~le tour final est arrivé~', description: 'bim bom \n jaime la prevenir de ca telegrafeur\n\n\n                  ~~fantastique', start: new Date(2021, 5, 1, 13).toJSON(), end: new Date(2021, 5, 1, 14).toJSON() })
-    ]);
-
-    let challenges: Challenge[] = await save([
-        new Challenge({ round: rounds[0], docker: '', dockerImageId: '', innerPorts: '', lock: -1, tag: tags[0], type: ChallengeType.BASIC, name: 'bruhrurh', description: 'it begin herere!!\nare you excite?? epic cool? ye yes\n\njust watch out it wil be hard', points: 5, flag: 'FLAG 1', attachment: '', order: 1 }),
-        new Challenge({ round: rounds[0], docker: '', dockerImageId: '', innerPorts: '', lock: 1, tag: null, type: ChallengeType.BASIC, name: 'come have fun here! (', description: 'hoo good job!\n...\n\n         more coming :)', points: 5, flag: 'FLAG SECOND', attachment: '', order: 4 }),
-        new Challenge({ round: rounds[1], docker: '', dockerImageId: '', innerPorts: '', lock: -1, tag: null, type: ChallengeType.BASIC, name: 'contitnitueing!', description: 'haha yes hope you liked your break becuas eits babaout to get WILD!  CRAZY!', points: 10, flag: 'cool flag B)', attachment: '', order: 4 }),
-        new Challenge({ round: rounds[1], docker: '', dockerImageId: '', innerPorts: '', lock: -1, tag: tags[0], type: ChallengeType.BASIC, name: 'thius is onlyly the begine', description: 'harder and harder it will get yeees', points: 15, flag: 'mmmmMMMMMMMMMMMMMMMMMMMMMM!', attachment: '', order: 3 }),
-        new Challenge({ round: rounds[1], docker: '', dockerImageId: '', innerPorts: '', lock: -1, tag: null, type: ChallengeType.BASIC, name: 'warm up cuz abotu to get stemey', description: 'i was just joking this one dont even got points LMAO\n\n\n\n\n\nepic owned', points: 0, flag: 'usesless flag LOL', attachment: '', order: 1 }),
-        new Challenge({ round: rounds[1], docker: '', dockerImageId: '', innerPorts: '', lock: -1, tag: tags[1], type: ChallengeType.BASIC, name: 'haha finif', description: 'BOO! yeah now it s hard cunt watch out ccd', points: 20, flag: 'haha you wont even find this i bet', attachment: '', order: 7 }),
-        new Challenge({ round: rounds[2], docker: '', dockerImageId: '', innerPorts: '', lock: -1, tag: tags[2], type: ChallengeType.BASIC, name: 'huhgg FIN$', description: 'Quest-ce que Lorem Ipsum? Lorem Ipsum est simplement un faux texte de lindustrie de limpression et de la composition. Lorem Ipsum a été le texte factice standard de lindustrie depuis les années 1500, quand un imprimeur inconnu a pris une galère de caractères et la brouillée pour en faire un livre de spécimens. Il a survécu non seulement cinq siècles, mais aussi le saut dans la composition électronique, demeurant essentiellement inchangé. Il a été popularisé dans les années 1960 avec la sortie de feuilles Letraset contenant des passages du Lorem Ipsum, et plus récemment avec un logiciel de publication assistée par ordinateur comme Aldus PageMaker comprenant des versions de Lorem Ipsum.', points: 999, flag: 'tres bon', attachment: '', order: 2 })
-    ]);
-
-    let hints: Hint[] = await save([
-        new Hint({ challenge: challenges[0], name: 'hint number 1', content: 'bl bla useless', cost: 1, order: 1 }),
-        new Hint({ challenge: challenges[0], name: 'SECOND HINT!!', content: 'wooo great', cost: 3, order: 2 })
-    ]);
-
-    let admin = new Account('admin', 'password');
-    admin.admin = true;
-    let accounts: Account[] = await save([
-        admin,
-        new Account('John', 'password', categories[0]),
-        new Account('Edward', 'password', categories[1]),
-        new Account('Thomas', 'password', categories[2]),
-        new Account('John 2', 'password', categories[3]),
-        new Account('BOB!', 'password', categories[4])
+    let pages: Page[] = await save([
+        new Page({ name: 'Home', path: '/', source: '/pages/_page/index.html', order: 1 }),
+        new Page({ name: 'About', path: '/about', source: '/pages/about/_page/index.html', order: 2 })
     ]);
 
     let sponsors: Sponsor[] = (await save([
-        new Sponsor({ name: "Cegeka", link: "https://www.cegeka.com/nl-be/", icon: "/sponsors/cegeka/logo_cegeka_w.png", order: 1 }),
-        new Sponsor({ name: "IBM", link: "https://www.ibm.com/be-en", icon: "/sponsors/ibm/ibm-banner.jpg", order: 2 }),
-        new Sponsor({ name: "EDM UHasselt", link: "https://www.uhasselt.be/edm", icon: "/sponsors/edm uhasselt/EDM-logo.png", order: 3 }),
-        new Sponsor({ name: "Intigriti", link: "https://www.intigriti.com/", icon: "/sponsors/intigriti/intigriti.png", order: 4 }),
+        new Sponsor({ name: 'Cegeka', link: 'https://www.cegeka.com/nl-be/', icon: '/sponsors/cegeka/logo_cegeka_w.png', order: 1 }),
+        new Sponsor({ name: 'IBM', link: 'https://www.ibm.com/be-en', icon: '/sponsors/ibm/ibm-banner.jpg', order: 2 }),
+        new Sponsor({ name: 'EDM UHasselt', link: 'https://www.uhasselt.be/edm', icon: '/sponsors/edm uhasselt/EDM-logo.png', order: 3 }),
+        new Sponsor({ name: 'Intigriti', link: 'https://www.intigriti.com/', icon: '/sponsors/intigriti/intigriti.png', order: 4 }),
+        new Sponsor({ name: 'Potvos', link: 'https://www.cordacampus.com/en/cordacompanies/potvos/', icon: '/sponsors/potvos/Potvos_logo.png', order: 5 }),
+        new Sponsor({ name: 'UHasselt faculty of sciences', link: 'https://www.uhasselt.be/fac-wetenschappen', icon: '/sponsors/uhasselt faculty of sciences/uh-wet.png', order: 6 })
     ]));
 
-    const teamRepo = new TeamRepoCustom;
-    let teams: Team[] = await Promise.all([teamRepo.saveWithCaptain('Team 1', accounts[1]),
-    teamRepo.saveWithCaptain('Team 2', accounts[2]),
-    teamRepo.saveWithCaptain('Team 3', accounts[3])]);
+    let admin = new Account('admin', process.env.ADMIN_PASSWORD);
+    admin.admin = true;
+    let captains: Account[] = await save([
+        admin,
+        new Account('Edward', 'password', categories[0]),
+        new Account('John', 'password', categories[1]),
+        new Account('Bob', 'password', categories[1]),
+        new Account('Ronald', 'password', categories[2])
+    ]);
 
-    /*
-    for (let i = 0; i < accounts.length; ++i) { // give every account a team, COMMENT IF TESTING TEAM CONSTRUCTOR
-        accounts[i].team = teams[Math.round(i * (teams.length - 1) / (accounts.length - 1))];
-        await DB.repo(Account).update(accounts[i].id, accounts[i]);
-    }*/
+    const teamRepo = new TeamRepoCustom();
+    let teams: Team[] = await Promise.all([
+        teamRepo.saveWithCaptain('Edward\'s team', captains[1]),
+        teamRepo.saveWithCaptain('Johmas', captains[2]),
+        teamRepo.saveWithCaptain('Bob the coder', captains[3]),
+        teamRepo.saveWithCaptain('Roland and Tim', captains[4])
+    ]);
+
+    let users: Account[] = await save([
+        new Account('Thomas', 'password', categories[1], teams[1]),
+        new Account('Tim', 'password', categories[2], teams[3])
+    ]);
+
+    const round = (name: string, description: string, start: Date, end: Date) => new Round({
+        name: name, folder: '/rounds/' + name.toLowerCase(), description: description, start: start.toJSON(), end: end.toJSON()
+    });
+
+    let rounds: Round[] = await save([ // TODO DATES
+        round('The very beginning', 'In this round you will be getting familiar with the flow of a CTF competition.', new Date(2021, 5, 1, 10), new Date(2021, 5, 1, 11)),
+        round('The first hardships', 'Things will start to get harder in this round, try to keep up!', new Date(2021, 5, 1, 11, 30), new Date(2021, 5, 1, 13)),
+        round('A real challenge', 'Hope things weren\'t too hard so far, because they are getting even harder!', new Date(2021, 5, 1, 14), new Date(2021, 5, 1, 16)),
+        round('The final stretch', 'Don\'t give up now! This is the last round', new Date(2021, 5, 1, 17), new Date(2021, 5, 1, 18))
+    ]);
+
+    const challenge = (o: number, r: number, ta: number, ty: ChallengeType, n: string, d: string, p: number, f: string, a: string, l: number) => new Challenge({
+        order: o, round: rounds[r], tag: tags[ta], type: ty, name: n, description: d, points: p, flag: f, attachment: a, lock: l, docker: '', dockerImageId: '', innerPorts: ''
+    });
+
+    let challenges: Challenge[] = await save([ // TODO
+        challenge(1, 0, 0, ChallengeType.BASIC, 'name1', 'description', 5, 'FLAG', '', -1),
+        challenge(2, 0, 0, ChallengeType.BASIC, 'name2', 'description', 5, 'FLAG', '', -1),
+        challenge(3, 1, 0, ChallengeType.BASIC, 'name3', 'description', 5, 'FLAG', '', -1),
+        challenge(4, 1, 0, ChallengeType.BASIC, 'name4', 'description', 5, 'FLAG', '', -1),
+        challenge(5, 1, 0, ChallengeType.BASIC, 'name5', 'description', 5, 'FLAG', '', -1),
+        challenge(6, 2, 0, ChallengeType.BASIC, 'name6', 'description', 5, 'FLAG', '', -1),
+        challenge(7, 2, 0, ChallengeType.BASIC, 'name7', 'description', 5, 'FLAG', '', -1),
+        challenge(8, 2, 0, ChallengeType.BASIC, 'name8', 'description', 5, 'FLAG', '', -1),
+        challenge(9, 2, 0, ChallengeType.BASIC, 'name9', 'description', 5, 'FLAG', '', -1),
+        challenge(10, 3, 0, ChallengeType.BASIC, 'name10', 'description', 5, 'FLAG', '', -1),
+        challenge(11, 3, 0, ChallengeType.BASIC, 'name11', 'description', 5, 'FLAG', '', -1),
+        challenge(12, 3, 0, ChallengeType.BASIC, 'name12', 'description', 5, 'FLAG', '', -1)
+    ]);
+
+    let hints: Hint[] = await save([ // TODO
+        
+    ]);
+
+    let questions: Question[] = await save([ // TODO
+
+    ]);
 
     let dockerManagement: DockerManagement = (await save([
         new DockerManagement(1000, 5000)
     ]))[0];
 
-    let dockerOpenPort: DockerOpenPort[] = (await save([
-        // vue server
-        new DockerOpenPort(80),
-        // node server
-        new DockerOpenPort(4000),
-        // postgresSQL
-        new DockerOpenPort(5432),
-        // pgAdmin
-        new DockerOpenPort(8080),
-        // docker portainer
-        new DockerOpenPort(8000),
-        new DockerOpenPort(9000),
+    let dockerOpenPort: DockerOpenPort[] = (await save([ // TODO keep hardcoded?
+        new DockerOpenPort(80), // vue server
+        new DockerOpenPort(Number.parseInt(process.env.SERVER_PORT)), // node server
+        new DockerOpenPort(Number.parseInt(process.env.DB_PORT)), // postgresSQL
+        new DockerOpenPort(8080), // pgAdmin
+        new DockerOpenPort(8000), // docker portainer
+        new DockerOpenPort(9000) // docker portainer
     ]));
 }
 

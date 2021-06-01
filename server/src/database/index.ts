@@ -8,8 +8,6 @@ import express from 'express';
 import dotenv from 'dotenv';
 dotenv.config();
 
-// TODO: create entity CRUD operations (custom entity repositories)
-
 // defines all events the database can emit
 interface DatabaseEvents {
     connect: () => void;
@@ -20,7 +18,6 @@ interface DatabaseEvents {
  * Database class to connect to the database and provide help functions to access it
  */
 class Database extends EventEmitter {
-    loadTestData: boolean = (process.env.DB_LOAD_DATA == 'true') ? true : false; // empties and loads test data into the database before connecting if true
     conn: Connection = null;
 
     constructor() {
@@ -61,7 +58,8 @@ class Database extends EventEmitter {
         }).then(async conn => {
             this.conn = conn;
             await this.conn.query(`SET search_path TO ${process.env.DB_SCHEMA};`);
-            if (this.loadTestData) await loadTestData();
+            let loaded = (await this.conn.query('SELECT * from competition')).length > 0;
+            if (!loaded || process.env.DB_LOAD_DATA == 'true') await loadTestData();
             this.emit('connect');
         }).catch(error => this.emit('error', error));
     }

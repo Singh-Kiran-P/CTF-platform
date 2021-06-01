@@ -288,10 +288,10 @@ export default Vue.extend({
             this.saveState = 'loading';
             const error = (data?: any) => {
                 this.saveState = 'error';
-                if (data?.statusCode == 404)Toast.send(this, 'Docker', data.message, 'danger');
+                if (data?.statusCode == 404)
+                    Toast.send(this, 'Docker', data.message, 'danger');
             };
             axios.put('/api/rounds/save', serialize(this.form)).then(res => {
-                console.log(res.data);
                 res.data.error ? error(res.data) : this.loadFormData(false);
             }).catch(() => error());
         },

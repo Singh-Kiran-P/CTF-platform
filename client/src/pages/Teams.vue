@@ -21,7 +21,7 @@
             <div class=table>
                 <label>Teams</label>
                 <span class=error v-if="error">{{error}}</span>
-                <b-table striped :busy="isLoading" :items="teams" :fields="teams_fields" :sort-by.sync="sortBy" sort-desc.sync="sortDesc" :per-page="0" no-local-sorting @sort-changed="sortingChanged">
+                <b-table fixed striped :busy="isLoading" :items="teams" :fields="teams_fields" :sort-by.sync="sortBy" sort-desc.sync="sortDesc" :per-page="0" no-local-sorting @sort-changed="sortingChanged">
                     <template v-slot:cell(name)="row">
                         <router-link :to="'/team/'+ row.item.uuid">{{row.item.name}}</router-link>
                     </template>

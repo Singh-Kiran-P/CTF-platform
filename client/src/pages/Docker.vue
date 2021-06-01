@@ -24,13 +24,21 @@
                 <StatusButton variant=primary normal=Save loading=Saving succes=Saved :state="saveState" @click="savePorts()" :disabled="saveDisabled"/>
             </div>
         </div>
-        <span class=info>You can view your docker images and containers below, and you can manage them <a :href="manage" target=_blank>here</a></span>
+        <span class=info>
+            A simple overview of your docker is provided below, for more control you can use
+            <Tooltip center below content="TODO: portainer explanation" class=link-tooltip>
+                <a :href="`${domain}:9000`" target=_blank>Portainer</a>
+            </Tooltip>
+        </span>
         <div class=images>
             <label>Images</label>
             <Tooltip below content="TODO: images explanation" class=info-tooltip>
                 <font-awesome-icon icon=info-circle />
             </Tooltip>
-            <b-table striped :fields="imageFields" :items="images" :busy="loadingImages">
+            <b-table fixed striped :fields="imageFields" :items="images" :busy="loadingImages">
+                <template v-slot:cell(delete)="row">
+                    <StatusButton variant=danger size=sm normal=Delete loading=Deleting succes=Deleted :state="row.item.deleting" @click="deleteImage(row.item)"/>
+                </template>
                 <template #table-busy>
                     <div class="text-center text-primary">
                         <b-spinner variant=primary label=Loading />
@@ -43,7 +51,15 @@
             <Tooltip below content="TODO: containers explanation" class=info-tooltip>
                 <font-awesome-icon icon=info-circle />
             </Tooltip>
-            <b-table striped :fields="containerFields" :items="containers" :busy="loadingContainers">
+            <b-table fixed striped :fields="containerFields" :items="containers" :busy="loadingContainers">
+                <template v-slot:cell(ports)="row">
+                    <template v-for="(port, i) in row.item.ports">
+                        <a :key="port" :href="`${domain}:${port}`" target=_blank>{{port}}</a>{{i == row.item.ports.length - 1 ? '' : ', '}}
+                    </template>
+                </template>
+                <template v-slot:cell(delete)="row">
+                    <StatusButton variant=danger size=sm normal=Delete loading=Deleting succes=Deleted :state="row.item.deleting" @click="deleteContainer(row.item)"/>
+                </template>
                 <template #table-busy>
                     <div class="text-center text-primary">
                         <b-spinner variant=primary label=Loading />
@@ -61,19 +77,23 @@ import axios from "axios";
 import Tooltip from '@/components/Tooltip.vue';
 import StatusButton from '@/components/StatusButton.vue';
 import { validateNumber, state } from '@shared/validation';
+import { shortTimeDisplay } from '@/assets/functions/strings';
 import { portsb } from '@/assets/functions/ports';
 
 type Container = {
     name: string,
     image: string,
-    ports: String,
+    ports: number[],
     state: string,
-    status: string
+    status: string,
+    deleting: string
 };
 
 type Image = {
     name: string,
-    size: string
+    size: string,
+    created: string,
+    deleting: string
 }
 
 export default Vue.extend({
@@ -95,14 +115,17 @@ export default Vue.extend({
 
         imageFields: [
             { key: 'name', sortable: true },
-            { key: 'size', sortable: true }
+            { key: 'size', sortable: true },
+            { key: 'created', sortable: true },
+            { key: 'delete', sortable: false }
         ],
         containerFields: [
             { key: 'name', sortable: true },
             { key: 'image', sortable: true },
             { key: 'ports', sortable: true },
             { key: 'state', sortable: true },
-            { key: 'status', sortable: true }
+            { key: 'status', sortable: true },
+            { key: 'delete', sortable: false }
         ],
 
         upperbound: NaN,
@@ -113,7 +136,7 @@ export default Vue.extend({
         saveState: 'normal',
         cancelState: 'normal',
 
-        manage: window.location.origin + ':9000' // TODO: mention portainer?
+        domain: window.location.origin
     }),
     computed: {
         empty(): boolean { return !this.lowerbound || !this.upperbound },
@@ -160,30 +183,52 @@ export default Vue.extend({
             }).catch(() => error());
         },
 
-        getImages(): void { // TODO: delete button
+        getImages(): void {
             this.loadingImages = true;
             axios.get('/api/docker/images').then(res => {
                 this.loadingImages = false;
                 if (!res.data) return;
                 this.images = res.data.map((item: any) => ({
-                    name: item.RepoTags[0], // TODO good name, created time
-                    size: (item.Size / Math.pow(1024, 2)).toFixed(2) + ' Mb'
+                    name: item.RepoTags[0],
+                    size: (item.Size / Math.pow(1024, 2)).toFixed(2) + ' mb',
+                    created: shortTimeDisplay(new Date(item.Created * 1000).toJSON()),
+                    deleting: 'normal'
                 }));
             }).catch(() => this.loadingImages = false);
         },
-        getContainers(): void { // TODO: delete button
+        getContainers(): void {
             this.loadingContainers = true;
             axios.get('/api/docker/containers').then(res => {
                 this.loadingContainers = false;
                 if (!res.data) return;
                 this.containers = res.data.map((item: any) => ({
                     name: item.Names[0].slice(1),
-                    image: item.Image, // TODO good image id
-                    ports: portsb(item.Ports).reduce((acc, cur, i) => acc + (i == 0 ? '' : ', ') + cur, ''), // TODO: port links
+                    image: item.Image,
+                    ports: portsb(item.Ports),
                     state: item.State,
                     status: item.Status,
+                    deleting: 'normal'
                 }));
             }).catch(() => this.loadingContainers = false);
+        },
+
+        deleteImage(image: any): void {
+            image.deleting = 'loading';
+            const error = () => image.deleting = 'error';
+            setTimeout(() => {
+                let err = true;
+                if (err) return error();
+                image.deleting = 'succes';
+            }, 1000);//.catch(() => error());
+        },
+        deleteContainer(container: any): void {
+            container.deleting = 'loading';
+            const error = () => container.deleting = 'error';
+            setTimeout(() => {
+                let err = true;
+                if (err) return error();
+                container.deleting = 'succes';
+            }, 1000);//.catch(() => error());
         }
     }
 });
@@ -215,6 +260,10 @@ export default Vue.extend({
     color: var(--info);
     display: inline-block;
     margin-left: var(--margin);
+}
+
+.link-tooltip {
+    display: inline-block;
 }
 
 .info {

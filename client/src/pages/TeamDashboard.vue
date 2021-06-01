@@ -22,7 +22,7 @@
             <div class=members>
                 <label>Members</label>
                 <span class=error v-if="membersLoadingError">{{membersLoadingError}}</span>
-                <b-table striped :items="members" :fields="members_fields" :busy="members_isLoading">
+                <b-table fixed striped :items="members" :fields="members_fields" :busy="members_isLoading">
                     <template v-slot:cell(name)="row">
                         <span>{{row.item.name}}</span>
                         <Tooltip v-if="row.item.captain" :title="`${row.item.name} is the captain of ${team.name}`" content="The captain can delete the team, remove members and generate new invite links" class=captain-icon>
@@ -43,7 +43,7 @@
             <div class=solves>
                 <label>Solves</label>
                 <span class=error v-if="solvesLoadingError">{{solvesLoadingError}}</span>
-                <b-table striped :items="solves" :fields="solves_fields" :busy="solves_isLoading">
+                <b-table fixed striped :items="solves" :fields="solves_fields" :busy="solves_isLoading">
                     <template v-slot:cell(challenge)="row">
                         <router-link :to="'/challenge/' + row.item.challenge.id">{{row.item.challenge.name}}</router-link>
                     </template>
@@ -95,7 +95,7 @@ import axios, { AxiosResponse } from 'axios';
 import Loading from '@/components/Loading.vue'
 import Tooltip from '@/components/Tooltip.vue';
 import StatusButton from '@/components/StatusButton.vue';
-import { timeDisplay } from '@/assets/functions/strings';
+import { shortTimeDisplay } from '@/assets/functions/strings';
 
 export default Vue.extend({
     name: 'Dashboard',
@@ -146,7 +146,7 @@ export default Vue.extend({
         leavingState: 'normal'
     }),
     methods: {
-        timeDisplay(time: string): string { return timeDisplay(time); },
+        timeDisplay(time: string): string { return shortTimeDisplay(time); },
         
         getMembers() {
             this.members_isLoading = true;

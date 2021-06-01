@@ -30,17 +30,5 @@ router.get("/stopChallengeContainer/:challengeId", isAuth, controller.stopChalle
 
 router.get("/resetChallengeContainer/:challengeId", isAuth, controller.resetChallengeContainer_GET);
 
-// TODO: remove comments
-
-// router.post("/makeImage", isAdmin, controller.makeImage_POST);
-
-// router.post("/createChallengeContainer", isAuth, controller.createChallengeContainer_POST);
-
-// router.post("/startContainer", isAuth, controller.startContainer_POST);
-
-// router.post("/stopContainer", isAuth, controller.stopContainer_POST);
-
-// router.post("/resetContainer", isAuth, controller.resetContainer_POST);
-
 export default { path: "/docker", router };
 

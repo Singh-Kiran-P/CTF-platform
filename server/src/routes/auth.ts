@@ -7,7 +7,7 @@ import { getAccount } from '../auth';
 const router = express.Router();
 
 router.post('/login', (req, res, next) => {
-    loginAvailable(res, null, () => { // TODO: get user ip?
+    loginAvailable(res, null, () => {
         const error = (err?: string) => res.json({ error: err || 'Could not login user' });
         req.body = req.fields;
         passport.authenticate('local', (err, user) => {

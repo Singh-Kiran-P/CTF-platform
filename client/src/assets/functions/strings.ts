@@ -44,4 +44,10 @@ const timeDisplay = (time: string): string => {
     return display + ', at ' + date.toLocaleString('nl-BE', { hour: 'numeric', minute: 'numeric', second: 'numeric' });
 }
 
-export { solvePoints, solveNames, typeName, typeDescription, durationDisplay, countdownDisplay, timerDisplay, timeDisplay };
+const shortTimeDisplay = (time: string): string => {
+    let date = new Date(time);
+    let display = date.toLocaleString('en-GB', { day: 'numeric', month: 'short' });
+    return display + ' at ' + date.toLocaleString('nl-BE', { hour: 'numeric', minute: 'numeric' });
+}
+
+export { solvePoints, solveNames, typeName, typeDescription, durationDisplay, countdownDisplay, timerDisplay, timeDisplay, shortTimeDisplay };

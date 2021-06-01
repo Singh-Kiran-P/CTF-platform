@@ -1,6 +1,5 @@
 import auth from './auth';
 import team from './team';
-import util from './util';
 import rounds from './rounds';
 import docker from './docker';
 import account from './account';
@@ -16,7 +15,6 @@ export default [
     account,
     docker,
     auth,
-    util,
     team,
     rounds,
     uploads,

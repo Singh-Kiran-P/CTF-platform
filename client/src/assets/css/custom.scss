@@ -104,6 +104,10 @@ $primary: rgb(63, 181, 129);
     background: var(--gray-light-c);
 }
 
+::-webkit-scrollbar-thumb:hover {
+    background: var(--gray-half-c);
+}
+
 html, body {
     width: 100%;
     height: 100%;
@@ -196,10 +200,41 @@ input, textarea, select {
         }
         
         & > td {
-            border-color: var(--gray-half-c);
             color: var(--black-c);
+            border-color: var(--gray-half-c);
+
+            &, span {
+                overflow: hidden;
+                white-space: nowrap;
+            }
+
+            &:hover {
+                &, & span {
+                    overflow: initial;
+                    overflow-y: auto;
+                }
+            }
         }
     }
+}
+
+.slider-btn {
+    background: none !important;
+    width: 3rem !important;
+    padding: 0 !important;
+
+    .slider-icon {
+        border-left: var(--half-margin) solid var(--gray-c) !important;
+        border-bottom: var(--half-margin) solid var(--gray-c) !important;
+    }
+
+    &:hover .slider-icon {
+        border-color: var(--black-c) !important;
+    }
+}
+
+.slider-item {
+    padding: 0 3rem;
 }
 
 .dark-mode {

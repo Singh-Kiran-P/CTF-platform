@@ -132,7 +132,7 @@ const attempt = (res: express.Response, account: Account, team: Team, challenge:
             }
             DB.repo(Solve).save(new Solve(challenge, team, new Date().toJSON(), account)).then(solve => {
                 if (!solve) return res.json(error(true));
-                let solved = responseSolve(challenge, solve);
+                let solved = responseSolve(challenge, solve); // TODO: delete container?
                 socketEmit('solved', challenge, next?.i, team, account, content, solved.points, solve.time);
                 leaderboardController.updateLeaderboard(account, solved.points, solved.time);
                 res.send({ solved: solved });

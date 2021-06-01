@@ -19,9 +19,9 @@
             <b-pagination v-model="currentPage" :total-rows="totalRows" :per-page="perPage" align=fill size=sm @change="handleCurrentPageChange"/>
 
             <div class=table>
-                <label for=users-table>Users</label>
+                <label>Users</label>
                 <span class=error v-if="error">{{error}}</span>
-                <b-table id=users-table striped :busy="isLoading" :items="users" :fields="users_fields" :sort-by.sync="sortBy" sort-desc.sync="sortDesc" :per-page="0" no-local-sorting @sort-changed="sortingChanged">
+                <b-table fixed striped :busy="isLoading" :items="users" :fields="users_fields" :sort-by.sync="sortBy" sort-desc.sync="sortDesc" :per-page="0" no-local-sorting @sort-changed="sortingChanged">
                     <template v-slot:cell(team)="row">
                         <router-link v-if="row.item.team" :to="'/team/' + row.item.teamUuid">{{row.item.team}}</router-link>
                         <span v-else>{{ row.item.team }}</span>
