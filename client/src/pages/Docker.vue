@@ -282,8 +282,6 @@ export default Vue.extend({
         },
     },
     methods: {
-        state,
-
         portInput(): void {
             this.saveState = "normal";
             this.cancelState = "normal";
@@ -375,7 +373,6 @@ export default Vue.extend({
                     let data = response.data;
                     console.log(data);
                     if (data.statusCode == 200) {
-                        this.state = "succes";
                         toast.send(this, "Message", data.message, "success");
                         image.deleting = "succes";
                     } else {
@@ -384,12 +381,6 @@ export default Vue.extend({
                     }
                 })
                 .catch(() => error());
-
-            setTimeout(() => {
-                let err = true;
-                if (err) return error();
-                image.deleting = "succes";
-            }, 1000); //.catch(() => error());
         },
         deleteContainer(container: any): void {
             console.log(container);
@@ -404,7 +395,6 @@ export default Vue.extend({
                     console.log(data);
 
                     if (data.statusCode == 200) {
-                        this.state = "succes";
                         toast.send(this, "Message", data.message, "success");
                         container.deleting = "succes";
                     } else {
@@ -413,12 +403,6 @@ export default Vue.extend({
                     }
                 })
                 .catch(() => error());
-
-            setTimeout(() => {
-                let err = true;
-                if (err) return error();
-                container.deleting = "succes";
-            }, 1000); //.catch(() => error());
         },
     },
 });
