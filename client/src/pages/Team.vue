@@ -1,5 +1,5 @@
 <template>
-    <component :is="show" />
+    <component :is="show"/>
 </template>
 
 <script lang="ts">

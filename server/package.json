@@ -5,7 +5,7 @@
         "build": "tsc -b",
         "server_watch_TS": "tsc --watch",
         "client": "npm run client --prefix ../client",
-        "server": "npm run build && concurrently --kill-others  \"tsc --watch\" \"nodemon dist/server/src\"",
+        "server": "npm run build && concurrently --kill-others  \"tsc --watch\" \"nodemon dist\"",
         "dev": "concurrently --kill-others  \"npm run client\" \"npm run server\"",
         "makeDocs": "npx typedoc --out docs src",
         "makeDocs-dark": "npx typedoc --out docs src"

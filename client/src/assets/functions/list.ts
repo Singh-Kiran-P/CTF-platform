@@ -2,7 +2,7 @@
 
 import Vue from 'vue';
 import axios from 'axios';
-import { is } from '@shared/validation';
+import { is } from '@/shared/src/validation';
 
 type Order = { order: number };
 

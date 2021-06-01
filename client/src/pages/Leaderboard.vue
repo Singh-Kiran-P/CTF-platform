@@ -31,7 +31,7 @@ import axios from 'axios';
 import Loading from '@/components/Loading.vue';
 import { Carousel, Slide } from 'vue-carousel';
 import { Slider, SliderItem } from 'vue-easy-slider';
-import { Sponsor } from '@shared/validation/configForm';
+import { Sponsor } from '@/shared/src/validation/configForm';
 import Scoreboard from '@/components/Scoreboard.vue';
 
 export default Vue.extend({

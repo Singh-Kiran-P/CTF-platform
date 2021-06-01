@@ -1,9 +1,6 @@
-const path = require('path');
-var hostURL
-if (process.env.HOSTING == "DOCKER")
-    hostURL = `http://${process.env.VUE_APP_API_HOST_DOCKER}:${process.env.VUE_APP_API_PORT}`;
-if (process.env.HOSTING == "LOCALHOST")
-    hostURL = `http://${process.env.VUE_APP_API_HOST}:${process.env.VUE_APP_API_PORT}`;
+let hostURL = '';
+if (process.env.HOSTING == "DOCKER") hostURL = `http://${process.env.VUE_APP_API_HOST_DOCKER}:${process.env.VUE_APP_API_PORT}`;
+if (process.env.HOSTING == "LOCALHOST") hostURL = `http://${process.env.VUE_APP_API_HOST}:${process.env.VUE_APP_API_PORT}`;
 
 module.exports = {
     runtimeCompiler: true, // for lazy loading route pages and loading uploaded html pages
@@ -14,14 +11,12 @@ module.exports = {
                 "^/api": {
                     target: hostURL,
                     changeOrigin: true,
-                    logLevel: "debug",
                     pathRewrite: {
                         "^/api": ""
                     }
                 },
-
             },
-            disableHostCheck: true,   // That solved it
+            disableHostCheck: true,
             watchOptions: {
                 ignored: [
                     /node_modules/,
@@ -30,8 +25,5 @@ module.exports = {
                 poll: true,
             }
         }
-    },
-    chainWebpack: config => {
-        config.resolve.alias.set('@shared', path.resolve('../shared/src'))
     }
 };

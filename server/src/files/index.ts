@@ -1,18 +1,19 @@
+import { is } from '@/shared/src/validation';
 import { File as UFile } from 'formidable';
-import { is } from '@shared/validation';
 import fse, { mkdir } from 'fs-extra';
 import extract from 'extract-zip';
 import { ncp } from 'ncp';
 import path from 'path';
 import fs from 'fs';
 
+const docsdir = '/server';
 const uploaddir = '/server/uploads';
 
 const parentDir = (p: string, n: number = 1): string => p.length > 1 ? (n == 0 ? p : parentDir(path.dirname(p), n - 1)) : '';
 const fileName = (p: string): string => p ? path.basename(p) : '';
 
 type Err = NodeJS.ErrnoException;
-const Root = parentDir(require.main.filename, 5);
+const Root = parentDir(__dirname, 3);
 
 const createDir = (path: string) => new Promise<void>((resolve, reject) => mkdir(Root + path, { recursive: true }, err => err ? reject(err) : resolve()));
 
@@ -130,4 +131,4 @@ const uploadFiles = <E>(items: E[], base: string, newFile: (e: E) => boolean, ge
     return Promise.all([...initialUploads, chain(() => Promise.all(moves), () => Promise.all(secondaryUploads.map(upload => upload())))]);
 }
 
-export { UFile, Root, uploaddir, parentDir, fileName, createDir, upload, move, remove, unzip, chain, uploadFiles };
+export { UFile, Root, docsdir, uploaddir, parentDir, fileName, createDir, upload, move, remove, unzip, chain, uploadFiles };

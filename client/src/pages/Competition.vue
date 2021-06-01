@@ -191,10 +191,10 @@ import IconButton from '@/components/IconButton.vue';
 import StatusButton from '@/components/StatusButton.vue';
 import DateTimePicker from '@/components/DateTimePicker.vue';
 import { nextOrder, moveDown, toggledItems, loadItems } from '@/assets/functions/list';
-import { Form, Round, Challenge, ChallengeType, Hint, Question, state, validate, validInput, sortRounds, validForm, isf } from '@shared/validation/roundsForm';
+import { Form, Round, Challenge, ChallengeType, Hint, Question, state, validate, validInput, sortRounds, validForm, isf } from '@/shared/src/validation/roundsForm';
 import { typeName, typeDescription, durationDisplay } from '@/assets/functions/strings';
-import { Tag } from '@shared/validation/configForm';
-import { serialize } from '@shared/objectFormdata';
+import { Tag } from '@/shared/src/validation/configForm';
+import { serialize } from '@/shared/src/objectFormdata';
 import Toast from '@/assets/functions/toast';
 import path from 'path';
 

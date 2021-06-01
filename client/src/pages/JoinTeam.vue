@@ -1,6 +1,6 @@
 <template>
     <div class=joinTeam>
-        <span v-if="error">Invalid invite link, return to the <router-link :to="{ name: 'Team' }">Team page</router-link></span>
+        <span v-if="error">Invalid invite link, return to the <router-link :to="{ name: 'Your Team' }">Team page</router-link></span>
         <Loading v-else/>
     </div>
 </template>

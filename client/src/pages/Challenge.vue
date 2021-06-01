@@ -3,7 +3,7 @@
     <div v-else class=challenge>
         <div v-if="joinTeam">
             <span class=center>You have to be part of a team to join the competition</span>
-            <router-link class=center :to="{ name: 'Team' }">Create or join a team</router-link>
+            <router-link class=center :to="{ name: 'Your Team' }">Create or join a team</router-link>
         </div>
         <div v-else-if="notStarted">
             <span class=center>This challenge is not yet available</span>
@@ -120,7 +120,7 @@ import Tooltip from '@/components/Tooltip.vue';
 import Collapse from '@/components/Collapse.vue';
 import AdminHeader from '@/components/AdminHeader.vue';
 import StatusButton from '@/components/StatusButton.vue';
-import { Challenge, ChallengeType, Hint, Question, validChallenge } from '@shared/validation/roundsForm';
+import { Challenge, ChallengeType, Hint, Question, validChallenge } from '@/shared/src/validation/roundsForm';
 import { typeName, typeDescription, solvePoints, solveNames, durationDisplay, countdownDisplay, timerDisplay } from '@/assets/functions/strings';
 import { portsa } from '@/assets/functions/ports';
 import path from 'path';

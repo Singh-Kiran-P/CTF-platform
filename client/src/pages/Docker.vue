@@ -171,7 +171,7 @@ import Vue from "vue";
 import axios from "axios";
 import Tooltip from "@/components/Tooltip.vue";
 import StatusButton from "@/components/StatusButton.vue";
-import { validateNumber, state } from "@shared/validation";
+import { validateNumber, state } from "@/shared/src/validation";
 import { shortTimeDisplay } from "@/assets/functions/strings";
 import { portsb } from "@/assets/functions/ports";
 import toast from "@/assets/functions/toast";

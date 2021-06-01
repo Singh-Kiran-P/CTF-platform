@@ -142,8 +142,8 @@ import Collapse from '@/components/Collapse.vue';
 import IconButton from '@/components/IconButton.vue';
 import StatusButton from '@/components/StatusButton.vue';
 import { nextOrder, moveDown } from '@/assets/functions/list';
-import { state, validInput, validForm, validate, Category, Tag, Page, Sponsor, Form, isf } from '@shared/validation/configForm';
-import { serialize } from '@shared/objectFormdata';
+import { state, validInput, validForm, validate, Category, Tag, Page, Sponsor, Form, isf } from '@/shared/src/validation/configForm';
+import { serialize } from '@/shared/src/objectFormdata';
 import path from 'path';
 
 type Editable = { editable?: boolean };
@@ -315,7 +315,7 @@ span.info {
     .item-category ~ span:not(.item-value), .item-category ~ .invalid-feedback {
         width: 100%;
     }
-    
+
     .b-form-file.half:first-of-type {
         margin-right: var(--margin);
     }

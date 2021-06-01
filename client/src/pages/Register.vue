@@ -52,8 +52,8 @@
 import Vue from 'vue';
 import axios from 'axios';
 import StatusButton from '@/components/StatusButton.vue';
-import { validateUsername, validatePassword, validForm, Form } from '@shared/validation/registerForm';
-import { state, is } from '@shared/validation';
+import { validateUsername, validatePassword, validForm, Form } from '@/shared/src/validation/registerForm';
+import { state, is } from '@/shared/src/validation';
 
 export default Vue.extend({
     name: 'Register',
@@ -76,7 +76,7 @@ export default Vue.extend({
         usernameError: '',
         categoryFeedback: ''
     }),
-    
+
     computed: {
         usernameFeedback(): string { return this.usernameError || validateUsername(this.form.username, false); },
         passwordFeedback(): string { return validatePassword(this.form.password, this.form.confirmPassword, false); },

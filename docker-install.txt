@@ -1,6 +1,5 @@
 # @author Kiran Singh
 
-
 apt-get update
 
 apt-get install \
@@ -26,4 +25,3 @@ chmod +x nodesource_setup.sh
 apt-get install -y nodejs
 
 cd /
-

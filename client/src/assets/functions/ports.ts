@@ -1,6 +1,6 @@
 // functions to get all ports from a response
 
-import { is } from '@shared/validation';
+import { is } from '@/shared/src/validation';
 
 type PortsA = {
     [string: string]: { HostPort: string }[]

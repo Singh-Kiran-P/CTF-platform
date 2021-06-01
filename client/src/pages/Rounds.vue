@@ -3,7 +3,7 @@
     <div v-else class=rounds>
         <div v-if="joinTeam">
             <span class=center>You have to be part of a team to join the competition</span>
-            <router-link class=center :to="{ name: 'Team' }">Create or join a team</router-link>
+            <router-link class=center :to="{ name: 'Your Team' }">Create or join a team</router-link>
         </div>
         <div v-else-if="rounds.length == 0">
             <span class=center>The competition does not yet have any rounds</span>
@@ -127,10 +127,10 @@ import axios from 'axios';
 import Loading from '@/components/Loading.vue';
 import Tooltip from '@/components/Tooltip.vue';
 import Collapse from '@/components/Collapse.vue';
-import { Tag } from '@shared/validation/configForm';
+import { Tag } from '@/shared/src/validation/configForm';
 import AdminHeader from '@/components/AdminHeader.vue';
 import { toggledItems, loadItems } from '@/assets/functions/list';
-import { Round, Challenge, validForm, validChallenges } from '@shared/validation/roundsForm';
+import { Round, Challenge, validForm, validChallenges } from '@/shared/src/validation/roundsForm';
 import { typeName, typeDescription, solvePoints, solveNames, durationDisplay, countdownDisplay } from '@/assets/functions/strings';
 
 type Visible = { visible?: boolean };
@@ -270,7 +270,7 @@ $min-column-width: calc(var(--breakpoint-sm) / 2);
         -moz-columns: 0 1;
         columns: 0 1;
     }
-    
+
     & > * {
         padding-bottom: var(--double-margin);
         -webkit-column-break-inside: avoid;
