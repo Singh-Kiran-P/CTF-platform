@@ -88,7 +88,7 @@ router.get('/infoDashboard/:uuid', (req, res) => {
         team.getPlacement().then((place: number) => {
             data.placement = place;
             return res.json({ info: data, isMember: isMember, isCaptain: isCaptain, isAdmin: isAdmin });
-        }).catch((err) => res.json({ error: 'Error retrieving placement' }));
+        }).catch((err) => res.json({ error: err + 'Error retrieving placement' }));
     }).catch((err) => res.json({ error: 'Team not found' }));
 });
 
@@ -113,10 +113,11 @@ router.get('/getSolves/:uuid', (req, res) => {
 
     DB.repo(Team).findOne({ where: { id: uuid }, relations: ['solves', 'solves.account', 'solves.challenge', 'usedHints', 'usedHints.challenge'] })
         .then(team => {
+            console.log(JSON.stringify(team));
             let solves = team.solves.map(solve => ({
                 id: solve.id,
                 challenge: { name: solve.challenge.name, id: solve.challenge.id },
-                solvedBy: solve.account.name,
+                solvedBy: solve.account?.name || team.name,
                 points: solvePoints(team, solve),
                 time: solve.time
             }));

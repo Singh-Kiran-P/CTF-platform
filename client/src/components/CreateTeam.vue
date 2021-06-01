@@ -4,7 +4,7 @@
             <b-form-group label="Team name" label-for=teamname>
                 <b-form-input
                     id=teamname
-                    type=text
+                    type=text trim
                     v-model="form.teamname"
                     placeholder="Enter team name"
                     :state="state(teamnameFeedback)"
@@ -55,16 +55,13 @@ export default Vue.extend({
                 if(response.data.error) return error(response.data.error);
                 this.createState = 'succes';
                 this.$router.go(0); // page reload
-            }).catch(err => alert(err));
+            }).catch(() => error('Error creating team'));
         },
         validateTeamname(): string {
             if(this.createFeedback != '') return this.createFeedback;
-            let feedback = '';
-            feedback = validateString(this.form.teamname, 'Teamname', 4, 32, false);
-            if(feedback == '' && this.form.teamname.length > 0) {
-                return regexName(this.form.teamname, 'Teamname');
-            }
-            return feedback;
+            let feedback = validateString(this.form.teamname, 'Team name', 3, 32, false);
+            if (feedback) return feedback;
+            return regexName(this.form.teamname, 'Team name');
         },
         resetCreateFeedback() {
             this.createFeedback = "";

@@ -1,9 +1,6 @@
-import DB, { Team, Competition, Category, Challenge, ChallengeType, Tag, Account, Round, Page, TeamRepoCustom, Sponsor, Hint, DockerManagement, DockerOpenPort } from '../database';
+import DB, { Team, Competition, Category, Challenge, ChallengeType, Tag, Account, Round, Page, TeamRepoCustom, Sponsor, Hint, DockerManagement, DockerOpenPort, Question, Solve } from '../database';
 import dotenv from 'dotenv';
-import { Question } from '@shared/validation/roundsForm';
 dotenv.config();
-
-// TODO: good test data
 
 /**
  * loads test entries into the database
@@ -23,13 +20,14 @@ async function loadTestData() {
     ]);
 
     let tags: Tag[] = await save([
-        new Tag({ name: 'Crypto', description: 'Cryptography challenges focus on being able to decrypt encrypted data', order: 1 }),
-        new Tag({ name: 'Networking', description: 'Networking challenges focus on all things to with the internet', order: 2 }),
-        new Tag({ name: 'Programming', description: 'Programming challenges require you to write programs', order: 3 }),
-        new Tag({ name: 'Forensics', description: 'Forensics require you to analyze and dissect given attachments', order: 4 })
+        new Tag({ name: 'Programming', description: 'Programming challenges require you to write programs', order: 1 }),
+        new Tag({ name: 'Crypto', description: 'Cryptography challenges focus on being able to decrypt encrypted data', order: 2 }),
+        new Tag({ name: 'Networking', description: 'Networking challenges focus on all things to with the internet', order: 3 }),
+        new Tag({ name: 'Binary', description: 'These challenhes will have you reverse engineering or exploiting a binary file', order: 4 }),
+        new Tag({ name: 'Forensics', description: 'Forensics require you to analyze and dissect given attachments', order: 5 })
     ]);
 
-    let pages: Page[] = await save([ // TODO
+    let pages: Page[] = await save([
         new Page({ name: 'Home', path: '/', source: '/pages/_page/index.html', order: 1 }),
         new Page({ name: 'About', path: '/about', source: '/pages/about/_page/index.html', order: 2 })
     ]);
@@ -47,20 +45,20 @@ async function loadTestData() {
     admin.admin = true;
     let accounts: Account[] = await save([
         admin,
-        new Account('Edward', 'password', categories[0]),
-        new Account('Johnathan', 'password', categories[0]),
-        new Account('Jeff', 'password', categories[0]),
-        new Account('Michael', 'password', categories[0]),
-        new Account('Thomas', 'password', categories[1]),
-        new Account('John', 'password', categories[1]),
-        new Account('Bob', 'password', categories[1]),
-        new Account('Brent', 'password', categories[1]),
-        new Account('Jay', 'password', categories[1]),
-        new Account('Bob', 'password', categories[1]),
-        new Account('Tim', 'password', categories[2]),
-        new Account('Boris', 'password', categories[2]),
-        new Account('Chad', 'password', categories[2]),
-        new Account('Ronald', 'password', categories[2])
+        new Account('Edward', 'pass', categories[0]),
+        new Account('Johnathan', 'pass', categories[0]),
+        new Account('Jeff', 'pass', categories[0]),
+        new Account('Michael', 'pass', categories[0]),
+        new Account('Thomas', 'pass', categories[1]),
+        new Account('John', 'pass', categories[1]),
+        new Account('Bob', 'pass', categories[1]),
+        new Account('Brent', 'pass', categories[1]),
+        new Account('Jay', 'pass', categories[1]),
+        new Account('Jonas', 'pass', categories[1]),
+        new Account('Tim', 'pass', categories[2]),
+        new Account('Boris', 'pass', categories[2]),
+        new Account('Chad', 'pass', categories[2]),
+        new Account('Ronald', 'pass', categories[2])
     ]);
 
     const teamRepo = new TeamRepoCustom();
@@ -79,41 +77,48 @@ async function loadTestData() {
         name: name, folder: '/rounds/' + name.toLowerCase(), description: description, start: new Date(t + start).toJSON(), end: new Date(t + end).toJSON()
     });
 
-    let rounds: Round[] = await save([ // TODO DATES
-        round('The very beginning', 'In this round you will be getting familiar with the flow of a CTF competition.', -o / 2, o / 2),
-        round('The first hardships', 'Things will start to get harder in this round, try to keep up!', o * 2, o * 4),
-        round('A real challenge', 'Hope things weren\'t too hard so far, because they are getting even harder!', o * 7, o * 10),
-        round('The final stretch', 'Don\'t give up now! This is the last round', o * 12, o * 14)
+    let rounds: Round[] = await save([
+        round('The very beginning', 'In this round you will be getting familiar with the flow of a CTF competition.', -o * 3, -o * 2.5),
+        round('The first hardships', 'Things will start to get harder in this round, try to keep up!', -o * 2, o * 1),
+        round('A real challenge', 'Hope things weren\'t too hard so far, because they are getting even harder!', o * 4, o * 8),
+        round('The final stretch', 'Don\'t give up now! This is the last round', o * 9, o * 11)
     ]);
 
-    const challenge = (order: number, round: number, tag: number, type: ChallengeType,
-                       name: string, description: string, points: number, flag: string, attachment: string, lock: number) => new Challenge({
-        order: order, round: rounds[round], tag: tags[tag], type: type, name: name, description: description, points: points, flag: flag, attachment: attachment, lock: lock,
-        docker: '', dockerImageId: '', innerPorts: ''
+    const challenge = (order: number, round: number, tag: number, quiz: boolean, points: number, flag: string, lock: number,
+                       attachment: string, name: string, description: string) => new Challenge({
+        order: order, round: rounds[round], tag: tags[tag], type: quiz ? ChallengeType.QUIZ : ChallengeType.BASIC, name: name, description: description, points: points, flag: flag,
+        attachment: attachment, lock: lock, docker: '', dockerImageId: '', innerPorts: ''
     });
 
-    let challenges: Challenge[] = await save([ // TODO
-        challenge(1, 0, 0, ChallengeType.BASIC, 'name1', 'description', 5, 'FLAG', '', -1),
-        challenge(2, 0, 0, ChallengeType.BASIC, 'name2', 'description', 5, 'FLAG', '', -1),
-        challenge(3, 1, 0, ChallengeType.BASIC, 'name3', 'description', 5, 'FLAG', '', -1),
-        challenge(4, 1, 0, ChallengeType.BASIC, 'name4', 'description', 5, 'FLAG', '', -1),
-        challenge(5, 1, 0, ChallengeType.BASIC, 'name5', 'description', 5, 'FLAG', '', -1),
-        challenge(6, 2, 0, ChallengeType.BASIC, 'name6', 'description', 5, 'FLAG', '', -1),
-        challenge(7, 2, 0, ChallengeType.BASIC, 'name7', 'description', 5, 'FLAG', '', -1),
-        challenge(8, 2, 0, ChallengeType.BASIC, 'name8', 'description', 5, 'FLAG', '', -1),
-        challenge(9, 2, 0, ChallengeType.BASIC, 'name9', 'description', 5, 'FLAG', '', -1),
-        challenge(10, 3, 0, ChallengeType.BASIC, 'name10', 'description', 5, 'FLAG', '', -1),
-        challenge(11, 3, 0, ChallengeType.BASIC, 'name11', 'description', 5, 'FLAG', '', -1),
-        challenge(12, 3, 0, ChallengeType.BASIC, 'name12', 'description', 5, 'FLAG', '', -1)
+    let challenges: Challenge[] = await save([
+        challenge(1, 0, 0, false, 2, 'FLAG', -1, '', 'Two sum', 'Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target. You may assume that each input would have exactly one solution, and you may not use the same element twice. You can return the answer in any order.'),
+        challenge(2, 0, 2, false, 3, 'FLAG', -1, '', 'Substring no repeating chars', 'Given a string s, find the length of the longest substring without repeating characters.'),
+        challenge(1, 1, 3, false, 5, 'FLAG', -1, '/median of 2 sorted arrays/attachment/images.zip', 'Median of 2 sorted arrays', 'Given two sorted arrays nums1 and nums2 of size m and n respectively, return the median of the two sorted arrays. The overall run time complexity should be O(log (m+n)).'),
+        challenge(2, 1, 3, false, 6, 'FLAG', -1, '/zigzag conversion/attachment/images.zip', 'ZigZag conversion', 'The string "PAYPALISHIRING" is written in a zigzag pattern on a given number of rows like this: (you may want to display this pattern in a fixed font for better legibility)'),
+        challenge(3, 1, 1, true, 10, 'FLAG', 2, '', 'Regular Expression Matching', 'Given an input string (s) and a pattern (p), implement regular expression matching with support for \'.\' and \'*\' where:  \'.\' Matches any single character.​​​​ \'*\' Matches zero or more of the preceding element. The matching should cover the entire input string (not partial).'),
+        challenge(1, 2, 4, false, 7, 'FLAG', -1, '', 'Letter Combinations Phone Number', 'Given a string containing digits from 2-9 inclusive, return all possible letter combinations that the number could represent. Return the answer in any order. A mapping of digit to letters (just like on the telephone buttons) is given below. Note that 1 does not map to any letters.'),
+        challenge(2, 2, 4, false, 10, 'FLAG', 1, '', 'Longest common prefix', 'Write a function to find the longest common prefix string amongst an array of strings. If there is no common prefix, return an empty string "".'),
+        challenge(3, 2, 2, false, 15, 'FLAG', 2, '', 'Remove Nth Node From End of List', 'Given the head of a linked list, remove the nth node from the end of the list and return its head. Follow up: Could you do this in one pass?'),
+        challenge(4, 2, 1, false, 20, 'FLAG', 3, '', 'Remove Duplicates from Sorted', 'Given a sorted array nums, remove the duplicates in-place such that each element appears only once and returns the new length. Do not allocate extra space for another array, you must do this by modifying the input array in-place with O(1) extra memory.'),
+        challenge(1, 3, 3, false, 10, 'FLAG', -1, '', 'Substring with Concatenation',  'You are given a string s and an array of strings words of the same length. Return all starting indices of substring(s) in s that is a concatenation of each word in words exactly once, in any order, and without any intervening characters. You can return the answer in any order.'),
+        challenge(2, 3, 0, false, 10, 'FLAG', 1, '', 'Valid Sudoku',  'Determine if a 9 x 9 Sudoku board is valid. Only the filled cells need to be validated according to the following rules:'),
+        challenge(3, 3, 3, false, 10, 'FLAG', 1, '', 'Pow(x, n)',  'Implement pow(x, n), which calculates x raised to the power n (i.e., xn).')
     ]);
 
-    let hints: Hint[] = await save([ // TODO
-        
+    let hints: Hint[] = await save([
+        new Hint({ challenge: challenges[3], order: 1, cost: 1, name: 'Tip to get you started', content: 'Maybe try to swap some things around' }),
+        new Hint({ challenge: challenges[3], order: 2, cost: 4, name: 'Only for if you are stuck', content: 'You have to recusively converse the zig zag by swapping the values of neighbouring characters' })
     ]);
 
-    let questions: Question[] = await save([ // TODO
-
+    let questions: Question[] = await save([
+        new Question({ quiz: challenges[4], accuracy: 80, order: 1, question: 'What does this regex do? \'/([a-zA-Z0-9+)/g\'', answer: 'returns all numbers and letters\nreturns all letters and numbers\nnumbers and letters\nletters and numbers\nalphanumeric characters' }),
+        new Question({ quiz: challenges[4], accuracy: 100, order: 2, question: 'Does this string match the regex? \'alphanumeric string\' \'/([a-zA-Z0-9+)/g\'', answer: 'no' })
     ]);
+
+    let max = new Date().getTime();
+    let min = new Date(rounds[1].start).getTime();
+    let r = (l: number, u: number) => Math.floor(Math.random() * (u - l + 1) + l);
+    await save([...Array(6).keys()].map(() => new Solve(challenges[r(2, 4)], teams[r(0, 5)], new Date(r(min, max)).toJSON())));
 
     let dockerManagement: DockerManagement = (await save([
         new DockerManagement(1000, 5000)

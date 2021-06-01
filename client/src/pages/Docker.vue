@@ -78,7 +78,7 @@
             <Tooltip
                 center
                 below
-                content="Portainer explanation is a third party docker manager"
+                content="Portainer is a third party docker manager"
                 class="link-tooltip"
             >
                 <a :href="`${domain}:9000`" target="_blank">Portainer</a>
@@ -331,8 +331,6 @@ export default Vue.extend({
             axios
                 .get("/api/docker/images")
                 .then((res) => {
-                    console.log(res.data);
-
                     this.loadingImages = false;
                     if (!res.data) return;
                     this.images = res.data.map((item: any) => ({

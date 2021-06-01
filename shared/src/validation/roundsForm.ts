@@ -37,7 +37,7 @@ const validQuestions = (questions?: Question[], create?: boolean): boolean => {
 };
 
 const validate = {
-    rounds: (rounds: Round[]): string => validateList(rounds, 'round', true),
+    rounds: (rounds: Round[]): string => validateList(rounds, 'round', false),
     challenges: (challenges?: Challenge[]): string => challenges ? validateList(challenges, 'challenge', true) : '',
     hints: (hints?: Hint[]): string => hints ? validateList(hints, 'hint', false) : '',
     questions: (questions?: Question[]): string => questions ? validateList(questions, 'question', true) : '',

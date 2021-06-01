@@ -68,8 +68,7 @@ export class DockerController {
      * @category Routes
      */
     public deleteContainer_POST(req: Request, res: Response) {
-        let name = req.fields.name.toString()
-        console.log(name);
+        let name = req.fields.name.toString();
         this.stopContainerById(name)
             .then(() => {
                 this.removeContainerById(name)
@@ -124,7 +123,6 @@ export class DockerController {
      */
     public saveUsedPorts_POST(req: Request, res: Response) {
         let ports = req.fields.ports.toString().split(",").map(p => Number.parseInt(p.trim())).filter(p => p && !isNaN(p));
-        console.log(ports);
 
         const dockerOpenPortRepo = DB.repo(DockerOpenPort);
         Promise.all(ports.map(p => dockerOpenPortRepo.save(new DockerOpenPort(p))))
@@ -140,8 +138,6 @@ export class DockerController {
     */
     public containers_GET(req: Request, res: Response) {
         docker.listContainers((err, containers) => {
-            console.log(err);
-            console.log(containers);
             res.json(containers);
         });
     }
@@ -500,7 +496,6 @@ export class DockerController {
                 pump(
                     build(path, { t: dockerChallengeName })
                         .on("complete", (id: any) => {
-                            // console.log(id);
                             return resolve(id);
                         }),
                     process.stdout,
@@ -524,12 +519,8 @@ export class DockerController {
             docker.getImage(imageId)
                 .remove({ force: { true: 'true' } }, (err, res) => {
                     if (err) {
-                        console.log({ error: err, message: err, statusCode: 404 });
-
                         return reject({ error: "Can not delete image", message: err.json.message, statusCode: 404 });
                     }
-                    console.log(res);
-
                     resolve();
                 })
         })

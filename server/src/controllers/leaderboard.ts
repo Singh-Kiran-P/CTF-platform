@@ -91,6 +91,7 @@ export class LeaderBoardController {
 
             for (const team of teamsData) {
                 let sum = 0;
+                team.scores.sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime());
                 team.scores = team.scores.map(score => {
                     sum += score.score;
                     return Object.assign({}, score, { score: sum });

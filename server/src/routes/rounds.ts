@@ -40,30 +40,18 @@ router.put('/save', isAdmin, (req, res) => {
         });
 
     type ListsType = { hints: VHint[], questions: VQuestion[] };
-    const error = (err: any, action: string): any => { console.log('Error ' + action + ': ' + err); res.json({ error: `Error ${action}` }); };
+    const error = (action: string): any => res.json({ error: `Error ${action}` });
     const lists = (c: ListsType): ListsType => ({ hints: c?.hints, questions: c?.questions });
-    console.log('starting');
     roundUploads.then(() => Promise.all(challengeUploads).then(() => {
-        console.log('uploads done');
         DB.setRepo(DB.repo(Round), data.rounds.map(x => new Round(x)), {}, x => [x.folder], true).then(rounds => {
-            console.log('rounds done');
             let challengeRounds = rounds.map(x => Object.assign({}, x, { challenges: data.rounds.find(y => y.name == x.name)?.challenges })).filter(x => x.challenges);
-            if (challengeRounds.length == 0) { console.log('save done'); res.send(); } else challengeRounds.forEach((round, i) => {
+            if (challengeRounds.length == 0) res.send(); else challengeRounds.forEach((round, i) => {
                 Promise.all(round.challenges.map((c: Challenge & VChallenge) => c.type != ChallengeType.INTERACTIVE ? Docker.deleteImage(c.dockerImageId) : (!c.dockerFile ? null : chain(
-                    () => console.log('starting docker delete'),
                     () => Docker.deleteImage(c.dockerImageId),
-                    () => console.log('docker delete done'),
-                    () => console.log('starting docker make'),
-                    () => Docker.makeImage(uploaddir + round.folder + parentDir(c.docker), `${i}-${c.order}-${new Date().getTime()}`).then(id => {
-                        c.dockerImageId = id;
-                        console.log('docker image id assigned: ' + id);
-                    }),
-                    () => console.log('docker make done'))
+                    () => Docker.makeImage(uploaddir + round.folder + parentDir(c.docker), `${i}-${c.order}-${new Date().getTime()}`).then(id => { c.dockerImageId = id; }))
                 ))).then(() => {
-                    console.log('docker done');
                     let challenges = round.challenges.map(x => new Challenge(Object.assign({}, x, { round: round })));
                     DB.setRepo(DB.repo(Challenge), challenges, { where: { round: round } }, x => cfolder(x) ? [uploaddir + round.folder + cfolder(x)] : [], true).then(challenges => {
-                        console.log('challenges done');
                         Promise.all(challenges.map(x => Object.assign({}, x, lists(round.challenges.find(y => y.order == x.order)))).map(challenge => {
                             let hints = challenge.hints?.map(x => Object.assign({}, new Hint(x), { challenge: challenge }));
                             let questions = challenge.type == ChallengeType.QUIZ ? challenge.questions?.map(x => Object.assign({}, new Question(x), { quiz: challenge })) : [];
@@ -71,12 +59,12 @@ router.put('/save', isAdmin, (req, res) => {
                                 hints == undefined ? null : DB.setRepo(DB.repo(Hint), hints, { where: { challenge: challenge } }),
                                 questions == undefined ? null : DB.setRepo(DB.repo(Question), questions, { where: { quiz: challenge } })
                             ]);
-                        })).then(() => { console.log('save done'); res.send(); }).catch(err => error(err, 'saving'));
-                    }).catch(err => error(err, 'saving'));
-                }).catch(err => error(err, 'uploading'));
+                        })).then(() => res.send()).catch(() => error('saving'));
+                    }).catch(() => error('saving'));
+                }).catch(() => error('uploading'));
             });
-        }).catch(err => error(err, 'saving'));
-    }).catch(err => error(err, 'uploading'))).catch(err => error(err, 'uploading'));
+        }).catch(() => error('saving'));
+    }).catch(() => error('uploading'))).catch(() => error('uploading'));
 });
 
 export default { path: '/rounds', router };

@@ -65,7 +65,8 @@ export class Team {
     }
     getPlacement(): Promise<number> {
         return new Promise<number>(async (resolve, reject)=> {
-            DB.repo(Team).find({relations: ['accounts', 'solves', 'solves.challenge', 'solves.challenge.usedHints', 'solves.challenge.usedHints.team']}).then((teamsDB: Team[]) => {
+            DB.repo(Team).find({relations: ['accounts', 'solves', 'solves.challenge', 'usedHints', 'usedHints.challenge']}).then((teamsDB: Team[]) => {
+                if (!teamsDB) reject('No teams');
                 let currentCat = this.getCategory();
                 let currentPoints = this.getPoints();
                 let placement = teamsDB.filter(t => t.id != this.id && t.getCategory().id == currentCat.id).reduce((acc, cur) => {
