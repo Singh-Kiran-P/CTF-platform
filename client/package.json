@@ -21,29 +21,20 @@
         "concurrently": "^6.0.0",
         "core-js": "^3.12.1",
         "dotenv": "^8.2.0",
-        "object-to-formdata": "^4.1.0",
-        "regenerator-runtime": "^0.13.7",
         "socket.io-client": "^4.0.2",
         "sweetalert2": "^10.15.7",
         "swiper": "^6.6.2",
         "vue": "^2.6.12",
-        "vue-3-socket.io": "^1.0.2",
         "vue-carousel": "^0.18.0",
-        "vue-carousel-3d": "^1.0.1",
-        "vue-class-component": "^7.0.2",
         "vue-easy-slider": "^5.3.4",
         "vue-fontawesome": "^0.0.2",
         "vue-meta": "^2.4.0",
         "vue-property-decorator": "^8.1.0",
         "vue-router": "^3.2.0",
-        "vue-slick-carousel": "^1.0.6",
         "vue-socket.io": "^3.0.10",
         "vue-socket.io-extended": "^4.2.0",
         "vue-sweetalert2": "^4.2.1",
-        "vuelidate": "^0.7.6",
-        "vueperslides": "^3.3.0",
-        "vuex": "^3.6.2",
-        "vuex-class": "^0.3.2"
+        "vuelidate": "^0.7.6"
     },
     "devDependencies": {
         "@vue/cli-plugin-babel": "~4.5.12",
@@ -55,11 +46,7 @@
         "typescript": "~4.1.5",
         "vue-template-compiler": "^2.6.11",
         "@types/axios": "^0.14.0",
-        "@types/jest": "^23.1.4",
-        "@vue/cli-plugin-unit-jest": "^3.7.0",
-        "@vue/test-utils": "1.0.0-beta.29",
-        "babel-core": "7.0.0-bridge.0",
-        "ts-jest": "^23.0.0"
+        "babel-core": "7.0.0-bridge.0"
     },
     "browserslist": [
         "> 1%",

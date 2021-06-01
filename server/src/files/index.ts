@@ -1,4 +1,3 @@
-import { uploaddir } from '../routes/uploads';
 import { File as UFile } from 'formidable';
 import { is } from '@shared/validation';
 import fse, { mkdir } from 'fs-extra';
@@ -6,6 +5,8 @@ import extract from 'extract-zip';
 import { ncp } from 'ncp';
 import path from 'path';
 import fs from 'fs';
+
+const uploaddir = '/server/uploads';
 
 const parentDir = (p: string, n: number = 1): string => p.length > 1 ? (n == 0 ? p : parentDir(path.dirname(p), n - 1)) : '';
 const fileName = (p: string): string => p ? path.basename(p) : '';

@@ -38,13 +38,11 @@ app.all(/./, (_, __, next) => {
     else DB.once('connect', () => next());
 });
 
-// serve docs
+// static serving files
 app.use('/docs', express.static(path.join(__dirname, "../../../", 'docs')));
 app.use('/docs-routes', express.static(path.join(__dirname, "../../../", 'routes-docs')));
-
-
-//to fetch images
 app.use('/sponsors', express.static(path.join(__dirname, "../../../" , 'uploads', 'sponsors')));
+app.use('/pages', express.static(path.join(__dirname, "../../../" , 'uploads', 'pages')));
 
 // register all routes
 routes.forEach(route => app.use(route.path, route.router));
