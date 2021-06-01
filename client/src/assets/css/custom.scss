@@ -203,15 +203,19 @@ input, textarea, select {
             color: var(--black-c);
             border-color: var(--gray-half-c);
 
+            & > span, & > a {
+                max-width: 100%;
+            }
+
             &, span {
-                overflow: hidden;
-                white-space: nowrap;
+                overflow: hidden !important;
+                white-space: nowrap !important;
             }
 
             &:hover {
-                &, & span {
-                    overflow: initial;
-                    overflow-y: auto;
+                &, & > span, & > a {
+                    overflow: initial !important;
+                    overflow-y: auto !important;
                 }
             }
         }

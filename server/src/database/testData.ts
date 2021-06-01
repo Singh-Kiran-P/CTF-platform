@@ -46,25 +46,22 @@ async function loadTestData() {
 
     let admin = new Account('admin', process.env.ADMIN_PASSWORD);
     admin.admin = true;
-    let captains: Account[] = await save([
+    let accounts: Account[] = await save([
         admin,
         new Account('Edward', 'password', categories[0]),
+        new Account('Thomas', 'password', categories[1]),
         new Account('John', 'password', categories[1]),
         new Account('Bob', 'password', categories[1]),
+        new Account('Tim', 'password', categories[2]),
         new Account('Ronald', 'password', categories[2])
     ]);
 
     const teamRepo = new TeamRepoCustom();
     let teams: Team[] = await Promise.all([
-        teamRepo.saveWithCaptain('Edward\'s team', captains[1]),
-        teamRepo.saveWithCaptain('Johmas', captains[2]),
-        teamRepo.saveWithCaptain('Bob the coder', captains[3]),
-        teamRepo.saveWithCaptain('Roland and Tim', captains[4])
-    ]);
-
-    let users: Account[] = await save([
-        new Account('Thomas', 'password', categories[1], teams[1]),
-        new Account('Tim', 'password', categories[2], teams[3])
+        teamRepo.saveWithCaptain('Edward\'s team', accounts[1], []),
+        teamRepo.saveWithCaptain('Johmas', accounts[2], [accounts[3]]),
+        teamRepo.saveWithCaptain('Bob the coder', accounts[4], []),
+        teamRepo.saveWithCaptain('Roland and Tim', accounts[5], [accounts[6]])
     ]);
 
     const round = (name: string, description: string, start: Date, end: Date) => new Round({
