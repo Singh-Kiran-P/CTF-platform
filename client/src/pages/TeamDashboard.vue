@@ -1,7 +1,7 @@
 <template>
     <Loading v-if="isLoading"/>
     <div v-else-if="error">
-        <span class=top-error>{{error}}Something went wrong, return to the <router-link :to="{ name: 'Teams' }">teams page</router-link></span>
+        <span class=top-error>Something went wrong, return to the <router-link :to="{ name: 'Teams' }">teams page</router-link></span>
     </div>
     <div v-else class=dashboard>
         <div>

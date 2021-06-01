@@ -113,7 +113,6 @@ router.get('/getSolves/:uuid', (req, res) => {
 
     DB.repo(Team).findOne({ where: { id: uuid }, relations: ['solves', 'solves.account', 'solves.challenge', 'usedHints', 'usedHints.challenge'] })
         .then(team => {
-            console.log(JSON.stringify(team));
             let solves = team.solves.map(solve => ({
                 id: solve.id,
                 challenge: { name: solve.challenge.name, id: solve.challenge.id },
