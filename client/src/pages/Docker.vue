@@ -282,8 +282,6 @@ export default Vue.extend({
         },
     },
     methods: {
-        state,
-
         portInput(): void {
             this.saveState = "normal";
             this.cancelState = "normal";
