@@ -22,10 +22,7 @@ class Database extends EventEmitter {
 
     constructor() {
         super();
-        if (process.env.DB_RESET_DATA.endsWith('loading')) {
-            setTimeout(() => this.emit('connect'), 2000);
-            return;
-        }
+        if (process.env.DB_RESET_DATA.endsWith('loading')) return;
         process.env.DB_RESET_DATA += ' loading';
         this.connect();
     }
