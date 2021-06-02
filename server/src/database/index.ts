@@ -22,6 +22,11 @@ class Database extends EventEmitter {
 
     constructor() {
         super();
+        if (process.env.DB_RESET_DATA.endsWith('loading')) {
+            setTimeout(() => this.emit('connect'), 2000);
+            return;
+        }
+        process.env.DB_RESET_DATA += ' loading';
         this.connect();
     }
 
@@ -52,18 +57,19 @@ class Database extends EventEmitter {
             synchronize: true,
             logging: (process.env.DB_LOGGING == 'true') ? true : false,
             entities: [
-                path.join(__dirname, '/entities/*/*.js')
+                path.join(__dirname, '/entities/*/*{.js,.ts}')
             ]
         }).then(async conn => {
             this.conn = conn;
             await this.conn.query(`SET search_path TO ${process.env.DB_SCHEMA};`);
             let connect = async (loaded: boolean) => {
-                if (!loaded || process.env.DB_RESET_DATA == 'true') await loadTestData();
+                let reset = process.env.DB_RESET_DATA.startsWith('true');
+                if (!loaded || reset) await loadTestData();
                 this.emit('connect');
             };
-            this.conn.query('SELECT * from competition').then(async res => {
+            this.conn.query('SELECT * from competition').then(res => {
                 connect(res?.length > 0);
-            }).catch(() => connect(false));
+            }).catch(error => this.emit('error', error));
         }).catch(error => this.emit('error', error));
     }
 

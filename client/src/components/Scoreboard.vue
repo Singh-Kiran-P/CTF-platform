@@ -58,12 +58,15 @@ export default Vue.extend({
     }),
     created() {
         this.$socket.$subscribe(this.category, (data: any) => {
-            let team = this.teams.find((team) => team.uuid == data.teamId);
-            if (!team) return;
-            let len = Math.max(team.scores.length - 1, 0);
-            this.chart.series.getIndex(0)?.addData({
-                date: new Date(data.timestamp),
-                score: team.scores[len].score + data.score,
+            let i = this.teams.findIndex((team) => team.uuid == data.teamId);
+            if (i < 0) return;
+            let len = this.teams[i].scores.length;
+            let score = (this.teams[i].scores[len - 1]?.score || 0) + data.score;
+            this.teams[i].scores.push(score);
+            this.teams[i].total = score;
+            this.chart.series.getIndex(i)?.addData({
+                time: new Date(data.timestamp),
+                score: score
             });
         });
 
