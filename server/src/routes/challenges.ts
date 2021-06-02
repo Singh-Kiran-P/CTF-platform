@@ -1,4 +1,4 @@
-import DB, { Challenge, Round, Solve, Question, Hint, UsedHint, Attempt, AttemptType, solveAvailable, Account, Team } from '../database';
+import DB, { Challenge, Round, Solve, Question, Hint, UsedHint, Attempt, AttemptType, solveAvailable, Account, Team, ChallengeType } from '../database';
 import { LeaderBoardController } from "../controllers/leaderboard";
 import { DockerController } from "../controllers/docker";
 import { getAccount, isAuth } from '../auth/index';
@@ -135,7 +135,7 @@ const attempt = (res: express.Response, account: Account, team: Team, challenge:
             DB.repo(Solve).save(new Solve(challenge, team, new Date().toJSON(), account)).then(solve => {
                 if (!solve) return res.json(error(true));
                 let solved = responseSolve(challenge, solve);
-                controller.stopContainer(challenge.id.toString(), team.id, false);
+                if (challenge.type == ChallengeType.INTERACTIVE) controller.stopContainer(challenge.id.toString(), team.id, false);
                 socketEmit('solved', challenge, next?.i, team, account, content, solved.points, solve.time);
                 leaderboardController.updateLeaderboard(account, solved.points, solved.time);
                 res.send({ solved: solved });
