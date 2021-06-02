@@ -62,9 +62,10 @@ export default Vue.extend({
             if (!team) return;
             let len = Math.max(team.scores.length - 1, 0);
             this.chart.series.getIndex(0)?.addData({
-                date: new Date(data.timestamp),
+                time: new Date(data.timestamp),
                 score: team.scores[len].score + data.score,
             });
+            team.total += data.score;
         });
 
         this.$root.$on('rangeChanged', (cat: string, data: any) => {
