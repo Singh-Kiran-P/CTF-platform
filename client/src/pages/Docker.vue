@@ -240,10 +240,10 @@ export default Vue.extend({
             return !this.lowerbound || !this.upperbound;
         },
         cancelDisabled(): boolean {
-            return this.empty;
+            return this.empty || this.saveState == "loading";
         },
         saveDisabled(): boolean {
-            return this.empty || !state(this.validatePorts);
+            return this.empty || !state(this.validatePorts) || this.cancelState == "loading";
         },
         validatePorts(): string {
             let minPort = 1000;
@@ -300,6 +300,7 @@ export default Vue.extend({
                     this.lowerbound = Number(res.data.lowerBoundPort);
                     this.upperbound = Number(res.data.upperBoundPort);
                     this.cancelState = "succes";
+                    this.saveState = "succes";
                 })
                 .catch(() => error());
         },
@@ -320,6 +321,7 @@ export default Vue.extend({
                         res2.data.statusCode == 404
                     )
                         return error();
+                    this.cancelState = "succes";
                     this.saveState = "succes";
                     this.excluded = "";
                 })
