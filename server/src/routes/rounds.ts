@@ -61,7 +61,7 @@ router.put('/save', isAdmin, (req, res) => {
                             ]);
                         })).then(() => res.send()).catch(() => error('saving'));
                     }).catch(() => error('saving'));
-                }).catch(() => error('uploading'));
+                }).catch(err => error(err));
             });
         }).catch(() => error('saving'));
     }).catch(() => error('uploading'))).catch(() => error('uploading'));
