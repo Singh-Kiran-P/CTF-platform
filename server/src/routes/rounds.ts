@@ -61,7 +61,7 @@ router.put('/save', isAdmin, (req, res) => {
                             ]);
                         })).then(() => res.send()).catch(() => error('saving'));
                     }).catch(() => error('saving'));
-                }).catch(err => error(err));
+                }).catch(err => res.json(Object.assign({}, err, { error: 'Error uploading' })));
             });
         }).catch(() => error('saving'));
     }).catch(() => error('uploading'))).catch(() => error('uploading'));
