@@ -24,4 +24,4 @@ chmod +x nodesource_setup.sh
 ./nodesource_setup.sh
 apt-get install -y nodejs
 
-cd /
+cd / 
